@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/ch16/schI" {
+  within "/us/usc/t45/ch16"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch16/schI" subchapter {
+    num "I" "SUBCHAPTER I—"
+    heading "GENERAL PROVISIONS"
+    member "/us/usc/t45/s701"
+    member "/us/usc/t45/s702"
+    hash "99f304e47b5a95a10fcfeef79d44e993cb7b61f623098498994a2985eac97f2c"
+  }
+  layers {
+    operative "99f304e47b5a95a10fcfeef79d44e993cb7b61f623098498994a2985eac97f2c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

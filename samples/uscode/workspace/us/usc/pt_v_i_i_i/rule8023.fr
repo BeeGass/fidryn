@@ -1,0 +1,64 @@
+edition 2
+module "/us/usc/ptVIII/rule8023" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8023" courtRule {
+    num "8023" "Rule 8023."
+    heading "Voluntary Dismissal"
+    provision "/us/usc/ptVIII/rule8023/a" subsection {
+      num "a" "(a)"
+      heading "Stipulated Dismissal."
+      content "The clerk of the district court or BAP must dismiss an appeal if the parties file a signed dismissal agreement specifying how costs are to be paid and pay any court fees that are due."
+      hash "1b2e639251f5c78e5086897a4a964e44bcaee735c346dbd82eee08d76cdc3641"
+    }
+    provision "/us/usc/ptVIII/rule8023/b" subsection {
+      num "b" "(b)"
+      heading "Appellant’s Motion to Dismiss."
+      content "An appeal may be dismissed on the appellant’s motion on terms agreed to by the parties or fixed by the district court or BAP."
+      hash "21360b72407effbc4b0bcdfb97039843dc040cc4ada5ebd90a8082aee6a471ca"
+    }
+    provision "/us/usc/ptVIII/rule8023/c" subsection {
+      num "c" "(c)"
+      heading "Other Relief."
+      content "A court order is required for any relief beyond the dismissal of an appeal—including approving a settlement, vacating an action of the bankruptcy court, or remanding the case to it."
+      hash "7d3b13247227cd84e0ba40d2d4a0842ef5eb7fb8e480338f9dddf718f7d9464e"
+    }
+    provision "/us/usc/ptVIII/rule8023/d" subsection {
+      num "d" "(d)"
+      heading "Court Approval."
+      content "This rule does not alter the legal requirements governing court approval of a settlement, payment, or other consideration."
+      hash "989059c8b120df2ca7d6ae4d185cbf92b4a6ba39d2eb74e3e5ab3d801764aa80"
+    }
+    hash "c8910c7cfe4fcaad7c220ebdd75eb28b337ca604a1d045f3ea2f3da15329c59a"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8023/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8001(c) and F.R.App.P. 42. The provision of the former rule regarding dismissal of appeals in the bankruptcy court prior to docketing of the appeal has been deleted. Now that docketing occurs promptly after a notice of appeal is filed, see Rules 8003(d) and 8004(c), an appeal likely will not be voluntarily dismissed before docketing."
+    p "The rule retains the provision of the former rule that the district or BAP clerk must dismiss an appeal upon the parties’ agreement. District courts and BAPs continue to have discretion to dismiss an appeal on an appellant’s motion. Nothing in the rule prohibits a district court or BAP from dismissing an appeal for other reasons authorized by law, such as the failure to prosecute an appeal."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "6e11a7277f16e74ec396d82f670b3280f667ee5fce4703bbff84ba2f5fbc1543"
+  }
+  note "/us/usc/ptVIII/rule8023/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022 Amendment"
+    p "The amendment is intended to conform the rule to the revised version of Appellate Rule 42(b) on which it was modelled. It clarifies that the fees that must be paid are court fees, not attorney’s fees. The rule does not alter the legal requirements governing court approval of a settlement, payment, or other consideration. See, e.g., Fed. R. Bankr. P. 9019 (requiring court approval of compromise or settlement). The amendment clarifies that any order beyond mere dismissal—including approving a settlement, vacating or remanding—requires a court order."
+    hash "a9b193dfa71e30fcf8eb819d6fcac78a176371ffc4af7a6daced178e23229fca"
+  }
+  note "/us/usc/ptVIII/rule8023/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8023 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "52414ee827e758425c3ee263f59efcaa21bfab50b16bda32e54610e62feda677"
+  }
+  layers {
+    operative "c8910c7cfe4fcaad7c220ebdd75eb28b337ca604a1d045f3ea2f3da15329c59a"
+    enacted "7de90b389f1a3c1c390ac7f4ac052eda5c64b9d0cb5bb5c18b7543b9c1097eb3"
+    editorial "c123147395bc67d4a14d9cbd681e53ae4619f430e4a7fae858011e69ee7f7ee8"
+  }
+}

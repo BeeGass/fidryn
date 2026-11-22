@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s852" {
+  within "/us/usc/t45/ch17/schIII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s852" section {
+    num "852" "§ 852."
+    heading "Repealed. " ["Pub. L. 97–35, title XI, § 1188(e)" -> "/us/pl/97/35/tXI/s1188/e"] ", Aug. 13, 1981, " ["95 Stat. 699" -> "/us/stat/95/699"]
+    status repealed
+    hash "85f60bfa34aebf1f7f36e0487b8a3a00bc6a952024c9f4ab56c0df102c8687dd"
+  }
+  note "/us/usc/t45/s852/note/ungrouped/pl.94.210/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 94–210, title VII, § 702" -> "/us/pl/94/210/tVII/s702"] ", Feb. 5, 1976, " ["90 Stat. 120" -> "/us/stat/90/120"] ", set forth provisions relating to the Operations Review Panel."
+    hash "ff3583dfc351512989e60c73c93f26f3bc7479bc4112715493656a31e1d19f4b"
+  }
+  note "/us/usc/t45/s852/note/statutoryNotes/pl.97.35/effective-date-of-repeal" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date of Repeal"
+    p "Repeal effective Oct. 1, 1981, see " ["section 1189 of Pub. L. 97–35" -> "/us/pl/97/35/s1189"] "."
+    hash "8469a493dc92346625ff60b0df54633d48589384ad504cb437ee36adc4201c2c"
+  }
+  layers {
+    operative "85f60bfa34aebf1f7f36e0487b8a3a00bc6a952024c9f4ab56c0df102c8687dd"
+    enacted "22986d15fbda5c3e0d44f04e0b1535645629df4c5ccdf27997562a7ffea34aa1"
+    editorial "4e111bf7f733ffc507e553432f626a2fe4ae59a06c1052ad076ea15d6da90623"
+  }
+}

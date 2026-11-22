@@ -1,0 +1,54 @@
+edition 2
+module "/us/usc/t45/s920" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s920" section {
+    num "920" "§ 920."
+    heading "Continuation of service"
+    provision "/us/usc/t45/s920/a" subsection {
+      num "a" "(a)"
+      content "Until the occurrence of an event described in subsection (b) of this section, the Milwaukee Railroad (1) shall maintain its entire railroad system, as it existed on October 15, 1979, (2) shall continue no less than the regular level of service provided by it as of that date, and (3) shall not embargo traffic (other than when necessitated by acts of God or safety requirements) or abandon or discontinue service over any part of its railroad system."
+      hash "2fe588130d79b1434a601d1d6ccb1eed2e99f321f52c06b7ef404467bf7d6367"
+    }
+    provision "/us/usc/t45/s920/b" subsection {
+      num "b" "(b)"
+      chapeau "The Milwaukee Railroad shall comply with the requirements of subsection (a) of this section until—"
+      provision "/us/usc/t45/s920/b/1" paragraph {
+        num "1" "(1)"
+        content "an employee or employee-shipper ownership plan is not submitted to the Interstate Commerce Commission within the time period prescribed under " ["section 905(a) of this title" -> "/us/usc/t45/s905/a"] ";"
+        hash "e1c0855b7120380c240fb11af93b9fe8829e8e08ba42f645becac3b59238747d"
+      }
+      provision "/us/usc/t45/s920/b/2" paragraph {
+        num "2" "(2)"
+        content "the proposed plan is found by the Commission not to be feasible or the Commission does not act within 30 days;"
+        hash "a410a8f00a519190a6a900aa005590e882bc6cbff9db48ec4aa929f7cda51ae1"
+      }
+      provision "/us/usc/t45/s920/b/3" paragraph {
+        num "3" "(3)"
+        content "the proposed plan is found by the bankruptcy court not to be fair and equitable to the estate of the Milwaukee Railroad; or"
+        hash "4967112907f6c1c76f20cda3e14b3d8ff13d9a9557aaa660024709970c909248"
+      }
+      provision "/us/usc/t45/s920/b/4" paragraph {
+        num "4" "(4)"
+        content "the plan is not implemented within the time period prescribed under " ["section 905(c) of this title" -> "/us/usc/t45/s905/c"] "."
+        hash "eac09c0b7b8cb4053219ced2602d83521410f90f7a48384c2dd67f74a809166a"
+      }
+      hash "a2bad705db8793c4f55d807633c0664dca6d0669fb39fb2a3c913d7cfeefcf95"
+    }
+    hash "7d9b6f47b330ee77482730832ce8360ba1f845d77b80dc2b9f6dab09d9a2163b"
+  }
+  credit "(" ["Pub. L. 96–101, § 22" -> "/us/pl/96/101/s22"] ", Nov. 4, 1979, " ["93 Stat. 746" -> "/us/stat/93/746"] ".)"
+  note "/us/usc/t45/s920/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  layers {
+    operative "7d9b6f47b330ee77482730832ce8360ba1f845d77b80dc2b9f6dab09d9a2163b"
+    enacted "cea3dafbf5f94ce7ca031751b9d325643b2f01ac3728ffb2ab5ed92bc4d32eae"
+    editorial "906a1c71e795fb84b6dd12dd6cdb0bba43bc04828d13c9e2cbb3b637c9ecb6b3"
+  }
+}

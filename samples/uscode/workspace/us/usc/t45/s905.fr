@@ -1,0 +1,113 @@
+edition 2
+module "/us/usc/t45/s905" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s905" section {
+    num "905" "§ 905."
+    heading "Employee or employee-shipper ownership plan"
+    provision "/us/usc/t45/s905/a" subsection {
+      num "a" "(a)"
+      heading "Submission of plan to Commission; approval; findings"
+      provision "/us/usc/t45/s905/a/1" paragraph {
+        num "1" "(1)"
+        content "No later than December 1, 1979, an association composed of representatives of national railway labor organizations, employee coalitions, and shippers (or any combination of the foregoing) may submit to the Commission a single plan for converting all or a substantial part of the Milwaukee Railroad into an employee or employee-shipper owned company and a method for implementing such plan. The plan shall include a comprehensive evaluation of the prospects for the financial self-sustainability of the Milwaukee Railroad."
+        hash "3cb323ca97594d0d07abd259420b4020232ffb3f35794ee9fd01d60a9fd3bdb5"
+      }
+      provision "/us/usc/t45/s905/a/2" paragraph {
+        num "2" "(2)"
+        content "The Commission shall, within 30 days after the date of submission of a plan under paragraph (1) of this subsection, approve the proposed plan if it finds that such plan is feasible. The finding of the Commission with respect to the feasibility of the plan shall be made pursuant to " ["section 554 of title 5" -> "/us/usc/t5/s554"] "."
+        hash "563fd58ecfff4c227d923830d0fd6bf3239c2ac5a2e3b3483b0ebc71b8e061d3"
+      }
+      provision "/us/usc/t45/s905/a/3" paragraph {
+        num "3" "(3)"
+        chapeau "The Commission shall make a finding that the plan submitted under this section is feasible if it determines that—"
+        provision "/us/usc/t45/s905/a/3/A" subparagraph {
+          num "A" "(A)"
+          content "adequate public and private financing is available to the proponents of such plan;"
+          hash "3ef0a7ef59544388c85bcf2af50e2e52133651d6d9fd2a0d5299d1ff9d6baf63"
+        }
+        provision "/us/usc/t45/s905/a/3/B" subparagraph {
+          num "B" "(B)"
+          content "such plan is fair and equitable to the estate of the Milwaukee Railroad;"
+          hash "2141ef3670c3cdf8ab7eacfaaa2438b21429e0e72fc03264a728f3f06f9e559c"
+        }
+        provision "/us/usc/t45/s905/a/3/C" subparagraph {
+          num "C" "(C)"
+          content "implementation of such plan will occur by April 1, 1980;"
+          hash "98f4176addfae509866abfb9554f676720ba3f93b1d89b86cb1124cd2a65c081"
+        }
+        provision "/us/usc/t45/s905/a/3/D" subparagraph {
+          num "D" "(D)"
+          content "the railroad proposed to be operated under the plan can be operated on a self-sustaining basis; and"
+          hash "341537cc6d0053c15830c7818d875309546965977c6e3f888c6854c8b2a56151"
+        }
+        provision "/us/usc/t45/s905/a/3/E" subparagraph {
+          num "E" "(E)"
+          content "the plan contains an assessment of all operating practices, and includes agreements by labor and management to make implementing changes designed to achieve labor productivity increases (which may include changes in work rules to increase productivity) consistent with safe operations and adequate service."
+          hash "0abd88b09b984298e4446aa7be83f9b20a1c2aade429e6811dff3a84936f7312"
+        }
+        continuation "For purposes of the determinations under this paragraph, adequate financing shall include all sources of private funds, the probable value and priority of valid claims against the estate, and Federal, State, or local funds available under programs (in existence as of January 1, 1980) which are or will be available to the proponent and which the proponent is likely to obtain."
+        hash "53c56f3880edac025f1f54ca8561e881e9c966f14321825542f00e217407633f"
+      }
+      hash "48253dfb9a65c16200d8b131966b81852f90f33a70f34263f0f21773661c9962"
+    }
+    provision "/us/usc/t45/s905/b" subsection {
+      num "b" "(b)"
+      heading "Submission of findings to bankruptcy court"
+      content "If the Commission finds that the plan submitted under this section is feasible, it shall submit its finding to the bankruptcy court. Within 10 days after the date of such submission, the bankruptcy court shall, after a hearing, determine whether such plan is fair and equitable to the estate of the Milwaukee Railroad. The Commission’s determination with respect to that issue shall be rebutted only by clear and convincing evidence."
+      hash "0405108d0435de3b99b1c78178505b17df853410724e86022e461b5cb6048645"
+    }
+    provision "/us/usc/t45/s905/c" subsection {
+      num "c" "(c)"
+      heading "Implementation of plan"
+      content "If the Commission finds that the plan is feasible and the bankruptcy court determines that the plan is fair and equitable to the estate of the Milwaukee Railroad, the proponents of such plan shall implement the plan no later than April 1, 1980."
+      hash "2557097bfff2f6e90cea20daa56bb2e7d454e8c1087bed873327db8aded8f700"
+    }
+    provision "/us/usc/t45/s905/d" subsection {
+      num "d" "(d)"
+      heading "Judicial review"
+      content "Except as provided in this section, the findings of the Commission with respect to the plan shall not be subject to review."
+      hash "5382a7e5721fcaa4640efb5ae15e0769be5b3bc471e5f0541e6e820269f22637"
+    }
+    provision "/us/usc/t45/s905/e" subsection {
+      num "e" "(e)"
+      heading "Furnishing of reports and other information for preparation of plan"
+      provision "/us/usc/t45/s905/e/1" paragraph {
+        num "1" "(1)"
+        chapeau "The trustee of the Milwaukee Railroad shall promptly provide to the person engaged in developing the employee or employee and shipper ownership plan under this section—"
+        provision "/us/usc/t45/s905/e/1/A" subparagraph {
+          num "A" "(A)"
+          content "its most recent reports on the physical condition of the railroad; and"
+          hash "a16345fe56f681b051b5b3559a0ad23b9c6c77a4ac800e343effc06880c9a53c"
+        }
+        provision "/us/usc/t45/s905/e/1/B" subparagraph {
+          num "B" "(B)"
+          content "traffic, revenue, marketing, and other data necessary to determine the amount of the acquisition cost of the railroad or portion of the railroad that would be required to continue rail transportation over the railroad line."
+          hash "b80dc0d2cbd788f87bf7182f9361a5b427cd1c771e39315c83aa00c460096dcf"
+        }
+        hash "1b7d1e706e3ce65048485e1059af673c13f1531e3dfa47fa8593fdc99a12df97"
+      }
+      provision "/us/usc/t45/s905/e/2" paragraph {
+        num "2" "(2)"
+        content "Information provided pursuant to this subsection shall be used only for purposes of preparing a plan and shall not be disclosed to any competitor or, unless necessary in connection with the preparation of the plan, to any customer of the Milwaukee Railroad."
+        hash "22f79918158021dbb88054ff72d58b88bab546c9fffe2fcb93b21717a31e99a5"
+      }
+      hash "8160e20db5c5ff15a84e2cfeacf4c0b1716ea3df6bdf61a9ce44aec621e63745"
+    }
+    hash "c5ab803f775ac39d95178fe98e18907b8d90560ddca597eef9fa8ce9007b3605"
+  }
+  credit "(" ["Pub. L. 96–101, § 6" -> "/us/pl/96/101/s6"] ", Nov. 4, 1979, " ["93 Stat. 738" -> "/us/stat/93/738"] ".)"
+  note "/us/usc/t45/s905/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  layers {
+    operative "c5ab803f775ac39d95178fe98e18907b8d90560ddca597eef9fa8ce9007b3605"
+    enacted "ab097b6210d850a2a9cdced74675ea209d3b04e9e298db06fbf617cd1f098f5d"
+    editorial "ed1ba2fd8126d31b8cfc2abbf0ffb94d9693dcdf65bfbaab202db15ec435a088"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/workspace-v0.1.json",
+  "title": "fidryn.workspace/v0.1",
+  "description": "The manifest of a workspace of law modules, the file workspace.json at its top. A generated workspace has a release and no dependencies; a curated workspace has no release.",
+  "type": "object",
+  "required": ["schema", "name", "kind", "prefix", "toolchain", "dependencies"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "fidryn.workspace/v0.1" },
+    "name": { "type": "string" },
+    "kind": { "enum": ["generated", "curated"] },
+    "prefix": { "$ref": "#/$defs/address" },
+    "release": { "type": "string" },
+    "toolchain": { "type": "string" },
+    "dependencies": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/dependency" }
+    }
+  },
+  "if": {
+    "properties": { "kind": { "const": "generated" } },
+    "required": ["kind"]
+  },
+  "then": {
+    "required": ["release"],
+    "properties": { "dependencies": { "maxItems": 0 } }
+  },
+  "else": {
+    "not": { "required": ["release"] }
+  },
+  "$defs": {
+    "address": {
+      "$comment": "A slash followed by segments separated by slashes; a segment is ASCII letters, digits, '-', '.', '~' and the en dash, and is never '.' or '..'.",
+      "type": "string",
+      "pattern": "^(/(?!\\.\\.?(/|$))[A-Za-z0-9.~–-]+)+$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "dependency": {
+      "type": "object",
+      "required": ["name", "path", "release", "lock_digest"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "path": {
+          "$comment": "The directory of the dependency, relative to the manifest's, with '/' between its segments.",
+          "type": "string"
+        },
+        "release": { "type": "string" },
+        "lock_digest": { "$ref": "#/$defs/digest" }
+      }
+    }
+  }
+}

@@ -1,0 +1,163 @@
+edition 2
+module "/us/usc/t45/s791" {
+  within "/us/usc/t45/ch16/schVI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s791" section {
+    num "791" "§ 791."
+    heading "Relationship to other laws"
+    provision "/us/usc/t45/s791/a" subsection {
+      num "a" "(a)"
+      heading "Antitrust"
+      provision "/us/usc/t45/s791/a/1" paragraph {
+        num "1" "(1)"
+        content "Except as specifically provided in paragraph (2) of this subsection, no provision of this chapter shall be deemed to convey to any railroad or employee or director thereof any immunity from civil or criminal liability, or to create defenses to actions, under the antitrust laws."
+        hash "b3d96ac18483bd526908cc592cfc4de026f7658c342d452de0220c4a2992683d"
+      }
+      provision "/us/usc/t45/s791/a/2" paragraph {
+        num "2" "(2)"
+        content "The antitrust laws are inapplicable with respect to any action taken to formulate or implement the final system plan where such action was in compliance with the requirements of such plan and with respect to any action taken to formulate or implement any supplemental transaction."
+        hash "3df687b69f3c537da4b79c5b0c59fcf704ed960c49f3e4f9b4bf9de7fcfb786b"
+      }
+      provision "/us/usc/t45/s791/a/3" paragraph {
+        num "3" "(3)"
+        content "As used in this subsection, “antitrust laws” includes the Act of July 2, 1890 (ch. 647, " ["26 Stat. 209" -> "/us/stat/26/209"] "), as amended; the Act of October 15, 1914 (ch. 323, " ["38 Stat. 730" -> "/us/stat/38/730"] "), as amended; the Federal Trade Commission Act (" ["38 Stat. 717" -> "/us/stat/38/717"] "), as amended [" ["15 U.S.C. 41" -> "/us/usc/t15/s41"] " et seq.], sections 73 and 74 of the Act of August 27, 1894 (" ["28 Stat. 570" -> "/us/stat/28/570"] "), as amended [" ["15 U.S.C. 8" -> "/us/usc/t15/s8"] ", 9]; the Act of June 19, 1936 (ch. 592, " ["49 Stat. 1526" -> "/us/stat/49/1526"] "), as amended; and the antitrust laws of any State or subdivision thereof."
+        hash "48efd9f99a68751e35bfc4449c859f4b1a2ddc6c30866206a555629b30324f48"
+      }
+      hash "2d4ea42a03c26faf6199326cebc15ccc5979a5bb21d62587e1429085e1374019"
+    }
+    provision "/us/usc/t45/s791/b" subsection {
+      num "b" "(b)"
+      heading "Commerce, securities, and bankruptcy"
+      provision "/us/usc/t45/s791/b/1" paragraph {
+        num "1" "(1)"
+        content "The provisions of subtitle IV of title 49 and the Bankruptcy Act, are inapplicable (A) to actions taken under this chapter to formulate and implement the final system plan where such action was in compliance with the requirements of such plan, and (B) to actions taken under this chapter to formulate or implement any supplemental transaction."
+        hash "0f68b106025534c830586160c817f8e4f33c8e97b26356fa57a3a52a495a3ce2"
+      }
+      provision "/us/usc/t45/s791/b/2" paragraph {
+        num "2" "(2)"
+        content "All securities of the Corporation which are issued to the Association as the initial holder, or which are issued in connection with the transfer to the Corporation or a subsidiary thereof of rail properties under this chapter, shall be deemed for all purposes to have been issued subject to and authorized pursuant to section 11301" mark "1" 1 " of title 49."
+        hash "6408eafdad69224a86591ce697b98256084563b8ad30092ea3b450cf27dd690c"
+      }
+      provision "/us/usc/t45/s791/b/3" paragraph {
+        num "3" "(3)"
+        content "The provisions of " ["section 77e of title 15" -> "/us/usc/t15/s77e"] ", shall not apply to transactions involving the issuance of any security of the Corporation to the Association, transactions involving the issuance of any security of the Corporation that is deposited with the special court pursuant to " ["section 743(a) of this title" -> "/us/usc/t45/s743/a"] ", or transactions involving the issuance or distribution of any security of the Corporation, where the terms and conditions of such issuance or distribution are approved by the special court pursuant to " ["section 743(c) of this title" -> "/us/usc/t45/s743/c"] "."
+        hash "1931ab79a39d4402171a698d3f0e70d35b4b460b9f9cdf7a4f8850f7e1c85596"
+      }
+      provision "/us/usc/t45/s791/b/4" paragraph {
+        num "4" "(4)"
+        content "The powers and duties of the Commission under section 77 of the Bankruptcy Act, with respect to a railroad in reorganization in the region which conveys all or substantially all of its designated rail properties to the Corporation or a subsidiary thereof, or to profitable railroads in the region, pursuant to the final system plan, and the requirement that plans of reorganization be filed with the Commission, shall cease upon the date of such conveyance. The powers and duties of the Commission under section 77 of the Bankruptcy Act shall also so terminate, as of February 5, 1976, with respect to any railroad in reorganization under such section 77 but not subject to this chapter which (1) does not operate any line of railroad, and (2) has transferred all or substantially all of its rail properties to a railroad in reorganization in the region which was subject to this chapter prior to February 5, 1976. Thereafter, such powers and duties of the Commission shall be vested in the district court of the United States which has jurisdiction of the estate of any such railroad in reorganization at the time of such conveyance. Such court shall proceed to reorganize or liquidate such railroad in reorganization pursuant to such section 77 on such terms as the court deems just and reasonable, or pursuant to any other provisions of the Bankruptcy Act, if the court finds that such action would be in the best interests of such estate. This paragraph does not affect any obligation of any carrier by railroad subject to regulation under subtitle IV of title 49. The powers and duties of the Commission under section 77 of the Bankruptcy Act shall continue in effect only to the extent that the railroad in reorganization continues to operate any line of railroad."
+        hash "e5a5741a58d24f529473886982ab8f198a82a0afdaaa186f86ad7db92891224d"
+      }
+      hash "8778e1799596d0a0e0169cf93524e7155e3cbab180267399a110fa65f802f997"
+    }
+    provision "/us/usc/t45/s791/c" subsection {
+      num "c" "(c)"
+      heading "Environment"
+      content "The provisions of " ["section 4332(2)(C) of title 42" -> "/us/usc/t42/s4332/2/C"] " shall not apply with respect to any action taken under authority of this chapter before, and including, the conveyance of rail properties ordered by the special court under section 743 (b)(1) of this title, and shall not apply thereafter to any action taken in compliance with the requirements of the final system plan."
+      hash "5cb72d479b0184d71ffff6bb11dc1c8d7269a7577011ef8d290c7290d745ea1a"
+    }
+    provision "/us/usc/t45/s791/d" subsection {
+      num "d" "(d)"
+      heading "Northeast Corridor"
+      provision "/us/usc/t45/s791/d/1" paragraph {
+        num "1" "(1)"
+        content "Rail properties designated in accordance with " ["section 716(c)(1)(C) of this title" -> "/us/usc/t45/s716/c/1/C"] " shall be purchased or leased by the National Railroad Passenger Corporation. The Corporation shall negotiate an appropriate sale or lease agreement with the National Railroad Passenger Corporation for the properties designated for transfer pursuant to " ["section 716(c)(1)(C) of this title" -> "/us/usc/t45/s716/c/1/C"] ", which shall take effect on the date of conveyance of such properties to the Corporation."
+        hash "3d52ea9d4555f02c5a28eb34fddaadc64944cea0cb71dbb6a44d7c115f324d46"
+      }
+      provision "/us/usc/t45/s791/d/2" paragraph {
+        num "2" "(2)"
+        content "Properties acquired by purchase, lease, or otherwise pursuant to this subsection shall be improved in order to meet the goal set forth in " ["section 716(a)(3) of this title" -> "/us/usc/t45/s716/a/3"] ", relating to improved highspeed passenger service, by the earliest practicable date after January 2, 1974."
+        hash "a20b116f447913849134e284895920ace0c44741fb44635b39d61d5073a8bd49"
+      }
+      provision "/us/usc/t45/s791/d/3" paragraph {
+        num "3" "(3)"
+        content "The Secretary shall begin the necessary engineering studies and improvements on January 2, 1974."
+        hash "81ec031d40315e14568009d97682d2fee2a3df2395bf82646ca918e380856bc9"
+      }
+      provision "/us/usc/t45/s791/d/4" paragraph {
+        num "4" "(4)"
+        content "The final system plan shall provide for any necessary coordination with freight or commuter services of use of the facilities designated in " ["section 716(c)(1)(C) of this title" -> "/us/usc/t45/s716/c/1/C"] ". Such coordination may be effectuated through a single operating entity, designated in the final system plan, or as mutually agreed upon by the interested parties."
+        hash "cb5ba7009e986a6abbf6d6ddaeae86a442b6772a6ea91be0dd96e9eb2d90b4f1"
+      }
+      provision "/us/usc/t45/s791/d/5" paragraph {
+        num "5" "(5)"
+        content "Construction or improvements made pursuant to this subsection may be made in consultation with the Corps of Engineers."
+        hash "a29695b44328fcc09f5446ff429dc03ce3cd09b732ee23a2676e6f5380172da3"
+      }
+      hash "48ab800b670ae86392544e435906573bdb7cd04c568a7b795071445a6aeeb5a6"
+    }
+    hash "9036014a1e000d43e1821dbf630dd09f4326ef56faf517076cdcb6a22a7c219c"
+  }
+  credit "(" ["Pub. L. 93–236, title VI, § 601(a)" -> "/us/pl/93/236/tVI/s601/a"] "–(d), Jan. 2, 1974, " ["87 Stat. 1021" -> "/us/stat/87/1021"] "; " ["Pub. L. 94–210, title VI, § 618" -> "/us/pl/94/210/tVI/s618"] ", title VII, § 706(b), formerly § 705(b), Feb. 5, 1976, " ["90 Stat. 117" -> "/us/stat/90/117"] ", 123, renumbered " ["Pub. L. 96–254, title II, § 206(a)" -> "/us/pl/96/254/tII/s206/a"] ", May 30, 1980, " ["94 Stat. 412" -> "/us/stat/94/412"] ".)"
+  note "/us/usc/t45/s791/note/editorialNotes/act.1914-09-26.ch311/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Act of July 2, 1890 (ch. 647, " ["26 Stat. 209" -> "/us/stat/26/209"] "), as amended, referred to in subsec. (a)(3), is known as the Sherman Act, which is classified to sections 1 to 7 of Title 15, Commerce and Trade. For complete classification of this Act to the Code, see Short Title note set out under " ["section 1 of Title 15" -> "/us/usc/t15/s1"] " and Tables."
+    p "Act of October 15, 1914 (ch. 323, " ["38 Stat. 730" -> "/us/stat/38/730"] "), as amended, referred to in subsec. (a)(3), is known as the Clayton Act, which is classified to sections 12, 13, 14 to 19, 21, and 22 to 27 of Title 15, and sections 52 and 53 of Title 29, Labor. For further details and complete classification of this Act to the Code, see References in Text note set out under " ["section 12 of Title 15" -> "/us/usc/t15/s12"] " and Tables."
+    p "The Federal Trade Commission Act (" ["38 Stat. 717" -> "/us/stat/38/717"] "), as amended, referred to in subsec. (a)(3), is " ["act Sept. 26, 1914, ch. 311" -> "/us/act/1914-09-26/ch311"] ", " ["38 Stat. 717" -> "/us/stat/38/717"] ", as amended, which is classified generally to subchapter I (§ 41 et seq.) of chapter 2 of Title 15. For complete classification of this Act to the Code, see " ["section 58 of Title 15" -> "/us/usc/t15/s58"] " and Tables."
+    p "Sections 73 and 74 of the Act of August 27, 1894, referred to in subsec. (a)(3), are sections 73 and 74 of " ["act Aug. 27, 1894, ch. 349" -> "/us/act/1894-08-27/ch349"] ", " ["28 Stat. 570" -> "/us/stat/28/570"] ". Sections 73 to 77 of this Act are known as the Wilson Tariff Act. Sections 73 to 76 enacted sections 8 to 11 of Title 15. Section 77 was not classified to the Code. For complete classification of this Act to the Code, see Short Title note set out under " ["section 8 of Title 15" -> "/us/usc/t15/s8"] " and Tables."
+    p "Act of June 19, 1936 (ch. 592, " ["49 Stat. 1526" -> "/us/stat/49/1526"] "), as amended, referred to in subsec. (a)(3), is popularly known as the Robinson-Patman Antidiscrimination Act and also as the Robinson-Patman Price Discrimination Act, which enacted sections 13a, 13b, and 21a of Title 15, Commerce and Trade, and amended " ["section 13 of Title 15" -> "/us/usc/t15/s13"] ". For complete classification of this Act to the Code, see Tables."
+    p "The Bankruptcy Act, referred to in subsec. (b)(1), (4), is " ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ", as amended, which was classified generally to former Title 11, Bankruptcy. Section 77 of this Act was classified to section 205 of former Title 11. The Act was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    p ["Section 11301 of title 49" -> "/us/usc/t49/s11301"] ", referred to in subsec. (b)(2), was omitted and a new section 11301 enacted in the general amendment of subtitle IV of Title 49, Transportation, by " ["Pub. L. 104–88, title I, § 102(a)" -> "/us/pl/104/88/tI/s102/a"] ", Dec. 29, 1995, " ["109 Stat. 804" -> "/us/stat/109/804"] ", 837. The new section 11301 does not relate to issuance of securities. Previously, in subsec. (b)(2), “" ["section 11301 of title 49" -> "/us/usc/t49/s11301"] "” was substituted for “section 20a of the Interstate Commerce Act (" ["49 U.S.C. 20a" -> "/us/usc/t49/s20a"] ")” on authority of " ["Pub. L. 95–473, § 3(b)" -> "/us/pl/95/473/s3/b"] ", Oct. 17, 1978, " ["92 Stat. 1466" -> "/us/stat/92/1466"] ", the first section of which enacted subtitle IV (§ 10101 et seq.) of Title 49."
+    hash "dd9ff61f60a6b4f1a292118c8d19983572d301119d5bf28f3afff7b1b3b9228e"
+  }
+  note "/us/usc/t45/s791/note/editorialNotes/pl.95.473/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "In subsec. (b)(1), (4), “subtitle IV of title 49” substituted for “the Interstate Commerce Act (" ["49 U.S.C. 1" -> "/us/usc/t49/s1"] " et seq.)” on authority of " ["Pub. L. 95–473, § 3(b)" -> "/us/pl/95/473/s3/b"] ", Oct. 17, 1978, " ["92 Stat. 1466" -> "/us/stat/92/1466"] ", the first section of which enacted subtitle IV (§ 10101 et seq.) of Title 49, Transportation."
+    p "A subsec. (e) of " ["section 601 of Pub. L. 93–236" -> "/us/pl/93/236/s601"] ", which was designated in the original as “Emergency Service”, amended section 1(16) of former Title 49, Transportation."
+    hash "5c495bf811b9b2cbf57a6df444e40ee51de40a1c69ab5a05ecc228c6b0a213bf"
+  }
+  note "/us/usc/t45/s791/note/editorialNotes/pl.94.210/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1976—Subsec. (a)(2). " ["Pub. L. 94–210, § 618(a)" -> "/us/pl/94/210/s618/a"] ", inserted provision relating to any action to formulate or implement any supplemental transaction."
+    p "Subsec. (b). " ["Pub. L. 94–210, § 618(b)" -> "/us/pl/94/210/s618/b"] ", redesignated existing provisions as par. (1), substituted provisions relating to inapplicability to actions under this chapter to formulate and implement the final system plan and any supplemental transaction, for provisions relating to inapplicability to transactions under this chapter to the extent necessary to formulate and implement the final system plan whenever a provision of the Interstate Commerce or Bankruptcy Act is inconsistent with this chapter, and added pars. (2) to (4)."
+    p "Subsec. (c). " ["Pub. L. 94–210, § 618(c)" -> "/us/pl/94/210/s618/c"] ", substituted provisions relating to inapplicability to action taken before, and including, the conveyance of rail properties under " ["section 743(b)(1) of this title" -> "/us/usc/t45/s743/b/1"] ", and action taken thereafter in compliance with the requirements of the final system plan, for provisions relating to inapplicability to action taken before the effective date of the final system plan."
+    p "Subsec. (d)(1). " ["Pub. L. 94–210, § 705(b)" -> "/us/pl/94/210/s705/b"] ", substituted mandatory for discretionary authority for purchase of properties by the Corporation and provisions relating to negotiations for properties for transfer pursuant to " ["section 716(c)(1)(C) of this title" -> "/us/usc/t45/s716/c/1/C"] ", for provisions relating to negotiations as provided in the final system plan."
+    hash "0a24059bf3deecafbc721d27e6fafaeefddeac122973a02e30f2c244bb4461db"
+  }
+  note "/us/usc/t45/s791/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
+    p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
+    hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
+  }
+  note "/us/usc/t45/s791/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  note "/us/usc/t45/s791/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  note "/us/usc/t45/s791/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Applicability of National Environmental Policy Act"
+    p ["Pub. L. 94–210, title VI, § 619" -> "/us/pl/94/210/tVI/s619"] ", Feb. 5, 1976, " ["90 Stat. 119" -> "/us/stat/90/119"] ", provided that:"
+    quoted "/us/pl/94/210/tVI/s619" {
+      p "“Nothing in this title [enacting sections 726 and 745 to 747 of this title and amending sections 702, 711 to 713, 716, 718 to 721, 724, 725, 741, 743, 744, 771, 772, 774, 775, 778, 779, and 791 of this title, and section 856 of former Title 31, Money and Finance] shall affect the application of the National Environmental Policy Act of 1969 (" ["42 U.S.C. 4321" -> "/us/usc/t42/s4321"] " et seq.) to actions of the Commission.”"
+    }
+    hash "d7dafcfda47ca59d8bce92d7ed7b1fc8cdb7e5360f5bf01cebb0dd3bcd7e361a"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "9036014a1e000d43e1821dbf630dd09f4326ef56faf517076cdcb6a22a7c219c"
+    enacted "5fb507082ad15e804db6962d4859007ae176d79953b52ff21c2225329ee85693"
+    editorial "9dede9c4ebb454ef8c692da28f6548ad4a3fb1fbf60c7c184107cf9556f69ca8"
+  }
+}

@@ -1,0 +1,58 @@
+edition 2
+module "/us/usc/t45/s1001" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1001" section {
+    num "1001" "§ 1001."
+    heading "Congressional findings"
+    chapeau "Congress hereby finds that—"
+    provision "/us/usc/t45/s1001/1" paragraph {
+      num "1" "(1)"
+      content "uninterrupted continuation of services over Rock Island lines is dependent on adequate employee protection provisions covering Rock Island Railroad employees who are not hired by other railroads;"
+      hash "74a126c9b6dda780ac89755cc854038b10812efbeb49c86c98a5fa7e1628b838"
+    }
+    provision "/us/usc/t45/s1001/2" paragraph {
+      num "2" "(2)"
+      content "for those Rock Island Railroad employees not hired by other rail carriers, there is no other practicable means of obtaining funds to meet the necessary costs of such employee protection that are assumed by the Rock Island Railroad;"
+      hash "7f072eeb8090c8b7a4782ed19c068d14d93942bd4947e965197401533905f1ee"
+    }
+    provision "/us/usc/t45/s1001/3" paragraph {
+      num "3" "(3)"
+      content "a cessation of necessary operations of the Rock Island Railroad would have serious repercussions on the economies of the States in which such railroad principally operates; and"
+      hash "0fcec669acd57787a3d6366d106742efab7741db123a70f34d31c724c351a9b9"
+    }
+    provision "/us/usc/t45/s1001/4" paragraph {
+      num "4" "(4)"
+      content "premature cessation of services over lines which are the subject of pending purchase application would result in harm to the shipping public and could imperil continuation of vital commuter service."
+      hash "8cd143eb37143d50c9d0ca80187f7c6f84df99074bbc8365f3dc166511dfd7dc"
+    }
+    hash "1203173f947c84a05f6d765a3c935c539caac3e7ce14c6d2f8ae31353d82698f"
+  }
+  credit "(" ["Pub. L. 96–254, title I, § 102" -> "/us/pl/96/254/tI/s102"] ", May 30, 1980, " ["94 Stat. 399" -> "/us/stat/94/399"] ".)"
+  note "/us/usc/t45/s1001/note/statutoryNotes/pl.96.254/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p ["Pub. L. 96–254, title I, § 101" -> "/us/pl/96/254/tI/s101"] ", May 30, 1980, " ["94 Stat. 399" -> "/us/stat/94/399"] ", provided that:"
+    quoted "/us/pl/96/254/tI/s101" {
+      p "“This title [enacting this chapter, amending sections 231f, 726, 825, 902, 911, 913, and 916 of this title, and enacting provisions set out as a note under this section] may be cited as the ‘Rock Island Railroad Transition and Employee Assistance Act’.”"
+    }
+    hash "71a6c09ef85c467d38ac02079cabd092fc04f0428c0a608dd8a5379b1f4eff9b"
+  }
+  note "/us/usc/t45/s1001/note/statutoryNotes/pl.96.448/savings-provision" enacted {
+    group statutoryNotes
+    topic "savings"
+    heading "Savings Provision"
+    p ["Pub. L. 96–254, title I, § 125" -> "/us/pl/96/254/tI/s125"] ", formerly § 124, May 30, 1980, " ["94 Stat. 409" -> "/us/stat/94/409"] "; renumbered § 125, " ["Pub. L. 96–448, title VII, § 701(a)(1)" -> "/us/pl/96/448/tVII/s701/a/1"] ", Oct. 14, 1980, " ["94 Stat. 1959" -> "/us/stat/94/1959"] ", provided that:"
+    quoted "/us/pl/96/448/tVII/s701/a/1" {
+      p "“If any provision of this title [see Short Title note above] or the application thereof to any person or circumstance is held invalid, the remainder of this title and the application of such provision to other persons or circumstances shall not be affected thereby.”"
+    }
+    hash "c154bd5bd664a61d637b5f0e6eb15fdb625c23624e177f088ecc7e10c078594b"
+  }
+  layers {
+    operative "1203173f947c84a05f6d765a3c935c539caac3e7ce14c6d2f8ae31353d82698f"
+    enacted "8e976090e93c7ff4d48d4a5422f2415ef17d75ac83c1eb4305a6679b025c7917"
+    editorial "c9b074154d7d6275a17578ce9332f016d7b7673d29dd58c20f8df105d36a46cc"
+  }
+}

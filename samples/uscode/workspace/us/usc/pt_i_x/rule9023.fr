@@ -1,0 +1,71 @@
+edition 2
+module "/us/usc/ptIX/rule9023" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9023" courtRule {
+    num "9023" "Rule 9023."
+    heading "New Trial; Altering or Amending a Judgment"
+    provision "/us/usc/ptIX/rule9023/a" subsection {
+      num "a" "(a)"
+      heading "Application of Civil Rule 59."
+      content "Except as this rule and Rule 3008 provide otherwise, Fed. R. Civ. P. 59 applies in a bankruptcy case."
+      hash "9b438b5f6a5084ccf4c241641904cdb0cf351ad3c71ae946cea8ddaa25da7bcd"
+    }
+    provision "/us/usc/ptIX/rule9023/b" subsection {
+      num "b" "(b)"
+      heading "By Motion."
+      content "A motion for a new trial or to alter or amend a judgment must be filed within 14 days after the judgment is entered. In some instances, Rule 8008 governs postjudgment motion practice after an appeal has been docketed and is pending."
+      hash "df284a0cf952bddab49c73a40cf463296d4abe8ec49e83b6401b68260a65d360"
+    }
+    provision "/us/usc/ptIX/rule9023/c" subsection {
+      num "c" "(c)"
+      heading "By the Court."
+      content "Within 14 days after judgment is entered, the court may, on its own, order a new trial."
+      hash "4dccf6bd96010e4e6a7f4947c8ef93d8fb7b553127bd27df6feeb310a4b0e5a0"
+    }
+    hash "43a6bb0f56950f29c6fd563ad7f96edf3841e9ecb731365dddac4abed55b4098"
+  }
+  credit "(As amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9023/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Rule 59 F.R.Civ.P. regulates motions for a new trial and amendment of judgment. Those motions must be served within 10 days of the entry of judgment. No similar time limit is contained in Rule 3008 which governs reconsideration of claims."
+    hash "3024f551ebbb99073930b10ea8f917c047059daa2db1536368ba992850c352b8"
+  }
+  note "/us/usc/ptIX/rule9023/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to limit to 14 days the time for a party to file a post judgment motion for a new trial and for the court to order sua sponte a new trial. In 2009, Rule 59 F. R. Civ. P. was amended to extend the deadline for these actions to 28 days after the entry of judgment. That deadline corresponds to the 30-day deadline for filing a notice of appeal in a civil case under Rule 4(a)(1)(A) F.R.App.P. In a bankruptcy case, however, the deadline for filing a notice of appeal is 14 days. Therefore, the 28-day deadline for filing a motion for a new trial or a motion to alter or amend a judgment would effectively override the notice of appeal deadline under Rule 8002(a) but for this amendment."
+    hash "47229547f0f704c8a31bf9f09acfbaffe46a7b902a8fd545e79c5e8b9c764279"
+  }
+  note "/us/usc/ptIX/rule9023/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014 Amendment"
+    p "This rule is amended to include a cross-reference to Rule 8008. That rule governs the issuance of an indicative ruling when relief is sought that the court lacks authority to grant because of an appeal that has been docketed and is pending."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "ffdbc3bd94aeed87628ac76d3749f5187c991535c08283dcf815b20e8e57a63f"
+  }
+  note "/us/usc/ptIX/rule9023/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9023 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "11ae355e9f5947ebd0b5096c0f249ea717a85b0343855698c95b2fcdb1a9bd40"
+  }
+  note "/us/usc/ptIX/rule9023/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subd. (a), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "deb4c0aa4ee80b33fd9101f209f848844329e50da3c46e96b8b0c3857dca9936"
+  }
+  layers {
+    operative "43a6bb0f56950f29c6fd563ad7f96edf3841e9ecb731365dddac4abed55b4098"
+    enacted "c8264923603f4f434bbc160298d4ef789f6370de9aa77fb08c73342ad837cc8e"
+    editorial "2876043f500804d75a0b296ca3cb01dd7bf51233b78f38959a65f746fae456d5"
+  }
+}

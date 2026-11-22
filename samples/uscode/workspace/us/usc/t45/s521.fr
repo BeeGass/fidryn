@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s521" {
+  alias "/us/usc/t45/s522"
+  within "/us/usc/t45/ch14/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s521" section {
+    num "521, 522" "§§ 521, 522."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "22157500429db0c858dc0b41fd92986c845c28319a6e6fb443c419ce661b0515"
+  }
+  note "/us/usc/t45/s521/note/ungrouped/pl.91.518/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 521, " ["Pub. L. 91–518, title II, § 201" -> "/us/pl/91/518/tII/s201"] ", Oct. 30, 1970, " ["84 Stat. 1329" -> "/us/stat/84/1329"] ", authorized report designating routes and basic service on intercity passenger system."
+    hash "39e95323f96ab5e7663c218de1c4938cf0326f631b9379cc10cd3120097230c6"
+  }
+  note "/us/usc/t45/s521/note/ungrouped/pl.91.518/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 522, " ["Pub. L. 91–518, title II, § 202" -> "/us/pl/91/518/tII/s202"] ", Oct. 30, 1970, " ["84 Stat. 1329" -> "/us/stat/84/1329"] ", directed review of preliminary report of Secretary designating the basic system."
+    hash "1399c73c603b556d48cfa94ade3f056f132ccbb5ef0c7c615dc624591c1c7b4c"
+  }
+  layers {
+    operative "22157500429db0c858dc0b41fd92986c845c28319a6e6fb443c419ce661b0515"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "14c23d3d35d9ec153c7de1d5d5593d1b87e5952024a5aff0fec1da78e87af8d5"
+  }
+}

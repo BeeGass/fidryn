@@ -1,0 +1,290 @@
+edition 2
+module "/us/usc/ptIII/rule3002.1" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3002.1" courtRule {
+    num "3002.1" "Rule 3002.1."
+    heading "Chapter 13—Claim Secured by a Security Interest in the Debtor’s Principal Residence"
+    provision "/us/usc/ptIII/rule3002.1/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content "This rule applies in a Chapter 13 case to a claim that is secured by a security interest in the debtor’s principal residence and for which the plan provides for the trustee or debtor to make payment on the debt. Unless the court orders otherwise, the requirements of this rule cease when an order terminating or annulling the automatic stay related to that residence becomes effective."
+      hash "aba6a018d1da21d6a508686e197a9a74a498bd9e3dfd441e076603dfed608f29"
+    }
+    provision "/us/usc/ptIII/rule3002.1/b" subsection {
+      num "b" "(b)"
+      heading "Notice of a Payment Change; Home-Equity Line of Credit; Effect of an Untimely Notice; Objection."
+      provision "/us/usc/ptIII/rule3002.1/b/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "Notice by the Claim Holder—In General. The claim holder must file a notice of any change in the payment amount, including one resulting from an interest-rate or escrow-account adjustment. The notice must be served on:"
+          p "• the debtor;"
+          p "• the debtor’s attorney; and"
+          p "• the trustee."
+        }
+        continuation "Except as provided in (b)(2), it must be filed and served at least 21 days before the new payment is due."
+        hash "9f36849a8ec8ec48b8c9db0b9c71b88660c37bdc524649c2182b84d86b0f6c78"
+      }
+      provision "/us/usc/ptIII/rule3002.1/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Notice of a Change in a Home-Equity Line of Credit."
+        provision "/us/usc/ptIII/rule3002.1/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "Deadline for the Initial Filing; Later Annual Filing. If the claim arises from a home-equity line of credit, the notice of a payment change must be filed and served either as provided in (b)(1) or within one year after the bankruptcy-petition filing, and then at least annually."
+          hash "b7926b1d23d6d16aa983ababab522cbc776529e31bfbb29198355200b0dac152"
+        }
+        provision "/us/usc/ptIII/rule3002.1/b/2/B" subparagraph {
+          num "B" "(B)"
+          chapeau "Content of the Annual Notice. The annual notice must:"
+          provision "/us/usc/ptIII/rule3002.1/b/2/B/i" clause {
+            num "i" "(i)"
+            content "state the payment amount due for the month when the notice is filed; and"
+            hash "a5f59d84b700f633d66e8b1726d58f451e5bafa35fb0f47675c6065f3d16767e"
+          }
+          provision "/us/usc/ptIII/rule3002.1/b/2/B/ii" clause {
+            num "ii" "(ii)"
+            content "include a reconciliation amount to account for any overpayment or underpayment during the prior year."
+            hash "32f5f365887279ab0250404fbf4f584e22fe1600dac8aa606b171baf35f3d8a1"
+          }
+          hash "ddce42bb07d4a71e581e34d6db92d91bcfd8391df40123b1c85f3e9a3595493d"
+        }
+        provision "/us/usc/ptIII/rule3002.1/b/2/C" subparagraph {
+          num "C" "(C)"
+          content "Amount of the Next Payment. The first payment due at least 21 days after the annual notice is filed and served must be increased or decreased by the reconciliation amount."
+          hash "97daaeabd412f28451d205d319e91d6002106b64e29b39562c54fe0060c95836"
+        }
+        provision "/us/usc/ptIII/rule3002.1/b/2/D" subparagraph {
+          num "D" "(D)"
+          content "Effective Date. The new payment amount stated in the annual notice (disregarding the reconciliation amount) is effective on the first payment due date after the payment under (C) has been made and remains effective until a new notice becomes effective."
+          hash "ce9719db82dcb6053de587943f3621e6048bf07e1f2aa0df4bad2350d6b8e600"
+        }
+        provision "/us/usc/ptIII/rule3002.1/b/2/E" subparagraph {
+          num "E" "(E)"
+          content "Payment Changes Greater Than $10. If the claim holder chooses to give annual notices under (b)(2) and the monthly payment increases or decreases by more than $10 in any month, the holder must file and serve (in addition to the annual notice) a notice under (b)(1) for that month."
+          hash "986870c49412cd3bec12ef44e61bfa830fc3cf61c55a1787193b8eb2522d5157"
+        }
+        hash "dc8bd859818e513d7b83e3d07bb734c2d5d88bd2cf69c9acc89da8783ea10e66"
+      }
+      provision "/us/usc/ptIII/rule3002.1/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Effect of an Untimely Notice. If the claim holder does not timely file and serve the notice required by (b)(1) or (b)(2), the effective date of the new payment amount is as follows:"
+        provision "/us/usc/ptIII/rule3002.1/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "when the notice concerns a payment increase, on the first payment due date that is at least 21 days after the untimely notice was filed and served; or"
+          hash "5b61699ee53c70cb357531d20bbedc4c7434a8186a7b34798faabf9d0f7c6877"
+        }
+        provision "/us/usc/ptIII/rule3002.1/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "when the notice concerns a payment decrease, on the actual payment due date, even if it is prior to the notice."
+          hash "89fbfe3e7e73c56233c3fa5a9a9d34cfb7e54b4a6120bcf01d02e5feef8b1254"
+        }
+        hash "eeb7a5e1323870fab3100862230052912978d16f1030bc6f8c6add1d4d8d21ef"
+      }
+      provision "/us/usc/ptIII/rule3002.1/b/4" paragraph {
+        num "4" "(4)"
+        content "Party in Interest’s Objection. A party in interest who objects to a payment change noticed under (b)(1) or (b)(2) may file and serve a motion to determine the change’s validity. Unless the court orders otherwise, if no motion is filed before the day the new payment is due, the change goes into effect on that date."
+        hash "1e22ace46d9a650000d8c122e3cb07d518e9ec637cbba0e85408b5e071e4093a"
+      }
+      hash "3f35d9cd7511f3f49ebca8247eb76435784b15d58ba9767d52ea554ddeb8de0a"
+    }
+    provision "/us/usc/ptIII/rule3002.1/c" subsection {
+      num "c" "(c)"
+      heading "Fees, Expenses, and Charges Incurred After the Case Was Filed; Notice by the Claim Holder."
+      content "The claim holder must file a notice itemizing all fees, expenses, and charges incurred after the case was filed that the holder asserts are recoverable against the debtor or the debtor’s principal residence. Within 180 days after the fees, expenses, or charges are incurred, the notice must be filed and served on the individuals listed in (b)(1)."
+      hash "f4a73d7989c09425235583975fffe9f44dcfcaad195bec14e42fb3aaa36bfb09"
+    }
+    provision "/us/usc/ptIII/rule3002.1/d" subsection {
+      num "d" "(d)"
+      heading "Filing Notice as a Supplement to a Proof of Claim."
+      content "A notice under (b) or (c) must be filed as a supplement to a proof of claim using Form 410S-1 or 410S-2, respectively. The notice is not subject to Rule 3001(f)."
+      hash "2103550dcecb8a7231a4b65db2fb21bd50eed340be2ad2d67a8003c2569f189d"
+    }
+    provision "/us/usc/ptIII/rule3002.1/e" subsection {
+      num "e" "(e)"
+      heading "Determining Fees, Expenses, or Charges."
+      content "On a party in interest’s motion, the court must, after notice and a hearing, determine whether paying any claimed fee, expense, or charge is required by the underlying agreement and applicable nonbankruptcy law. The motion must be filed within one year after the notice under (c) was served, unless a party in interest requests and the court orders a shorter period."
+      hash "bf4a7ec0ae14f8777524ce315eebcbeb709453ab394dbad3229dcfc5576bf4a0"
+    }
+    provision "/us/usc/ptIII/rule3002.1/f" subsection {
+      num "f" "(f)"
+      heading "Motion to Determine Status; Response; Court Determination."
+      provision "/us/usc/ptIII/rule3002.1/f/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "Timing; Content and Service. At any time after the date of the order for relief under Chapter 13 and until the trustee files the notice under (g)(1), the trustee or debtor may file a motion to determine the status of any claim described in (a). The motion must be prepared using Form 410C13-M1 and be served on:"
+          p "• the debtor and the debtor’s attorney, if the trustee is the movant;"
+          p "• the trustee, if the debtor is the movant; and"
+          p "• the claim holder."
+        }
+        hash "b936063321e4de2d371b32917268dbccae1295aa0e102d86cfe6401bb0eefa78"
+      }
+      provision "/us/usc/ptIII/rule3002.1/f/2" paragraph {
+        num "2" "(2)"
+        content "Response; Content and Service. If the claim holder disagrees with facts set forth in the motion, it must file a response within 28 days after the motion is served. The response must be prepared using Form 410C13-M1R and be served on the individuals listed in (b)(1)."
+        hash "f096b8fcca5836cf81012ab0f539d61711c9c7d00242a9d8ae81a7d9fa67af3d"
+      }
+      provision "/us/usc/ptIII/rule3002.1/f/3" paragraph {
+        num "3" "(3)"
+        content "Court Determination. If the claim holder’s response asserts a disagreement with facts set forth in the motion, the court must, after notice and a hearing, determine the status of the claim and enter an appropriate order. If the claim holder does not respond to the motion or files a response agreeing with the facts set forth in it, the court may grant the motion based on those facts and enter an appropriate order."
+        hash "f09fd0290a954ea2c022031f26ae6961e80dfd7a2e2545dc4dd99f1acf3cf508"
+      }
+      hash "2faab1eb53fa67c1d2ad92b73c216321827f0ff36e7dde0c5820ff3f44ba98f3"
+    }
+    provision "/us/usc/ptIII/rule3002.1/g" subsection {
+      num "g" "(g)"
+      heading "Trustee’s End-of-Case Notice of Disbursements Made; Response; Court Determination."
+      provision "/us/usc/ptIII/rule3002.1/g/1" paragraph {
+        num "1" "(1)"
+        chapeau "Timing and Content. Within 45 days after the debtor completes all payments due to the trustee under a Chapter 13 plan, the trustee must file a notice:"
+        provision "/us/usc/ptIII/rule3002.1/g/1/A" subparagraph {
+          num "A" "(A)"
+          content "stating what amount the trustee disbursed to the claim holder to cure any default and whether it has been cured;"
+          hash "fa2d507eed3d2b69b83f70ed885cc5be4d1339eedd271a8fdfd0c863cfed96dc"
+        }
+        provision "/us/usc/ptIII/rule3002.1/g/1/B" subparagraph {
+          num "B" "(B)"
+          content "stating what amount the trustee disbursed to the claim holder for payments that came due during the pendency of the case and whether such payments are current as of the date of the notice; and"
+          hash "76359cb659a79281c3099e38d143411310375f8154ed775b61388c0d2c7b5770"
+        }
+        provision "/us/usc/ptIII/rule3002.1/g/1/C" subparagraph {
+          num "C" "(C)"
+          content "informing the claim holder of its obligation to respond under (g)(3)."
+          hash "1527844a2a9072d19da612b2653bd6bcd0215e01259c5603c14f08d2e0f6b91b"
+        }
+        hash "f4164d481514ce6ac8db4ed2e64f255e97ec942e50725103c6da6368f2fd6b46"
+      }
+      provision "/us/usc/ptIII/rule3002.1/g/2" paragraph {
+        num "2" "(2)"
+        content {
+          p "Service. The notice must be prepared using Form 410C13-N and be served on:"
+          p "• the claim holder;"
+          p "• the debtor; and"
+          p "• the debtor’s attorney."
+        }
+        hash "d2c3a7cb4729eed293dbaa3c459d8ee420e726c66ca139d5618045c40c9115ae"
+      }
+      provision "/us/usc/ptIII/rule3002.1/g/3" paragraph {
+        num "3" "(3)"
+        content "Response. The claim holder must file a response to the notice within 28 days after its service. The response, which is not subject to Rule 3001(f), must be filed as a supplement to the claim holder’s proof of claim. The response must be prepared using Form 410C13-NR and be served on the individuals listed in (b)(1)."
+        hash "42d8b23a3446e22d36e635d0d2ef7ad286ad039415284ce412a517b47e49c71f"
+      }
+      provision "/us/usc/ptIII/rule3002.1/g/4" paragraph {
+        num "4" "(4)"
+        chapeau "Court Determination of a Final Cure and Payment."
+        provision "/us/usc/ptIII/rule3002.1/g/4/A" subparagraph {
+          num "A" "(A)"
+          content "Motion. Within 45 days after service of the response under (g)(3) or after service of the trustee’s notice under (g)(1) if no response is filed by the claim holder, the debtor or trustee may file a motion to determine whether the debtor has cured all defaults and paid all required postpetition amounts on a claim described in (a). The motion must be prepared using Form 410C13-M2 and be served on the entities listed in (f)(1)."
+          hash "1b3f5dc51dcf51e2870ceb36f34ac047961484b650cc8aa25dc7216120728b91"
+        }
+        provision "/us/usc/ptIII/rule3002.1/g/4/B" subparagraph {
+          num "B" "(B)"
+          content "Response. If the claim holder disagrees with the facts set forth in the motion, it must file a response within 28 days after the motion is served. The response must be prepared using Form 410C13-M2R and be served on the individuals listed in (b)(1)."
+          hash "2f1549d88f2073a6d99e3c3d3059c27e16f4b0438655ea1a5cd977923a761735"
+        }
+        provision "/us/usc/ptIII/rule3002.1/g/4/C" subparagraph {
+          num "C" "(C)"
+          content "Court Determination. After notice and a hearing, the court must determine whether the debtor has cured all defaults and paid all required postpetition amounts. If the claim holder does not respond to the motion or files a response agreeing with the facts set forth in it, the court may enter an appropriate order based on those facts."
+          hash "c88c4f5454034465f9ebb8469cfa0e3a85caed5e3709e5f7394a57da1d14713a"
+        }
+        hash "c29dcd597810460b1ae1c7ad201b6310de4770397133494ecf246797fc38608a"
+      }
+      hash "87af3d24ad029b2fb9f74d941dfada7ab5df6c3b2f5694b6fe865ecb49ff4bec"
+    }
+    provision "/us/usc/ptIII/rule3002.1/h" subsection {
+      num "h" "(h)"
+      heading "Claim Holder’s Failure to Give Notice or Respond."
+      chapeau "If the claim holder fails to provide any information as required by this rule, the court may, after notice and a hearing, do one or more of the following:"
+      provision "/us/usc/ptIII/rule3002.1/h/1" paragraph {
+        num "1" "(1)"
+        content "preclude the holder from presenting the omitted information in any form as evidence in a contested matter or adversary proceeding in the case—unless the court determines that the failure was substantially justified or is harmless;"
+        hash "ff17c18100c980d3a688225467fcf06ceaa19658c6c4c5e284aa4bb23c2989bd"
+      }
+      provision "/us/usc/ptIII/rule3002.1/h/2" paragraph {
+        num "2" "(2)"
+        content "award other appropriate relief, including reasonable expenses and attorney’s fees caused by the failure; and"
+        hash "822367adc6d4db7ebd13fa72bc176494dc0e29641d8ad961fbc40e50d4f64073"
+      }
+      provision "/us/usc/ptIII/rule3002.1/h/3" paragraph {
+        num "3" "(3)"
+        content "take any other action authorized by this rule."
+        hash "faba5a8e4b44f2b48a6124a4c7636247ff6765ea82ebeb1e00d1bebcc62b084c"
+      }
+      hash "5a55b597582548f1a2be39f94c889f3b825b798f6993c32f03e2709b6ef83e09"
+    }
+    hash "741fab22f9dcf9e6e198bc87b8d899306374b0e7f8594dc0645955ea4ceb60cf"
+  }
+  credit "(Added Apr. 26, 2011, eff. Dec. 1, 2011; amended Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024; Apr. 23, 2025, eff. Dec. 1, 2025.)"
+  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2011" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2011"
+    p "This rule is new. It is added to aid in the implementation of § 1322(b)(5), which permits a chapter 13 debtor to cure a default and maintain payments on a home mortgage over the course of the debtor’s plan. It applies regardless of whether the trustee or the debtor is the disbursing agent for postpetition mortgage payments."
+    p "In order to be able to fulfill the obligations of § l322(b)(5), a debtor and the trustee have to be informed of the exact amount needed to cure any prepetition arrearage, see Rule 3001(c)(2), and the amount of the postpetition payment obligations. If the latter amount changes over time, due to the adjustment of the interest rate, escrow account adjustments, or the assessment of fees, expenses, or other charges, notice of any change in payment amount needs to be conveyed to the debtor and trustee. Timely notice of these changes will permit the debtor or trustee to challenge the validity of any such charges, if appropriate, and to adjust postpetition mortgage payments to cover any undisputed claimed adjustment. Compliance with the notice provision of the rule should also eliminate any concern on the part of the holder of the claim that informing a debtor of a change in postpetition payment obligations might violate the automatic stay."
+    p "Subdivision (a). Subdivision (a) specifies that this rule applies only in a chapter 13 case to claims secured by a security interest in the debtor’s principal residence."
+    p "Subdivision (b). Subdivision (b) requires the holder of a claim to notify the debtor, debtor’s counsel, and the trustee of any postpetition change in the mortgage payment amount at least 21 days before the new payment amount is due."
+    p "Subdivision (c). Subdivision (c) requires an itemized notice to be given, within 180 days of incurrence, of any postpetition fees, expenses, or charges that the holder of the claim asserts are recoverable from the debtor or against the debtor’s principal residence. This might include, for example, inspection fees, late charges, or attorney’s fees."
+    p "Subdivision (d). Subdivision (d) provides the method of giving the notice under subdivisions (b) and (c). In both instances, the holder of the claim must give notice of the change as prescribed by the appropriate Official Form. In addition to serving the debtor, debtor’s counsel, and the trustee, the holder of the claim must also file the notice on the claims register in the case as a supplement to its proof of claim. Rule 3001(f) does not apply to any notice given under subdivision (b) or (c), and therefore the notice will not constitute prima facie evidence of the validity and amount of the payment change or of the fee, expense, or charge."
+    p "Subdivision (e). Subdivision (e) permits the debtor or trustee, within a year after service of a notice under subdivision (c), to seek a determination by the court as to whether the fees, expenses, or charges set forth in the notice are required by the underlying agreement or applicable nonbankruptcy law to cure a default or maintain payments."
+    p "Subdivision (f). Subdivision (f) requires the trustee to issue a notice to the holder of the claim, the debtor, and the debtor’s attorney within 30 days after completion of payments under the plan. The notice must (1) indicate that all amounts required to cure a default on a claim secured by the debtor’s principal residence have been paid, and (2) direct the holder to comply with subdivision (g). If the trustee fails to file this notice within the required time, this subdivision also permits the debtor to file and serve the notice on the trustee and the holder of the claim."
+    p "Subdivision (g). Subdivision (g) governs the response of the holder of the claim to the trustee’s or debtor’s notice under subdivision (f). Within 21 days after service of notice of the final cure payment, the holder of the claim must file and serve a statement indicating whether the prepetition default has been fully cured and also whether the debtor is current on all payments in accordance with § 1322(b)(5) of the Code. If the holder of the claim contends that all cure payments have not been made or that the debtor is not current on other payments required by § 1322(b)(5), the response must itemize all amounts, other than regular future installment payments, that the holder contends are due."
+    p "Subdivision (h). Subdivision (h) provides a procedure for the judicial resolution of any disputes that may arise about payment of a claim secured by the debtor’s principal residence. Within 21 days after the service of the statement under (g), the trustee or debtor may move for a determination by the court of whether any default has been cured and whether any other non-current obligations remain outstanding."
+    p "Subdivision (i). Subdivision (i) specifies sanctions that may be imposed if the holder of a claim fails to provide any of the information as required by subdivisions (b), (c), or (g)."
+    p "If, after the chapter 13 debtor has completed payments under the plan and the case has been closed, the holder of a claim secured by the debtor’s principal residence seeks to recover amounts that should have been but were not disclosed under this rule, the debtor may move to have the case reopened in order to seek sanctions against the holder of the claim under subdivision (i)."
+    p "Changes Made After Publication."
+    p "Subdivision (a). As part of organizational changes intended to make the rule shorter and clearer, a new subdivision (a) was inserted that specifies the applicability of the rule. Other subdivision designations were changed accordingly."
+    p "Subdivision (b). The timing of the notice of payment change, addressed in subdivision (a) of the published rule, was changed from 30 to 21 days before payment must be made in the new amount."
+    p "Subdivision (d). The provisions of the published rule prescribing the procedure for providing notice of payment changes and of fees, expenses, and charges were moved to subdivision (d)."
+    p "Subdivision (e). As part of the organizational revision of the rule, the provision governing the resolution of disputes over claimed fees, expenses, or charges was moved to this subdivision."
+    p "Subdivision (f). The triggering event for the filing of the notice of final cure payment was changed to the debtor’s completion of all payments required under the plan. A sentence was added requiring the notice to inform the holder of the mortgage claim of its obligation to file and serve a response under subdivision (g)."
+    p "Subdivision (h). The caption of this subdivision (which was subdivision (f) as published), was changed to describe its content more precisely."
+    p "Subdivision (i). The clause “the holder shall be precluded” was deleted, and the provision was revised to state that “the court may, after notice and hearing, take either or both” of the specified actions."
+    p "Committee Note. A sentence was added to the first paragraph to clarify that the rule applies regardless of whether ongoing mortgage payments are made directly by the debtor or disbursed through the chapter 13 trustee. Other changes were made to the Committee Note to reflect the changes made to the rule."
+    p "Other changes. Stylistic changes were made throughout the rule and Committee Note."
+    hash "683958d956034101dca53fc55949b7f4af1f74098a609fc13bc7a9a4d8cbc733"
+  }
+  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2016 Amendment"
+    p "Subdivision (a) is amended to clarify the applicability of the rule. Its provisions apply whenever a chapter 13 plan provides that contractual payments on the debtor’s home mortgage will be maintained, whether they will be paid by the trustee or directly by the debtor. The reference to § 1322(b)(5) of the Code is deleted to make clear that the rule applies even if there is no prepetition arrearage to be cured. So long as a creditor has a claim that is secured by a security interest in the debtor’s principal residence and the plan provides that contractual payments on the claim will be maintained, the rule applies."
+    p "Subdivision (a) is further amended to provide that, unless the court orders otherwise, the notice obligations imposed by this rule cease on the effective date of an order granting relief from the automatic stay with regard to the debtor’s principal residence. Debtors and trustees typically do not make payments on mortgages after the stay relief is granted, so there is generally no need for the holder of the claim to continue providing the notices required by this rule. Sometimes, however, there may be reasons for the debtor to continue receiving mortgage information after stay relief. For example, the debtor may intend to seek a mortgage modification or to cure the default. When the court determines that the debtor has a need for the information required by this rule, the court is authorized to order that the notice obligations remain in effect or be reinstated after the relief from the stay is granted."
+    hash "252609e37204e21c419efea855bb604a2ef578c737b0a02beaf119338825cd7c"
+  }
+  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "Subdivision (b) is subdivided and amended in two respects. First, it is amended in what is now subdivision (b)(1) to authorize courts to modify its requirements for claims arising from home equity lines of credit (HELOCs). Because payments on HELOCs may adjust frequently and in small amounts, the rule provides flexibility for courts to specify alternative procedures for keeping the person who is maintaining payments on the loan apprised of the current payment amount. Courts may specify alternative requirements for providing notice of changes in HELOC payment amounts by local rules or orders in individual cases."
+    p "Second, what is now subdivision (b)(2) is amended to acknowledge the right of the trustee, debtor, or other party in interest, such as the United States trustee, to object to a change in a home-mortgage payment amount after receiving notice of the change under subdivision (b)(1). The amended rule does not set a deadline for filing a motion for a determination of the validity of the payment change, but it provides as a general matter—subject to a contrary court order—that if no motion has been filed on or before the day before the change is to take effect, the announced change goes into effect. If there is a later motion and a determination that the payment change was not required to maintain payments under § 1322(b)(5), appropriate adjustments will have to be made to reflect any overpayments. If, however, a motion is made during the time specified in subdivision (b)(2), leading to a suspension of the payment change, a determination that the payment change was valid will require the debtor to cure the resulting default in order to be current on the mortgage at the end of the bankruptcy case."
+    p "Subdivision (e) is amended to allow parties in interest in addition to the debtor or trustee, such as the United States trustee, to seek a determination regarding the validity of any claimed fee, expense, or charge."
+    hash "2c93acefdcea47ba9497debfa31c01f5c82ed4bd98036ff26a6b452ae4ca975b"
+  }
+  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3002.1 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "57e0461fb9a3cf4d38017627bba95e331a44d586faa057cadba5c7cbd69459f4"
+  }
+  note "/us/usc/ptIII/rule3002.1/note/ungrouped/nolaw/committee-notes-on-rules-2025-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2025 Amendment"
+    p "The rule is amended to encourage a greater degree of compliance with its provisions and to allow assessments of a mortgage claim’s status while a chapter 13 case is pending in order to give the debtor an opportunity to cure any postpetition defaults that may have occurred. Stylistic changes are made throughout the rule, and its title and subdivision headings have been changed to reflect the amended content."
+    p "Subdivision (a), which describes the rule’s applicability, is amended to delete the words “contractual” and “installment” in the phrase “contractual installment payments” in order to clarify and broaden the rule’s applicability. The deletion of “contractual” is intended to make the rule applicable to home mortgages that may be modified and are being paid according to the terms of the plan rather than strictly according to the contract, including mortgages being paid in full during the term of the plan. The word “installment” is deleted to clarify the rule’s applicability to reverse mortgages. They are not paid in installments, but a debtor may be curing a default on a reverse mortgage under the plan. If so, the rule applies."
+    p "In addition to stylistic changes, subdivision (b) is amended to provide more detailed provisions about notice of payment changes for home-equity lines of credit (“HELOCs”) and to add provisions about the effective date of late payment change notices. The treatment of HELOCs presents a special issue under this rule because the amount owed changes frequently, often in small amounts. Requiring a notice for each change can be overly burdensome. Under new subdivision (b)(2), a HELOC claimant may choose to file only annual payment change notices—including a reconciliation figure (net overpayment or underpayment for the past year)—unless the payment change in a single month is for more than $10. This provision also ensures at least 21 days’ notice before a payment increase takes effect."
+    p "As a sanction for noncompliance, subdivision (b)(3) now provides that late notices of a payment increase do not go into effect until the first payment due date after the required notice period (at least 21 days) expires. The claim holder will not be permitted to collect the increase for the interim period. There is no delay, however, in the effective date of an untimely notice of a payment decrease. It may even take effect retroactively, if the actual due date of the decreased payment occurred before the claim holder gave notice of the change."
+    p "The changes made to subdivisions (c) and (d) are largely stylistic. Stylistic changes are also made to subdivision (e). In addition, the court is given authority, upon motion of a party in interest, to shorten the time for seeking a determination of the fees, expenses, or charges owed. Such a shortening, for example, might be appropriate in the later stages of a chapter 13 case."
+    p "Subdivision (f) is new. It provides a procedure for assessing the status of the mortgage at any point before the trustee files the notice under (g)(1). This optional procedure, which should be used only when necessary and appropriate for carrying out the plan, allows the debtor and the trustee to be informed of any deficiencies in payment and to reconcile records with the claim holder in time to become current before the case is closed. The procedure is initiated by motion of the trustee or debtor. An Official Form has been adopted for this purpose. The claim holder then must respond if it disagrees with facts stated in the motion, again using an Official Form to provide the required information. If the claim holder’s response asserts such a disagreement, the court, after notice and a hearing, will determine the status of the mortgage claim. If the claim holder fails to respond or does not dispute the facts set forth in the motion, the court may enter an order favorable to the moving party based on those facts."
+    p "Under subdivision (g), within 45 days after the last plan payment is made to the trustee, the trustee must file an End-of-Case Notice of Disbursements Made. An Official Form has been adopted for this purpose. The notice will state the amount that the trustee has paid to cure any default on the claim and whether the default has been cured. It will also state the amount that the trustee has disbursed on obligations that came due during the case and whether those payments are current as of the date of the notice. If the trustee has disbursed no amounts to the claim holder under either or both categories, the notice should be filed stating $0 for the amount disbursed. The claim holder then must respond within 28 days after service of the notice, again using an Official Form to provide the required information."
+    p "Either the trustee or the debtor may file a motion for a determination of final cure and payment. The motion, using the appropriate Official Form, may be filed within 45 days after the claim holder responds to the trustee’s notice under (g)(1), or, if the claim holder fails to respond to the notice, within 45 days after the notice was served. If the claim holder disagrees with any facts in the motion, it must respond within 28 days after the motion is served, using the appropriate Official Form. The court will then determine the status of the mortgage. A Director’s Form provides guidance on the type of information that should be included in the order."
+    p "Subdivision (h) was previously subdivision (i). It has been amended to clarify that the listed sanctions are authorized in addition to any other actions that the rule authorizes the court to take if the claim holder fails to provide notice or respond as required by the rule. Stylistic changes have also been made to the subdivision."
+    hash "ecfb26c516853ff77cf536f691b1a9195dc84338d9972cbbe83b59d6fcc8ef96"
+  }
+  layers {
+    operative "741fab22f9dcf9e6e198bc87b8d899306374b0e7f8594dc0645955ea4ceb60cf"
+    enacted "d1f939bc2354deb182f28f05bf9423aa9267bdb658fe219fcdc555f5b41d2d4b"
+    editorial "2ad3e0635db9de9c9dc57a054072d999517be0851ee656b946922ceb11cf20ca"
+  }
+}

@@ -1,0 +1,85 @@
+edition 2
+module "/us/usc/ptIX/rule9015" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9015" courtRule {
+    num "9015" "Rule 9015."
+    heading "Jury Trial"
+    provision "/us/usc/ptIX/rule9015/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content "In a bankruptcy case or proceeding, Fed. R. Civ. P. 38–39, 47–49, 51, and 81(c) (insofar as it applies to jury trials) apply. But a demand for a jury trial under Fed. R. Civ. P. 38(b) must be filed in accordance with Rule 5005."
+      hash "c4ce7bf6283e1354b36fa895f4684696160ea1ef1fcaafb4e74e0fe3e36be269"
+    }
+    provision "/us/usc/ptIX/rule9015/b" subsection {
+      num "b" "(b)"
+      heading "Jury Trial Before a Bankruptcy Judge."
+      chapeau "The parties may—jointly or separately—file a statement consenting to a jury trial conducted by a bankruptcy judge under 28 U.S.C. § 157(e) if:"
+      provision "/us/usc/ptIX/rule9015/b/1" paragraph {
+        num "1" "(1)"
+        content "the right to a jury trial applies;"
+        hash "f8ced9ff4f0dbffacd75b81ff011e8c5854237049375561841c963d33cfe0f91"
+      }
+      provision "/us/usc/ptIX/rule9015/b/2" paragraph {
+        num "2" "(2)"
+        content "a timely demand has been filed under Fed. R. Civ. P. 38(b);"
+        hash "6cc28516a53768e5de00bde2c70cd4dfab933238536415f5488feb8b3aadc783"
+      }
+      provision "/us/usc/ptIX/rule9015/b/3" paragraph {
+        num "3" "(3)"
+        content "the bankruptcy judge has been specially designated to conduct the jury trial; and"
+        hash "1c2a09029cd590f6f721db4f9ce4fa3ec22220efbda74c5b410c61c8b278a37e"
+      }
+      provision "/us/usc/ptIX/rule9015/b/4" paragraph {
+        num "4" "(4)"
+        content "the statement is filed within any time specified by local rule."
+        hash "1d2f3d74bc9e65db0a04eb69aa830e1bd0c6db1be2fccd24778b189a2f282752"
+      }
+      hash "7863537ad837ca9cf8a6ef102800b66194607e4385a5c92d5992a6b991f4c810"
+    }
+    provision "/us/usc/ptIX/rule9015/c" subsection {
+      num "c" "(c)"
+      heading "Judgment as a Matter of Law; Motion for a New Trial."
+      content "Fed. R. Civ. P. 50 applies in a bankruptcy case or proceeding—except that a renewed motion for judgment, or a request for a new trial, must be filed within 14 days after the judgment is entered."
+      hash "10c72fe26644f4680eecc7c25f0e85a1171fd36192414724ddcb9a646d20e709"
+    }
+    hash "e01830ff6f1b868544e674b0ee962ed694ce9a67cdb0db1884cabad004da8111"
+  }
+  credit "(Added Apr. 11, 1997, eff. Dec. 1, 1997; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997"
+    p "This rule provides procedures relating to jury trials. This rule is not intended to expand or create any right to trial by jury where such right does not otherwise exist."
+    p "GAP Report on Rule 9015. No changes to the published draft."
+    hash "425cce22a33e6d6ee8e30bf3f6d5a2afd4448898707fec95594efc898a079ff4"
+  }
+  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended by deleting Rule 50 F.R.Civ.P. from the list in subdivision (a) of rules made applicable in cases and proceedings. However, subdivision (c) is added to make Rule 50 applicable in cases and proceedings, but it limits the time for filing certain post judgment motions to 14 days after the entry of judgment. The amendment is necessary because Rule 50 F.R.Civ.P. was amended in 2009 to extend the deadline for the filing of these post judgment motions to 28 days. That deadline corresponds to the 30-day deadline for filing a notice of appeal in a civil case under Rule 4(a)(1)(A) F.R.App.P. In a bankruptcy case, the deadline for filing a notice of appeal is 14 days. Therefore, the 28-day deadline for filing these post judgment motions would effectively override the notice of appeal deadline under Rule 8002(a) but for this amendment."
+    p "Other amendments are stylistic."
+    hash "0fbf8e1a1222ec147b49deb437d9806efc8c8a4d2a9e5400d040feaa402ca838"
+  }
+  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9015 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "68dccfc355415dafab36754abbfe08aa9d96f0e4b444f140ab6601b7873194a8"
+  }
+  note "/us/usc/ptIX/rule9015/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subds. (a), (b)(2), and (c), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "8817de4d72be0a74f0c4185e757c0f39bf40bcdcb96265e89b77d7df2b6320bc"
+  }
+  layers {
+    operative "e01830ff6f1b868544e674b0ee962ed694ce9a67cdb0db1884cabad004da8111"
+    enacted "3b09276a53e8d6ab6af32c5880ad824b27043291aef171ec903e3afa1127028c"
+    editorial "895a105e353f7369ffcdf81921c29728f2c65778ef5b9353d6c800bcb5568965"
+  }
+}

@@ -1,0 +1,95 @@
+edition 2
+module "/us/usc/t45/s1301" {
+  within "/us/usc/t45/ch22/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1301" section {
+    num "1301" "§ 1301."
+    heading "Findings"
+    chapeau "The Congress finds that—"
+    provision "/us/usc/t45/s1301/1" paragraph {
+      num "1" "(1)"
+      content "the bankruptcy of the Penn Central and other railroads in the Northeast and Midwest resulted in a transportation emergency which required the intervention of the Federal Government;"
+      hash "7fdbc76f5e0711bc17c493a93f093acc0ed6abbefd7354ce7a10209166951a96"
+    }
+    provision "/us/usc/t45/s1301/2" paragraph {
+      num "2" "(2)"
+      content "the United States Government created the Consolidated Rail Corporation, which provides essential rail service to the Northeast and Midwest;"
+      hash "a3b5a67ad6f968e0552062e0517cd7c1ba24f7d2285c4f37e582b25a2aa9e2a6"
+    }
+    provision "/us/usc/t45/s1301/3" paragraph {
+      num "3" "(3)"
+      content "the future of rail service in the Northeast and Midwest is essential and must be protected through rail service obligations, consistent with the transfer of the Corporation to the private sector;"
+      hash "4f7422fd9c5154ac2baa3d692220195bcf9eef3e51782af616b1b3053ae8f37d"
+    }
+    provision "/us/usc/t45/s1301/4" paragraph {
+      num "4" "(4)"
+      content "the Northeast Rail Service Act of 1981 has achieved its purpose in allowing the Corporation to become financially self-sustaining;"
+      hash "65434255ae95a9fb292ec8ec6adf4003f38101f16f1059fecfee8a178f2a1229"
+    }
+    provision "/us/usc/t45/s1301/5" paragraph {
+      num "5" "(5)"
+      content "the Federal Government has invested over $7,000,000,000 in providing rail service to the Northeast and Midwest;"
+      hash "d2cfc929612eff017dda5d16753c227f40fc40f095844e2520207fd139b14671"
+    }
+    provision "/us/usc/t45/s1301/6" paragraph {
+      num "6" "(6)"
+      content "the Government, as a result of its ownership and investment of taxpayer dollars in the Corporation, controls substantial assets, including cash of approximately $1,000,000,000;"
+      hash "cb44f0a33d2f9da692fd578d1d870954b29856a16b1566ee51010d9e4528b3ed"
+    }
+    provision "/us/usc/t45/s1301/7" paragraph {
+      num "7" "(7)"
+      content "the Corporation’s viability and sound performance allow it to be sold to the American public for a substantial sum through a public offering;"
+      hash "00ff9b3a0bd9cb88d9ce72d174130eb0f57bf511e1aedc77817726f4cdc11817"
+    }
+    provision "/us/usc/t45/s1301/8" paragraph {
+      num "8" "(8)"
+      content "a public offering of the Corporation’s stock will preserve competitive rail service in the region, provide a reasonable return to the Government, and protect employment;"
+      hash "dafe7e30c8e1a100c86b70e798b1d3311cd2e54c04bc7d8f6189290a5cb5305d"
+    }
+    provision "/us/usc/t45/s1301/9" paragraph {
+      num "9" "(9)"
+      content "the Corporation’s employees contributed significantly to the turnaround in the Corporation’s financial performance and they should share in the Corporation’s success through a settlement of their claims for reimbursement for wages below industry standard, and a share in the common equity of the Corporation;"
+      hash "f781fbe898a0ddb33e7ee180a892b5d57ae4198eb4d610465aa410e3f9a25036"
+    }
+    provision "/us/usc/t45/s1301/10" paragraph {
+      num "10" "(10)"
+      content "the requirements of section 761(e)" mark "1" 1 " of this title are met by this chapter; and"
+      hash "283f6b404dbf12152bace5005d33669fc12834b99591ff2340926f25bc4af2a3"
+    }
+    provision "/us/usc/t45/s1301/11" paragraph {
+      num "11" "(11)"
+      content "the Secretary of Transportation has discharged the responsibilities of the Department of Transportation under the Northeast Rail Service Act of 1981 with respect to the sale of the Corporation as a single entity."
+      hash "d3a2f8d51516391e35524e14e1f19d87be1f81055c0021a641ef4671bd7f43aa"
+    }
+    hash "f8bfdc258aae85c1bbae12fae549dfaf460717938f933cd25eae5ec777df37a8"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4002" -> "/us/pl/99/509/tIV/s4002"] ", Oct. 21, 1986, " ["100 Stat. 1893" -> "/us/stat/100/1893"] ".)"
+  note "/us/usc/t45/s1301/note/editorialNotes/pl.97.35/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Northeast Rail Service Act of 1981, referred to in pars. (4) and (11), is subtitle E of title XI of " ["Pub. L. 97–35" -> "/us/pl/97/35"] ", §§ 1131–1169, Aug. 13, 1981, " ["95 Stat. 643" -> "/us/stat/95/643"] ". For complete classification of this Act to the Code, see Short Title note set out under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] " and Tables."
+    p ["Section 761 of this title" -> "/us/usc/t45/s761"] ", referred to in par. (10), was repealed by " ["Pub. L. 99–509, title IV, § 4033(a)(1)" -> "/us/pl/99/509/tIV/s4033/a/1"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] "."
+    p "This chapter, referred to in par. (10), was in the original “this subtitle” meaning subtitle A (§§ 4001–4052) of title IV of " ["Pub. L. 99–509" -> "/us/pl/99/509"] ", Oct. 21, 1986, " ["100 Stat. 1892" -> "/us/stat/100/1892"] ", known as the Conrail Privatization Act, which is classified principally to this chapter. For complete classification of subtitle A to the Code, see Short Title note set out below and Tables."
+    hash "ad1d319b90505ed256a0028e04e5ada9ab6edce9db3d4985ca326926dae1613c"
+  }
+  note "/us/usc/t45/s1301/note/statutoryNotes/pl.99.509/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p "Section 4001(a) of subtitle A (§§ 4001–4052) of title IV of " ["Pub. L. 99–509" -> "/us/pl/99/509"] " provided that:"
+    quoted "/us/pl/99/509" {
+      p "“This subtitle [enacting this chapter, amending sections 702, 726, 727, 741, 797, 821, 825, 829, 831, 1105, 1115, and 1116 of this title and sections 10362 and 10713 of Title 49, Transportation, repealing sections 761 to 769c, 797l, 825a, 1107, 1110, and 1114 of this title, and enacting provisions set out as a note under " ["section 797 of this title" -> "/us/usc/t45/s797"] "] may be cited as the ‘Conrail Privatization Act’.”"
+    }
+    hash "0b786eb48fe6abb582a673324633ce53c89af4c142a30b93c64261e33656045a"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "f8bfdc258aae85c1bbae12fae549dfaf460717938f933cd25eae5ec777df37a8"
+    enacted "a085ff4b72ff4b1a1eebc4519a4ec07d4e6e7a69c0d13290ab47605c38f4b47d"
+    editorial "fa606f0b673dfefff50a130ed419a8b3e357d5d7e4e42e9295eaccae9b6dff57"
+  }
+}

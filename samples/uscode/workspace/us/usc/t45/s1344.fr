@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/t45/s1344" {
+  within "/us/usc/t45/ch22/schII/ptC"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1344" section {
+    num "1344" "§ 1344."
+    heading "Status of Conrail after sale"
+    content "The Corporation shall be a rail carrier as defined in " ["section 10102 of title 49" -> "/us/usc/t49/s10102"] ", notwithstanding this subchapter."
+    hash "fd0b7466caf1e7549ba92cd60e3d511f4da2d5e985caa57d1ec887cfeac68fa4"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4036" -> "/us/pl/99/509/tIV/s4036"] ", Oct. 21, 1986, " ["100 Stat. 1909" -> "/us/stat/100/1909"] "; " ["Pub. L. 104–88, title III, § 332" -> "/us/pl/104/88/tIII/s332"] ", Dec. 29, 1995, " ["109 Stat. 953" -> "/us/stat/109/953"] ".)"
+  note "/us/usc/t45/s1344/note/editorialNotes/pl.104.88/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1995—" ["Pub. L. 104–88" -> "/us/pl/104/88"] " substituted “section 10102” for “section 10102(19)”."
+    hash "77f610e52ff8c605240ec44bd8e0b4ef4c47009d1cfd59a15677d717c9a619a8"
+  }
+  note "/us/usc/t45/s1344/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1995 Amendment"
+    p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
+    hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
+  }
+  layers {
+    operative "fd0b7466caf1e7549ba92cd60e3d511f4da2d5e985caa57d1ec887cfeac68fa4"
+    enacted "e130011aa74b9629a59ef7af4499fae9de95f0766b93568493c2f4969f1e58b6"
+    editorial "f5001f303eeafc3a0bc752158827ff7c4d2429b6cde84bca442012758116d1a8"
+  }
+}

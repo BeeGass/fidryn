@@ -1,0 +1,268 @@
+edition 2
+module "/us/usc/ptVIII/rule8002" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8002" courtRule {
+    num "8002" "Rule 8002."
+    heading "Time to File a Notice of Appeal"
+    provision "/us/usc/ptVIII/rule8002/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      provision "/us/usc/ptVIII/rule8002/a/1" paragraph {
+        num "1" "(1)"
+        content "Time to File. Except as (b) and (c) provide otherwise, a notice of appeal must be filed with the bankruptcy clerk within 14 days after the judgment, order, or decree to be appealed is entered."
+        hash "19e109a9efd5aa11cdf682d72b8b69c1fa16fc03f71a09aedb6063580ecd085d"
+      }
+      provision "/us/usc/ptVIII/rule8002/a/2" paragraph {
+        num "2" "(2)"
+        content "Filing Before the Entry of Judgment. A notice of appeal filed after the bankruptcy court announces a decision or order—but before entry of the judgment, order, or decree—is treated as filed on the date of and after the entry."
+        hash "e9a198910cb8760469e9113e0a459ce5754fa1290c79989b08b375f00fa2eb51"
+      }
+      provision "/us/usc/ptVIII/rule8002/a/3" paragraph {
+        num "3" "(3)"
+        content "Multiple Appeals. If one party timely files a notice of appeal, any other party may file a notice of appeal within 14 days after the date when the first notice was filed, or within the time otherwise allowed by this rule—whichever is later."
+        hash "d12f1330b6fb3b8cded5af3b95c4f2fa7d0124c38cf93ebf4ac83bb01d6b628f"
+      }
+      provision "/us/usc/ptVIII/rule8002/a/4" paragraph {
+        num "4" "(4)"
+        content "Mistaken Filing in Another Court. If a notice of appeal is mistakenly filed in a district court, BAP, or court of appeals, that court’s clerk must note on it the date when it was received and send it to the bankruptcy clerk. The notice is then considered filed in the bankruptcy court on the date noted."
+        hash "00ed20bc49fca46840b4493b5e174fd3be7e6dd4c65b414d15b82dca7f3618a7"
+      }
+      provision "/us/usc/ptVIII/rule8002/a/5" paragraph {
+        num "5" "(5)"
+        chapeau "Entry Defined."
+        provision "/us/usc/ptVIII/rule8002/a/5/A" subparagraph {
+          num "A" "(A)"
+          chapeau "In General. A judgment, order, or decree is entered for purposes of this subdivision (a):"
+          provision "/us/usc/ptVIII/rule8002/a/5/A/i" clause {
+            num "i" "(i)"
+            content "when it is entered in the docket under Rule 5003(a); or"
+            hash "bc2992ee29b617f2c4bcca42957ef85b1ac2f4841ae33c4880cd45a81530285a"
+          }
+          provision "/us/usc/ptVIII/rule8002/a/5/A/ii" clause {
+            num "ii" "(ii)"
+            content {
+              p "if Rule 7058 applies and Fed. R. Civ. P. 58(a) requires a separate document, when the judgment, order, or decree is entered in the docket under Rule 5003(a) and when the earlier of these events occurs:"
+              p "• the judgment, order, or decree is set out in a separate document; or"
+              p "• 150 days have run from entry of the judgment, order, or decree in the docket under Rule 5003(a)."
+            }
+            hash "a1c286d0ba47ac4ad5b86444b9a6588e0d6d41ebcfeb9d4fd37267d8b413e036"
+          }
+          hash "7023937239ab759f0f0c123e14c74fd5f3b27fbca32b61ba3f29d3d76ee17cfb"
+        }
+        provision "/us/usc/ptVIII/rule8002/a/5/B" subparagraph {
+          num "B" "(B)"
+          content "Failure to Use a Separate Document. A failure to set out a judgment, order, or decree in a separate document when required by Fed. R. Civ. P. 58(a) does not affect the validity of an appeal from that judgment, order, or decree."
+          hash "c0ab2925b8b0c6dbfa9a52a682697ea7f7987840a9144485ca636e530186f735"
+        }
+        hash "7f5214de35f27486bfe6cd5419a430d3f03273063f8e442507c521ae4d637630"
+      }
+      hash "7e22f3408186913e4d960b9e7988629af0a2bc4a498f5488a9866988fa5a479a"
+    }
+    provision "/us/usc/ptVIII/rule8002/b" subsection {
+      num "b" "(b)"
+      heading "Effect of a Motion on the Time to Appeal."
+      provision "/us/usc/ptVIII/rule8002/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. If a party files in the bankruptcy court any of the following motions—and does so within the time allowed by these rules—the time to file an appeal runs for all parties from the entry of the order disposing of the last such remaining motion:"
+        provision "/us/usc/ptVIII/rule8002/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "to amend or make additional findings under Rule 7052, whether or not granting the motion would alter the judgment;"
+          hash "62a67e00193f0dcc93fd8a6617bbfd1bd37bbdb18ff1d049e7907b22cbb3b0bc"
+        }
+        provision "/us/usc/ptVIII/rule8002/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "to alter or amend the judgment under Rule 9023;"
+          hash "43c2b549dc1100bb7f02e9656a6d0260e27909bd3ffa7158570680c2902feaeb"
+        }
+        provision "/us/usc/ptVIII/rule8002/b/1/C" subparagraph {
+          num "C" "(C)"
+          content "for a new trial under Rule 9023; or"
+          hash "2936da07a41ad4f73f36f0b9a973c7d8d86a671ecf817c4b1296e9b0944a95ed"
+        }
+        provision "/us/usc/ptVIII/rule8002/b/1/D" subparagraph {
+          num "D" "(D)"
+          content "for relief under Rule 9024 if the motion is filed within 14 days after the judgment is entered."
+          hash "78bbefec92af67951a6faac4199ec9455f8ff251164ba76e862a550744f35111"
+        }
+        hash "ab8b8add5e0d1e522cde6ddd48a8c9a4b5c4e51a605ea012a2c16f4b0396c825"
+      }
+      provision "/us/usc/ptVIII/rule8002/b/2" paragraph {
+        num "2" "(2)"
+        content "Notice of Appeal Filed Before a Motion Is Decided. If a party files a notice of appeal after the court announces or enters a judgment, order, or decree—but before it disposes of any motion listed in (1)—the notice becomes effective when the order disposing of the last such remaining motion is entered."
+        hash "1bb49b01705fd47174b4aa35583c56a78540751e59365c0dacc74301935c9d34"
+      }
+      provision "/us/usc/ptVIII/rule8002/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Appealing a Ruling on a Motion. A party intending to challenge an order disposing of a motion listed in (1)—or an alteration or amendment of a judgment, order, or decree made by a decision on the motion—must file a notice of appeal or an amended notice of appeal. It must:"
+        provision "/us/usc/ptVIII/rule8002/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "comply with Rule 8003 or 8004; and"
+          hash "d0125ed2c1f9830c5a19897a00d4919db6bc99dba44d70a05088cfeecbe97969"
+        }
+        provision "/us/usc/ptVIII/rule8002/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "be filed within the time allowed by this rule, measured from the entry of the order disposing of the last such remaining motion."
+          hash "8d66a8ede987911553ccd0e9c815719c4a647040e97715ee632d984544f2066e"
+        }
+        hash "b2e82c7db6c2af969d50694393cf1cf926ddf7e34467879dc98887b06e8d0bde"
+      }
+      provision "/us/usc/ptVIII/rule8002/b/4" paragraph {
+        num "4" "(4)"
+        content "No Additional Fee for an Amended Notice. No additional fee is required to file an amended notice of appeal."
+        hash "48836f4e1ead594e201e2f0eb20c73c8e33b57ae179e0e69ce6c036f14df29ef"
+      }
+      hash "3f15542e22cc260c23c37c4645000b8a08380a87d990051fab05622edb1a5fa0"
+    }
+    provision "/us/usc/ptVIII/rule8002/c" subsection {
+      num "c" "(c)"
+      heading "Appeal by an Inmate Confined in an Institution."
+      provision "/us/usc/ptVIII/rule8002/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. If an institution has a system designed for legal mail, an inmate confined there must use that system to receive the benefit of this paragraph (1). If an inmate files a notice of appeal from a bankruptcy court’s judgment, order, or decree, the notice is timely if it is deposited in the institution’s internal mail system on or before the last day for filing and:"
+        provision "/us/usc/ptVIII/rule8002/c/1/A" subparagraph {
+          num "A" "(A)"
+          chapeau "it is accompanied by:"
+          provision "/us/usc/ptVIII/rule8002/c/1/A/i" clause {
+            num "i" "(i)"
+            content "a declaration in compliance with 28 U.S.C. § 1746—or a notarized statement—setting out the date of deposit and stating that first-class postage is being prepaid; or"
+            hash "31fe186195e34f7e6fbfcc535e0cb04995f571029c127656beff0839bbe451c3"
+          }
+          provision "/us/usc/ptVIII/rule8002/c/1/A/ii" clause {
+            num "ii" "(ii)"
+            content "evidence (such as a postmark or date stamp) showing that the notice was so deposited and that postage was prepaid; or"
+            hash "9dffa1f424bbda2de47c9e37df0f0df660ba12f7400143ad94e437ecea84ed0e"
+          }
+          hash "3b26166cb883fb0b04065b7fe062d5cc1990fbd955d2a9ce3f35381c88e1dbdb"
+        }
+        provision "/us/usc/ptVIII/rule8002/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "the appellate court exercises its discretion to permit the later filing of a declaration or notarized statement that satisfies (A)(i)."
+          hash "1c9306e5b6da5f4d1ce26abbb54d42b799058ca79023903957f4eee0b57ad295"
+        }
+        hash "c07d83951999f8a8e6f758d327121002c2ecc160c9a27f41b0f4c98bf2569434"
+      }
+      provision "/us/usc/ptVIII/rule8002/c/2" paragraph {
+        num "2" "(2)"
+        content "Multiple Appeals. If an inmate files under this subdivision (c) the first notice of appeal, the 14-day period provided in (a)(3) for another party to file a notice of appeal runs from the date when the bankruptcy clerk dockets the first notice."
+        hash "3b5a6318d37dd1a87a08cd11d93db37616e8de447b4a0d9612b01aa3e76e950a"
+      }
+      hash "5c886aebb986da8d5dec0d65e64679fcb661b7ae5d4decd310f8b54b68b32305"
+    }
+    provision "/us/usc/ptVIII/rule8002/d" subsection {
+      num "d" "(d)"
+      heading "Extending the Time to File a Notice of Appeal."
+      provision "/us/usc/ptVIII/rule8002/d/1" paragraph {
+        num "1" "(1)"
+        chapeau "When the Time May Be Extended. Except as (2) provides otherwise, the bankruptcy court may, on motion, extend the time to file a notice of appeal if the motion is filed:"
+        provision "/us/usc/ptVIII/rule8002/d/1/A" subparagraph {
+          num "A" "(A)"
+          content "within the time allowed by this rule; or"
+          hash "a7c8e67107763efb3d297a1558e46c63255f994aa3d99ef9ea893c2b06031dfb"
+        }
+        provision "/us/usc/ptVIII/rule8002/d/1/B" subparagraph {
+          num "B" "(B)"
+          content "within 21 days after that time expires if the party shows excusable neglect."
+          hash "503b12454695bd1ffdaceb7105bbba91ce18c1fee389ad0beceb3a9ab15eeebd"
+        }
+        hash "582dad9b32e30c3ea6dfce3e066e11dcdd4caf31040f8d3fd548bbb1dc0921fa"
+      }
+      provision "/us/usc/ptVIII/rule8002/d/2" paragraph {
+        num "2" "(2)"
+        chapeau "When the Time Must Not Be Extended. The bankruptcy court must not extend the time to file the notice if the judgment, order, or decree being appealed:"
+        provision "/us/usc/ptVIII/rule8002/d/2/A" subparagraph {
+          num "A" "(A)"
+          content "grants relief from an automatic stay under § 362, 922, 1201, or 1301;"
+          hash "31f59486ec248a3bda84aa75a1aafd6620d330877a68c57e8173b184a3e401ed"
+        }
+        provision "/us/usc/ptVIII/rule8002/d/2/B" subparagraph {
+          num "B" "(B)"
+          content "authorizes the sale or lease of property or the use of cash collateral under § 363;"
+          hash "0fa8bdabd3785dc9bae6811c2a71f6f68cf515e5dda8e6221d2aa934444905ff"
+        }
+        provision "/us/usc/ptVIII/rule8002/d/2/C" subparagraph {
+          num "C" "(C)"
+          content "authorizes obtaining credit under § 364;"
+          hash "f3658154577adeac8c319d8d4892d3a124846cc2b067f56f04fa3bf540070a6a"
+        }
+        provision "/us/usc/ptVIII/rule8002/d/2/D" subparagraph {
+          num "D" "(D)"
+          content "authorizes assuming or assigning an executory contract or unexpired lease under § 365;"
+          hash "a4157a77ae094f9e4da6ee4b388d0cb0f1e31ade352ef8614f7cfa0fbe5617a0"
+        }
+        provision "/us/usc/ptVIII/rule8002/d/2/E" subparagraph {
+          num "E" "(E)"
+          content "approves a disclosure statement under § 1125; or"
+          hash "13f274e67a8cbdd1b58bc8546ed7dac6fd4a55f7d35d2252f8b1388a11f70f49"
+        }
+        provision "/us/usc/ptVIII/rule8002/d/2/F" subparagraph {
+          num "F" "(F)"
+          content "confirms a plan under § 943, 1129, 1225, or 1325."
+          hash "e1d96f62dfe2826584fff6f4645cb333d0edacc81a46ebf89364bd5d1f331830"
+        }
+        hash "da3eb05f224e9d5b3ab27b974a925baf06ab5b85ec8f7ec43417b52741b31c5f"
+      }
+      provision "/us/usc/ptVIII/rule8002/d/3" paragraph {
+        num "3" "(3)"
+        content "Limit on Extending Time. An extension of time must not exceed 21 days after the time allowed by this rule, or 14 days after the order granting the motion to extend time is entered—whichever is later."
+        hash "c0e6bcc32b021637503ada55051f563aa0b51e1d940468d7a06a3e5299d1dba5"
+      }
+      hash "5647ee6eec96cda6b31e0cbfd3521a8ad6ef8b44ad391b5e513b118897d49a2a"
+    }
+    hash "2193a51897a25374cf19d20671cde6c4162a3b6f82bd1954672de074912a6821"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8002, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 29, 1994, eff. Aug. 1, 1994; Apr. 11, 1997, eff. Dec. 1, 1997; Mar. 26, 2009, eff. Dec. 1, 2009, related to time for filing notice of appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "eabe9c77249cf89e378938210a596c8abe31082e9e14ce3c352b4a7708e17c05"
+  }
+  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8002 and F.R.App.P. 4(a) and (c). With the exception of subdivision (c), the changes to the former rule are stylistic. The rule retains the former rule’s 14-day time period for filing a notice of appeal, as opposed to the longer periods permitted for appeals in civil cases under F.R.App.P. 4(a)."
+    p "Subdivision (a) continues to allow any other party to file a notice of appeal within 14 days after the first notice of appeal is filed, or thereafter to the extent otherwise authorized by this rule. Subdivision (a) also retains provisions of the former rule that prescribe the date the notice of appeal is deemed filed if the appellant files it prematurely or in the wrong court."
+    p "Subdivision (b), like former Rule 8002(b) and F.R.App.P. 4(a), tolls the time for filing a notice of appeal when certain postjudgment motions are filed, and it prescribes the effective date of a notice of appeal that is filed before the court disposes of all of the specified motions. As under the former rule, a party that wants to appeal the court’s disposition of the motion or the alteration or amendment of a judgment, order, or decree in response to such a motion must file a notice of appeal or, if it has already filed one, an amended notice of appeal."
+    p "Although Rule 8003(a)(3)(C) requires a notice of appeal to be accompanied by the required fee, no additional fee is required for the filing of an amended notice of appeal."
+    p "Subdivision (c) mirrors the provisions of F.R.App.P. 4(c)(1) and (2), which specify timing rules for a notice of appeal filed by an inmate confined in an institution."
+    p "Subdivision (d) continues to allow the court to grant an extension of time to file a notice of appeal, except with respect to certain specified judgments, orders, and decrees."
+    p "Changes Made After Publication and Comment. Stylistic changes were made to the title of subdivision (b)(3) and to subdivision (c)(1)."
+    hash "19bbe27e437d597768f6f75b3bea22c82a71a25d616991636af9a3898ac00266"
+  }
+  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "Clarifying amendments are made to subdivisions (a), (b), and (c) of the rule. They are modeled on parallel provisions of F.R.App.P. 4."
+    p "Paragraph (5) is added to subdivision (a) to clarify the effect of the separate-document requirement of F.R.Civ.P. 58(a) on the entry of a judgment, order, or decree for the purpose of determining the time for filing a notice of appeal."
+    p "Rule 7058 adopts F.R.Civ.P. 58 for adversary proceedings. If Rule 58(a) requires a judgment to be set out in a separate document, the time for filing a notice of appeal runs—subject to subdivisions (b) and (c)—from when the judgment is docketed and the judgment is set out in a separate document or, if no separate document is prepared, from 150 days from when the judgment is entered in the docket. The court’s failure to comply with the separate-document requirement of Rule 58(a), however, does not affect the validity of an appeal."
+    p "Rule 58 does not apply in contested matters. Instead, under Rule 9021, a separate document is not required, and a judgment or order is effective when it is entered in the docket. The time for filing a notice of appeal under subdivision (a) therefore begins to run upon docket entry in contested matters, as well as in adversary proceedings for which Rule 58 does not require a separate document."
+    p "A clarifying amendment is made to subdivision (b)(1) to conform to a recent amendment to F.R.App.P. 4(a)(4)—from which Rule 8002(b)(1) is derived. Former Rule 8002(b)(1) provided that “[i]f a party timely files in the bankruptcy court” certain post-judgment motions, “the time to file an appeal runs for all parties from the entry of the order disposing of the last such remaining motion.” Responding to a circuit split concerning the meaning of “timely” in F.R.App.P. 4(a)(4), the amendment adopts the majority approach and rejects the approach taken in National Ecological Foundation v. Alexander, 496 F.3d 466 (6th Cir. 2007). A motion made after the time allowed by the Bankruptcy Rules will not qualify as a motion that, under Rule 8002(b)(1), re-starts the appeal time—and that fact is not altered by, for example, a court order that sets a due date that is later than permitted by the Bankruptcy Rules, another party’s consent or failure to object to the motion’s lateness, or the court’s disposition of the motion without explicit reliance on untimeliness."
+    p "Subdivision (c)(1) is revised to conform to F.R.App.P. 4(c)(1), which was recently amended to streamline and clarify the operation of the inmate-filing rule. The rule requires the inmate to show timely deposit and prepayment of postage. It is amended to specify that a notice is timely if it is accompanied by a declaration or notarized statement stating the date the notice was deposited in the institution’s mail system and attesting to the prepayment of first-class postage. The declaration must state that first-class postage “is being prepaid,”; not (as directed by the former rule) that first-class postage “has been prepaid.” This change reflects the fact that inmates may need to rely upon the institution to affix postage after the inmate has deposited the document in the institution’s mail system. A new Director’s Form sets out a suggested form of the declaration."
+    p "The amended rule also provides that a notice is timely without a declaration or notarized statement if other evidence accompanying the notice shows that the notice was deposited on or before the due date and that postage was prepaid. If the notice is not accompanied by evidence that establishes timely deposit and prepayment of postage, then the appellate court—district court, BAP, or court of appeals in the case of a direct appeal—has discretion to accept a declaration or notarized statement at a later date. The rule uses the phrase “exercises its discretion to permit”—rather than simply “permits”—to help ensure that pro se inmates are aware that a court will not necessarily forgive a failure to provide the declaration initially."
+    hash "f2662caa39854e1af31684910d8d87b9edd40acc0c5fb4f1ce7460fdc179477a"
+  }
+  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8002 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "3974c48741d87432d9adef9519bda5a8e4b3cc35715b6df1cf2394b7aff09d2d"
+  }
+  note "/us/usc/ptVIII/rule8002/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subd. (a)(5)(A)(ii), (B), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "b34d686175c4e3e97efac66c3a0ad62b4c8e8bed80c35ee33a92795e333f12d1"
+  }
+  layers {
+    operative "2193a51897a25374cf19d20671cde6c4162a3b6f82bd1954672de074912a6821"
+    enacted "d2990766f7620c8c14eae8bdfab2362843e3d9e61924e634a3ec08204ef33aac"
+    editorial "a987651c0d32d92de7c440e372f6f86e589b3fc6109cdd03963682e5747570f9"
+  }
+}

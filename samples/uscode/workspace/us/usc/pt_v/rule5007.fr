@@ -1,0 +1,67 @@
+edition 2
+module "/us/usc/ptV/rule5007" {
+  within "/us/usc/ptV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptV/rule5007" courtRule {
+    num "5007" "Rule 5007."
+    heading "Record of Proceedings; Transcripts"
+    provision "/us/usc/ptV/rule5007/a" subsection {
+      num "a" "(a)"
+      heading "Filing Original Notes, Tape Recordings, and Other Original Records of a Proceeding; Transcripts."
+      provision "/us/usc/ptV/rule5007/a/1" paragraph {
+        num "1" "(1)"
+        content "Records. The reporter or operator of a recording device must certify the original notes of testimony, any tape recordings, and other original records of a proceeding and must promptly file them with the clerk."
+        hash "5b18109b50e028c41045dd444398734921cebb962d38d366febab1da76045371"
+      }
+      provision "/us/usc/ptV/rule5007/a/2" paragraph {
+        num "2" "(2)"
+        content "Transcripts. A person who prepares a transcript must promptly file a certified copy with the clerk."
+        hash "cd07a6c8ac07d8f15ea0da3fa326fc21e9547da6172794e9e65702c3e23c2195"
+      }
+      hash "0dded762ef98ef75b7a669496f6f97468e52c8a7ff7a885110662b758cb2e99c"
+    }
+    provision "/us/usc/ptV/rule5007/b" subsection {
+      num "b" "(b)"
+      heading "Fee for a Transcript."
+      content "The fee for a copy of a transcript must be charged at the rate prescribed by the Judicial Conference of the United States. No fee may be charged for filing the certified copy."
+      hash "b5fd56df6146f43ffeee159a4ddf997a16017b1318c0de5294c43bc2b4bd2750"
+    }
+    provision "/us/usc/ptV/rule5007/c" subsection {
+      num "c" "(c)"
+      heading "Sound Recording or Transcript as Prima Facie Evidence."
+      content "In any proceeding, a certified sound recording or a transcript of a proceeding is admissible as prima facie evidence of the record."
+      hash "41fb2f8fe489e62bba58d3e830a5456db0859f586b34392a75bdb6ca16e90924"
+    }
+    hash "bd0c3d3e2d3586a227b38b9c6b7add66d846c23c361147a23f1b13f014422a41"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptV/rule5007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule supplements [former] 28 U.S.C. § 773. A record of proceedings before the bankruptcy judge is to be made whenever practicable. By whatever means the record is made, subdivision (a) requires that the preparer of the record certify and file the original notes, tape recording, or other form of sound recording of the proceedings. Similarly, if a transcript is requested, the preparer is to file a certified copy with the clerk."
+    p "Subdivision (b) is derived from 28 U.S.C. § 753(f)."
+    p "Subdivision (c) is derived from former Bankruptcy Rule 511(c). This subdivision extends to a sound recording the same evidentiary status as a transcript under [former] 28 U.S.C. § 773(b)."
+    hash "6affb9b45427f7a5362768949d83236750375313f032f6262640b561d77e1eb0"
+  }
+  note "/us/usc/ptV/rule5007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "The words “with the clerk” in the final sentence of subdivision (a) are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
+    hash "bd4748d5a8c1431c1408ca1117b704d6fc8b09b26627ceedc6f50bd17417f503"
+  }
+  note "/us/usc/ptV/rule5007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 5007 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "fae7f2c4fd3fb46f493d1299e9bc9b0549b83ee30fb31f239ba20ec335541cd8"
+  }
+  layers {
+    operative "bd0c3d3e2d3586a227b38b9c6b7add66d846c23c361147a23f1b13f014422a41"
+    enacted "d5f45ad67fe9a60b5126efdf0bd395b965338b52c42875c06a18b00ceb950ff9"
+    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+  }
+}

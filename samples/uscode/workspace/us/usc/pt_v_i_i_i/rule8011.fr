@@ -1,0 +1,248 @@
+edition 2
+module "/us/usc/ptVIII/rule8011" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8011" courtRule {
+    num "8011" "Rule 8011."
+    heading "Filing and Service; Signature"
+    provision "/us/usc/ptVIII/rule8011/a" subsection {
+      num "a" "(a)"
+      heading "Filing."
+      provision "/us/usc/ptVIII/rule8011/a/1" paragraph {
+        num "1" "(1)"
+        content "With the Clerk. A document required or permitted to be filed in a district court or BAP must be filed with the clerk of that court."
+        hash "4f3e30b8d25b7176c62466b01a7ae58ed732a0aaf198b35355f22bde6f828194"
+      }
+      provision "/us/usc/ptVIII/rule8011/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Method and Timeliness."
+        provision "/us/usc/ptVIII/rule8011/a/2/A" subparagraph {
+          num "A" "(A)"
+          chapeau "Nonelectronic Filing."
+          provision "/us/usc/ptVIII/rule8011/a/2/A/i" clause {
+            num "i" "(i)"
+            content "In General. For a document not filed electronically, filing may be accomplished by mail addressed to the district or BAP clerk. Except as provided in (ii) and (iii), filing is timely only if the clerk receives the document within the time set for filing."
+            hash "b0aeb0c68a47f148571edeee759d7086565834c03c23bc6c21cb7f19f38f7f30"
+          }
+          provision "/us/usc/ptVIII/rule8011/a/2/A/ii" clause {
+            num "ii" "(ii)"
+            content {
+              p "Brief or Appendix. A brief or appendix not filed electronically is also timely filed if, on or before the last day for filing, it is:"
+              p "• mailed to the clerk by first-class mail—or other class of mail that is at least as expeditious—postage prepaid; or"
+              p "• dispatched to a third-party commercial carrier for delivery to the clerk within 3 days."
+            }
+            hash "fe61a6b8229b233737352e69b9ed58e2a836ce2ecbef7bf165f56eba034d21ab"
+          }
+          provision "/us/usc/ptVIII/rule8011/a/2/A/iii" clause {
+            num "iii" "(iii)"
+            content {
+              p "Inmate Filing. If an institution has a system designed for legal mail, an inmate confined there must use that system to receive the benefit of this item (iii). A document not filed electronically by an inmate confined in an institution is timely if it is deposited in the institution’s internal mailing system on or before the last day for filing and:"
+              p "• it is accompanied by a declaration in compliance with 28 U.S.C. § 1746—or a notarized statement—setting out the date of deposit and stating that first-class postage is being prepaid; or by evidence (such as a postmark or date stamp) showing that the notice was so deposited and that postage was prepaid; or"
+              p "• the appellate court exercises its discretion to permit the later filing of a declaration or notarized statement that satisfies this item (iii)."
+            }
+            hash "014938cbb8fcd5c2edfe219ddf3139852783c00aa85ae8e4a37c425c49d90d61"
+          }
+          hash "8d7df77a54fdd1555a72f62f44cb4f2f1ac416b5c1e3448b0abd40d42728e739"
+        }
+        provision "/us/usc/ptVIII/rule8011/a/2/B" subparagraph {
+          num "B" "(B)"
+          chapeau "Electronic Filing."
+          provision "/us/usc/ptVIII/rule8011/a/2/B/i" clause {
+            num "i" "(i)"
+            content "By a Represented Person—Generally Required; Exceptions. An entity represented by an attorney must file electronically, unless nonelectronic filing is allowed by the court for cause or is allowed or required by local rule."
+            hash "9eff617436729f1863c93343b9123c4e14d6b6e21f9fa9fb3a03999e3d8ce1d7"
+          }
+          provision "/us/usc/ptVIII/rule8011/a/2/B/ii" clause {
+            num "ii" "(ii)"
+            content {
+              p "By an Unrepresented Individual—When Allowed or Required. An individual not represented by an attorney:"
+              p "• may file electronically only if allowed by court order or by local rule; and"
+              p "• may be required to file electronically only by court order, or by a local rule that includes reasonable exceptions."
+            }
+            hash "a89fee2dcf551ba1c193aae89e613ed2156ae2226f358ff55001f80f0631cb09"
+          }
+          provision "/us/usc/ptVIII/rule8011/a/2/B/iii" clause {
+            num "iii" "(iii)"
+            content "Same as a Written Paper. A document filed electronically is a written paper for purposes of these rules."
+            hash "38cdc1235d9b59ed66fc6d52fcc46e708c6439f7fa1c42be4940b1efcdf80d60"
+          }
+          hash "43defd29061840c31d2076e02f892b635ce73410e65c6b81b90c9c1df21d2fcc"
+        }
+        provision "/us/usc/ptVIII/rule8011/a/2/C" subparagraph {
+          num "C" "(C)"
+          content "When Paper Copies Are Required. No paper copies are required when a document is filed electronically. If a document is filed by mail or by delivery to the district court or BAP, no additional copies are required. But the district court or BAP may, by local rule or order in a particular case, require that a specific number of paper copies be filed or furnished."
+          hash "2ff4101da29932b7000aca7fbee39e4baf1e45e0236568eb192d173a7131ea78"
+        }
+        hash "5dec231f179a185a5180fe8ff578c18f376600ae14655860562d748709398718"
+      }
+      provision "/us/usc/ptVIII/rule8011/a/3" paragraph {
+        num "3" "(3)"
+        content "Clerk’s Refusal of Documents. The court clerk must not refuse to accept for filing any document solely because it is not presented in proper form as required by these rules or by any local rule or practice."
+        hash "7e34320c3765baa5736408795866f62744f1d9b3a12740d00e7277fb8db25e8d"
+      }
+      hash "104469e7d726b4b9784a7f4a54b25cca1fd9949785c4f0c4a02b361c8ab26b75"
+    }
+    provision "/us/usc/ptVIII/rule8011/b" subsection {
+      num "b" "(b)"
+      content "Service of All Documents Required." mark "1" 1 " Unless a rule requires service by the clerk, a party must, at or before the time of the filing of a document, serve it on the other parties to the appeal. Service on a party represented by counsel must be made on the party’s counsel."
+      hash "8e71d50b5299a5583224bcff93b22bd2f24f6f59ff5585ed7fd89d269e425fb4"
+    }
+    provision "/us/usc/ptVIII/rule8011/c" subsection {
+      num "c" "(c)"
+      heading "Manner of Service."
+      provision "/us/usc/ptVIII/rule8011/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "Nonelectronic Service. Nonelectronic service may be by any of the following:"
+        provision "/us/usc/ptVIII/rule8011/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "personal delivery;"
+          hash "0925e8f00f3535e2d9ea8b18307c34d32140d68a15376590ec61d88fba830730"
+        }
+        provision "/us/usc/ptVIII/rule8011/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "mail; or"
+          hash "d83bacedce2c540007fb8d01f7a6a3575f1080e3981f0d49cd73c23c3b53342a"
+        }
+        provision "/us/usc/ptVIII/rule8011/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "third-party commercial carrier for delivery within 3 days."
+          hash "d0faae3dcb333d252977cb35ad23bbb18eaf62ba5b55592399d049804125ef5c"
+        }
+        hash "4184e8b01e90481b1403d5c81cf36386b734612cb28f44e53cae38bf6d0247b1"
+      }
+      provision "/us/usc/ptVIII/rule8011/c/2" paragraph {
+        num "2" "(2)"
+        chapeau "Service By Electronic Means. Electronic service may be made by:"
+        provision "/us/usc/ptVIII/rule8011/c/2/A" subparagraph {
+          num "A" "(A)"
+          content "sending a document to a registered user by filing it with the court’s electronic-filing system; or"
+          hash "b2512d1de8fe8f6f155082355c10a4310020c42184279351248b33cec4f93710"
+        }
+        provision "/us/usc/ptVIII/rule8011/c/2/B" subparagraph {
+          num "B" "(B)"
+          content "using other electronic means that the person served consented to in writing."
+          hash "b28fa1361a225fe542aabced60ad98646113e42f139e8e9ea9150fa19338845b"
+        }
+        hash "f07668820ae7589935632d54d9a3d85ff106021f2e3a33d08bd331d15989f014"
+      }
+      provision "/us/usc/ptVIII/rule8011/c/3" paragraph {
+        num "3" "(3)"
+        content "When Service Is Complete. Service by mail or by third-party commercial carrier is complete on mailing or delivery to the carrier. Service by electronic means is complete on filing or sending, unless the person making service receives notice that the document was not received by the person served."
+        hash "8291ebd24157a4e6991a6e95826b96d7fe235e98dc241ea3d008f92568d1d70c"
+      }
+      hash "b19becdd1803744a9f87c38fecb4efb7cab5e59d951f614514950d7d8f465a87"
+    }
+    provision "/us/usc/ptVIII/rule8011/d" subsection {
+      num "d" "(d)"
+      heading "Proof of Service."
+      provision "/us/usc/ptVIII/rule8011/d/1" paragraph {
+        num "1" "(1)"
+        chapeau "Requirements. A document presented for filing must contain either of the following if it was served other than through the court’s electronic-filing system:"
+        provision "/us/usc/ptVIII/rule8011/d/1/A" subparagraph {
+          num "A" "(A)"
+          content "an acknowledgement of service by the person served; or"
+          hash "dd35a6f3411efbaf97d6ba839af1c01ad110bdcd7685fdacab4ed2bb0fd463a4"
+        }
+        provision "/us/usc/ptVIII/rule8011/d/1/B" subparagraph {
+          num "B" "(B)"
+          chapeau "proof of service consisting of a statement by the person who made service certifying:"
+          provision "/us/usc/ptVIII/rule8011/d/1/B/i" clause {
+            num "i" "(i)"
+            content "the date and manner of service;"
+            hash "109404a7553e6258fee1a6ef98e926a9e66ef389b87bac0bd7e19fcf97e6e9ae"
+          }
+          provision "/us/usc/ptVIII/rule8011/d/1/B/ii" clause {
+            num "ii" "(ii)"
+            content "the names of the persons served; and"
+            hash "68ad897c23456baf0c623df3ef3770bd3896aa882fc727686b1a7940933dad30"
+          }
+          provision "/us/usc/ptVIII/rule8011/d/1/B/iii" clause {
+            num "iii" "(iii)"
+            content "the mail or electronic address, the fax number, or the address of the place of delivery—as appropriate for the manner of service—for each person served."
+            hash "d8fb5ee5a09b6622651f9144c5d912948ce676b3f75535356c422ee3389b8272"
+          }
+          hash "4758c28308d59d341d834092629b54ed20c68af45aed14a60227093d3baddfe3"
+        }
+        hash "8fdcc0e11883827b145b04d3ae95a3ed5ae146d409c15fe31d99a6c8c40221d4"
+      }
+      provision "/us/usc/ptVIII/rule8011/d/2" paragraph {
+        num "2" "(2)"
+        content "Delayed Proof of Service. A district or BAP clerk may accept a document for filing without an acknowledgement or proof of service, but must require the acknowledgment or proof of service to be filed promptly thereafter."
+        hash "b2f6863295191b472c4ddf535c91c4be149af01fcf7e35cefb528798496341af"
+      }
+      provision "/us/usc/ptVIII/rule8011/d/3" paragraph {
+        num "3" "(3)"
+        content "For a Brief or Appendix. When a brief or appendix is filed, the proof of service must also state the date and manner by which it was filed."
+        hash "8ee8681c9248bcd648ff7290609885f910801d6a6c44631593be04589d3f841e"
+      }
+      hash "ef2514cb009794c571cca75306c6c11358e5d29ba0b3a17d577e2cecbc2a87d4"
+    }
+    provision "/us/usc/ptVIII/rule8011/e" subsection {
+      num "e" "(e)"
+      heading "Signature Always Required."
+      provision "/us/usc/ptVIII/rule8011/e/1" paragraph {
+        num "1" "(1)"
+        content "Electronic Filing. Every document filed electronically must include the electronic signature of the person filing it or, if the person is represented, the counsel’s electronic signature. A filing made through a person’s electronic-filing account and authorized by that person—together with that person’s name on a signature block—constitutes the person’s signature."
+        hash "c8ee046904977b8fc5bd19021394ee4bcbaab55e2aabae02f04c488dbce784cc"
+      }
+      provision "/us/usc/ptVIII/rule8011/e/2" paragraph {
+        num "2" "(2)"
+        content "Paper Filing. Every document filed in paper form must be signed by the person filing it or, if the person is represented, by the person’s counsel."
+        hash "374f03a93c3c3dea7edf3cb4cda2306dc4a5f367479dc7afb6cb8c0878399d79"
+      }
+      hash "5291291103a8feaac5a41b98dd2d7c0a77bed6e4ec953d3444aca52d046b4b54"
+    }
+    hash "d0bb3824ab012522c41107cc4e4c35fcd79dc06250be248cbe61de9258c65c76"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8011, Apr. 25, 1983, eff. Aug. 1, 1983, related to motions, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "f2264ed6bd753777b039c6585edc18644b23998644fa576a8f61d42985023fec"
+  }
+  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8008 and F.R.App.P. 25. It adopts some of the additional details of the appellate rule, and it provides greater recognition of the possibility of electronic filing and service."
+    p "Subdivision (a) governs the filing of documents in the district court or BAP. Consistent with other provisions of these Part VIII rules, subdivision (a)(2) requires electronic filing of documents, including briefs and appendices, unless the district court’s or BAP’s procedures permit or require other methods of delivery to the court. An electronic filing is timely if it is received by the district or BAP clerk within the time fixed for filing. No additional copies need to be submitted when documents are filed electronically, by mail, or by delivery unless the district court or BAP requires them."
+    p "Subdivision (a)(3) provides that the district or BAP clerk may not refuse to accept a document for filing solely because its form does not comply with these rules or any local rule or practice. The district court or BAP may, however, direct the correction of any deficiency in any document that does not conform to the requirements of these rules or applicable local rules, and may prescribe such other relief as the court deems appropriate."
+    p "Subdivisions (b) and (c) address the service of documents in the district court or BAP. Except for documents that the district or BAP clerk must serve, a party that makes a filing must serve copies of the document on the other parties to the appeal. Service on represented parties must be made on counsel. Subdivision (c) expresses the general requirement under these Part VIII rules that documents be sent electronically. See Rule 8001(c). Local court rules, however, may provide for other means of service, and subdivision (c) specifies non-electronic methods of service by or on an unrepresented party. Electronic service is complete upon transmission, unless the party making service receives notice that the transmission did not reach the person intended to be served in a readable form."
+    p "Subdivision (d) retains the former rule’s provisions regarding proof of service of a document filed in the district court or BAP. In addition, it provides that a certificate of service must state the mail or electronic address or fax number to which service was made."
+    p "Subdivision (e) is a new provision that requires an electronic signature of counsel or an unrepresented filer for documents that are filed electronically in the district court or BAP. A local rule may specify a method of providing an electronic signature that is consistent with any standards established by the Judicial Conference of the United States. Paper copies of documents filed in the district court or BAP must bear an actual signature of counsel or the filer. By requiring a signature, subdivision (e) ensures that a readily identifiable attorney or party takes responsibility for every document that is filed."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "2ebff1efa03494884686afb176410ce34a356484a26a9f7b0c7ccdb08d1c8ae6"
+  }
+  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "The rule is amended to conform to the amendments to F.R.App.P. 25 on inmate filing, electronic filing, signature, service, and proof of service."
+    p "Consistent with Rule 8001(c), subdivision (a)(2) generally makes electronic filing mandatory. The rule recognizes exceptions for persons proceeding without an attorney, exceptions for good cause, and variations established by local rule."
+    p "Subdivision (a)(2)(A)(iii) is revised to conform to F.R.App.P. 25(a)(2)(A)(iii), which was recently amended to streamline and clarify the operation of the inmate-filing rule. The rule requires the inmate to show timely deposit and prepayment of postage. It is amended to specify that a notice is timely if it is accompanied by a declaration or notarized statement stating the date the notice was deposited in the institution’s mail system and attesting to the prepayment of first-class postage. The declaration must state that first-class postage “is being prepaid,” not (as directed by the former rule) that first-class postage “has been prepaid.” This change reflects the fact that inmates may need to rely upon the institution to affix postage after the inmate has deposited the document in the institution’s mail system. A new Director’s Form sets out a suggested form of the declaration."
+    p "The amended rule also provides that a notice is timely without a declaration or notarized statement if other evidence accompanying the notice shows that the notice was deposited on or before the due date and that postage was prepaid. If the notice is not accompanied by evidence that establishes timely deposit and prepayment of postage, then the appellate court—district court, BAP, or court of appeals in the case of a direct appeal—has discretion to accept a declaration or notarized statement at a later date. The rule uses the phrase “exercises its discretion to permit”—rather than simply “permits”—to help ensure that pro se inmates are aware that a court will not necessarily forgive a failure to provide the declaration initially."
+    p "Subdivision (c) is amended to authorize electronic service by means of the court’s electronic-filing system on registered users without requiring their written consent. All other forms of electronic service require the written consent of the person served."
+    p "Service is complete when a person files the paper with the court’s electronic-filing system for transmission to a registered user, or when one person sends it to another person by other electronic means that the other person has consented to in writing. But service is not effective if the person who filed with the court or the person who sent by other agreed-upon electronic means receives notice that the paper did not reach the person to be served. The rule does not make the court responsible for notifying a person who filed the paper with the court’s electronic-filing system that an attempted transmission by the court’s system failed. But a filer who receives notice that the transmission failed is responsible for making effective service."
+    p "As amended, subdivision (d) eliminates the requirement of proof of service when service is made through the electronic-filing system. The notice of electronic filing generated by the system serves that purpose."
+    p "Subdivision (e) requires the signature of counsel or an unrepresented party on every document that is filed. A filing made through a person’s electronic-filing account and authorized by that person, together with that person’s name on a signature block, constitutes the person’s signature. A person’s electronic-filing account means an account established by the court for use of the court’s electronic-filing system, which account the person accesses with the user name and password (or other credentials) issued to that person by the court."
+    hash "13ee4b35c9b74092bdf74be5b42b7949bd30b5fc7c245eb604f8f77b2c2b1c6f"
+  }
+  note "/us/usc/ptVIII/rule8011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8011 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "8320e5bc16da63be80fbef9519778ee71f56d203c61e729dca9f677b554c532f"
+  }
+  footnote 1 "1" {
+    p "So in original. The heading probably should not be italicized."
+  }
+  layers {
+    operative "d0bb3824ab012522c41107cc4e4c35fcd79dc06250be248cbe61de9258c65c76"
+    enacted "bf88b1bde0d8cd0278520e6dba089e052322e8662cd2650edb54d1f089f3c045"
+    editorial "572854136cdad978f31c78f3b3ac51eec7acabc0d305094c0b158422cddb12ef"
+  }
+}

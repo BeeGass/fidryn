@@ -1,0 +1,69 @@
+{
+  "addresses": {
+    "aliases": 0,
+    "assigned": 0,
+    "disambiguated": 0
+  },
+  "containers": 1,
+  "containers_by_kind": {
+    "title": 1
+  },
+  "footnotes": 0,
+  "not_imported": {
+    "footnotes_in_tables_of_contents": 0,
+    "links_in_tables_of_contents": 0,
+    "links_without_words": 0,
+    "note_group_headings": 0,
+    "release_notes": 0,
+    "tables_of_contents": 0
+  },
+  "notes": {
+    "editorial": 0,
+    "enacted": 0
+  },
+  "notes_by_group": {},
+  "outside_by_body": {},
+  "prefix": "/us/usc",
+  "provisions": 6,
+  "references": {
+    "editorial": {
+      "ambiguous": 0,
+      "exact": 0,
+      "malformed": 0,
+      "no-unit": 0,
+      "outside": 0,
+      "range-form": 0,
+      "target-status": 0,
+      "unit-only": 0
+    },
+    "enacted": {
+      "ambiguous": 0,
+      "exact": 0,
+      "malformed": 0,
+      "no-unit": 0,
+      "outside": 0,
+      "range-form": 0,
+      "target-status": 0,
+      "unit-only": 0
+    },
+    "operative": {
+      "ambiguous": 0,
+      "exact": 0,
+      "malformed": 0,
+      "no-unit": 0,
+      "outside": 0,
+      "range-form": 0,
+      "target-status": 0,
+      "unit-only": 0
+    }
+  },
+  "release": "999-1",
+  "units": 1,
+  "units_by_kind": {
+    "section": 1
+  },
+  "units_by_status": {
+    "in-force": 1
+  },
+  "with_images": 0
+}

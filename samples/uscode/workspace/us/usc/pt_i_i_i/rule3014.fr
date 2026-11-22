@@ -1,0 +1,70 @@
+edition 2
+module "/us/usc/ptIII/rule3014" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3014" courtRule {
+    num "3014" "Rule 3014."
+    heading "Chapter 9 or 11—Secured Creditors’ Election to Apply § 1111(b)"
+    provision "/us/usc/ptIII/rule3014/a" subsection {
+      num "a" "(a)"
+      heading "Time for an Election."
+      provision "/us/usc/ptIII/rule3014/a/1" paragraph {
+        num "1" "(1)"
+        content "Chapter 9 or 11. In a Chapter 9 or 11 case, before a hearing on the disclosure statement concludes, a class of secured creditors may elect to apply § 1111(b)(2). If the disclosure statement is conditionally approved under Rule 3017.1 and a final hearing on it is not held, the election must be made within the time provided in Rule 3017.1(a)(2). In either situation, the court may set another time for the election."
+        hash "d4dbc8b4b76f2bde9324a1d978fba417cf99c46d6ba5a3bc37ee3629189bc2cd"
+      }
+      provision "/us/usc/ptIII/rule3014/a/2" paragraph {
+        num "2" "(2)"
+        content "Subchapter V of Chapter 11. In a case under Subchapter V of Chapter 11 in which § 1125 does not apply, the election may be made no later than a date the court sets."
+        hash "9ca46cf3dedb97a88255de88f040bd3cefa453cae4c83e898107da409d71dcef"
+      }
+      hash "771b74b51603edaad1056071a44bde62c350b5ecaa443f70aafb72480f1bc7e0"
+    }
+    provision "/us/usc/ptIII/rule3014/b" subsection {
+      num "b" "(b)"
+      heading "Signed Writing; Binding Effect."
+      content "The election must be made in writing and signed, unless made at the hearing on the disclosure statement. An election made by the majorities required by § 1111(b)(1)(A)(i) is binding on all members of the class."
+      hash "0605e9478cd14d480f5cd9783f0c4a3a93daf8012839b4f4b919724e3f04c8f7"
+    }
+    hash "52038042d9db9c22396a407fc37a58606301442558d9d3c60bbc7c82fe3f81c2"
+  }
+  credit "(As amended Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Pursuant to § 1111(b)(1) of the Code, a nonrecourse secured loan is converted, automatically, into a recourse loan thereby entitling the creditor to an unsecured deficiency claim if the value of the collateral is less than the debt. The class, however, may retain the loan as a nonrecourse loan by electing application of § 1111(b)(2) by the majorities stated in § 1111(b)(1)(A)(i). That section does not specify any time periods for making the election."
+    p "Rule 3014 provides that if no agreement is negotiated, the election of § 1111(b)(2) of the Code may be made at any time prior to conclusion of the hearing on the disclosure statement. Once the hearing has been concluded, it would be too late for a secured creditor class to demand different treatment unless the court has fixed a later time. This would be the case if, for example, a public class of secured creditors should have an approved disclosure statement prior to electing under § 1111(b)."
+    p "Generally it is important that the proponent of a plan ascertain the position of the secured creditor class before a plan is proposed. The secured creditor class must know the prospects of its treatment under the plan before it can intelligently determine its rights under § 1111(b). The rule recognizes that there may be negotiations between the proponent of the plan and the secured creditor leading to a representation of desired treatment under § 1111(b). If that treatment is approved by the requisite majorities of the class and culminates in a written, signed statement filed with the court, that statement becomes binding and the class may not thereafter demand different treatment under § 1111(b) with respect to that plan. The proponent of the plan is thus enabled to seek approval of the disclosure statement and transmit the plan for voting in anticipation of confirmation. Only if that plan is not confirmed may the class of secured creditors thereafter change its prior election."
+    p "While this rule and the Code refer to a class of secured creditors it should be noted that ordinarily each secured creditor is in a separate and distinct class. In that event, the secured creditor has the sole power to determine application of § 1111(b) with respect to that claim."
+    hash "5a10f9c1596f4d0ec1cfe6e1af3aaf4c7095c18c69f624e5f0b7f85e0948f14f"
+  }
+  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997 Amendment"
+    p "This amendment provides a deadline for electing application of § 1111(b)(2) in a small business case in which a conditionally approved disclosure statement is finally approved without a hearing."
+    p "GAP Report on Rule 3014. No changes to the published draft."
+    hash "39a145d92fe14ecf06f30a22acde14e42323e1e14d4fc5865bc22eea7252fcf0"
+  }
+  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022 Amendment"
+    p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. Because there generally will not be a disclosure statement in a subchapter V case, see § 1181(b) of the Code, the rule is amended to provide a deadline for making an election under § 1111(b) in such cases that is set by the court."
+    hash "187a74883ba7d5abb5b4e27609a12b1fafb02f6ccdc2202edb3e9a10ed2fbd0b"
+  }
+  note "/us/usc/ptIII/rule3014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3014 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "395968e202d7131aebe1c9788d809acedf4ddc14654434bdb1a7640b108cbcdd"
+  }
+  layers {
+    operative "52038042d9db9c22396a407fc37a58606301442558d9d3c60bbc7c82fe3f81c2"
+    enacted "841b7309edf1c37893c1a0b364d99f7b102d349d37d23e07479ae3da9baf87ac"
+    editorial "898a2123d81cc7d5b2eae685178a49e69d1b9fd50c76d6479e71b3a5fc6f2da7"
+  }
+}

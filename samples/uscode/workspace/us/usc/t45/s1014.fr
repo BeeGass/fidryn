@@ -1,0 +1,102 @@
+edition 2
+module "/us/usc/t45/s1014" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1014" section {
+    num "1014" "§ 1014."
+    heading "New career training assistance"
+    provision "/us/usc/t45/s1014/a" subsection {
+      num "a" "(a)"
+      heading "Eligible employees"
+      content "An employee who elects to receive a separation allowance under an employee protection agreement entered into or a benefit schedule prescribed under " ["section 1005 of this title" -> "/us/usc/t45/s1005"] " may, if so provided under such agreement or benefit schedule, receive from the Board reasonable expenses for training in qualified institutions for new career opportunities."
+      hash "53eb724da5a0f2bcc432d29321f9df053149dce9206fc834f0e006ba9a46e70b"
+    }
+    provision "/us/usc/t45/s1014/b" subsection {
+      num "b" "(b)"
+      heading "Conditions for assistance"
+      chapeau "To be eligible for assistance under this section, an employee—"
+      provision "/us/usc/t45/s1014/b/1" paragraph {
+        num "1" "(1)"
+        content "must first exhaust any Federal educational benefits available to such employee under any existing program; and"
+        hash "3f3e293edc891fda48f7b0e489c19e634827793117aaffe586d934ecd1655581"
+      }
+      provision "/us/usc/t45/s1014/b/2" paragraph {
+        num "2" "(2)"
+        content "must begin his course of training within 2 years following the date of such employee’s separation from employment with the Rock Island Railroad."
+        hash "31371d150ef689b99d181ccb6f8766a4ee9bc7118e182032c4e776cef2389e85"
+      }
+      hash "160ba6f953b22dd379ff794b9f43ba4c9649af0711b06bb3f8eb75a73143351d"
+    }
+    provision "/us/usc/t45/s1014/c" subsection {
+      num "c" "(c)"
+      heading "Determination of reasonable expenses by Board"
+      content "Reasonable expenses for assistance under this section shall be determined by the Board on the basis of an application therefor filed by an employee with the Board."
+      hash "a7d69b1ca64e270a321edc75eed8acb0fba0890f7f3ba0055271c0206098f66c"
+    }
+    provision "/us/usc/t45/s1014/d" subsection {
+      num "d" "(d)"
+      heading "Assistance prohibited after April 1, 1984"
+      content "No assistance may be provided under this section after April 1, 1984."
+      hash "4bdd5e92011e297a849b9f7a6e445cba870a2502dbd0cc2fb4b7f27868b10af6"
+    }
+    provision "/us/usc/t45/s1014/e" subsection {
+      num "e" "(e)"
+      heading "Definitions"
+      chapeau "As used in this section—"
+      provision "/us/usc/t45/s1014/e/1" paragraph {
+        num "1" "(1)"
+        content "the term “expenses” means actual, reasonable expenses paid for room, board, tuition, fees, or educational material in an amount not to exceed $3,000; and"
+        hash "b1ddaf8d8eae4b8e1c9db07a4482364f8e9ff5d76c88cb79cebdea16fd91be7f"
+      }
+      provision "/us/usc/t45/s1014/e/2" paragraph {
+        num "2" "(2)"
+        content "the term “qualified institution” means an educational institution accredited for payment by the Veterans’ Administration under chapter 36 of title 38, or a State-accredited institution which has been in existence for not less than 2 years."
+        hash "dcf1483ed423afb86fac43693e835dc2695858222e3734b799ff90c1928f79c5"
+      }
+      hash "acd8e3cf3ea219168f6acc0923966c96eb3b57eab6a55119b75508b9f288de06"
+    }
+    hash "d31dcb404060d2ebac739a6d3f84adba9d9498fd0d850b26676bebad0ba2a6c5"
+  }
+  credit "(" ["Pub. L. 96–254, title I, § 119(a)" -> "/us/pl/96/254/tI/s119/a"] "–(e), May 30, 1980, " ["94 Stat. 408" -> "/us/stat/94/408"] "; " ["Pub. L. 97–468, title II, § 233" -> "/us/pl/97/468/tII/s233"] ", Jan. 14, 1983, " ["96 Stat. 2547" -> "/us/stat/96/2547"] ".)"
+  note "/us/usc/t45/s1014/note/editorialNotes/pl.96.254/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Section is comprised of subsecs. (a) to (e) of " ["section 119 of Pub. L. 96–254" -> "/us/pl/96/254/s119"] ". Subsec. (f) of section 119 amended " ["section 911 of this title" -> "/us/usc/t45/s911"] "."
+    hash "6a83ee8b663c0ff9416fcd2ffac22284a5797e994137e10484c6712a03b29213"
+  }
+  note "/us/usc/t45/s1014/note/editorialNotes/pl.97.468/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1983—Subsec. (a). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " substituted “under an employee protection agreement entered into or a benefit schedule prescribed under " ["section 1005 of this title" -> "/us/usc/t45/s1005"] " may, if so provided under such agreement or benefit schedule,” for “from the Rock Island Railroad under an employee protection agreement or arrangement entered into under " ["section 1005 of this title" -> "/us/usc/t45/s1005"] " may”."
+    hash "96f2ae59ccc50c692b5326b18adf9ce526606d4ad03b3b05cb501329fd4ddcf7"
+  }
+  note "/us/usc/t45/s1014/note/statutoryNotes/pl.100.527/change-of-name" enacted {
+    group statutoryNotes
+    topic "changeOfName"
+    heading "Change of Name"
+    p "Reference to Veterans’ Administration deemed to refer to Department of Veterans Affairs pursuant to " ["section 10 of Pub. L. 100–527" -> "/us/pl/100/527/s10"] ", set out as a Department of Veterans Affairs Act note under " ["section 301 of Title 38" -> "/us/usc/t38/s301"] ", Veterans’ Benefits."
+    hash "8f287ec28c9989546a9525b68875f8240e914d3ae3ee85c8342c78666023494b"
+  }
+  definition "/us/usc/t45/s1014/e/1" {
+    term "expenses"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t45/s1014"
+    basis restated
+  }
+  definition "/us/usc/t45/s1014/e/2" {
+    term "qualified institution"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t45/s1014"
+    basis restated
+  }
+  layers {
+    operative "d31dcb404060d2ebac739a6d3f84adba9d9498fd0d850b26676bebad0ba2a6c5"
+    enacted "e81f3b7479b5f34051df1d481587687e5985b4b567c48ee48a0a80f3df1d8750"
+    editorial "c854aec88d0f8d9d5ec76e83d13d204c6ff039527001f08df919247c9dbe5bd4"
+  }
+}

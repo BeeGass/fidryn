@@ -63,26 +63,28 @@
     <ol>
       <li><a href="/docs/language" aria-current="page"><span class="n">&sect;2</span><span class="t">Language</span><span class="d">Modules, queries, rules, duties</span></a></li>
       <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="d">Records, valid-at, known-at</span></a></li>
+      <li><a href="/docs/law-modules"><span class="n">&sect;4</span><span class="t">Law modules</span><span class="d">Provisions of law as data</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Run</p>
     <ol>
-      <li><a href="/docs/cli"><span class="n">&sect;4</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
-      <li><a href="/docs/mill"><span class="n">&sect;5</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
+      <li><a href="/docs/cli"><span class="n">&sect;5</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
+      <li><a href="/docs/mill"><span class="n">&sect;6</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Read results</p>
     <ol>
-      <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
-      <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+      <li><a href="/docs/outcomes"><span class="n">&sect;7</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
+      <li><a href="/docs/examples"><span class="n">&sect;8</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+      <li><a href="/docs/coverage"><span class="n">&sect;9</span><span class="t">Coverage</span><span class="d">What the sample of the Code holds</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Contribute</p>
     <ol>
-      <li><a href="/docs/contributing"><span class="n">&sect;8</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+      <li><a href="/docs/contributing"><span class="n">&sect;10</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
     </ol>
   </div>
   <div class="group">
@@ -97,27 +99,35 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 2 &middot; Write</p>
     <h1 id="doc-title">The Fidryn language</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#where-a-statement-ends"><span class="n">2.11</span> Where a statement ends</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.12</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.13</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.14</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.15</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.16</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.17</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.18</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.19</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.20</span> Verify</a></li><li class="lvl-3"><a href="#the-fields-of-a-verify-block"><span class="n">2.20.1</span> The fields of a verify block</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.21</span> What the language will not do</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#editions"><span class="n">2.1</span> Editions</a></li><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.2</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.3</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.4</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.5</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.6</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.7</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.8</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.9</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.10</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.11</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#where-a-statement-ends"><span class="n">2.12</span> Where a statement ends</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.13</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.14</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.15</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.16</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.17</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.18</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.19</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.20</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.21</span> Verify</a></li><li class="lvl-3"><a href="#the-fields-of-a-verify-block"><span class="n">2.21.1</span> The fields of a verify block</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.22</span> What the language will not do</a></li></ol></details>
     <div class="prose">
 <p>Read this as a map of the constructs you will see in <code>.fr</code> files, then
 open the fixtures and check them. For build, <code>check</code>, and the first
 <code>run</code>, start with <a href="/docs/getting-started">Getting started</a>.</p>
 <p>Fidryn (FID-rin) is a language for legal instruments: precise where
 law is mechanical, explicit where judgment enters. This repository is
-the 0.2 research interpreter. Example modules are fixtures. They are
+the 0.3 research interpreter. Example modules are fixtures. They are
 not legal advice, not operative instruments, and not a complete
 statement of any jurisdiction's law.</p>
-<p>The grammar in <code>grammar.ebnf</code> is closed, but the 0.2 parser enforces
+<p>The grammar in <code>grammar.ebnf</code> is closed, but the 0.3 parser enforces
 that only inside <code>source</code> blocks, the bodies of rules and the request
 block of a judgment's <code>otherwise suspend NeedJudgment</code>. In most other
 declarations an unknown field is skipped without a diagnostic; see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>. Copy from an existing
 <code>.fr</code> file when you are unsure a spelling parses. The reference is
 <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>.</p>
-<h2 id="surface-inventory-status-qualified"><span class="hn">2.1</span> Surface inventory (status-qualified) <a class="anchor" href="#surface-inventory-status-qualified" aria-label="Link to this section">#</a></h2>
+<h2 id="editions"><span class="hn">2.1</span> Editions <a class="anchor" href="#editions" aria-label="Link to this section">#</a></h2>
+<p>A <code>.fr</code> file is of one of two editions. This guide describes the first,
+which carries no marker: modules of queries, rules and the other
+declarations below, which the interpreter checks and runs. A file whose
+first two words are <code>edition 2</code>, before which only white space and
+comments may stand, is a law module of edition 2: it holds provisions of
+law as data in a grammar of its own, and it is checked and never
+evaluated. Its reference is <a href="/docs/law-modules">Law modules</a>.</p>
+<h2 id="surface-inventory-status-qualified"><span class="hn">2.2</span> Surface inventory (status-qualified) <a class="anchor" href="#surface-inventory-status-qualified" aria-label="Link to this section">#</a></h2>
 <p>The grammar (<a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>) is broader than this map.
 Use the table as a honesty check; open a fixture for the full field list.
-Support in 0.2 is <strong>parsed / checked / executed</strong> only where noted — see
+Support in 0.3 is <strong>parsed / checked / executed</strong> only where noted — see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Construct</th><th>Fixture example</th><th>Status note</th></tr></thead><tbody>
 <tr><td><code>import</code> (+ <code>digest</code> / <code>alias</code>)</td><td><code>examples/trust/bryan-revocable-trust.fr</code></td><td>Parsed. <code>alias</code> is accepted and ignored. An import with no digest and no matching package does nothing.</td></tr>
@@ -135,7 +145,7 @@ Support in 0.2 is <strong>parsed / checked / executed</strong> only where noted 
 <tr><td>Module type parameters</td><td>status</td><td>Type-name substitution only; no cross-file value-parameter calculus</td></tr>
 </tbody></table>
 </div>
-<h2 id="module-header"><span class="hn">2.2</span> Module header <a class="anchor" href="#module-header" aria-label="Link to this section">#</a></h2>
+<h2 id="module-header"><span class="hn">2.3</span> Module header <a class="anchor" href="#module-header" aria-label="Link to this section">#</a></h2>
 <p>Every file is one module. The header names the instrument, the dated
 slice it encodes, and what it refuses to claim.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">module</span> <span class="tk-ty">Programs</span><span class="tk-pu">.</span><span class="tk-ty">LatePayment</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;0.1.0&quot;</span> <span class="tk-pu">{</span>
@@ -199,7 +209,7 @@ to the module file:</p>
 that omit a manifest get an empty default. CLI <code>check</code> / <code>run</code> of a
 path can byte-authenticate artifacts against files next to the module.
 Pasted source in the <a href="/docs/mill">Mill</a> does not.</p>
-<h2 id="sources-and-digests"><span class="hn">2.3</span> Sources and digests <a class="anchor" href="#sources-and-digests" aria-label="Link to this section">#</a></h2>
+<h2 id="sources-and-digests"><span class="hn">2.4</span> Sources and digests <a class="anchor" href="#sources-and-digests" aria-label="Link to this section">#</a></h2>
 <p>A <code>source { }</code> block names an artifact the module is encoding.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">source</span> FinalPayStatute <span class="tk-pu">{</span>
     <span class="tk-kw">kind</span> statute
@@ -209,7 +219,7 @@ Pasted source in the <a href="/docs/mill">Mill</a> does not.</p>
     <span class="tk-kw">digest</span> fixture
     <span class="tk-kw">effective</span> <span class="tk-pu">[</span><span class="tk-nu">2026-09-17</span><span class="tk-pu">,</span> <span class="tk-nu">+inf</span><span class="tk-pu">)</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p>In 0.2 a <code>source</code> block is a record for the reader. The parser rejects
+<p>In 0.3 a <code>source</code> block is a record for the reader. The parser rejects
 an unknown field in it, and the checker requires an <code>artifact</code> field
 (<code>E540</code>). The checker also types the source's name as a <code>String</code>, so a
 query that returns <code>FinalPayStatute</code> passes <code>check</code>, but <code>run</code> fails
@@ -228,11 +238,11 @@ the module directory or to <code>--source-root</code>, and compare. A missing fi
 or a mismatch leaves the artifact unauthenticated, and an import that
 requires that digest fails with E200. Pasted source in the
 <a href="/docs/mill">Mill</a> reads no manifest and no files.</p>
-<h2 id="imports"><span class="hn">2.4</span> Imports <a class="anchor" href="#imports" aria-label="Link to this section">#</a></h2>
+<h2 id="imports"><span class="hn">2.5</span> Imports <a class="anchor" href="#imports" aria-label="Link to this section">#</a></h2>
 <p>Modules may import another module by name and version. An import that
 carries a <code>digest</code> must find that digest on an authenticated artifact of
 the source manifest above, or the checker reports E200. An <code>alias</code> line
-in an import is accepted and ignored in 0.2.</p>
+in an import is accepted and ignored in 0.3.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">import</span> <span class="tk-ty">MA</span><span class="tk-pu">.</span><span class="tk-ty">TrustLaw</span><span class="tk-pu">.</span><span class="tk-ty">Fixture</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;2026-08-23&quot;</span>
 <span class="tk-kw">import</span> <span class="tk-ty">Agency</span><span class="tk-pu">.</span><span class="tk-ty">FOIARegulations</span> <span class="tk-kw">version</span> <span class="tk-st">&quot;fixture-2026-08-23&quot;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">digest</span> fixture
@@ -243,7 +253,7 @@ digest in an import asks for a manifest artifact with that digest whose
 file <code>check</code> or <code>run</code> of a path has read and matched. With no matching
 manifest artifact the import is E200. Mill paste loads no manifest, so
 there an import with a digest is always E200.</p>
-<h2 id="entities-propositions-and-offices"><span class="hn">2.5</span> Entities, propositions, and offices <a class="anchor" href="#entities-propositions-and-offices" aria-label="Link to this section">#</a></h2>
+<h2 id="entities-propositions-and-offices"><span class="hn">2.6</span> Entities, propositions, and offices <a class="anchor" href="#entities-propositions-and-offices" aria-label="Link to this section">#</a></h2>
 <p>Name the parties and the propositions you will later test. A
 proposition is not a Boolean.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">entity</span> Payer <span class="tk-pu">:</span> <span class="tk-ty">NaturalPerson</span>
@@ -260,7 +270,7 @@ proposition is not a Boolean.</p>
     <span class="tk-kw">lost_by</span> <span class="tk-pu">{</span>Death<span class="tk-pu">,</span> EffectiveResignation<span class="tk-pu">,</span> EffectiveRemoval<span class="tk-pu">}</span>
     <span class="tk-kw">competence</span> <span class="tk-pu">{</span>AdministerTrust<span class="tk-pu">,</span> DecideTrustDistributions<span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
-<p>Fidryn 0.2 reads only an office's name and parameters. The rest of the
+<p>Fidryn 0.3 reads only an office's name and parameters. The rest of the
 declaration, <code>occupied_by</code> and every field in the body, is discarded:
 every office reaches the intermediate representation with occupant type
 <code>LegalPerson</code>, at most one occupant and no competence, and nothing reads
@@ -269,7 +279,7 @@ the declaration at run time (test
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>).</p>
 <p><code>Occupies(Bryan, TrusteeOf(BRT))</code> is a proposition about that office,
 not a <code>Bool</code>.</p>
-<h2 id="record-and-evidence-types"><span class="hn">2.6</span> Record and evidence types <a class="anchor" href="#record-and-evidence-types" aria-label="Link to this section">#</a></h2>
+<h2 id="record-and-evidence-types"><span class="hn">2.7</span> Record and evidence types <a class="anchor" href="#record-and-evidence-types" aria-label="Link to this section">#</a></h2>
 <p>Name structured payloads the case and Observe paths will carry.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">record_type</span> FOIARequest <span class="tk-pu">{</span>
     <span class="tk-co">// fields as in examples/foia/foia-request.fr</span>
@@ -280,7 +290,7 @@ not a <code>Bool</code>.</p>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>These declarations are part of the closed grammar. Copy field shapes from
 an existing fixture rather than inventing spellings.</p>
-<h2 id="observations"><span class="hn">2.7</span> Observations <a class="anchor" href="#observations" aria-label="Link to this section">#</a></h2>
+<h2 id="observations"><span class="hn">2.8</span> Observations <a class="anchor" href="#observations" aria-label="Link to this section">#</a></h2>
 <p>An <code>observation</code> names an evidence-shaped fact the evaluator may Observe.
 Its header binds one record and, after <code>establishes</code>, gives the
 proposition that the record establishes. Its body holds the conditions
@@ -297,7 +307,7 @@ the record must meet. This one is from
 <p>Observe still requires a matching case evidence row with <code>observedAt</code> at
 or before <code>--known-at</code>. Declaring an observation does not invent the
 record.</p>
-<h2 id="queries-goals-and-effects"><span class="hn">2.8</span> Queries, goals, and effects <a class="anchor" href="#queries-goals-and-effects" aria-label="Link to this section">#</a></h2>
+<h2 id="queries-goals-and-effects"><span class="hn">2.9</span> Queries, goals, and effects <a class="anchor" href="#queries-goals-and-effects" aria-label="Link to this section">#</a></h2>
 <p>A query is the thing you <code>run</code>. The body is <code>return</code> / <code>require</code>
 statements or an explicit <code>goal</code>. Fixtures use <code>Evaluate</code>,
 <code>UniqueOccupant</code>, <code>RunDecision</code>, and <code>StatusOf</code>.</p>
@@ -337,7 +347,7 @@ a promise that the engine will invent evidence. If the case does not
 supply what the effect needs, the outcome is <code>suspended</code>. <code>run</code> never
 fills that request. See <a href="/docs/outcomes">Outcomes</a> and
 <a href="/docs/cases-and-time">Cases and time</a>.</p>
-<h2 id="automatic-versus-judgment"><span class="hn">2.9</span> Automatic versus judgment <a class="anchor" href="#automatic-versus-judgment" aria-label="Link to this section">#</a></h2>
+<h2 id="automatic-versus-judgment"><span class="hn">2.10</span> Automatic versus judgment <a class="anchor" href="#automatic-versus-judgment" aria-label="Link to this section">#</a></h2>
 <p>Mark a query <code>automatic</code> only when the answer is mechanical and the
 effect row is empty.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">query</span> <span class="tk-kw">automatic</span> pay_due_immediately<span class="tk-pu">(</span>discharged<span class="tk-pu">:</span> <span class="tk-ty">Bool</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Bool</span> <span class="tk-pu">{</span>
@@ -365,7 +375,7 @@ it needs, and what happens on established / rejected / otherwise. The
 trust fixture's incapacity judgment requires two distinct physician
 certificates and otherwise suspends <code>NeedJudgment</code>. The language will
 not collapse "the physicians have not spoken" into <code>false</code>.</p>
-<h2 id="require-return-and-sequential-evaluation"><span class="hn">2.10</span> Require, return, and sequential evaluation <a class="anchor" href="#require-return-and-sequential-evaluation" aria-label="Link to this section">#</a></h2>
+<h2 id="require-return-and-sequential-evaluation"><span class="hn">2.11</span> Require, return, and sequential evaluation <a class="anchor" href="#require-return-and-sequential-evaluation" aria-label="Link to this section">#</a></h2>
 <p>Statements in a block run left to right. Several statements lower to
 a <code>seq</code>; the last value is the result. <code>require</code> is a gate: <code>true</code>
 continues, <code>false</code> suspends and does not return the later value.</p>
@@ -377,7 +387,7 @@ runs both. Nested <code>seq</code> under <code>+</code>, a call, or <code>if</co
 the completed prefix, so a later term does not re-run an earlier
 attach.</p>
 <p><code>require determined P using Determine</code> asks for a determination of <code>P</code>
-instead of treating <code>P</code> as a Bool. In 0.2 the <code>using</code> clause is parsed
+instead of treating <code>P</code> as a Bool. In 0.3 the <code>using</code> clause is parsed
 and discarded. Any determination of <code>P</code> on the case that names a
 protocol and a decider answers the requirement. A negative determination
 fails it, and with none the query suspends with a request for a judgment
@@ -388,7 +398,7 @@ and the line below it is not read as the name.</p>
 <code>calc</code> or an <code>fn</code>, or a <code>transaction</code> block cannot read is rejected with
 <code>E100</code>, wherever it stands in the block. A <code>return</code> with no expression is
 one.</p>
-<h2 id="where-a-statement-ends"><span class="hn">2.11</span> Where a statement ends <a class="anchor" href="#where-a-statement-ends" aria-label="Link to this section">#</a></h2>
+<h2 id="where-a-statement-ends"><span class="hn">2.12</span> Where a statement ends <a class="anchor" href="#where-a-statement-ends" aria-label="Link to this section">#</a></h2>
 <p>A statement ends at a <code>;</code> or at the end of its line. It goes on into the
 next line in two cases.</p>
 <ul>
@@ -467,7 +477,7 @@ The six header keywords, <code>jurisdiction</code>, <code>source_snapshot</code>
 <code>source_manifest</code>, <code>effective_at</code>, <code>recorded_at</code> and <code>outside_scope</code>, are
 rejected with <code>E100</code> in the same way when the statement ends with the
 keyword: the value is not read from the next line.</p>
-<h2 id="calc-conditionals-money-and-durations"><span class="hn">2.12</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
+<h2 id="calc-conditionals-money-and-durations"><span class="hn">2.13</span> Calc, conditionals, money, and durations <a class="anchor" href="#calc-conditionals-money-and-durations" aria-label="Link to this section">#</a></h2>
 <p><code>calc</code> is a total, effect-free function. It must not recurse (E530).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">calc</span> return_deadline<span class="tk-pu">(</span><span class="tk-pu">)</span> <span class="tk-pu">-&gt;</span> <span class="tk-ty">Duration</span><span class="tk-pu">&lt;</span><span class="tk-kw">counted_days</span><span class="tk-pu">&gt;</span> <span class="tk-pu">{</span>
     <span class="tk-kw">return</span> <span class="tk-nu">21</span> <span class="tk-nu">counted_days</span>
@@ -478,7 +488,7 @@ keyword: the value is not read from the next line.</p>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>A <code>calc</code> or an <code>fn</code> needs its <code>{ ... }</code> body. A header with none is
 rejected with <code>E100</code>.</p>
-<p>Fidryn 0.2 cannot add a duration to a time in an expression: <code>end + return_deadline()</code>, with <code>end: Time</code>, is <code>E210</code>. A deadline is computed
+<p>Fidryn 0.3 cannot add a duration to a time in an expression: <code>end + return_deadline()</code>, with <code>end: Time</code>, is <code>E210</code>. A deadline is computed
 only by a duty's <code>due</code> clause; see <a href="#duties">Duties</a>.</p>
 <p>Money is <code>USD(100.00)</code>, never an untyped decimal. Durations carry a
 calendar kind (<code>counted_days</code>, <code>calendar_days</code>, <code>working_days</code>,
@@ -514,7 +524,7 @@ the module is rejected with <code>E100</code>.</p>
     <span class="tk-kw">goal</span> Evaluate <span class="tk-pu">{</span> <span class="tk-kw">if</span> Incapacitated<span class="tk-pu">(</span>Bryan<span class="tk-pu">)</span> <span class="tk-pu">{</span> Bryan <span class="tk-pu">}</span> <span class="tk-pu">}</span>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>Use <code>when operative P</code> on a rule, or <code>require determined P using Determine</code> in a query. <code>Prop</code> has no conversion to <code>Bool</code>.</p>
-<h2 id="rules"><span class="hn">2.13</span> Rules <a class="anchor" href="#rules" aria-label="Link to this section">#</a></h2>
+<h2 id="rules"><span class="hn">2.14</span> Rules <a class="anchor" href="#rules" aria-label="Link to this section">#</a></h2>
 <p>A <code>rule</code> fires when a guard holds, then derives or establishes a
 proposition. The current staged worklist is <strong>bounded and specialized</strong>
 (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a>); this is not a
@@ -537,7 +547,7 @@ a proposition: <code>then establish 5</code> is rejected with <code>E210</code>,
 consequence that is the name of an entity whose type is neither <code>Prop</code>
 nor an alias of <code>Prop</code>. Two more lines are accepted:
 <code>valid_time</code> and <code>record_time</code>, each followed by an interval with both of
-its bounds, such as <code>[2026-08-14, +inf)</code>. Fidryn 0.2 reads them and does
+its bounds, such as <code>[2026-08-14, +inf)</code>. Fidryn 0.3 reads them and does
 not apply them: the consequences of the rule hold at every time, whatever
 the interval says (see
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md#known-limits-pinned-by-tests">implementation-status</a>).</p>
@@ -550,7 +560,7 @@ must use <code>operative</code>, <code>determined</code>, <code>assumed</code>, 
 bare proposition. The successor rule in the trust fixture also
 <code>select unique candidate from nominations_for(...)</code> with
 <code>require unique nomination_rank</code>. A tie is not a silent pick.</p>
-<h2 id="interpretation-families"><span class="hn">2.14</span> Interpretation families <a class="anchor" href="#interpretation-families" aria-label="Link to this section">#</a></h2>
+<h2 id="interpretation-families"><span class="hn">2.15</span> Interpretation families <a class="anchor" href="#interpretation-families" aria-label="Link to this section">#</a></h2>
 <p>When the instrument still admits more than one reading, declare the
 family and what each alternative establishes.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">interpretation_family</span> DeadlineMeaning <span class="tk-pu">{</span>
@@ -574,7 +584,7 @@ and the case has not selected one, the outcome is <code>suspended</code>
 <p>The trust fixture binds a family to a clause and names a selector
 (<code>explicit_instrument_definition or controlling_interpretation or request Interpret</code>). That is how a court selection on the case becomes
 operative. It is not a default vote.</p>
-<h2 id="nominations"><span class="hn">2.15</span> Nominations <a class="anchor" href="#nominations" aria-label="Link to this section">#</a></h2>
+<h2 id="nominations"><span class="hn">2.16</span> Nominations <a class="anchor" href="#nominations" aria-label="Link to this section">#</a></h2>
 <p>A nomination is a ranked candidate for an office.</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">nomination</span> Alice <span class="tk-kw">for</span> TrusteeOf<span class="tk-pu">(</span>BRT<span class="tk-pu">)</span> <span class="tk-kw">rank</span> <span class="tk-nu">1</span>
     <span class="tk-kw">from</span> Instrument<span class="tk-pu">.</span><span class="tk-kw">clause</span><span class="tk-pu">(</span><span class="tk-st">&quot;4.4.a&quot;</span><span class="tk-pu">)</span>
@@ -587,12 +597,12 @@ occupancy record, eligibility, and any required acceptance. Open
 eligibility stays <code>suspended</code>, or becomes <code>contingent</code> under
 <a href="/docs/cli">CLI</a> <code>explore</code> with declared bounds. It does not collapse to
 the first name on the list.</p>
-<h2 id="powers-legal-acts-clauses-and-conflict-doctrines"><span class="hn">2.16</span> Powers, legal acts, clauses, and conflict doctrines <a class="anchor" href="#powers-legal-acts-clauses-and-conflict-doctrines" aria-label="Link to this section">#</a></h2>
+<h2 id="powers-legal-acts-clauses-and-conflict-doctrines"><span class="hn">2.17</span> Powers, legal acts, clauses, and conflict doctrines <a class="anchor" href="#powers-legal-acts-clauses-and-conflict-doctrines" aria-label="Link to this section">#</a></h2>
 <p>These constructs appear in fixtures (trust, FOIA, prenup, minimum wage).</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">power</span> SettlorAmendmentPower <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
 <span class="tk-kw">legal_act</span> AcceptOffice<span class="tk-pu">(</span>candidate<span class="tk-pu">:</span> <span class="tk-ty">LegalPerson</span><span class="tk-pu">,</span> <span class="tk-kw">office</span><span class="tk-pu">:</span> <span class="tk-ty">Office</span><span class="tk-pu">)</span> <span class="tk-pu">{</span> <span class="tk-pu">..</span><span class="tk-pu">.</span> <span class="tk-pu">}</span>
 <span class="tk-kw">conflict_doctrine</span> ChildSupportCannotBeAdverselyAffected <span class="tk-pu">..</span><span class="tk-pu">.</span></code></pre></figure>
-<p>Fidryn 0.2 does not interpret the bodies of <code>power</code>, <code>legal_act</code>,
+<p>Fidryn 0.3 does not interpret the bodies of <code>power</code>, <code>legal_act</code>,
 <code>conflict_doctrine</code> or <code>scenario</code> declarations, so an unknown field in
 one of them passes without a diagnostic. A <code>clause</code> body is kept as text.
 The evaluator knows two clause names, <code>SpousalSupportWaiver</code> and
@@ -600,7 +610,7 @@ The evaluator knows two clause names, <code>SpousalSupportWaiver</code> and
 <p>When the rules' staged effects both add and withdraw the same
 proposition, the outcome kind is <code>normConflict</code>. No <code>conflict_doctrine</code>
 is consulted, and list order is never a silent tie-break.</p>
-<h2 id="duties"><span class="hn">2.17</span> Duties <a class="anchor" href="#duties" aria-label="Link to this section">#</a></h2>
+<h2 id="duties"><span class="hn">2.18</span> Duties <a class="anchor" href="#duties" aria-label="Link to this section">#</a></h2>
 <p>A <code>duty</code> names bearer, claimant, attachment, content, and due time.
 From <a href="https://github.com/BeeGass/fidryn/blob/main/tests/programs/late-payment.fr"><code>tests/programs/late-payment.fr</code></a>:</p>
 <figure class="code" data-lang="fr"><figcaption><span>.fr</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">duty</span> PayInvoice <span class="tk-pu">{</span>
@@ -629,7 +639,7 @@ guard. A <code>kind: duty</code> event on the case does not commit performance
 unless an authority grant covers the action, or the event is an
 explicit <code>assumption</code>. That gate is in
 <a href="/docs/cases-and-time">Cases and time</a>.</p>
-<h2 id="transactions-and-quantifiers"><span class="hn">2.18</span> Transactions and quantifiers <a class="anchor" href="#transactions-and-quantifiers" aria-label="Link to this section">#</a></h2>
+<h2 id="transactions-and-quantifiers"><span class="hn">2.19</span> Transactions and quantifiers <a class="anchor" href="#transactions-and-quantifiers" aria-label="Link to this section">#</a></h2>
 <p><code>transaction { ... }</code> blocks exist in the grammar and are exercised by
 <code>tests/programs/transaction-atomic.fr</code>. Support is <strong>partial</strong> — not a
 full atomic commit engine for arbitrary legal acts.</p>
@@ -640,7 +650,7 @@ are the same quantifier. Open domains suspend. Nested / open-world
 theorem proving is not implemented. Prefer reading
 <a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation-status</a> before treating a
 quantified <code>verify</code> as a proved theorem.</p>
-<h2 id="scenarios-in-module"><span class="hn">2.19</span> Scenarios (in-module) <a class="anchor" href="#scenarios-in-module" aria-label="Link to this section">#</a></h2>
+<h2 id="scenarios-in-module"><span class="hn">2.20</span> Scenarios (in-module) <a class="anchor" href="#scenarios-in-module" aria-label="Link to this section">#</a></h2>
 <p>A <code>scenario</code> block writes down example hypotheses in fixtures that do
 not ship companion JSON case files (for example under
 <code>examples/states/</code>).</p>
@@ -651,7 +661,7 @@ not ship companion JSON case files (for example under
     <span class="tk-kw">at</span> <span class="tk-nu">2026-09-17T12:00:00-04:00</span>
 <span class="tk-pu">}</span></code></pre></figure>
 <p>Grammar: <code>ScenarioDecl</code> in <a href="https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf"><code>grammar.ebnf</code></a>. Fidryn
-0.2 does not interpret a <code>scenario</code> block: the parser reads its name and
+0.3 does not interpret a <code>scenario</code> block: the parser reads its name and
 skips its body, and nothing in it reaches evaluation
 (<a href="https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md">implementation status</a>). Neither <code>run</code> nor
 <code>run --scenario</code> reads these blocks.</p>
@@ -661,8 +671,8 @@ the report's <code>executionMode</code> is then <code>scenario</code>. The mill 
 mode when the pasted case has a nonempty <code>assumptions</code> list. A default
 <code>run</code> is operative and ignores <code>assumptions</code>. See
 <a href="/docs/cases-and-time">Cases and time</a> and <a href="/docs/cli">CLI</a>.</p>
-<h2 id="verify"><span class="hn">2.20</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
-<p>A <code>verify</code> block is a named property made of <code>assert</code> lines. Fidryn 0.2
+<h2 id="verify"><span class="hn">2.21</span> Verify <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
+<p>A <code>verify</code> block is a named property made of <code>assert</code> lines. Fidryn 0.3
 decides closed formulas only: literals, arithmetic, comparisons, Boolean
 connectives, and quantifiers over a literal set or bounded synthetic
 entities.</p>
@@ -682,7 +692,7 @@ lines (<code>assert automatic pay_due_immediately has empty effect row</code>).
 Treat those as documentation the checker records as a verify item, not
 as a solved proof. The empty-effect-row rule for <code>automatic</code> is E420
 whether or not a <code>verify</code> block repeats it.</p>
-<h3 id="the-fields-of-a-verify-block"><span class="hn">2.20.1</span> The fields of a verify block <a class="anchor" href="#the-fields-of-a-verify-block" aria-label="Link to this section">#</a></h3>
+<h3 id="the-fields-of-a-verify-block"><span class="hn">2.21.1</span> The fields of a verify block <a class="anchor" href="#the-fields-of-a-verify-block" aria-label="Link to this section">#</a></h3>
 <p>A verify block is a list of fields. Nine words begin a field:</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>First word</th><th>What <code>verify</code> does with the field</th></tr></thead><tbody>
 <tr><td><code>assert</code></td><td>The expression after it is an assertion.</td></tr>
@@ -786,7 +796,7 @@ examined. So <code>assert true or no_such_name</code> is proved, and so is
 <code>for_all x in {1, 2}: x == 3</code>, where the second line is the right
 operand of <code>+</code>.</li>
 </ul>
-<h2 id="what-the-language-will-not-do"><span class="hn">2.21</span> What the language will not do <a class="anchor" href="#what-the-language-will-not-do" aria-label="Link to this section">#</a></h2>
+<h2 id="what-the-language-will-not-do"><span class="hn">2.22</span> What the language will not do <a class="anchor" href="#what-the-language-will-not-do" aria-label="Link to this section">#</a></h2>
 <p>Fidryn will not hide judgment in a <code>Bool</code>. A proposition is a <code>Prop</code>.
 <code>if Incapacitated(Bryan)</code> is E310. Write <code>operative</code>, <code>determined</code>,
 <code>assumed</code>, or <code>necessarily</code>, or request <code>Determine</code>.</p>
@@ -806,12 +816,12 @@ refusals in larger fixtures. The <a href="/docs/mill">Mill</a> will not live-fil
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/language.md">Edit this page on GitHub</a><a href="/docs/language.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.1</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.2</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.3</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.4</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.5</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.6</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.7</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.8</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.9</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.10</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#where-a-statement-ends"><span class="n">2.11</span> Where a statement ends</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.12</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.13</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.14</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.15</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.16</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.17</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.18</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.19</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.20</span> Verify</a></li><li class="lvl-3"><a href="#the-fields-of-a-verify-block"><span class="n">2.20.1</span> The fields of a verify block</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.21</span> What the language will not do</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#editions"><span class="n">2.1</span> Editions</a></li><li class="lvl-2"><a href="#surface-inventory-status-qualified"><span class="n">2.2</span> Surface inventory (status-qualified)</a></li><li class="lvl-2"><a href="#module-header"><span class="n">2.3</span> Module header</a></li><li class="lvl-2"><a href="#sources-and-digests"><span class="n">2.4</span> Sources and digests</a></li><li class="lvl-2"><a href="#imports"><span class="n">2.5</span> Imports</a></li><li class="lvl-2"><a href="#entities-propositions-and-offices"><span class="n">2.6</span> Entities, propositions, and offices</a></li><li class="lvl-2"><a href="#record-and-evidence-types"><span class="n">2.7</span> Record and evidence types</a></li><li class="lvl-2"><a href="#observations"><span class="n">2.8</span> Observations</a></li><li class="lvl-2"><a href="#queries-goals-and-effects"><span class="n">2.9</span> Queries, goals, and effects</a></li><li class="lvl-2"><a href="#automatic-versus-judgment"><span class="n">2.10</span> Automatic versus judgment</a></li><li class="lvl-2"><a href="#require-return-and-sequential-evaluation"><span class="n">2.11</span> Require, return, and sequential evaluation</a></li><li class="lvl-2"><a href="#where-a-statement-ends"><span class="n">2.12</span> Where a statement ends</a></li><li class="lvl-2"><a href="#calc-conditionals-money-and-durations"><span class="n">2.13</span> Calc, conditionals, money, and durations</a></li><li class="lvl-2"><a href="#rules"><span class="n">2.14</span> Rules</a></li><li class="lvl-2"><a href="#interpretation-families"><span class="n">2.15</span> Interpretation families</a></li><li class="lvl-2"><a href="#nominations"><span class="n">2.16</span> Nominations</a></li><li class="lvl-2"><a href="#powers-legal-acts-clauses-and-conflict-doctrines"><span class="n">2.17</span> Powers, legal acts, clauses, and conflict doctrines</a></li><li class="lvl-2"><a href="#duties"><span class="n">2.18</span> Duties</a></li><li class="lvl-2"><a href="#transactions-and-quantifiers"><span class="n">2.19</span> Transactions and quantifiers</a></li><li class="lvl-2"><a href="#scenarios-in-module"><span class="n">2.20</span> Scenarios (in-module)</a></li><li class="lvl-2"><a href="#verify"><span class="n">2.21</span> Verify</a></li><li class="lvl-3"><a href="#the-fields-of-a-verify-block"><span class="n">2.21.1</span> The fields of a verify block</a></li><li class="lvl-2"><a href="#what-the-language-will-not-do"><span class="n">2.22</span> What the language will not do</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.3.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

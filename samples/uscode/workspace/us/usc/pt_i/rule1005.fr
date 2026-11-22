@@ -1,0 +1,85 @@
+edition 2
+module "/us/usc/ptI/rule1005" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1005" courtRule {
+    num "1005" "Rule 1005."
+    heading "Caption of a Petition; Title of the Case"
+    provision "/us/usc/ptI/rule1005/a" subsection {
+      num "a" "(a)"
+      heading "Caption and Title; Required Information."
+      chapeau "A petition’s caption must contain the name of the court, the title of the case, and the case number (if known). The title must include the following information about the debtor:"
+      provision "/us/usc/ptI/rule1005/a/1" paragraph {
+        num "1" "(1)"
+        content "name;"
+        hash "49d32efa740e29885200c9a38a055a7fbc3a157b0ed230b26dda28348407c1f0"
+      }
+      provision "/us/usc/ptI/rule1005/a/2" paragraph {
+        num "2" "(2)"
+        content "employer-identification number;"
+        hash "7b2b3eabf4cf46845ce4ae22b4a287ea534328a3d2b8ff21955d8730352e3f7d"
+      }
+      provision "/us/usc/ptI/rule1005/a/3" paragraph {
+        num "3" "(3)"
+        content "the last 4 digits of the social-security number or individual taxpayer-identification number;"
+        hash "49dd6dbd54a36fc0caff935f6b37e227d1f2c423ade658c48610c6a0e9474262"
+      }
+      provision "/us/usc/ptI/rule1005/a/4" paragraph {
+        num "4" "(4)"
+        content "any other federal taxpayer-identification number; and"
+        hash "11e0fd799f923461997cfaa07f52bd3c13f341c8a3d548f4490cbbd88995389b"
+      }
+      provision "/us/usc/ptI/rule1005/a/5" paragraph {
+        num "5" "(5)"
+        content "all other names the debtor has used within 8 years before the petition was filed."
+        hash "9a4276e54effdd3f8a9a5338d384c04528e6376faf34c6450ff7d2865539cce0"
+      }
+      hash "b64ecf3a6f170ace8621464a22b1a3e15de88b406d4cb047b3cece2a3184829e"
+    }
+    provision "/us/usc/ptI/rule1005/b" subsection {
+      num "b" "(b)"
+      heading "Petition Not Filed by the Debtor."
+      content "A petition not filed by the debtor must include all names that the petitioner knows have been used by the debtor."
+      hash "92b8d8e5278258799ff8d6693120d6f29fbbbeb337b0bcced911e7dade74b594"
+    }
+    hash "0ea84a5451b0810759719bf1d824db4110a48cedfd77a6bf1e47cd93e0a4f591"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Mar. 27, 2003, eff. Dec. 1, 2003; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "The title of the case should include all names used by the debtor, such as trade names, former married names and maiden name. See also Official Form No. 1 and the Advisory Committee Note to that Form. Additional names of the debtor are also required to appear in the caption of each notice to creditors. See Rule 2002(m)."
+    hash "2153eaff24d24d12f2d3616932c3ccfda6a38e082cfb4480afa4803b8ec3e21d"
+  }
+  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2003 Amendment"
+    p "The rule is amended to implement the Judicial Conference policy to limit the disclosure of a party’s social security number and similar identifiers. Under the rule, as amended, only the last four digits of the debtor’s social security number need be disclosed. Publication of the employer identification number does not present the same identity theft or privacy protection issues. Therefore, the caption must include the full employer identification number."
+    p "Debtors must submit with the petition a statement setting out their social security numbers. This enables the clerk to include the full social security number on the notice of the section 341 meeting of creditors, but the statement itself is not submitted in the case or maintained in the case file."
+    p "Changes Made After Publication and Comments. The rule was changed only slightly after publication. The rule was changed to make clear that only the debtor’s social security number is truncated to the final four digits, but other numerical identifiers must be set out in full. The rule also was amended to include a requirement that a debtor list other federal taxpayer identification numbers that may be in use."
+    hash "b1845836bac93a18137a39ea3963e0f6f0c4929d400fe88baceed5b4695442ba"
+  }
+  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The rule is amended to require the disclosure of all names used by the debtor in the past eight years. Section 727(a)(8) was amended in 2005 to extend the time between chapter 7 discharges from six to eight years, and the rule is amended to implement that change. The rule also is amended to require the disclosure of the last four digits of an individual debtor’s taxpayer-identification number. This truncation of the number applies only to individual debtors. This is consistent with the requirements of Rule 9037."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "77aa723a83a24d9a7da20b1fcd5cb24a5b630a63679435ce5707114732f3780f"
+  }
+  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1005 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "0fd44815d5bfb4684a8f4ce5fb1a1ac59c5a5826d2cb3fcfd44b94ca92c153a6"
+  }
+  layers {
+    operative "0ea84a5451b0810759719bf1d824db4110a48cedfd77a6bf1e47cd93e0a4f591"
+    enacted "61c95ca7f7634d2af809d1dc04a2a596241a7a4d8c1d6e05789dcb408fe34a71"
+    editorial "42fba81e2694ffec0c6a55eb792ba466c1eca64faca1c5da9d613973e8c824c7"
+  }
+}

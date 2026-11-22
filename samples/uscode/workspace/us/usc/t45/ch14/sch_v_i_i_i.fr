@@ -1,0 +1,21 @@
+edition 2
+module "/us/usc/t45/ch14/schVIII" {
+  within "/us/usc/t45/ch14"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch14/schVIII" subchapter {
+    num "VIII" "SUBCHAPTER VIII—"
+    heading "MISCELLANEOUS PROVISIONS"
+    member "/us/usc/t45/s641"
+    member "/us/usc/t45/s642...644"
+    member "/us/usc/t45/s645"
+    member "/us/usc/t45/s646...650c"
+    member "/us/usc/t45/s650d"
+    hash "7f2983847d0ac962d18618ecb7ddfa034d0a95204a393bf8d23d3726563deffc"
+  }
+  layers {
+    operative "7f2983847d0ac962d18618ecb7ddfa034d0a95204a393bf8d23d3726563deffc"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

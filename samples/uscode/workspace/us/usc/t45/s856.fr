@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s856" {
+  within "/us/usc/t45/ch17/schIII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s856" section {
+    num "856" "§ 856."
+    heading "Repealed. " ["Pub. L. 103–429, § 7(a)(1)" -> "/us/pl/103/429/s7/a/1"] ", Oct. 31, 1994, " ["108 Stat. 4388" -> "/us/stat/108/4388"]
+    status repealed
+    hash "989eaf6f9bee230c406246a0c19750e9e198ed2e0d38e9c61e03612e0463589e"
+  }
+  note "/us/usc/t45/s856/note/ungrouped/pl.94.210/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 94–210, title VII, § 708" -> "/us/pl/94/210/tVII/s708"] ", as added " ["Pub. L. 102–533, § 4(a)" -> "/us/pl/102/533/s4/a"] ", Oct. 27, 1992, " ["106 Stat. 3516" -> "/us/stat/106/3516"] ", directed Secretary to develop and report to Congress within one year after Oct. 27, 1992, on a program master plan for improvements in passenger service between Boston and New York."
+    hash "3a5327e88d12e9acb2a206e9e2f67d051209b7aeb4718bdf879b42c8c9170714"
+  }
+  note "/us/usc/t45/s856/note/statutoryNotes/pl.103.429/effective-date-of-repeal" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date of Repeal"
+    p ["Pub. L. 103–429, § 7(a)(1)" -> "/us/pl/103/429/s7/a/1"] ", Oct. 31, 1994, " ["108 Stat. 4388" -> "/us/stat/108/4388"] ", provided that the repeal by section 7(a)(1) is effective July 5, 1994."
+    hash "8e61ebcea38b2ffc77119fdd0e0f1ce45aaa652cd650c43b0993e375c1e053ae"
+  }
+  layers {
+    operative "989eaf6f9bee230c406246a0c19750e9e198ed2e0d38e9c61e03612e0463589e"
+    enacted "b533a2f6379c4da65ba393dc0705a002527e17104deb6400d1b319536ff42c79"
+    editorial "66b3aa89c71280df010568c43344eb1bab86779d27b54e34f32cf3d70409e96e"
+  }
+}

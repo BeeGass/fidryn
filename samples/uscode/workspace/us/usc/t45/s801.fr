@@ -1,0 +1,126 @@
+edition 2
+module "/us/usc/t45/s801" {
+  within "/us/usc/t45/ch17/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s801" section {
+    num "801" "§ 801."
+    heading "Declaration of policy"
+    provision "/us/usc/t45/s801/a" subsection {
+      num "a" "(a)"
+      heading "Purpose"
+      chapeau "The purpose of this Act and chapter 224 of title 49, United States Code, is to provide the means to rehabilitate and maintain the physical facilities, improve the operations and structure, and restore the financial stability of the railway system of the United States, and to promote the revitalization of such railway system, so that this mode of transportation will remain viable in the private sector of the economy and will be able to provide energy-efficient, ecologically compatible transportation services with greater efficiency, effectiveness, and economy, through—"
+      provision "/us/usc/t45/s801/a/1" paragraph {
+        num "1" "(1)"
+        content "ratemaking and regulatory reform;"
+        hash "d86bff5d7c2fba6c726ac7c4fb820ae4079dbffa39fa04b0c581cd590f1fb3e0"
+      }
+      provision "/us/usc/t45/s801/a/2" paragraph {
+        num "2" "(2)"
+        content "the encouragement of efforts to restructure the system on a more economically justified basis, including planning authority in the Secretary of Transportation, an expedited procedure for determining whether merger and consolidation applications are in the public interest, and continuing reorganization authority;"
+        hash "f7a83a2e2cb4298ba8059462ae4dcff7c7a9ff489732dbec4a09b572bd3bb4e4"
+      }
+      provision "/us/usc/t45/s801/a/3" paragraph {
+        num "3" "(3)"
+        content "financing mechanisms that will assure adequate rehabilitation and improvement of facilities and equipment, implementation of the final system plan, and implementation of the Northeast Corridor project;"
+        hash "8b2594b82d7617b05503489b3ec7a41a818c50392624d63db24268db52e4f6a8"
+      }
+      provision "/us/usc/t45/s801/a/4" paragraph {
+        num "4" "(4)"
+        content "transitional continuation of service on light-density rail lines that are necessary to continued employment and community well-being throughout the United States;"
+        hash "06b539385ccc3d78f300fd614dd2659ac4fd6e165e2f2912c7d6b3bf84347cbf"
+      }
+      provision "/us/usc/t45/s801/a/5" paragraph {
+        num "5" "(5)"
+        content "auditing, accounting, reporting, and other requirements to protect Federal funds and to assure repayment of loans and financial responsibility; and"
+        hash "df53aa547d2c3cf09c6f56d9b0ac6640795c9764c88fbe7a3ebf015949419cd0"
+      }
+      provision "/us/usc/t45/s801/a/6" paragraph {
+        num "6" "(6)"
+        content "necessary studies."
+        hash "0db4265abd941b057f8673a1b7c8a0de04361504ec248dbcf611ae23bd82251f"
+      }
+      hash "4ca9c841dfe770afa10086da8e4e9d0a574d725b04000931758de8685a28de4f"
+    }
+    provision "/us/usc/t45/s801/b" subsection {
+      num "b" "(b)"
+      heading "Policy"
+      chapeau "The policy of this Act and chapter 224 of title 49, United States Code, is to—"
+      provision "/us/usc/t45/s801/b/1" paragraph {
+        num "1" "(1)"
+        content "balance the needs of carriers, shippers, and the public;"
+        hash "62c1e58807841dc7b5eb268f019b33840f697f0f30c590b912c1bf33267b0fa5"
+      }
+      provision "/us/usc/t45/s801/b/2" paragraph {
+        num "2" "(2)"
+        content "foster competition among all carriers by railroad and other modes of transportation, to promote more adequate and efficient transportation services, and to increase the attractiveness of investing in railroads and rail-service-related enterprises;"
+        hash "e767c7e783c53f8059a037fb143383905b24cb1e522a1fc4c267acbdc98c66a5"
+      }
+      provision "/us/usc/t45/s801/b/3" paragraph {
+        num "3" "(3)"
+        content "permit railroads greater freedom to raise or lower rates for rail services in competitive markets;"
+        hash "7b3870ec5717ac89ade7a6e8e96d710fd92fbc715aee606918e3b9d112ca8d4b"
+      }
+      provision "/us/usc/t45/s801/b/4" paragraph {
+        num "4" "(4)"
+        content "promote the establishment of railroad rate structures which are more sensitive to changes in the level of seasonal, regional, and shipper demand;"
+        hash "f58992c8ffb39248ca63ba58794b95a69cbfaa5e4d411ef2ad19d64b7acd9510"
+      }
+      provision "/us/usc/t45/s801/b/5" paragraph {
+        num "5" "(5)"
+        content "promote separate pricing of distinct rail and rail-related services;"
+        hash "6ed5db0074de959588f17dc350264e1dd373f073df5971422e19047442634f21"
+      }
+      provision "/us/usc/t45/s801/b/6" paragraph {
+        num "6" "(6)"
+        content "formulate standards and guidelines for determining adequate revenue levels for railroads; and"
+        hash "66e2c7877d2b5d5886326d40331741d2d82a3d171110aa86b664b9cc7da30ed3"
+      }
+      provision "/us/usc/t45/s801/b/7" paragraph {
+        num "7" "(7)"
+        content "modernize and clarify the functions of railroad rate bureaus."
+        hash "1b971a6b55a957009643127e4f88fa6f249f5bbe2a98c50c079d72a4c6e754d4"
+      }
+      hash "95f877d5cf2e31f7f6ac55862ec222e2211d9a82d93a5ac432dbe2653629a9e2"
+    }
+    hash "ae03515f155ceb7de0617f11c5eb9e3aa3ae384edf02aaffc53f2571b9cf5b30"
+  }
+  credit "(" ["Pub. L. 94–210, title I, § 101" -> "/us/pl/94/210/tI/s101"] ", Feb. 5, 1976, " ["90 Stat. 33" -> "/us/stat/90/33"] "; " ["Pub. L. 117–58, div. B, title I, § 21301(j)(3)(A)" -> "/us/pl/117/58/dB/tI/s21301/j/3/A"] ", Nov. 15, 2021, " ["135 Stat. 691" -> "/us/stat/135/691"] ".)"
+  note "/us/usc/t45/s801/note/editorialNotes/pl.94.210/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This Act, referred to in text, means " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", Feb. 5, 1976, " ["90 Stat. 31" -> "/us/stat/90/31"] ", known as the Railroad Revitalization and Regulatory Reform Act of 1976. For complete classification of this Act to the Code, see Short Title note set out below and Tables."
+    hash "7041625991a711bc5bb882d717e149fd70610dc7dead45738c728999d8f2a5f2"
+  }
+  note "/us/usc/t45/s801/note/editorialNotes/pl.117.58/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "2021—Subsec. (a). " ["Pub. L. 117–58, § 21301(j)(3)(A)(i)" -> "/us/pl/117/58/s21301/j/3/A/i"] ", substituted “The purpose of this Act and chapter 224 of title 49, United States Code, is to” for “It is the purpose of the Congress in this Act to” in introductory provisions."
+    p "Subsec. (b). " ["Pub. L. 117–58, § 21301(j)(3)(A)(ii)" -> "/us/pl/117/58/s21301/j/3/A/ii"] ", substituted “The policy of this Act and chapter 224 of title 49, United States Code, is” for “It is declared to be the policy of the Congress in this Act” in introductory provisions."
+    hash "1cfa297c33b6af42d2d425fdf4755c842fb711034a71ebc80343baf3725e643f"
+  }
+  note "/us/usc/t45/s801/note/statutoryNotes/pl.114.94/short-title-of-2015-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 2015 Amendment"
+    p ["Pub. L. 114–94, div. A, title XI, § 11601(a)" -> "/us/pl/114/94/dA/tXI/s11601/a"] ", Dec. 4, 2015, " ["129 Stat. 1693" -> "/us/stat/129/1693"] ", provided that:"
+    quoted "/us/pl/114/94/dA/tXI/s11601/a" {
+      p "“This subtitle [subtitle F (§§ 11601–11611) of title XI of div. A of " ["Pub. L. 114–94" -> "/us/pl/114/94"] ", amending sections 821 to 823 of this title and enacting provisions set out as notes under " ["section 821 of this title" -> "/us/usc/t45/s821"] "] may be cited as the ‘Railroad Infrastructure Financing Improvement Act’.”"
+    }
+    hash "8931416e81dc6e9422ae055b9ea0a2356cf4e33757524743c39549bf78920bc3"
+  }
+  note "/us/usc/t45/s801/note/statutoryNotes/pl.94.210/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p ["Pub. L. 94–210, § 1" -> "/us/pl/94/210/s1"] ", Feb. 5, 1976, " ["90 Stat. 31" -> "/us/stat/90/31"] ", provided in part that this Act [enacting this chapter and sections 726 and 745 to 747 of this title, and sections 1a, 5c, 26b, 26c, 1613, 1653a, 1654, and 1657a of former Title 49, Transportation, amending sections 543, 545, 546, 562 to 564, 702, 711 to 713, 715, 716, 718 to 721, 724, 725, 741, 743, 744, 762, 763, 771, 772, 774, 775, 778, 779, and 791 of this title, sections 77c, 77s, 78m, and 80a–3 of Title 15, Commerce and Trade, sections 11 and 856 of former Title 31, Money and Finance, and sections 1, 1a, 5, 5b, 6, 12, 13, 15, 15a, 17, 20, 27, 314, 1653, 1658, and 1659 of former Title 49, repealing sections 761 to 762 of this title, enacting provisions set out as notes under sections 745, 761, 791, and 793 of this title, sections 77c and 80a–3 of Title 15, and sections 1, 1a, 5b, 5c, 17, and 1654 of former Title 49, and amending notes set out under section 1651 of former Title 49] may be cited as the “Railroad Revitalization and Regulatory Reform Act of 1976”."
+    hash "7fffcabd25a24c67d3653549dd88e88a33136f181d2ea379660e6325bd432571"
+  }
+  layers {
+    operative "ae03515f155ceb7de0617f11c5eb9e3aa3ae384edf02aaffc53f2571b9cf5b30"
+    enacted "bb8ad63a552b9c441edee4e1829a940a3e6e8142552c36c3dcc785afc6faf435"
+    editorial "c83f9182d91160747c2cd2b68aafc0300e29923ed2a84a8c19ab77d03c4d94f3"
+  }
+}

@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/t45/s51" {
+  within "/us/usc/t45/ch2"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s51" section {
+    num "51" "§ 51."
+    heading "Liability of common carriers by railroad, in interstate or foreign commerce, for injuries to employees from negligence; employee defined"
+    content {
+      p "Every common carrier by railroad while engaging in commerce between any of the several States or Territories, or between any of the States and Territories, or between the District of Columbia and any of the States or Territories, or between the District of Columbia or any of the States or Territories and any foreign nation or nations, shall be liable in damages to any person suffering injury while he is employed by such carrier in such commerce, or, in case of the death of such employee, to his or her personal representative, for the benefit of the surviving widow or husband and children of such employee; and, if none, then of such employee’s parents; and, if none, then of the next of kin dependent upon such employee, for such injury or death resulting in whole or in part from the negligence of any of the officers, agents, or employees of such carrier, or by reason of any defect or insufficiency, due to its negligence, in its cars, engines, appliances, machinery, track, roadbed, works, boats, wharves, or other equipment."
+      p "Any employee of a carrier, any part of whose duties as such employee shall be the furtherance of interstate or foreign commerce; or shall, in any way directly or closely and substantially, affect such commerce as above set forth shall, for the purposes of this chapter, be considered as being employed by such carrier in such commerce and shall be considered as entitled to the benefits of this chapter."
+    }
+    hash "63b95930891d7f83bee991b59e5bbaee4136366b5b1f68a100bd73766d325b21"
+  }
+  credit "(" ["Apr. 22, 1908, ch. 149, § 1" -> "/us/act/1908-04-22/ch149/s1"] ", " ["35 Stat. 65" -> "/us/stat/35/65"] "; " ["Aug. 11, 1939, ch. 685, § 1" -> "/us/act/1939-08-11/ch685/s1"] ", " ["53 Stat. 1404" -> "/us/stat/53/1404"] ".)"
+  note "/us/usc/t45/s51/note/editorialNotes/nolaw/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1939—Act Aug. 11, 1939, inserted last par."
+    hash "48cee4ec21ec1799cc342478d2ff6e488cc3f727f5da1446fab095b9ef447378"
+  }
+  note "/us/usc/t45/s51/note/statutoryNotes/act.1906-06-11.ch3073/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p "The Act of Apr. 22, 1908, as amended, which comprises this chapter, is popularly known as the “Employers’ Liability Act”."
+    p "The following are also popularly known as Employers’ Liability Acts:"
+    p ["June 11, 1906, ch. 3073" -> "/us/act/1906-06-11/ch3073"] ", " ["34 Stat. 232" -> "/us/stat/34/232"] " [Unconstitutional]."
+    p ["Apr. 5, 1910, ch. 143" -> "/us/act/1910-04-05/ch143"] ", " ["36 Stat. 291" -> "/us/stat/36/291"] ". See sections 56 and 59 of this title."
+    p ["Aug. 11, 1939, ch. 685" -> "/us/act/1939-08-11/ch685"] ", " ["53 Stat. 1404" -> "/us/stat/53/1404"] ". See sections 51, 54, 56, and 60 of this title."
+    hash "d3fbf26c29a4506c631803a467b9024e591602f08f3908955cbc1184f7b71e3f"
+  }
+  layers {
+    operative "63b95930891d7f83bee991b59e5bbaee4136366b5b1f68a100bd73766d325b21"
+    enacted "2314ba5404700df2affb2c2d50dfe3d88933545749744e9880f4fd90f8152eee"
+    editorial "7475ea7baf30532d128c05fe2993f0216b1c2b59e8564c166a7b158ccb8cc972"
+  }
+}

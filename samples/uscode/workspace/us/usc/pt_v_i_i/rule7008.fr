@@ -1,0 +1,55 @@
+edition 2
+module "/us/usc/ptVII/rule7008" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7008" courtRule {
+    num "7008" "Rule 7008."
+    heading "General Rules of Pleading"
+    content "Fed. R. Civ. P. 8 applies in an adversary proceeding. The allegation of jurisdiction required by that rule must include a reference to the name, number, and Code chapter of the case that the adversary proceeding relates to and the district and division where it is pending. In an adversary proceeding before a bankruptcy court, a complaint, counterclaim, crossclaim, or third-party complaint must state whether the pleader does or does not consent to the entry of final orders or judgment by the bankruptcy court."
+    hash "ee611a0d383371b8f1b743371326a09598b3e3b6cd077f6a049408d5c513177f"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Proceedings before a bankruptcy judge are either core or non-core. 28 U.S.C. § 157. A bankruptcy judge may enter a final order or judgment in a core proceeding. In a non-core proceeding, absent consent of the parties, the bankruptcy judge may not enter a final order or judgment but may only submit proposed findings of fact and conclusions of law to the district judge who will enter the final order or judgment. 28 U.S.C. § 157(c)(1). The amendment to subdivision (a) of this rule requires an allegation as to whether a proceeding is core or non-core. A party who alleges that the proceeding is non-core shall state whether the party does or does not consent to the entry of a final order or judgment by the bankruptcy judge. Failure to include the statement of consent does not constitute consent. Only express consent in the pleadings or otherwise is effective to authorize entry of a final order or judgment by the bankruptcy judge in a non-core proceeding. Amendments to Rule 7012 require that the defendant admit or deny the allegation as to whether the proceeding is core or non-core."
+    hash "23df72688a9df5452d1f6531fe2b9b76d3a3806edec1937b31229e08acdf6c46"
+  }
+  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014 Amendment"
+    p "The rule is amended to delete subdivision (b), which required a request for attorney’s fees always to be pleaded as a claim in an allowed pleading. That requirement, which differed from the practice under the Federal Rules of Civil Procedure, had the potential to serve as a trap for the unwary."
+    p "The procedures for seeking an award of attorney’s fees are now set out in Rule 7054(b)(2), which makes applicable most of the provisions of Rule 54(d)(2) F.R.Civ.P. As specified by Rule 54(d)(2)(A) and (B) F.R.Civ.P., a claim for attorney’s fees must be made by a motion filed no later than 14 days after entry of the judgment unless the governing substantive law requires those fees to be proved at trial as an element of damages. When fees are an element of damages, such as when the terms of a contract provide for the recovery of fees incurred prior to the instant adversary proceeding, the general pleading requirements of this rule still apply."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "6dd444e9e1b78d4bd16a9e8fa12eab5c20933de45b4f0b1b9066c9691eba9041"
+  }
+  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2016 Amendment"
+    p "The rule is amended to remove the requirement that the pleader state whether the proceeding is core or non-core and to require in all proceedings that the pleader state whether the party does or does not consent to the entry of final orders or judgment by the bankruptcy court. Some proceedings that satisfy the statutory definition of core proceedings, 28 U.S.C. § 157(b)(2), may remain beyond the constitutional power of a bankruptcy judge to adjudicate finally. The amended rule calls for the pleader to make a statement regarding consent, whether or not a proceeding is termed non-core. Rule 7012(b) has been amended to require a similar statement in a responsive pleading. The bankruptcy judge will then determine the appropriate course of proceedings under Rule 7016."
+    hash "6328193dd6de8e028f1f3797398efca8906fe2a033244b5041ffc059f94f91f0"
+  }
+  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7008 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "9d489000e7f8dfff4e7cc8b84c8df7dbc892d946589f53905882a9215a1b3d8c"
+  }
+  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "ee611a0d383371b8f1b743371326a09598b3e3b6cd077f6a049408d5c513177f"
+    enacted "d2ac22e839ca218a00a10e3452a10e4c4be3069723e9043be765b094aac2d2cb"
+    editorial "176cd1dc9c159a04284086ce1f85382034e2a74cbc47a6d0549bfefdb3d190aa"
+  }
+}

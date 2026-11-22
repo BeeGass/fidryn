@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s921" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s921" section {
+    num "921" "§ 921."
+    heading "Office of Rail Public Counsel"
+    content "The Office of Rail Public Counsel may appear and be heard in the case in the bankruptcy court involving the reorganization of the Milwaukee Railroad, for purposes of representing affected shippers, localities, and municipalities with respect to the proposed abandonment of any line of the Milwaukee Railroad."
+    hash "a2bc33f4c33c8a9e759a3fb7f863dee94d4ce65434b0329a8dc6278a81735098"
+  }
+  credit "(" ["Pub. L. 96–101, § 25" -> "/us/pl/96/101/s25"] ", Nov. 4, 1979, " ["93 Stat. 747" -> "/us/stat/93/747"] ".)"
+  layers {
+    operative "a2bc33f4c33c8a9e759a3fb7f863dee94d4ce65434b0329a8dc6278a81735098"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5d12496b0c1626bfdf89746fb2d3949a40239273ca8c04af2b58cf1711272989"
+  }
+}

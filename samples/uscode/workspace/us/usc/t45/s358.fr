@@ -1,0 +1,1110 @@
+edition 2
+module "/us/usc/t45/s358" {
+  within "/us/usc/t45/ch11"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s358" section {
+    num "358" "§ 358."
+    heading "Contributions"
+    provision "/us/usc/t45/s358/a" subsection {
+      num "a" "(a)"
+      heading "Employer contribution"
+      provision "/us/usc/t45/s358/a/1" paragraph {
+        num "1" "(1)"
+        heading "In general"
+        provision "/us/usc/t45/s358/a/1/A" subparagraph {
+          num "A" "(A)"
+          heading "General rule"
+          provision "/us/usc/t45/s358/a/1/A/i" clause {
+            num "i" "(i)"
+            heading "Contribution rate generally"
+            content "Every employer shall pay a contribution, with respect to having employees in his service, equal to the percentage determined under subparagraph (B), (C), or (D), whichever is applicable, of so much of the compensation paid in any calendar month by such employer to any employee as is not in excess of the monthly compensation base for that month as computed under " ["section 351(i) of this title" -> "/us/usc/t45/s351/i"] "."
+            hash "0c4fc1998aa56d024aeae909e3b4b3f576fa0d0b5814f2185eba8cc7cc87bfda"
+          }
+          provision "/us/usc/t45/s358/a/1/A/ii" clause {
+            num "ii" "(ii)"
+            heading "Multiple employer limitation"
+            chapeau "If compensation is paid to an employee by more than one employer in any calendar month—"
+            provision "/us/usc/t45/s358/a/1/A/ii/I" subclause {
+              num "I" "(I)"
+              content "the contributions required by this subsection shall not apply to any amount of the aggregate compensation paid to such employee by all such employers in such calendar month which is in excess of such monthly compensation base; and"
+              hash "fc8579803cbc9052d4a9f84600f1a80a4700ea9a125f4759f6c0f61fd2af568a"
+            }
+            provision "/us/usc/t45/s358/a/1/A/ii/II" subclause {
+              num "II" "(II)"
+              content "each employer (other than a subordinate unit of a national-railway-labor-organization employer) shall be liable for that portion of the contribution with respect to such compensation paid by all such employers which the compensation paid by him to such employee bears to the total compensation paid in such month by all such employers to such employee."
+              hash "1cd5dc3fd0180e822a044f6274f48d439da3429658a1aa485afdb9433d0a7cf6"
+            }
+            hash "00052e1696b40d1b372223de8a547eaebcddfe31b5aef78b01760463174c8693"
+          }
+          continuation "In the event that the compensation paid by such employers to the employee in such month is less than such monthly compensation base, each subordinate unit of a national-railway-labor-organization employer shall be liable for such portion of any additional contribution as the compensation paid by such employer to such employee in such month bears to the total compensation paid by all such employers to such employee in such month."
+          hash "5089e3606f713d9a4770488e540423e53ad72933dc77dadbd2911b35dd764aae"
+        }
+        provision "/us/usc/t45/s358/a/1/B" subparagraph {
+          num "B" "(B)"
+          heading "Transitional rule"
+          provision "/us/usc/t45/s358/a/1/B/i" clause {
+            num "i" "(i)"
+            heading "1st, 2d, and 3d calendar years"
+            content "Except as provided in clause (vi), with respect to compensation paid in calendar years 1988, 1989, and 1990, the contribution rate shall be 8 percent."
+            hash "e516ded3e9bed154ea8a0390f86ba4a71bb684f1de1e70d7715e7ba06a70bac5"
+          }
+          provision "/us/usc/t45/s358/a/1/B/ii" clause {
+            num "ii" "(ii)"
+            heading "4th calendar year"
+            chapeau "With respect to compensation paid in calendar year 1991, the contribution rate shall be the smaller of—"
+            provision "/us/usc/t45/s358/a/1/B/ii/I" subclause {
+              num "I" "(I)"
+              content "the maximum contribution limit computed under paragraph (20); or"
+              hash "6f2ec8b0255d302eb188342d891f3a08d206430690d4ce82aa8a2666d96408a1"
+            }
+            provision "/us/usc/t45/s358/a/1/B/ii/II" subclause {
+              num "II" "(II)"
+              content {
+                p "the percentage computed pursuant to the following formula:"
+                table {
+                  head {
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td ""
+                    td "2A+B"
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td "R="
+                    td "———"
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td ""
+                    td "3"
+                    td ""
+                  }
+                }
+              }
+              hash "a2a1547120780ba05dfae70e7708d0e264bd7000002d10009a405d02daca0b27"
+            }
+            hash "16a534d22d2c9f17f54f1c2f29934a6e8f2405909af38e33b316aa287ddc9f92"
+          }
+          provision "/us/usc/t45/s358/a/1/B/iii" clause {
+            num "iii" "(iii)"
+            heading "5th calendar year"
+            chapeau "With respect to compensation paid in calendar year 1992, the contribution rate shall be the smaller of—"
+            provision "/us/usc/t45/s358/a/1/B/iii/I" subclause {
+              num "I" "(I)"
+              content "the maximum contribution limit computed under paragraph (20); or"
+              hash "6f2ec8b0255d302eb188342d891f3a08d206430690d4ce82aa8a2666d96408a1"
+            }
+            provision "/us/usc/t45/s358/a/1/B/iii/II" subclause {
+              num "II" "(II)"
+              content {
+                p "the percentage computed pursuant to the following formula:"
+                table {
+                  head {
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td ""
+                    td "A+2C"
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td "R="
+                    td "———"
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td ""
+                    td "3"
+                    td ""
+                  }
+                }
+              }
+              hash "e91b81eb75f46f9c6cee5c1813de71f5ea594d38fdaab8fb0268c643b932319b"
+            }
+            hash "9740aeb3dd8e48529ae080f2c956dbd392f8d892c0316a4804a04349eed51d22"
+          }
+          provision "/us/usc/t45/s358/a/1/B/iv" clause {
+            num "iv" "(iv)"
+            heading "Meaning of symbols"
+            chapeau "For purposes of the formulas in clauses (ii) and (iii)—"
+            provision "/us/usc/t45/s358/a/1/B/iv/I" subclause {
+              num "I" "(I)"
+              content "“R” is the applicable contribution rate expressed as a percentage for months in the calendar year;"
+              hash "00b727448651793b6b536a0e2d4dcea0f79541cf97a65de91517705698f3fdd3"
+            }
+            provision "/us/usc/t45/s358/a/1/B/iv/II" subclause {
+              num "II" "(II)"
+              content "“A” is the contribution rate determined under clause (i);"
+              hash "be90fd3e75bad254e36390d3d9e15c3331f6d061fad0bc8ea704876549d79373"
+            }
+            provision "/us/usc/t45/s358/a/1/B/iv/III" subclause {
+              num "III" "(III)"
+              content "“B” is the percentage rate for the employer, as determined under subparagraph (C), for calendar year 1991; and"
+              hash "ad9e9ded41e71e569ddca06ee50b016a12c1bbf300f1ad1bc96d52a21ceac722"
+            }
+            provision "/us/usc/t45/s358/a/1/B/iv/IV" subclause {
+              num "IV" "(IV)"
+              content "“C” is the percentage rate for the employer, as determined under subparagraph (C), for calendar year 1992."
+              hash "561ee034bff6366da9bf88250e43215830bc5fda12602d9578e5db738ab18af4"
+            }
+            hash "e34a030291bb3f17939ce8c7fd0bddd100e2f40bea49f4b54fbda84d9b6eb2af"
+          }
+          provision "/us/usc/t45/s358/a/1/B/v" clause {
+            num "v" "(v)"
+            heading "Special rule for certain computations"
+            chapeau "For purposes of computing B and C in such formulas—"
+            provision "/us/usc/t45/s358/a/1/B/v/I" subclause {
+              num "I" "(I)"
+              content "the percentage rate computed under subparagraph (C), if more than the maximum contribution limit computed under paragraph (20) shall not be reduced to that limit; and"
+              hash "e2b99a9f69b33e28725c79b863611d1062a4d03c22b9ca682bd3265e051ea841"
+            }
+            provision "/us/usc/t45/s358/a/1/B/v/II" subclause {
+              num "II" "(II)"
+              content "any computations which under subparagraph (C) are to be made on the basis of a 4-quarter or a 12-quarter period ending on a given June 30 shall be made on the basis of a period beginning on January 1, 1990, and ending on that June 30, and the amount so computed shall be increased to an amount that bears the same ratio to the amount so computed as 4 or 12, as appropriate, bears to the number of calendar quarters in the period on which the computation was based."
+              hash "d55c323ac9bda2d7aa68d4fe7a1a02b95a6208a98c97665d279c51203efbe481"
+            }
+            hash "3ec668f0db8ddf36f497fb99dc410ac088b853fad363a3fb16c6ca6a0b2a82fa"
+          }
+          provision "/us/usc/t45/s358/a/1/B/vi" clause {
+            num "vi" "(vi)"
+            heading "Special transition rule for public commuter railroads"
+            content "With respect to each of calendar years 1989 and 1990, the contribution of the National Railroad Passenger Corporation and an employer which on November 10, 1988, is a publicly funded and publicly operated carrier providing rail commuter service shall be equal to the amount of benefits attributable to such carrier, plus an amount equal to 0.65 percent of the total compensation paid by that employer in that year on which that employer’s contribution would be based under clause (i) if such employer’s contribution were determined under that clause."
+            hash "18dc785be78a41dbcdafaef3ae57e53bcc8381357cde0e6747d967f07594ac0c"
+          }
+          hash "2b95d97b86138e0bc06fb16d4a630eb8d01634751ab8841196a8386eb0df456c"
+        }
+        provision "/us/usc/t45/s358/a/1/C" subparagraph {
+          num "C" "(C)"
+          heading "Experience-rated contributions"
+          chapeau "With respect to compensation paid in a calendar year that begins after December 31, 1992, the contribution rate for each employer shall be determined as follows:"
+          provision "/us/usc/t45/s358/a/1/C/i" clause {
+            num "i" "(i)"
+            heading "Step 1"
+            content "Compute the employer’s benefit ratio as of the preceding June 30 to 4 decimal points in accordance with paragraph (2)."
+            hash "29dcc255f5d2fe79ede0c8ae9b2fb76d5c6d1419cf5915fc46cd09d8abdb71ce"
+          }
+          provision "/us/usc/t45/s358/a/1/C/ii" clause {
+            num "ii" "(ii)"
+            heading "Step 2"
+            content "Subtract the employer’s reserve ratio as of the preceding June 30 as computed to 4 decimal points in accordance with paragraph (4)."
+            hash "1b53480c0ac69180f0effc761450f9139a2fc3138ca74f1c5cfb95fb0d3d0e33"
+          }
+          provision "/us/usc/t45/s358/a/1/C/iii" clause {
+            num "iii" "(iii)"
+            heading "Step 3"
+            content "Subtract the pooled credit ratio for the calendar year, if any, as computed to 4 decimal points in accordance with paragraph (12)."
+            hash "9de70c9e5ba4a1cb4390dddd0fac834c13d2b43ce79c38fdc10b8713a144fffe"
+          }
+          provision "/us/usc/t45/s358/a/1/C/iv" clause {
+            num "iv" "(iv)"
+            heading "Step 4"
+            content "Multiply by 100 the total arrived at under the steps set forth in clauses (i) through (iii) so as to obtain a percentage rate, which shall be rounded to the nearest 100th of 1 percent. If the total arrived at under such steps is 0 or less than 0, the percentage rate as so computed shall be 0."
+            hash "ba25824f6b54267f1b86358b3f0c87739efec8be71681597571b30c0dee49cb8"
+          }
+          provision "/us/usc/t45/s358/a/1/C/v" clause {
+            num "v" "(v)"
+            heading "Step 5"
+            content "Add 0.65 to the percentage rate arrived at under clause (iv), representing the portion of the employer’s contribution which is to be deposited to the credit of the fund under subsection (i)."
+            hash "16220601751b4c65caf4cca3f705e18f5d8a6f385cc8e7bd78683cdb0bbf36b1"
+          }
+          provision "/us/usc/t45/s358/a/1/C/vi" clause {
+            num "vi" "(vi)"
+            heading "Step 6"
+            content "Add the surcharge rate for the calendar year, if any, as computed under paragraph (14)."
+            hash "c149433f10ccd927fd12b73a95a252da378c28b9a0f79dd5c422e9200aafd57a"
+          }
+          provision "/us/usc/t45/s358/a/1/C/vii" clause {
+            num "vii" "(vii)"
+            heading "Step 7"
+            content "Add the pooled charge ratio for the calendar year, if any, as computed to 4 decimal points under paragraph (13) and multiplied by 100."
+            hash "1daa2c2f1030543d402371dac521faf83f48c5b24798b449a9f753c201f9860d"
+          }
+          provision "/us/usc/t45/s358/a/1/C/viii" clause {
+            num "viii" "(viii)"
+            heading "Step 8"
+            content "Reduce the precentage" mark "1" 1 " rate computed in accordance with the preceding steps to the maximum contribution limit computed under paragraph (20), if such rate is higher than such limit. The rate computed in accordance with the preceding steps, after any reduction under this clause, is the contribution rate."
+            hash "6a5efd546aa3aafd9f82659061d16e89c77a6f799adf33f201cef18d4f52a380"
+          }
+          hash "8efe3e1213a3193eda28eb98cc12271260d104b2e505142859a08c5287692fad"
+        }
+        provision "/us/usc/t45/s358/a/1/D" subparagraph {
+          num "D" "(D)"
+          heading "New-employer contribution rates"
+          chapeau "Notwithstanding subparagraphs (B) and (C), the contribution rate applicable to a new employer who does not become subject to this chapter until after December 31, 1989, shall be determined as follows:"
+          provision "/us/usc/t45/s358/a/1/D/i" clause {
+            num "i" "(i)"
+            heading "1st calendar year"
+            chapeau "With respect to compensation paid in calendar months before the end of the first full calendar year in which the employer is subject to this chapter, the contribution rate shall be the average contribution rate paid by all employers during the 3 calendar years preceding the calendar year before the calendar year in which the compensation is paid. The average contribution rate shall be determined—"
+            provision "/us/usc/t45/s358/a/1/D/i/I" subclause {
+              num "I" "(I)"
+              content "by dividing the aggregate contributions paid by all employers under this subsection in those 3 calendar years by the aggregate compensation with respect to which such contributions were paid; and"
+              hash "cb23b811173a6f85a082a321b455a89fc8104c2dba35f4edc0682ddcf0af3323"
+            }
+            provision "/us/usc/t45/s358/a/1/D/i/II" subclause {
+              num "II" "(II)"
+              content "by multiplying the resulting ratio as computed to 4 decimal points by 100."
+              hash "ed220a8379e930a984369b67b510a19badea652d2a05f7a06fad57f2fab9811f"
+            }
+            hash "1cab88563cf6bc48d4eaa7ea17e35eb494e510c4ac96b2620baf3d9d8bb065b9"
+          }
+          provision "/us/usc/t45/s358/a/1/D/ii" clause {
+            num "ii" "(ii)"
+            heading "2d calendar year"
+            chapeau "With respect to compensation paid in calendar months in the next calendar year, the contribution rate shall be the smaller of—"
+            provision "/us/usc/t45/s358/a/1/D/ii/I" subclause {
+              num "I" "(I)"
+              content "the maximum contribution limit computed under paragraph (20); or"
+              hash "6f2ec8b0255d302eb188342d891f3a08d206430690d4ce82aa8a2666d96408a1"
+            }
+            provision "/us/usc/t45/s358/a/1/D/ii/II" subclause {
+              num "II" "(II)"
+              content {
+                p "the percentage rate computed pursuant to the following formula:"
+                table {
+                  head {
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td ""
+                    td ""
+                    td "2(A2)+B"
+                    td ""
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td "R="
+                    td "A"
+                    td "————"
+                    td ""
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td ""
+                    td ""
+                    td "3"
+                    td ""
+                    td ""
+                  }
+                }
+              }
+              hash "1c6ccae48729c86ad274f402c33951c492503debf7be6790fb8dbf09d027e43f"
+            }
+            hash "9f9294aedc0b6deeb74ab45d04ec1341cab985109666963073ec0146284ef7ed"
+          }
+          provision "/us/usc/t45/s358/a/1/D/iii" clause {
+            num "iii" "(iii)"
+            heading "3d calendar year"
+            chapeau "With respect to compensation paid in calendar months in the third full calendar year in which the employer is subject to the coverage of this chapter, the contribution rate shall be the smaller of—"
+            provision "/us/usc/t45/s358/a/1/D/iii/I" subclause {
+              num "I" "(I)"
+              content "the maximum contribution limit computed under paragraph (20); or"
+              hash "6f2ec8b0255d302eb188342d891f3a08d206430690d4ce82aa8a2666d96408a1"
+            }
+            provision "/us/usc/t45/s358/a/1/D/iii/II" subclause {
+              num "II" "(II)"
+              content {
+                p "the percentage rate computed pursuant to the following formula:"
+                table {
+                  head {
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td ""
+                    td "A3+2C"
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td "R="
+                    td "———"
+                    td ""
+                  }
+                  body {
+                    td ""
+                    td ""
+                    td "3"
+                    td ""
+                  }
+                }
+              }
+              hash "859ad25931f6ec4c1851892ffe77e5ce8f6b345a32fd57faf8d80b1ad06fd65b"
+            }
+            hash "5d99385e284d070c628a315a5baded3549e7a5e20a222f7196b4d2a85a588b6f"
+          }
+          provision "/us/usc/t45/s358/a/1/D/iv" clause {
+            num "iv" "(iv)"
+            heading "Subsequent calendar years"
+            content "With respect to all calendar months in calendar years subsequent to that calendar year, the contribution rate shall be determined under subparagraph (C)."
+            hash "14c8d240166b8e5ddc3b4db2ab0ba92544c0bb6a6b81cc3062564b34571b644f"
+          }
+          provision "/us/usc/t45/s358/a/1/D/v" clause {
+            num "v" "(v)"
+            heading "Meaning of symbols"
+            chapeau "For purposes of the formulas in clauses (ii) and (iii)—"
+            provision "/us/usc/t45/s358/a/1/D/v/I" subclause {
+              num "I" "(I)"
+              content "“R” is the applicable contribution rate expressed as a percentage for months in the calendar year;"
+              hash "00b727448651793b6b536a0e2d4dcea0f79541cf97a65de91517705698f3fdd3"
+            }
+            provision "/us/usc/t45/s358/a/1/D/v/II" subclause {
+              num "II" "(II)"
+              content "“A1” is the contribution rate determined under clause (i) for such employer’s first full calendar year;"
+              hash "6f75170ca726849a27b179629315d217f1f095e4c59624d8e4692a8d755d7e46"
+            }
+            provision "/us/usc/t45/s358/a/1/D/v/III" subclause {
+              num "III" "(III)"
+              content "“A2” is the contribution rate which would have been determined under clause (i) if the employer’s second calendar year had been its first full calendar year;"
+              hash "4ff1be3e9a0a375f1710b56621ddc15e8eeb715ca8abf59e017f2ae26a4f3ea0"
+            }
+            provision "/us/usc/t45/s358/a/1/D/v/IV" subclause {
+              num "IV" "(IV)"
+              content "“A3” is the contribution rate which would have been determined under clause (i) if the employer’s third calendar year had been such employer’s first full calendar year;"
+              hash "c281d995edcc757d888a7711af602f162c367782e5c0a907ff75db81040f038a"
+            }
+            provision "/us/usc/t45/s358/a/1/D/v/V" subclause {
+              num "V" "(V)"
+              content "“B” is the contribution rate for the employer as determined under subparagraph (C) for the employer’s second full calendar year; and"
+              hash "8b1961ebf65206d24843dad63853f7dace50a5bee5442738030db1df9c35037a"
+            }
+            provision "/us/usc/t45/s358/a/1/D/v/VI" subclause {
+              num "VI" "(VI)"
+              content "“C” is the contribution rate for the employer as determined under subparagraph (C) for the employer’s third full calendar year."
+              hash "3289a3d79a9aaf0569a919ab9fcb118112780e8062ec0a137ed498b8e2142e7b"
+            }
+            hash "22d1784ba9e56f8ad8bb0956dd4f787cc019933b702e3a65ecbee428492883e6"
+          }
+          provision "/us/usc/t45/s358/a/1/D/vi" clause {
+            num "vi" "(vi)"
+            heading "Special rule for certain computations"
+            chapeau "For purposes of computing B and C in such formulas—"
+            provision "/us/usc/t45/s358/a/1/D/vi/I" subclause {
+              num "I" "(I)"
+              content "the percentage rate computed under subparagraph (C), shall not be reduced under clause (viii) of that subparagraph; and"
+              hash "549ba4d3b2eb323c4944345d5afb0567e19df6b0ceab7273e97d1bf2894e27af"
+            }
+            provision "/us/usc/t45/s358/a/1/D/vi/II" subclause {
+              num "II" "(II)"
+              content "any computations which under subparagraph (C) are to be made on the basis of a 4-quarter or 12-quarter period ending on a given June 30 shall be made on the basis of a period commencing with the first day of the first calendar quarter that begins after the date on which the employer first commenced paying compensation subject to this chapter and ending on that June 30, and the amount so computed shall be increased to an amount that bears the same ratio to the amount so computed as 4 or 12, as appropriate, bears to the number of calendar quarters in the period on which the computation was based."
+              hash "f628529c6ad44acde50748b26918c047f68945450bb6e52e67d1606029f4fb50"
+            }
+            hash "a52e1e5d64861054d4e05bb703c95528abf78885000d88e71bc2f1b4bd1f19ba"
+          }
+          hash "345aba9564be8d54e62572abe282077b7b3c1a6922e4f2b1ca70038045ea5ab3"
+        }
+        hash "96fd5d48d88f3a051d93bb0ab617834314ded02f57810335f93587b39c29e1ee"
+      }
+      provision "/us/usc/t45/s358/a/2" paragraph {
+        num "2" "(2)"
+        heading "Benefit ratio"
+        content "An employer’s benefit ratio as of any given June 30 shall be determined by dividing all benefits charged to the employer under paragraph (15) during the 12 calendar quarters ending on such June 30 by the employer’s 3-year compensation base as of such June 30 as computed under paragraph (3)."
+        hash "f1642b59d89cd5d3f01e634522b32ff3a4d942b3aa7c6f307cc387d847af275f"
+      }
+      provision "/us/usc/t45/s358/a/3" paragraph {
+        num "3" "(3)"
+        heading "3-year compensation base"
+        content "An employer’s 3-year compensation base as of any given June 30 is the aggregate compensation with respect to which contributions were paid by the employer under this subsection in the 12 calendar quarters ending on such June 30."
+        hash "aa4e2f3da85f71a9093d79b1eddd7f9b06c61b6467ab24f2599d30ca719bb0fa"
+      }
+      provision "/us/usc/t45/s358/a/4" paragraph {
+        num "4" "(4)"
+        heading "Reserve ratio"
+        content "An employer’s reserve ratio as of any given June 30 shall be computed by dividing the employer’s reserve balance as of such June 30, as computed under paragraph (6), by that employer’s 1-year compensation base as of such June 30, as computed under paragraph (5). The employer’s reserve ratio may be either a positive or a negative figure, depending upon whether the employer’s reserve balance is a positive or negative figure."
+        hash "61fe64f947cb776c2441b66740245d4bee30da640c50328dafb75c0c56950123"
+      }
+      provision "/us/usc/t45/s358/a/5" paragraph {
+        num "5" "(5)"
+        heading "1-year compensation base"
+        content "An employer’s 1-year compensation base as of any given June 30 is the aggregate compensation with respect to which contributions were paid by the employer under this subsection in the 4 calendar quarters ending on such June 30."
+        hash "f39a8d0fb7170102f1bfc79e1914003dc6bb5fb4310ee18d36a66e4c3298d11e"
+      }
+      provision "/us/usc/t45/s358/a/6" paragraph {
+        num "6" "(6)"
+        heading "Reserve balance"
+        content "An employer’s reserve balance as of any given June 30 shall be determined by subtracting the employer’s cumulative benefit balance as of such June 30, computed under paragraph (7), from the employer’s net cumulative contribution balance as of such June 30, computed under paragraph (8). An employer’s reserve balance may be either positive or negative, depending upon whether or not that employer’s net cumulative contribution balance exceeds the employer’s cumulative benefit balance."
+        hash "8531c6635c2644540295e9d257f5c26dba4f01f8eeca76ed1b27991affb15970"
+      }
+      provision "/us/usc/t45/s358/a/7" paragraph {
+        num "7" "(7)"
+        heading "Cumulative benefit balance"
+        chapeau "An employer’s cumulative benefit balance as of any given June 30 shall be determined by adding—"
+        provision "/us/usc/t45/s358/a/7/A" subparagraph {
+          num "A" "(A)"
+          content "the net amount of the benefits charged to the employer under paragraph (15) on or after January 1, 1990; and"
+          hash "bde6dd2f7568e0a9ae12ee51b9919aa37f05cbf0ac1337cd0b6e8036638fdf64"
+        }
+        provision "/us/usc/t45/s358/a/7/B" subparagraph {
+          num "B" "(B)"
+          content "the cumulative amount of the employer’s unallocated charges for the same period, if any, as computed under paragraph (9)."
+          hash "45fe9adc7036256e1ea3a295fd9d2a481a0ad7930d67e06c149965b9a7b3eeab"
+        }
+        hash "eb552a421c673575f6b97c0107d44add5c253205380ae6d8b22f4b0711298446"
+      }
+      provision "/us/usc/t45/s358/a/8" paragraph {
+        num "8" "(8)"
+        heading "Net cumulative contribution balance"
+        chapeau "An employer’s net cumulative contribution balance as of any given June 30 shall be determined as follows:"
+        provision "/us/usc/t45/s358/a/8/A" subparagraph {
+          num "A" "(A)"
+          heading "Step 1"
+          chapeau "Compute the sum of"
+          provision "/us/usc/t45/s358/a/8/A/i" clause {
+            num "i" "(i)"
+            content "all contributions paid by the employer pursuant to this subsection;"
+            hash "7948d4b9015d2e6481d096ccb51260d570b69c51d31af435e73100141cee4d2d"
+          }
+          provision "/us/usc/t45/s358/a/8/A/ii" clause {
+            num "ii" "(ii)"
+            content "that portion of the tax imposed under " ["section 3321(a) of title 26" -> "/us/usc/t26/s3321/a"] " that is attributable to the surtax rate under section 516(b) of the Railroad Unemployment Insurance and Retirement Improvement Act of 1988;" mark "2" 2 " and"
+            hash "ad45accc6463b333e0b6c201abf9f0a55f547cb1860275a887e5cc60d4ae7416"
+          }
+          provision "/us/usc/t45/s358/a/8/A/iii" clause {
+            num "iii" "(iii)"
+            content "any taxes paid by the employer pursuant to " ["section 3321(a) of title 26" -> "/us/usc/t26/s3321/a"] " (after the outstanding balance of loans made under " ["section 360(d) of this title" -> "/us/usc/t45/s360/d"] " before October 1, 1985, plus interest, have been paid);"
+            hash "9df580f3af38cc9eb93b2e6a3224a9e33ce2cc259c89cfd4d6551ca1ac329716"
+          }
+          continuation "on or after January 1, 1990."
+          hash "939c084594315fca2ada43e92e14ecde75bb112e8908005b96d208f8c7213729"
+        }
+        provision "/us/usc/t45/s358/a/8/B" subparagraph {
+          num "B" "(B)"
+          heading "Step 2"
+          content "Subtract an amount equal to the amount of such contributions deposited to the credit of the fund under subsection (i)."
+          hash "3f9d572cf08d4a12a5626ba4b77b7bee4ebcb672535e7299f59ef508d9a00912"
+        }
+        provision "/us/usc/t45/s358/a/8/C" subparagraph {
+          num "C" "(C)"
+          heading "Step 3"
+          content "Add an amount equal to the aggregate amount by which such contributions were reduced in prior calendar years as a result of pooled credits, if any, under paragraph (1)(C)(iii)."
+          hash "5d71fa6e46fe77b75bbd10b8abfc775a20e107e3483d5d4110f9a0af24f8ff9f"
+        }
+        hash "200cb502139ed27e4e24ece1bd6c93fec943eb2150dbd6c41a2491b37a530ab3"
+      }
+      provision "/us/usc/t45/s358/a/9" paragraph {
+        num "9" "(9)"
+        heading "Unallocated charge"
+        content "An employer’s unallocated charge as of any given June 30 is the amount that as of such June 30 bears the same ratio to the system unallocated charge balance, computed under paragraph (10), as the employer’s 1-year compensation base, computed under paragraph (5), bears to the system compensation base computed under paragraph (11)."
+        hash "f07fec9336c6c05de53bef37de098b468155cd240e7afbfa339a377c19770e2f"
+      }
+      provision "/us/usc/t45/s358/a/10" paragraph {
+        num "10" "(10)"
+        heading "System unallocated charge balance"
+        chapeau "The system unallocated charge balance as of any given June 30 shall be determined as follows:"
+        provision "/us/usc/t45/s358/a/10/A" subparagraph {
+          num "A" "(A)"
+          heading "Step 1"
+          content "Compute the aggregate amount of all interest paid by the account on loans from the Railroad Retirement Account after September 30, 1985, pursuant to " ["section 360(d) of this title" -> "/us/usc/t45/s360/d"] ", during the 4 calendar quarters ending on that June 30."
+          hash "0562966129a6e22645eebefc4c2ec3a643bdd3af4cfd50bbac49f3a994175b72"
+        }
+        provision "/us/usc/t45/s358/a/10/B" subparagraph {
+          num "B" "(B)"
+          heading "Step 2"
+          content "Add the aggregate amount of any additions to the system unallocated charge balance specified in paragraphs (15) and (16), during that period."
+          hash "8be2cdc3deef47530e312657febb1cb783a039ea70d00b8f7f0e483e8b1c6f62"
+        }
+        provision "/us/usc/t45/s358/a/10/C" subparagraph {
+          num "C" "(C)"
+          heading "Step 3"
+          content "Add the aggregate amount of any other expenditures by the account during that period not chargeable to any individual employer under paragraph (15) or to the fund under " ["section 361 of this title" -> "/us/usc/t45/s361"] "."
+          hash "7a9092822163637e9525eadbc8f29307d12655959bb2fb5ebdb48752833be237"
+        }
+        provision "/us/usc/t45/s358/a/10/D" subparagraph {
+          num "D" "(D)"
+          heading "Step 4"
+          content "Subtract the aggregate amount of all income to the account, under " ["section 360(a)(iv) of this title" -> "/us/usc/t45/s360/a/iv"] " or " ["section 360(a)(vii) of this title" -> "/us/usc/t45/s360/a/vii"] ", during that period."
+          hash "a11f83e64120fbc4755f222cc33fca36c328355b2ce85d84676998c71d14ed3e"
+        }
+        provision "/us/usc/t45/s358/a/10/E" subparagraph {
+          num "E" "(E)"
+          heading "Step 5"
+          content "Subtract the aggregate amount of all transfers to the account, pursuant to " ["section 361(d) of this title" -> "/us/usc/t45/s361/d"] ", during that period."
+          hash "5d053dd402510bf8dd7826d98eb01a2241b106b9179d5c88e0e8137df5bd88ed"
+        }
+        provision "/us/usc/t45/s358/a/10/F" subparagraph {
+          num "F" "(F)"
+          heading "Step 6"
+          content "Subtract the aggregate amount of all other income and receipts of the account, during that period, which are not assigned to individual employer balances."
+          hash "9055473dde4ac397e3e1a20f9e2649cbe2d0d3a7ef5a153c0be9f868f8b4f08b"
+        }
+        provision "/us/usc/t45/s358/a/10/G" subparagraph {
+          num "G" "(G)"
+          heading "Step 7"
+          content "Subtract the net cumulative contribution balance of each employer whose balance has been cancelled pursuant to paragraph (16), during that period, calculated as of the date of such cancellation."
+          hash "db6e6e40c94bcd4ddd9feee892afd22aa482809db188589fa3669d6326ffdc82"
+        }
+        hash "a8e3e27a3edc63d06e746c6fa4174d59bd92fb580902d849dd403afe664884d1"
+      }
+      provision "/us/usc/t45/s358/a/11" paragraph {
+        num "11" "(11)"
+        heading "System compensation base"
+        content "The system compensation base as of any given June 30 shall be determined by adding together the amounts of the 1-year compensation bases of all employers and employee representatives subject to this chapter, computed in accordance with paragraph (5), as of such June 30."
+        hash "0b469fe07e873f7563afdcb990c4436a274c0598b1237c8c7267d489cecfb852"
+      }
+      provision "/us/usc/t45/s358/a/12" paragraph {
+        num "12" "(12)"
+        heading "Pooled credit ratio"
+        chapeau "The pooled credit ratio, if any, for a calendar year shall be determined as follows:"
+        provision "/us/usc/t45/s358/a/12/A" subparagraph {
+          num "A" "(A)"
+          heading "Step 1"
+          content "Compute the balance to the credit of the account as of the close of business on the preceding June 30, including any amounts in the account attributable to loans made under " ["section 360(d) of this title" -> "/us/usc/t45/s360/d"] " before October 1, 1985, but disregarding the obligation to repay such loans and interest thereon. In determining such balance as of June 30 of any year, so much of the balance to the credit of the railroad unemployment insurance administration fund as of the close of business on such date as is in excess of $6,000,000 shall be deemed to be part of the balance to the credit of such account. There will be a pooled credit ratio for the calendar year only if that balance is in excess of the greater of $250,000,000 or of the amount that bears the same ratio to $250,000,000 as the system compensation base as of that June 30 bears to the system compensation base as of June 30, 1991, as computed in accordance with paragraph (11)."
+          hash "9bfaf8f461b5886cc57201f2e2655ab0060cf10b4cce9d9c10f7e258d2666587"
+        }
+        provision "/us/usc/t45/s358/a/12/B" subparagraph {
+          num "B" "(B)"
+          heading "Step 2"
+          content "If there is such an excess amount, divide that excess amount by the system compensation base as of the June 30 preceding the calendar year. The result is the pooled credit ratio for the calendar year."
+          hash "85b441f9c6e7d2b196db393c985442d2d4eddfd47a44b700a68a5776901cb545"
+        }
+        hash "d26de11df552485467a213b14e123b0ef5bd02f282f6fafdc9882be17361e7b1"
+      }
+      provision "/us/usc/t45/s358/a/13" paragraph {
+        num "13" "(13)"
+        heading "Pooled charge ratio"
+        chapeau "The pooled charge ratio, if any, for a calendar year shall be determined as follows:"
+        provision "/us/usc/t45/s358/a/13/A" subparagraph {
+          num "A" "(A)"
+          heading "Step 1"
+          chapeau "With respect to each employer whose contribution rate for that calendar year as computed through step 6 under paragraph (1)(C) was greater than the maximum contribution limit computed under paragraph (20), multiply the employer’s 1-year compensation base as of the preceding June 30, as computed in accordance with paragraph (5), by the difference between—"
+          provision "/us/usc/t45/s358/a/13/A/i" clause {
+            num "i" "(i)"
+            content "the percentage rate determined under subparagraph (B), (C), or (D) of paragraph (1) before the reduction to the maximum contribution limit; and"
+            hash "377a49a35d078ee235cb59fe751cc8b5be0fe6970de026c0f7700154b999c936"
+          }
+          provision "/us/usc/t45/s358/a/13/A/ii" clause {
+            num "ii" "(ii)"
+            content "the maximum contribution limit."
+            hash "e677add43757ac188e5a65ce0281affdf178d9a14492269688c1d9d131dd9f6a"
+          }
+          hash "8e15fd243ed6ad88ce81362a5c8e8ccda80a7af9215495194a10178fb5a21d33"
+        }
+        provision "/us/usc/t45/s358/a/13/B" subparagraph {
+          num "B" "(B)"
+          heading "Step 2"
+          content "Add the amounts arrived at under step 1 so as to obtain an aggregate amount for all such employers."
+          hash "fbad159d7b9777701452637408d47f8af73485f1a2bb4670545d8aa053428979"
+        }
+        provision "/us/usc/t45/s358/a/13/C" subparagraph {
+          num "C" "(C)"
+          heading "Step 3"
+          content "For each employer whose contribution rate as computed through step 3 under paragraph (1)(C) was less than 0, the percentage rate by which such employer’s rate was raised in order to bring that rate to 0 shall be multiplied by that employer’s 1-year compensation base as of the preceding June 30. Subtract the total of the amounts computed under the preceding sentence for all employers from the amount arrived at in step 2."
+          hash "2826c42ef88ba679068cf68af38a540090c115130703e7f7c1d5df8a220f165e"
+        }
+        provision "/us/usc/t45/s358/a/13/D" subparagraph {
+          num "D" "(D)"
+          heading "Step 4"
+          content "Divide the aggregate amount arrived at under step 3 by the system compensation base as of the preceding June 30 as computed under paragraph (11) minus the one-year compensation base of those employers whose rates computed through step 6 of paragraph (1)(C) exceeded the maximum contribution rate computed under paragraph (20). The result is the pooled charge ratio for the calendar year."
+          hash "ae80f5af9e31628f6c0f6ba9591a4a572b7bbee5cd49c591f859c23dd3ff0441"
+        }
+        hash "809d8aef5c9aaa80924af2401b461a4a16500888b4e377ac01b02e92b65cfade"
+      }
+      provision "/us/usc/t45/s358/a/14" paragraph {
+        num "14" "(14)"
+        heading "Surcharge rate"
+        chapeau "The surcharge rate for a calendar year, if any, shall be determined as follows:"
+        provision "/us/usc/t45/s358/a/14/A" subparagraph {
+          num "A" "(A)"
+          heading "Step 1"
+          content "Compute the balance to the credit of the account as of the close of business on the preceding June 30, including any amounts in the account attributable to loans made under " ["section 360(d) of this title" -> "/us/usc/t45/s360/d"] " before October 1, 1985, but disregarding the obligation to repay such loans and interest thereon. In determining such balance as of June 30 of any year, so much of the balance to the credit of the railroad unemployment insurance administration fund as of the close of business on such date as is in excess of $6,000,000 shall be deemed to be part of the balance to the credit of such account. There will be a surcharge rate for the calendar year only if that balance is less than the greater of $100,000,000 or of the amount that bears the same ratio to $100,000,000 as the system compensation base as of that June 30 bears to the system compensation base as of June 30, 1991, as computed in accordance with paragraph (11)."
+          hash "f8cafd41ca651f4829b4ed30c6ba47123abb25feb376a9e76c213b61e02d8e9a"
+        }
+        provision "/us/usc/t45/s358/a/14/B" subparagraph {
+          num "B" "(B)"
+          heading "Step 2"
+          provision "/us/usc/t45/s358/a/14/B/i" clause {
+            num "i" "(i)"
+            content "If the balance to the credit of the account is less than the greater of the amounts referred to in the 2nd sentence of step 1 but is equal to or more than the greater of $50,000,000 or of the amount that bears the same ratio to $50,000,000 as the system compensation base as of that June 30 bears to the system compensation base as of June 30, 1991, then the surcharge rate for the calendar year shall be 1.5 percent."
+            hash "bbd429ca4e9d9f1b4af8b7394b241d7ea21c220a37e661083696eb2e871ac765"
+          }
+          provision "/us/usc/t45/s358/a/14/B/ii" clause {
+            num "ii" "(ii)"
+            content "If the balance to the credit of the account is less than the greater of the amounts referred to in the clause (i), but greater than or equal to zero, then the surcharge rate for the calendar year shall be 2.5 percent."
+            hash "86292a2f9fcb7a3522a49e1aa6f6b99712b1d38a63486cc8e49793058ba3a0da"
+          }
+          provision "/us/usc/t45/s358/a/14/B/iii" clause {
+            num "iii" "(iii)"
+            content "If the balance to the credit of the account is less than zero, the surcharge rate for the calendar year shall be 3.5 percent."
+            hash "609832a195f996ef37f22a0de729145f19b2b61e54f733d3dea8828d80ecfe1f"
+          }
+          hash "d6899c5ec15afd8993c22f875a02b61e2c74f9bbd4fe169ee1878db3f942efe3"
+        }
+        hash "7faf4d1a67dd464c815e3b062635a5aeb5731f70743383ea60ecbec7d02326e7"
+      }
+      provision "/us/usc/t45/s358/a/15" paragraph {
+        num "15" "(15)"
+        heading "Chargeable benefits"
+        provision "/us/usc/t45/s358/a/15/A" subparagraph {
+          num "A" "(A)"
+          heading "In general"
+          content "Beginning January 1, 1990, all benefits paid to an employee for days of unemployment or days of sickness shall be charged to that employee’s base year employer by adding amounts equal to the amounts of such benefits to the employer’s cumulative benefit balance except that benefits paid by reason of strikes or work stoppages growing out of labor disputes shall not be added to the employer’s cumulative benefit balance but instead shall be added to the system unallocated charge balance."
+          hash "1672c42c3372547252a077c5d571e11ceb98aa1a79048bd5913c9941a2a63084"
+        }
+        provision "/us/usc/t45/s358/a/15/B" subparagraph {
+          num "B" "(B)"
+          heading "Adjustments"
+          content "A sum equal to each amount realized in recovery for overpayment, erroneous payment, or reimbursement of benefits and credited to the account pursuant to section 360(a)(v) or 360(a)(viii) of this title shall be subtracted from the cumulative benefit balances of the employers of the employees to whom such an amount was paid as a benefit in the proportion to the amount by which each such employer’s cumulative benefit balance was increased as a result of the payment of the benefit."
+          hash "98cb2b62c2558ae9125992a837a11de26cf5b956e67de45ae644917587224509"
+        }
+        provision "/us/usc/t45/s358/a/15/C" subparagraph {
+          num "C" "(C)"
+          heading "Multiple employers"
+          provision "/us/usc/t45/s358/a/15/C/i" clause {
+            num "i" "(i)"
+            heading "In general"
+            chapeau "All benefits paid to an employee who had more than 1 base-year employer shall be charged to the cumulative benefit balances of the employee’s base year employers—"
+            provision "/us/usc/t45/s358/a/15/C/i/I" subclause {
+              num "I" "(I)"
+              content "in reverse chronological order of the employee’s employment with each such employer in the base year if the employer at the time of the claim was the last base year employer, and the amount charged to each employer shall not exceed the compensation paid by that employer to the employee in the base year; and"
+              hash "0b39ac5ee0ad2a797b26aad8c232a294f0746d4554071cd821ae07bef3d80da3"
+            }
+            provision "/us/usc/t45/s358/a/15/C/i/II" subclause {
+              num "II" "(II)"
+              content "in all other cases, in the same ratio as the compensation paid to such employee by the employer bears to the total of such compensation paid to such employees by all such employers in the base year."
+              hash "bb8b56e89ab02f756397bd9f620d332dfb222f23fb087d9cea380ed9f7c5a38b"
+            }
+            hash "4c2d3e49167cde20f049d4dbb882d35f0b6da227ee9bb59c7b96c911974a1f64"
+          }
+          provision "/us/usc/t45/s358/a/15/C/ii" clause {
+            num "ii" "(ii)"
+            heading "Special rule for employer with cancelled balances"
+            content "All benefits chargeable under this subparagraph to an employer for which the Board has cancelled balances under paragraph (16) shall be added to the system unallocated charge balance."
+            hash "123dca11674835a2d971e5aa4a541b90a5177f70e86aee9482dd40a15eb6202d"
+          }
+          hash "e9ff36f082db5bdb3039912ca6e3bb0eec293912fc11363a8c095760b79ed2f0"
+        }
+        hash "7d91795e2bf63afb95d48434180c581ff3928751b3f5d1044224cc66c1e19ba4"
+      }
+      provision "/us/usc/t45/s358/a/16" paragraph {
+        num "16" "(16)"
+        heading "Defunct employer"
+        content "Whenever the Board determines, pursuant to such regulations as the Board may prescribe, that an employer has permanently ceased to pay compensation with respect to which contributions are payable pursuant to this subsection, the Board shall, effective on the date of the Board’s determination, transfer the employer’s net cumulative contribution balance as a subtraction from, and cumulative benefit balance as an addition to, the system unallocated charge balance and cancel all other accumulations of the employer."
+        hash "873458945776db30f4646e1c5fc632b2d7a2c6b7eec25fe94f9337473788ddd0"
+      }
+      provision "/us/usc/t45/s358/a/17" paragraph {
+        num "17" "(17)"
+        heading "Individual employer record"
+        provision "/us/usc/t45/s358/a/17/A" subparagraph {
+          num "A" "(A)"
+          heading "In general"
+          content "As of January 1, 1990, the Board shall commence maintaining an individual employer record with respect to each employer, and the records necessary to determine pooled charges, pooled credits and unallocated charge balances for the system. Whenever a new employer begins paying compensation with respect to which contributions are payable pursuant to this subsection, the Board shall establish and maintain an individual employer record for such employer."
+          hash "6f1d22c15ee5d131ee511c8b47f2bda311fca76510496851f2068d841678746e"
+        }
+        provision "/us/usc/t45/s358/a/17/B" subparagraph {
+          num "B" "(B)"
+          heading "Definition"
+          content "As used in this paragraph, the term “individual employer record” means a record of an individual employer’s benefit ratio, reserve ratio, 1-year compensation base, 3-year compensation base, unallocated charge, reserve balance, net cumulative contribution balance, and cumulative benefit balance."
+          hash "a60ded244c129e5eb1577602472e33a66a3edbb1fe4b4f954212fb78ac0350b1"
+        }
+        hash "3aca950324765019ba79677dde081ec69a6923fc003312d274b640b9f0437780"
+      }
+      provision "/us/usc/t45/s358/a/18" paragraph {
+        num "18" "(18)"
+        heading "Joint employer records"
+        content "Pursuant to regulations prescribed by the Board, the Board may allow 2 or more employers, upon application, to establish and maintain, or to discontinue, a joint individual employer record for such employers as though such joint record constituted a single employer’s individual employer record."
+        hash "ab55b109d96ebe134b40bc791a0cc7d8c56ca101a6cfab19d41b9003adf11e12"
+      }
+      provision "/us/usc/t45/s358/a/19" paragraph {
+        num "19" "(19)"
+        heading "Mergers, consolidations, or other changes in employer identity"
+        provision "/us/usc/t45/s358/a/19/A" subparagraph {
+          num "A" "(A)"
+          heading "With other employers"
+          content "In the event of a merger, consolidation, unification, or reorganization in which an employer combines with another employer and the combination entails no partitioning of the property of the employer, the individual employer records of the 2 employers shall be combined into a joint individual employer record if the parties request such joint treatment pursuant to paragraph (18) or if the Board otherwise determines, pursuant to regulations prescribed by the Board, that such joint treatment is desirable."
+          hash "abd4f7f5dbeeb5af88ac8f1bae6acfd8c9526098b48976bdb7bdd35620d00bc3"
+        }
+        provision "/us/usc/t45/s358/a/19/B" subparagraph {
+          num "B" "(B)"
+          heading "With nonemployers"
+          content "In the event of a merger, consolidation, unification, or reorganization in which an employer combines with another entity that is not an employer, the employer’s individual employer record shall attach to the combined entity."
+          hash "c1346ae2d9b41517887caa74d07e58226d9478b65ec5f5ac4ebb827fce5b104a"
+        }
+        provision "/us/usc/t45/s358/a/19/C" subparagraph {
+          num "C" "(C)"
+          heading "Sale of assets"
+          content "In the event property of an employer is sold or transferred to another employer or other entity, or is partitioned among 2 or more employers or entities, the cumulative benefit balance, net cumulative contribution balance, 1-year compensation base, and 3-year compensation base of the employer shall be prorated among the employers which receive the property, including any entities which become employers by virtue of such transfer or partition, in such equitable manner as the Board by regulation shall prescribe."
+          hash "df10cd2bc1651b0ae018f0bd571fd3569d1fdaa0a2c95529d1bfb8a8553e1257"
+        }
+        provision "/us/usc/t45/s358/a/19/D" subparagraph {
+          num "D" "(D)"
+          heading "Reincorporation"
+          content "The cumulative benefit balance, net cumulative contribution balance, 1-year compensation base, and 3-year compensation base of an employer that reincorporates or otherwise alters its corporate identity in a transaction not involving a merger, consolidation, or unification shall attach to the reincorporated or altered entity."
+          hash "23d74be3aa58763de2db3d521911977eb8330ac71263588edf16c9089394b042"
+        }
+        provision "/us/usc/t45/s358/a/19/E" subparagraph {
+          num "E" "(E)"
+          heading "Abandonment"
+          content "If an employer abandons property or discontinues service but continues to operate as an employer, the employer’s individual employer record shall continue to be calculated as provided in this subsection without retroactive adjustment."
+          hash "499da80a23d139ce4503568feacc6b09db588cd5a9b2a436b666d4bb0ae4b7e8"
+        }
+        hash "2fe9b595286e4e4c3774e486c60a86b6ef1b69f61ce58c14e4d29f48d8f0e341"
+      }
+      provision "/us/usc/t45/s358/a/20" paragraph {
+        num "20" "(20)"
+        heading "Maximum contribution limit"
+        content "The maximum contribution limit with respect to a calendar year is 12 percent, unless a 3.5 percent surcharge under paragraph (14) is in effect with respect to that calendar year. If such a surcharge is in effect the maximum contribution limit with respect to that calendar year is 12.5 percent."
+        hash "6c46a548e6eedd639eaaa5639f3955f7ce8b6540499072799d16d7b26b679d4f"
+      }
+      provision "/us/usc/t45/s358/a/21" paragraph {
+        num "21" "(21)"
+        heading "Special rules for certain computations under paragraph (1)(C)"
+        provision "/us/usc/t45/s358/a/21/A" subparagraph {
+          num "A" "(A)"
+          chapeau "Any computation that is to be made under paragraph (1)(C) on the basis of a 12-quarter period ending on a given June 30 shall be made on the basis of a period—"
+          provision "/us/usc/t45/s358/a/21/A/i" clause {
+            num "i" "(i)"
+            chapeau "beginning on the later of—"
+            provision "/us/usc/t45/s358/a/21/A/i/I" subclause {
+              num "I" "(I)"
+              content "January 1, 1990;"
+              hash "7d58e6799894051d6a0fa483886a5d82cc27ad8153e209d2be124e0058393e57"
+            }
+            provision "/us/usc/t45/s358/a/21/A/i/II" subclause {
+              num "II" "(II)"
+              content "the first day of the first calendar quarter that begins after the date on which the employer first began to pay compensation subject to this chapter; or"
+              hash "e6b75e6a84f40afc061c7e73e75969cca156c6f1812beff93994b01d6b7962b4"
+            }
+            provision "/us/usc/t45/s358/a/21/A/i/III" subclause {
+              num "III" "(III)"
+              content "July 1 of the third calendar year preceding that June 30; and"
+              hash "e8dc85bbbe02ff8f6496cfa71007b1604174e6806f725bd65f613cd423ffef93"
+            }
+            hash "cc494f3c43e867a535de57971ebcab2d04e14cc4b4a6cd2ed08a22e1b55c2170"
+          }
+          provision "/us/usc/t45/s358/a/21/A/ii" clause {
+            num "ii" "(ii)"
+            content "ending on that June 30."
+            hash "d653589ed10f7faf88e4df6956ce848c2336772e0a2340c99180682bf9e7d5f1"
+          }
+          hash "0cd4887425f5ae5854a50282b4f96fd7b3d95f28e4d626a92585d1344fde6a90"
+        }
+        provision "/us/usc/t45/s358/a/21/B" subparagraph {
+          num "B" "(B)"
+          content "The amount computed under subparagraph (A) shall be increased to an amount that bears the same ratio to the amount so computed as 12 bears to the number of calendar quarters on which the computation is based."
+          hash "8f99231dfb8836d2f59725cbcf558c3ef115112ee6dde3790fc0cb1c283b31c4"
+        }
+        hash "71d8d2e9c48faaca44a7c58cbd8bb9f8e5911526ca27b19dc29678bf8891077f"
+      }
+      hash "422eb82003e611e23601ba88617b566184cf69b0c1e0065f644bc4f348226467"
+    }
+    provision "/us/usc/t45/s358/b" subsection {
+      num "b" "(b)"
+      heading "Employee representative contribution"
+      content "Each employee representative shall pay a contribution with respect to so much of the compensation paid to him for services performed as an employee representative as is not in excess of the monthly compensation base computed in accordance with " ["section 351(i) of this title" -> "/us/usc/t45/s351/i"] ", at a rate which shall be determined under subsection (a) in the same manner and with the same effect as if the employee organization by which such employee representative is employed were an employer as defined in this chapter."
+      hash "03404b4e6400c593fa912bf10b6174d4218506b0a45f583bcf8b55b4ac1b8c2f"
+    }
+    provision "/us/usc/t45/s358/c" subsection {
+      num "c" "(c)"
+      heading "Board proclamation of balance"
+      provision "/us/usc/t45/s358/c/1" paragraph {
+        num "1" "(1)"
+        heading "In general"
+        chapeau "Not later than October 15, 1990, and October 15 of each year thereafter the Board shall proclaim—"
+        provision "/us/usc/t45/s358/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "the balance to the credit of the account as of the preceding June 30 for purposes of paragraphs (12) and (14) of subsection (a);"
+          hash "a64a06678ce10e25aab9dcacfc6bac9e5d5d863d442d66b5f9353a81c13927d4"
+        }
+        provision "/us/usc/t45/s358/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "the balance of any advances to the account under " ["section 360(d) of this title" -> "/us/usc/t45/s360/d"] " after September 30, 1985, that has not been repaid with interest as provided in such section as of September 30 of that year;"
+          hash "df217a9bb271fa29e35fbd4ce26ec0618fb00ffd5435f46476905da670563ab3"
+        }
+        provision "/us/usc/t45/s358/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "the system compensation base as of that June 30 as computed in accordance with paragraph (11) of that subsection;"
+          hash "a4df9daae2ce228b4b3c8dfe58fbbf0f721dc2e8a20b4bcd98559426ad7aa6ef"
+        }
+        provision "/us/usc/t45/s358/c/1/D" subparagraph {
+          num "D" "(D)"
+          content "the system unallocated charge balance as of that June 30, as computed in accordance with paragraph (10) of that subsection; and"
+          hash "1486fa597d460a459b3656b48759c9ac13a5001995a4c5a145c5862a2d510106"
+        }
+        provision "/us/usc/t45/s358/c/1/E" subparagraph {
+          num "E" "(E)"
+          content "the pooled credit ratio, the pooled charge ratio, and the surcharge rate, if any, as determined under paragraph (12), (13), or (14) of that subsection and applicable in the following calendar year."
+          hash "7f1c479eebe331251747a04d155e6a3238a1e784b9e0123f6b3894c0abc7e871"
+        }
+        hash "4b240eb3e34bf5ae5141df497be5470d4464fbe7c4c6639ca26814dfd2ef2001"
+      }
+      provision "/us/usc/t45/s358/c/2" paragraph {
+        num "2" "(2)"
+        heading "Publication of notice"
+        content "As soon as is practicable after such proclamation, the Board shall publish notice in the Federal Register of the amounts so determined and proclaimed."
+        hash "52cb1a97bc31952cef90ef5588b6db43a161abdb33380a91731bbf7c7193261c"
+      }
+      hash "fbeec9fedbc3b128c3400e55c236564ab206c727e4820ca861644de87417f6a1"
+    }
+    provision "/us/usc/t45/s358/d" subsection {
+      num "d" "(d)"
+      heading "Notifications by Board"
+      provision "/us/usc/t45/s358/d/1" paragraph {
+        num "1" "(1)"
+        content "Not later than the last day of any calendar quarter that begins after March 31, 1990, the Board shall notify each employer and employee representative of its net cumulative contribution balance and cumulative benefit balance as of the end of the preceding calendar quarter, as computed in accordance with paragraphs (7) and (8) of subsection (a) as of the last day of such preceding calendar quarter rather than as of a given June 30 if such last day is not a June 30."
+        hash "4faa6c6f3c668ada0e90a7d2f64ddf222b9bd1f33595e5e468e1015f9318ea4c"
+      }
+      provision "/us/usc/t45/s358/d/2" paragraph {
+        num "2" "(2)"
+        content "Not later than October 15, 1990, and October 15 of each year thereafter, the Board shall notify each employer and employee representative of its benefit ratio, reserve ratio, 1-year compensation base, 3-year compensation base, unallocated charge, and reserve balance as of the preceding June 30 as computed in accordance with paragraphs (2), (3), (4), (5), (6), and (9) of subsection (a), and of the contribution rate applicable to the employer or employee representative in the following calendar year as computed under paragraphs (1)(B), (C), or (D) of that subsection."
+        hash "2a6f814a2aed33c18e4679092122937a7308dfe6fbfdbb59f5fef0444d34b86d"
+      }
+      hash "1a2aab21e805bcf85cf7ee155ef23a1832b568e20d35b5bc6b19ce2370eafa19"
+    }
+    provision "/us/usc/t45/s358/e" subsection {
+      num "e" "(e)"
+      heading "Information to verify accuracy to be made available"
+      content "Notwithstanding any other provision of law, upon request by an employer or employee representative, the Board shall make available to such employer or employee representative any information available to the Board which may be necessary to verify the accuracy of a contribution rate determined by the Board to be applicable to such employer or employee representative, or of any component of that contribution rate including the accuracy of the employer’s individual employer record, upon payment by such employer or employee representative to the Board of the cost incurred by the Board in making such information available. The amounts so paid to the Board shall be credited to and deposited in the fund."
+      hash "314e32dbe678b786a7f7491edd3dac4adb247d7e57359928d6adf6537887c892"
+    }
+    provision "/us/usc/t45/s358/f" subsection {
+      num "f" "(f)"
+      heading "Fractional parts of a cent"
+      content "In the payment of any contribution under this chapter, a fractional part of a cent shall be disregarded unless it amounts to one-half cent or more, in which case it shall be increased to one cent."
+      hash "6cab34e120812c10e21f63fa454eb91068211e7d94cba227d7a807bf28e225cf"
+    }
+    provision "/us/usc/t45/s358/g" subsection {
+      num "g" "(g)"
+      heading "Adjustments for improper payments"
+      content "If more or less than the correct amount of the contribution required by this section is paid with respect to any compensation, then, under regulations prescribed under this chapter by the Board, proper adjustments with respect to the contribution shall be made, without interest, in connection with subsequent contribution payments made under this chapter by the same employer or employee representative."
+      hash "8c65e52b61b2179652d04db262631308f438e180df50b182658c112fa926e11c"
+    }
+    provision "/us/usc/t45/s358/h" subsection {
+      num "h" "(h)"
+      heading "Refunding overpayment; collecting underpayment"
+      content "If more or less than the correct amount of the contribution required by this section is paid with respect to any compensation and the overpayment or underpayment of the contribution cannot be adjusted under subsection (d) of this section, the amount of the overpayment shall be refunded from the account, or the amount of the underpayment shall be collected, in such manner and at such times (subject to the statute of limitations properly applicable thereto) as may be prescribed by regulations of the Board."
+      hash "38bf3a7b8536fc0833416d7ac5ef023d7b2e30fcb85b498ff335049d2e764e71"
+    }
+    provision "/us/usc/t45/s358/i" subsection {
+      num "i" "(i)"
+      heading "Collection and deposit of contributions"
+      content "The contributions required by this chapter shall be collected by the Board and shall be deposited by it with the Secretary of the Treasury of the United States, such part thereof as equals 0.65 per centum of the total compensation on which such contributions are based to be deposited to the credit of the fund and the balance to be deposited to the credit of the account."
+      hash "f3421c2e15af2caa8a16ec641de3373bdb80ae53f2a276eda8d49cdf7510d7df"
+    }
+    provision "/us/usc/t45/s358/j" subsection {
+      num "j" "(j)"
+      heading "Time for payment; failure to pay promptly"
+      content "The contributions required by this chapter shall be collected and paid quarterly or at such other times and in such manner and under such conditions not inconsistent with this chapter as may be prescribed by regulations of the Board, and shall not be deducted, in whole or in part, from the compensation of employees in the employer’s employ. If a contribution required by this chapter is not paid when due, there shall be added to the amount payable (except in the case of adjustments made in accordance with the provisions of this chapter) interest at the rate of 1 per centum per month or fraction of a month from the date the contribution became due until paid. Any interest collected pursuant to this subsection shall be credited to the account."
+      hash "7405b3fc24618db22a88aa71d80ff764af74f0b353c00387447f450cae19866b"
+    }
+    provision "/us/usc/t45/s358/k" subsection {
+      num "k" "(k)"
+      heading "Application of other laws; authority of Board"
+      content "All provisions of law, including penalties, applicable with respect to any tax imposed by the provisions of the Railroad Retirement Tax Act [" ["26 U.S.C. 3201" -> "/us/usc/t26/s3201"] " et seq.], insofar as applicable and not inconsistent with the provisions of this chapter, shall be applicable with respect to the contributions required by this chapter: Provided, That all authority and functions conferred by or pursuant to such provisions upon any officer or employee of the United States, except the authority to institute and prosecute, and the function of instituting and prosecuting, criminal proceedings, shall, with respect to such contributions, be vested in and exercised by the Board or such officers and employees of the Board as it may designate therefor. The remedies available under the first sentence of this subsection for an employer or employee representative who contests the amount of contributions payable by him shall also apply with respect to a contention that the contribution rate determined by the Board under subsection (a) or (b) to be applicable to such employer or employee representative is inaccurate or otherwise improper."
+      hash "c122ee946caff88631331cb4f4d80c8cae9ae3488a6f068bdb45bff78a55143a"
+    }
+    hash "13b3d6be1e94381737e367151e4e2bc1408c407422196ef6f01be1aa8fc9d2a6"
+  }
+  credit "(" ["June 25, 1938, ch. 680, § 8" -> "/us/act/1938-06-25/ch680/s8"] ", " ["52 Stat. 1102" -> "/us/stat/52/1102"] "; " ["July 31, 1946, ch. 709, § 318" -> "/us/act/1946-07-31/ch709/s318"] ", " ["60 Stat. 739" -> "/us/stat/60/739"] "; " ["June 23, 1948, ch. 608" -> "/us/act/1948-06-23/ch608"] ", §§ 4, 5(a), 6, " ["62 Stat. 577" -> "/us/stat/62/577"] ", 578; " ["Aug. 31, 1954, ch. 1164" -> "/us/act/1954-08-31/ch1164"] ", pt. III, §§ 305, 306, " ["68 Stat. 1042" -> "/us/stat/68/1042"] "; " ["Pub. L. 85–927" -> "/us/pl/85/927"] ", pt. II, § 203, Sept. 6, 1958, " ["72 Stat. 1782" -> "/us/stat/72/1782"] "; " ["Pub. L. 86–28" -> "/us/pl/86/28"] ", pt. III, §§ 306, 307, May 19, 1959, " ["73 Stat. 32" -> "/us/stat/73/32"] "; " ["Pub. L. 88–133, title III" -> "/us/pl/88/133/tIII"] ", §§ 303(a), 304, Oct. 5, 1963, " ["77 Stat. 222" -> "/us/stat/77/222"] ", 223; " ["Pub. L. 89–700, title II, § 204" -> "/us/pl/89/700/tII/s204"] ", title III, § 301(i), (ii), Oct. 30, 1966, " ["80 Stat. 1087" -> "/us/stat/80/1087"] ", 1088; " ["Pub. L. 94–92, title I, § 1(g)" -> "/us/pl/94/92/tI/s1/g"] ", (h), Aug. 9, 1975, " ["89 Stat. 463" -> "/us/stat/89/463"] "; " ["Pub. L. 97–35, title XI, § 1128(b)" -> "/us/pl/97/35/tXI/s1128/b"] ", Aug. 13, 1981, " ["95 Stat. 641" -> "/us/stat/95/641"] "; " ["Pub. L. 98–76, title V, § 503(a)" -> "/us/pl/98/76/tV/s503/a"] ", Aug. 12, 1983, " ["97 Stat. 440" -> "/us/stat/97/440"] "; " ["Pub. L. 100–647, title VII" -> "/us/pl/100/647/tVII"] ", §§ 7102(a)–(d), 7103(a), Nov. 10, 1988, " ["102 Stat. 3759–3770" -> "/us/stat/102/3759-3770"] "; " ["Pub. L. 101–322, § 8(a)" -> "/us/pl/101/322/s8/a"] ", July 6, 1990, " ["104 Stat. 297" -> "/us/stat/104/297"] ".)"
+  note "/us/usc/t45/s358/note/editorialNotes/act.1938-06-25.ch680/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This chapter, referred to in text, was in the original “this Act”, meaning " ["act June 25, 1938, ch. 680" -> "/us/act/1938-06-25/ch680"] ", " ["52 Stat. 1094" -> "/us/stat/52/1094"] ", which enacted this chapter and amended sections 503 and 1104 and former " ["section 1107 of Title 42" -> "/us/usc/t42/s1107"] ", The Public Health and Welfare. For complete classification of this Act to the Code, see " ["section 367 of this title" -> "/us/usc/t45/s367"] " and Tables."
+    p "Section 516(b) of the Railroad Unemployment Insurance and Retirement Improvement Act of 1988, referred to in subsec. (a)(8)(A)(ii), probably means " ["section 7106(b) of Pub. L. 100–647" -> "/us/pl/100/647/s7106/b"] ", title VII, Nov. 10, 1988, " ["102 Stat. 3773" -> "/us/stat/102/3773"] ", which is set out as a note under " ["section 3321 of Title 26" -> "/us/usc/t26/s3321"] ", Internal Revenue Code."
+    p "The Railroad Retirement Tax Act, referred to in subsec. (k), is " ["act Aug. 16, 1954, ch. 736" -> "/us/act/1954-08-16/ch736"] ", §§ 3201, 3202, 3211, 3212, 3221, and 3231 to 3233, " ["68A Stat. 431" -> "/us/stat/68A/431"] ", which is classified generally to chapter 22 (§ 3201 et seq.) of Title 26. For complete classification of this Act to the Code, see " ["section 3233 of Title 26" -> "/us/usc/t26/s3233"] " and Tables."
+    hash "7680be2c4d365c1fd7368fc5dd6b618ad1f6534035a4838e589e1878bfdef06b"
+  }
+  note "/us/usc/t45/s358/note/editorialNotes/pl.101.322/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1990—Subsec. (a)(1)(B)(vi). " ["Pub. L. 101–322" -> "/us/pl/101/322"] " inserted “the National Railroad Passenger Corporation and” after “the contribution of”."
+    p "1988—Subsec. (a). " ["Pub. L. 100–647, § 7102(a)" -> "/us/pl/100/647/s7102/a"] ", added subsec. (a) and struck out former subsec. (a) which consisted of two undesignated pars."
+    p "Subsec. (b). " ["Pub. L. 100–647, § 7102(b)" -> "/us/pl/100/647/s7102/b"] ", amended subsec. (b) generally. Prior to amendment, subsec. (b) read as follows: “Each employee representative shall pay a contribution with respect to so much of the compensation paid to him for services performed as an employee representative during any month as is not, for any such calendar month, in excess of $600, at the rate applicable to employers in accordance with subsection (a) of this section. The compensation of an employee representative and the contribution with respect thereto shall be determined in the same manner and with the same effect as if the employee organization by which such employee representative is employed were an employer as defined in this chapter.”"
+    p "Subsecs. (c) to (g). " ["Pub. L. 100–647, § 7102(d)" -> "/us/pl/100/647/s7102/d"] ", added subsecs. (c) to (e) and redesignated former subsecs. (c) to (g) as (f) to (j), respectively."
+    p "Subsec. (h). " ["Pub. L. 100–647, § 7102(d)(1)" -> "/us/pl/100/647/s7102/d/1"] ", redesignated former subsec. (e) as (h). Former subsec. (h) redesignated (k)."
+    p ["Pub. L. 100–647, § 7102(c)" -> "/us/pl/100/647/s7102/c"] ", inserted at end “The remedies available under the first sentence of this subsection for an employer or employee representative who contests the amount of contributions payable by him shall also apply with respect to a contention that the contribution rate determined by the Board under subsection (a) or (b) to be applicable to such employer or employee representative is inaccurate or otherwise improper.”"
+    p "Subsec. (i). " ["Pub. L. 100–647, § 7103(a)" -> "/us/pl/100/647/s7103/a"] ", substituted “0.65” for “0.5”."
+    p ["Pub. L. 100–647, § 7102(d)(1)" -> "/us/pl/100/647/s7102/d/1"] ", redesignated former subsec. (f) as (i)."
+    p "Subsecs. (j), (k). " ["Pub. L. 100–647, § 7102(d)(1)" -> "/us/pl/100/647/s7102/d/1"] ", redesignated former subsecs. (g) and (h) as (j) and (k), respectively."
+    p "1983—Subsec. (a). " ["Pub. L. 98–79, § 503(a)(1)" -> "/us/pl/98/79/s503/a/1"] ", amended provisions preceding table generally. Prior to amendment, such provisions read as follows: “Every employer shall pay a contribution, with respect to having employees in his service, equal to the percentage determined as set forth below of so much of the compensation as is not in excess of $300 for any calendar month paid by him to any employee for services rendered to him after June 30, 1939, and before July 1, 1954, and is not in excess of $350 for any calendar month paid by him to any employee for services rendered to him after June 30, 1954, and before June 1, 1959, and is not in excess of $400 for any calendar month paid by him to any employee for services rendered to him after May 31, 1959: Provided, however, That if compensation is paid to an employee by more than one employer with respect to any such calendar month, the contributions required by this subsection shall apply to not more than $300 for any month before July 1, 1954, and to not more than $350 for any month after June 30, 1954, and before June 1, 1959, and to not more than $400 for any month after May 31, 1959, of the aggregate compensation paid to said employee by all said employers with respect to such calendar month, and each employer other than a subordinate unit of a national railway-labor-organization employer shall be liable for that proportion of the contribution with respect to such compensation paid by all such employers which the compensation paid by him after December 31, 1946, to the employee for services during any calendar month after 1946 bears to the total compensation paid by all such employers after December 31, 1946, to such employee for services rendered during such month; and in the event that the compensation so paid by such employers to the employee for services rendered during such month is less than $300 if such month is before July 1, 1954, or less than $350 if such month is after June 30, 1954, and before June 1, 1959, or less than $400 if such month is after May 31, 1959, each subordinate unit of a national railway-labor-organization employer shall be liable for such proportion of any additional contribution as the compensation paid by such employer after December 31, 1946, to such employee for services rendered during such month bears to the total compensation paid by all such employers after December 31, 1946, to such employee for services rendered during such month:"
+    p "“1. With respect to compensation paid prior to January 1, 1948, the rate shall be 3 per centum;"
+    p "“2. With respect to compensation paid after the month in which this chapter was amended in 1959, the rate shall be as follows:”."
+    p "Subsec. (b). " ["Pub. L. 98–76, § 503(a)(2)" -> "/us/pl/98/76/s503/a/2"] ", struck out “after December 1975” after “during any month”, and substituted “$600” for “$400”."
+    p "1981—Subsec. (f). " ["Pub. L. 97–35" -> "/us/pl/97/35"] " substituted “equals 0.5 per centum” for “equals 0.25 per centum”."
+    p "1975—Subsec. (a). " ["Pub. L. 94–92, § 1(g)" -> "/us/pl/94/92/s1/g"] ", substituted table reading:"
+    table {
+      head {
+        td ""
+      }
+      body {
+        td "“$300,000,000 or more"
+        td "0.5"
+      }
+      body {
+        td "$200,000,000 or more but less than $300,000,000"
+        td "4.0"
+      }
+      body {
+        td "$100,000,000 or more but less than $200,000,000"
+        td "5.5"
+      }
+      body {
+        td "$50,000,000 or more but less than $100,000,000"
+        td "7.0"
+      }
+      body {
+        td "Less than $50,000,000"
+        td "8.0”"
+      }
+      body {
+        td "for prior provisions reading:"
+        td ""
+      }
+      body {
+        td "“$450,000,000 or more"
+        td "1½"
+      }
+      body {
+        td "$400,000,000 or more but less than $450,000,000"
+        td "2"
+      }
+      body {
+        td "$350,000,000 or more but less than $400,000,000"
+        td "2½"
+      }
+      body {
+        td "$300,000,000 or more but less than $350,000,000"
+        td "3"
+      }
+      body {
+        td "Less than $300,000,000"
+        td "4”"
+      }
+    }
+    p "Subsec. (b). " ["Pub. L. 94–92, § 1(h)" -> "/us/pl/94/92/s1/h"] ", substituted “Each employee representative shall pay a contribution with respect to so much of the compensation paid to him for services performed as an employee representative during any month after December 1975 as is not, for any such calendar month, in excess of $400, at the rate applicable to employers in accordance with subsection (a) of this section.” for “Each employee representative shall pay, with respect to his income, a contribution equal to 4 per centum of so much of the compensation of such employee representative as is not in excess of $300 for any calendar month, paid to him for services performed as an employee representative after June 30, 1939, and before July 1, 1954, and as is not in excess of $350 paid to him for services rendered as an employee representative in any calendar month after June 30, 1954, and before June 1, 1959, and as is not in excess of $400 paid to him for services rendered as an employee representative in any calendar month after May 31, 1959.”"
+    p "1966—Subsec. (a). " ["Pub. L. 89–700, § 301(i)" -> "/us/pl/89/700/s301/i"] ", (ii), substituted “before June 1, 1959” for “before the calendar month next following the month in which this Act was amended in 1959”, and “after May 31, 1959” for “after the month in which this Act was so amended”."
+    p "Subsec. (b). " ["Pub. L. 89–700" -> "/us/pl/89/700"] ", §§ 204(a), 301(i), (ii), increased contribution rate from 3¾ per centum to 4 per centum, and substituted “before June 1, 1959” for “before the calendar month next following the month in which this Act was amended in 1959”, and “after May 31, 1959” for “after the month in which this Act was so amended”."
+    p "Subsec. (h). " ["Pub. L. 89–700, § 204(b)" -> "/us/pl/89/700/s204/b"] ", substituted “the provisions of the Railroad Retirement Tax Act” for “section 1800 or 2700 of title 26, and the provisions of " ["section 3661 of title 26" -> "/us/usc/t26/s3661"] "”."
+    p "1963—Subsec. (a). " ["Pub. L. 88–133, § 303(a)" -> "/us/pl/88/133/s303/a"] ", increased contribution rate in table from 3¾ to 4 percent when balance to credit of railroad unemployment insurance account as of close of business on Sept. 30 of any year is less than $300,000,000."
+    p "Subsec. (f). " ["Pub. L. 88–133, § 304" -> "/us/pl/88/133/s304"] ", increased amount of contributions to be deposited to credit of fund from 0.2 per centum to 0.25 per centum of total compensation on which such contributions are based."
+    p "1959—Subsec. (a). " ["Pub. L. 86–28, § 306" -> "/us/pl/86/28/s306"] ", increased earnings base from $350 to $400 per month for months after May 1959 for purposes of unemployment insurance contributions, and contribution rates with respect to compensation paid after May 1959 by 1 percent for each of the categories over $300,000,000, by 1¼ percent when the balance was $250,000,000 or more but less than $300,000,000, and by ¾ of 1 percent where the balance was less than $250,000,000."
+    p "Subsec. (b). " ["Pub. L. 86–28, § 307" -> "/us/pl/86/28/s307"] ", increased contribution rate from 3 to 3¾ per centum and maximum amount of compensation for which contribution is payable from $350 to $400 for services rendered in any calendar month after May 1959."
+    p "1958—Subsec. (a). " ["Pub. L. 85–927" -> "/us/pl/85/927"] " inserted provision deeming balance to credit of fund a part of balance to credit of account."
+    p "1954—Subsecs. (a), (b). Act Aug. 31, 1954, increased earnings base from $300 to $350 per month after June 30, 1954 for purposes of unemployment insurance contributions."
+    p "1948—Subsec. (a). Act June 23, 1948, §§ 4, 5(a), substituted for flat 3 percent contribution rate a sliding scale under which tax rate is automatically adjusted in accordance with amount of reserves in unemployment insurance account as of close of business on Sept. 30 of each year."
+    p "Subsec. (f). Act June 23, 1948, § 6, changed rates of credits to account and fund."
+    p "1946—Subsec. (a). Act July 31, 1946, § 318(a), changed basis of contributions from compensation payable during a month to compensation paid during the month and inserted provisions relating to proration of contributions where one of the employers is a railway labor organization."
+    p "Subsec. (h). Act July 31, 1946, § 318(b), substituted references to sections of the Internal Revenue Code for references to the sections of the Internal Revenue Acts of 1926 and 1934 from which they were derived."
+    hash "8bcb88126b94feebed1c9bd9fc3f98c297f475c40f10e7b7b1737df3ed87bc0a"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.101.322/effective-date-of-1990-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1990 Amendment"
+    p ["Pub. L. 101–322, § 8(b)" -> "/us/pl/101/322/s8/b"] ", July 6, 1990, " ["104 Stat. 297" -> "/us/stat/104/297"] ", provided that:"
+    quoted "/us/pl/101/322/s8/b" {
+      p "“The amendment made by subsection (a) [amending this section] shall be effective as of January 1, 1989.”"
+    }
+    hash "704f2672627132bec9a7f9771ec0e1574b27d17658f721467150b38d214f9831"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.100.647/effective-date-of-1988-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1988 Amendment"
+    p ["Pub. L. 100–647, title VII, § 7102(e)" -> "/us/pl/100/647/tVII/s7102/e"] ", Nov. 10, 1988, " ["102 Stat. 3770" -> "/us/stat/102/3770"] ", provided that:"
+    quoted "/us/pl/100/647/tVII/s7102/e" {
+      p "“The amendments made by this section [amending this section] shall take effect upon the date of the enactment of this Act [Nov. 10, 1988].”"
+    }
+    p ["Pub. L. 100–647, title VII, § 7103(c)" -> "/us/pl/100/647/tVII/s7103/c"] ", Nov. 10, 1988, " ["102 Stat. 3770" -> "/us/stat/102/3770"] ", provided that:"
+    quoted "/us/pl/100/647/tVII/s7103/c" {
+      p "“The amendments made by this section [amending this section and sections 360 and 361 of this title] shall apply with respect to compensation paid in months beginning after September 30, 1988.”"
+    }
+    hash "bb3af8e6cdd1b5e280023f558d8ef30b6c1b3cc611fb4a602c27e0ba4fa66874"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.98.76/effective-date-of-1983-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1983 Amendment"
+    p "Amendment by " ["Pub. L. 98–76" -> "/us/pl/98/76"] " applicable to compensation paid for services rendered after Dec. 31, 1983, see " ["section 503(c) of Pub. L. 98–76" -> "/us/pl/98/76/s503/c"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
+    hash "a36699cd5b7cbd5ccdf17fbbfd021a14edd14b1758c0b5d63924dc6a5d623ccb"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1981 Amendment"
+    p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Oct. 1, 1981, and applicable only with respect to annuities awarded on or after that date, see " ["section 1129 of Pub. L. 97–35" -> "/us/pl/97/35/s1129"] ", set out as a note under " ["section 231 of this title" -> "/us/usc/t45/s231"] "."
+    hash "f34eedda9e0a73372e03d4a62b8df5d0ec73b66dc4aad6dab3e7c1e5b987c19c"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1975 Amendment"
+    p "Amendment by " ["Pub. L. 94–92" -> "/us/pl/94/92"] " effective with respect to compensation paid for services rendered after Dec. 31, 1975, see " ["section 2 of Pub. L. 94–92" -> "/us/pl/94/92/s2"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
+    hash "f2ba637f0f633170fd562de44ebc0b4bf7b9ed908566eb3e3e3ee1c6df0c60a8"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.88.133/effective-date-of-1963-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1963 Amendment"
+    p ["Pub. L. 88–133, title III, § 303(a)" -> "/us/pl/88/133/tIII/s303/a"] ", Oct. 5, 1963, " ["77 Stat. 222" -> "/us/stat/77/222"] ", provided that the amendment made by section 303(a) is effective with respect to compensation paid after Dec. 31, 1963."
+    p ["Pub. L. 88–133, title III, § 304" -> "/us/pl/88/133/tIII/s304"] ", Oct. 5, 1963, " ["77 Stat. 223" -> "/us/stat/77/223"] ", provided that the amendment made by section 304 is effective with respect to contributions collected by the Railroad Retirement Board after Dec. 31, 1961."
+    hash "d83b33ad259a365de16176a816a24bf93f84bd225cb440fb0650cc5fa6d31e12"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.86.28/effective-date-of-1959-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1959 Amendment"
+    p "Amendment by sections 306(4), (5) and 307(1) of " ["Pub. L. 86–28" -> "/us/pl/86/28"] " effective first day of calendar month next following May 1959, and applicable only with respect to compensation paid for services rendered in calendar months after May 1959, see " ["section 309 of Pub. L. 86–28" -> "/us/pl/86/28/s309"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
+    hash "9cae218d01fd8fda9de7bbb0c0a96a4a6a532750f395c88453b9b92e2e8a11b6"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.85.927/effective-date-of-1958-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1958 Amendment"
+    p "Amendment by " ["Pub. L. 85–927" -> "/us/pl/85/927"] " effective Sept. 6, 1958, except as otherwise indicated, see " ["section 207(c) of Pub. L. 85–927" -> "/us/pl/85/927/s207/c"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
+    hash "e5491c4ad18c46a3258951b0ea60b804fb41eaea802bcca74a247d6a7c4a35a8"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/nolaw/effective-date-of-1954-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1954 Amendment"
+    p "Amendment by act Aug. 31, 1954, effective July 1, 1954, see section 401 of act Aug. 31, 1954, set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
+    hash "e9786b4be163d0a8ffd8af6eb98fd468d5469dea7119ccfa9a11be8a637ba011"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1946 Amendment"
+    p "Amendment by act July 31, 1946, effective Jan. 1, 1947, see section 402 of act July 31, 1946."
+    hash "1f8fdac108c88dc24fbc9f733cde1705004215eb4705d744e85fb4067fec1644"
+  }
+  note "/us/usc/t45/s358/note/statutoryNotes/act.1948-06-23.ch608/adjustment-or-refund-of-excessive-contributions" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Adjustment or Refund of Excessive Contributions"
+    p ["Act June 23, 1948, ch. 608, § 5(b)" -> "/us/act/1948-06-23/ch608/s5/b"] ", " ["62 Stat. 578" -> "/us/stat/62/578"] ", provided that:"
+    quoted "/us/act/1948-06-23/ch608/s5/b" {
+      p "“Contributions paid under subsection (a) of section 8 of the Railroad Unemployment Insurance Act, as amended [subsec. (a) of this section], prior to the enactment of the foregoing amendment thereof [June 23, 1948] which are in excess of those required by said subsection as so amended shall be subject to adjustment or refund in accordance with the provisions of subsections (d) and (e) of said section 8 [subsecs. (d) and (e) of this section].”"
+    }
+    hash "4c3665fa65998f5dcf19ea7b5f1ef10dbcb724c6a8f1755625badc56ac2bf815"
+  }
+  footnote 1 "1" {
+    p "So in original. Probably should be “percentage”."
+  }
+  footnote 2 "2" {
+    p "See References in Text note below."
+  }
+  definition "/us/usc/t45/s358/a/17/B" {
+    term "individual employer record"
+    kind means
+    words "As used in this paragraph"
+    region "/us/usc/t45/s358/a/17"
+    basis restated
+  }
+  layers {
+    operative "13b3d6be1e94381737e367151e4e2bc1408c407422196ef6f01be1aa8fc9d2a6"
+    enacted "a00f82de6121bf59610623c723c8564d37847e2dff5f2e316930d3c616ca7db8"
+    editorial "6f0105eca28a40e09e45de16969854c04ce616cca35850dfbbb5840c4ba563dc"
+  }
+}

@@ -24,6 +24,8 @@ Source: https://github.com/BeeGass/fidryn
   - HTML: https://fidryn.onlygass.dev/docs/language
 - [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time.md): Case records, admissible completions, valid-at and known-at in Fidryn.
   - HTML: https://fidryn.onlygass.dev/docs/cases-and-time
+- [Law modules](https://fidryn.onlygass.dev/docs/law-modules.md): The reference of Fidryn law modules of edition 2: addresses, hashes, syntax, workspaces, references, definitions, bindings, change sets and the importer of the United States Code.
+  - HTML: https://fidryn.onlygass.dev/docs/law-modules
 - [CLI](https://fidryn.onlygass.dev/docs/cli.md): Every fidryn CLI subcommand and flag the reference binary accepts.
   - HTML: https://fidryn.onlygass.dev/docs/cli
 - [Mill](https://fidryn.onlygass.dev/docs/mill.md): Localhost Fidryn mill UI on 127.0.0.1 — checks modules; does not live-file.
@@ -32,6 +34,8 @@ Source: https://github.com/BeeGass/fidryn
   - HTML: https://fidryn.onlygass.dev/docs/outcomes
 - [Examples](https://fidryn.onlygass.dev/docs/examples.md): Trust, tax, federal slices, and the fifty-state corpus map for Fidryn.
   - HTML: https://fidryn.onlygass.dev/docs/examples
+- [Coverage](https://fidryn.onlygass.dev/docs/coverage.md): The coverage ledger of the sample of the United States Code in the Fidryn repository: what was imported, addressed and extracted.
+  - HTML: https://fidryn.onlygass.dev/docs/coverage
 - [Contributing](https://fidryn.onlygass.dev/docs/contributing.md): Toolchain, tests, and how to work on the Fidryn reference interpreter.
   - HTML: https://fidryn.onlygass.dev/docs/contributing
 

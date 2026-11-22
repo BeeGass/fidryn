@@ -1,0 +1,69 @@
+edition 2
+module "/us/usc/ptI/rule1013" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1013" courtRule {
+    num "1013" "Rule 1013."
+    heading "Contested Petition in an Involuntary Case; Default"
+    provision "/us/usc/ptI/rule1013/a" subsection {
+      num "a" "(a)"
+      heading "Hearing and Disposition."
+      chapeau "When a petition in an involuntary case is contested, the court must:"
+      provision "/us/usc/ptI/rule1013/a/1" paragraph {
+        num "1" "(1)"
+        content "rule on the issues presented at the earliest practicable time; and"
+        hash "45e62ec45a75799316ef58c4e249be002ec0edb7397de43fddb48364885c72b6"
+      }
+      provision "/us/usc/ptI/rule1013/a/2" paragraph {
+        num "2" "(2)"
+        content "promptly issue an order for relief, dismiss the petition, or issue any other appropriate order."
+        hash "59c67f2265200d68c8c34a1c559d0a24bae4426536961784ff7d96c6d4fa6f79"
+      }
+      hash "dd9dce9ea477e476ff0f8fcfe71434a1f7142ca566f116b10c559b35301a56b0"
+    }
+    provision "/us/usc/ptI/rule1013/b" subsection {
+      num "b" "(b)"
+      heading "Default."
+      content "If the petition is not contested within the time allowed by Rule 1011, the court must issue the order for relief on the next day or as soon as practicable."
+      hash "851071eb93a6646d8095e7de340cda48c427247dbfd6ff85769e24da30bcc358"
+    }
+    hash "1769ef6d1cc8dd240ff1573da1fb1ff8f31402b28aae235502ee9eee3918595f"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Bankruptcy Rule 115(a) and (c) and applies in chapter 7 and 11 cases. The right to trial by jury under § 19a of the Bankruptcy Act has been abrogated and the availability of a trial by jury is within the discretion of the bankruptcy judge pursuant to [former] 28 U.S.C. § 1480(b). Rule 9015 governs the demand for a jury trial."
+    p "Subdivision (b) of Rule 1013 is derived from former Bankruptcy Rule 115(c) and § 18(e) of the Bankruptcy Act. If an order for relief is not entered on default, dismissal will ordinarily be appropriate but the court may postpone definitive action. See also Rule 9024 with respect to setting aside an order for relief on default for cause."
+    p "Subdivision (e) of former Bankruptcy Rule 115 has not been carried over because its provisions are covered by § 303(i) of the Code."
+    hash "329760a8d07e870078bd67a3e86a38e56b4dbaa92654c7522fb40e4ce0be8819"
+  }
+  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Reference to the Official Form number is deleted in anticipation of future revision and renumbering of the Official Forms."
+    hash "52442a076009196e6a2b2d867281fd4e269c30b1b658ab961039c969e7314a5c"
+  }
+  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "Subdivision (c) is abrogated because the official form for the order for relief was abrogated in 1991. Other amendments are stylistic and make no substantive change."
+    hash "65612cdbfe33d8de66bee2f95944598defcf1f5ebfdd33d80de47a8fbd6d8569"
+  }
+  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1013 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "d728ddaca33d7b0c126b00f4c7ceea11d707829d6c85d0a643b67d4d37be6a2d"
+  }
+  layers {
+    operative "1769ef6d1cc8dd240ff1573da1fb1ff8f31402b28aae235502ee9eee3918595f"
+    enacted "5d16a082a868fdf90ce20fb483e04b7f39e443fc937339c6f95d5517eeaa98f4"
+    editorial "d202609dfe2eeac2eab4f0c7973ec5056d55b5d9af32ea8a4f5d21ef9431f8f6"
+  }
+}

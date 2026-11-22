@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s59" {
+  within "/us/usc/t45/ch2"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s59" section {
+    num "59" "§ 59."
+    heading "Survival of right of action of person injured"
+    content "Any right of action given by this chapter to a person suffering injury shall survive to his or her personal representative, for the benefit of the surviving widow or husband and children of such employee, and, if none, then of such employee’s parents; and, if none, then of the next of kin dependent upon such employee, but in such cases there shall be only one recovery for the same injury."
+    hash "80b853ce13fcc0b5adc72b428528a4d5b4b95b437f00934a1ea5b8266983dc44"
+  }
+  credit "(" ["Apr. 22, 1908, ch. 149, § 9" -> "/us/act/1908-04-22/ch149/s9"] ", as added " ["Apr. 5, 1910, ch. 143, § 2" -> "/us/act/1910-04-05/ch143/s2"] ", " ["36 Stat. 291" -> "/us/stat/36/291"] ".)"
+  layers {
+    operative "80b853ce13fcc0b5adc72b428528a4d5b4b95b437f00934a1ea5b8266983dc44"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1dfbb15e710865852541906c3eef0d54a6714b700d4af8cbe5ef733165d85dcd"
+  }
+}

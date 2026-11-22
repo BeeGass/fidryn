@@ -1,0 +1,169 @@
+edition 2
+module "/us/usc/ptI/rule1017" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1017" courtRule {
+    num "1017" "Rule 1017."
+    heading "Dismissing a Case; Suspending Proceedings; Converting a Case to Another Chapter"
+    provision "/us/usc/ptI/rule1017/a" subsection {
+      num "a" "(a)"
+      heading "Dismissing a Case—In General."
+      content "Except as provided in § 707(a)(3), 707(b), 1208(b), or 1307(b), or in Rule 1017(b), (c), or (e), the court must conduct a hearing on notice under Rule 2002 before dismissing a case on the petitioner’s motion, for want of prosecution or other cause, or by the parties’ consent. For the purpose of the notice, a debtor who has not already filed a list of creditors and their addresses must do so before the deadline set by the court. If the debtor fails to timely file the list, the court may order the debtor or another entity to do so."
+      hash "a403c22b1044cf01e63adbe01c4ceab3026586451c3a5d0e3e04f722ac6d71d9"
+    }
+    provision "/us/usc/ptI/rule1017/b" subsection {
+      num "b" "(b)"
+      heading "Dismissing a Case for Failure to Pay an Installment Toward the Filing Fee."
+      content "If the debtor fails to pay any installment toward the filing fee, the court may dismiss the case after a hearing on notice to the debtor and trustee. If the court dismisses or closes the case without full payment of the filing fee, previous installment payments must be distributed as if full payment had been made."
+      hash "a60a7a406b5120b2700787fcf3d3f6f9d94d2b8a8716a54824df1c7efe446cd1"
+    }
+    provision "/us/usc/ptI/rule1017/c" subsection {
+      num "c" "(c)"
+      heading "Dismissing a Voluntary Chapter 7 or Chapter 13 Case for Failure to File a Document on Time."
+      content "On motion of the United States trustee, the court may dismiss a voluntary Chapter 7 case under § 707(a)(3), or a Chapter 13 case under § 1307(c)(9), for a failure to timely file the information required by § 521(a)(1). But the court may do so only after a hearing on notice served by the United States trustee on the debtor, trustee, and any other entity as the court orders."
+      hash "5ea30bf6e4e59d186c5cad3ad1837cdd79bbcd3b4fb3e2241b965af4c7f5736e"
+    }
+    provision "/us/usc/ptI/rule1017/d" subsection {
+      num "d" "(d)"
+      heading "Dismissing a Case or Suspending Proceedings Under § 305."
+      content "The court may dismiss a case or suspend proceedings under § 305 only after a hearing on notice under Rule 2002(a)."
+      hash "b16ae1a824fc79917b267bd65b4bc8f17f58f952d57d15e0b4ff6e67782fdeea"
+    }
+    provision "/us/usc/ptI/rule1017/e" subsection {
+      num "e" "(e)"
+      heading "Dismissing an Individual Debtor’s Chapter 7 Case for Abuse or Converting It to Chapter 11 or 13."
+      provision "/us/usc/ptI/rule1017/e/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "In General. On motion under § 707(b), the court may dismiss an individual debtor’s Chapter 7 case for abuse or, with the debtor’s consent, convert it to Chapter 11 or 13. The court may do so only after a hearing on notice to:"
+          p "• the debtor;"
+          p "• the trustee;"
+          p "• the United States trustee; and"
+          p "• any other entity as the court orders."
+        }
+        hash "cae294f51cd92e873971ce6ce55c0970ea513005cc066552a1227bb037923774"
+      }
+      provision "/us/usc/ptI/rule1017/e/2" paragraph {
+        num "2" "(2)"
+        chapeau "Time to File a Motion; Content. Except as § 704(b)(2) provides otherwise, a motion to dismiss a case for abuse under § 707(b) or (c) must be filed within 60 days after the first date set for the meeting of creditors under § 341(a). On request made within the 60-day period, the court may, for cause, extend the time to file. The motion must:"
+        provision "/us/usc/ptI/rule1017/e/2/A" subparagraph {
+          num "A" "(A)"
+          content "set forth all matters to be considered at the hearing; and"
+          hash "fa954c8201a37027a0ac073cd9023afaabb3420109ea3de31147def1c7d3a058"
+        }
+        provision "/us/usc/ptI/rule1017/e/2/B" subparagraph {
+          num "B" "(B)"
+          content "if made under § 707(b)(1) and (3), state with particularity the circumstances alleged to constitute abuse."
+          hash "d85a6ef449a0143644443bbd7c341777677a9df11249c40b883199d527e42253"
+        }
+        hash "be6ddb892fc43186ae72a2f651f42e6321872557601a6063f46134bc5f3118e5"
+      }
+      provision "/us/usc/ptI/rule1017/e/3" paragraph {
+        num "3" "(3)"
+        content "Hearing on the Court’s Own Motion; Serving Notice. If the hearing is set on the court’s own motion, the clerk must serve notice on the debtor within 60 days after the first date set for the meeting of creditors under § 341(a). The notice must set forth all matters to be considered at the hearing."
+        hash "2348f8e16f21e913c27ac036d5e227a36788850ada99f1180f2bb51f1fd736fa"
+      }
+      hash "e5455939f2d3fa8f3a83c70a7453b9a03d716d14fa205e526a6eb72f2b01b7dc"
+    }
+    provision "/us/usc/ptI/rule1017/f" subsection {
+      num "f" "(f)"
+      heading "Procedures for Dismissing, Suspending, or Converting a Case."
+      provision "/us/usc/ptI/rule1017/f/1" paragraph {
+        num "1" "(1)"
+        content "In General. Rule 9014 governs a proceeding to dismiss or suspend a case or to convert it to another chapter—except under § 706(a), 1112(a), 1208(a) or (b), or 1307(a) or (b)."
+        hash "39b516ad3d344b44d5ad805b1f722a7b2c207375f6a324fa09d8efd0ca881680"
+      }
+      provision "/us/usc/ptI/rule1017/f/2" paragraph {
+        num "2" "(2)"
+        content "Cases Requiring a Motion. Dismissing or converting a case under § 706(a), 1112(a), 1208(b), or 1307(b) requires a motion filed and served as required by Rule 9013."
+        hash "ceecf749c3a70b2e7ed1e679add5460e1b49c48bcd183a7d7b0d764fadc4c909"
+      }
+      provision "/us/usc/ptI/rule1017/f/3" paragraph {
+        num "3" "(3)"
+        content "Conversion in a Chapter 12 or 13 Case. If the debtor files a conversion notice under § 1208(a) or § 1307(a), the case will be converted without court order. The notice date becomes the date of the conversion order in applying § 348(c) or Rule 1019. The clerk must promptly send a copy of the notice to the United States trustee."
+        hash "0f7398ad1ca253dda2ce479b8e61119714fab0f6ea6a169fec5d3e357f6a59d7"
+      }
+      hash "8609a3f03a55a0ea3e8a4b9dfff22113c98b769c871eadb9d38cf11c7f56bef1"
+    }
+    hash "373ee8dda34d955ed14104529cc39f321404ff0d3c92aa360473c2107f3bf0f2"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 17, 2000, eff. Dec. 1, 2000; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a) of this rule is derived from former Bankruptcy Rule 120(a). While the rule applies to voluntary and involuntary cases, the “consent of the parties” referred to is that of petitioning creditors and the debtor in an involuntary case. The last sentence recognizes that the court should not be confined to petitioning creditors in its choice of parties on whom to call for assistance in preparing the list of creditors when the debtor fails to do so. This subdivision implements §§ 303(j), 707, 1112 and 1307 of the Code by specifying the manner of and persons to whom notice shall be given and requiring the court to hold a hearing on the issue of dismissal."
+    p "Subdivision (b) is derived from former Bankruptcy Rule 120(b). A dismissal under this subdivision can occur only when the petition has been permitted to be filed pursuant to Rule 1006(b). The provision for notice in paragraph (3) is correlated with the provision in Rule 4006 when there is a waiver, denial, or revocation of a discharge. As pointed out in the Note accompanying Rule 4008, the purpose of notifying creditors of a debtor that no discharge has been granted is to correct their assumption to the contrary so that they can take appropriate steps to protect their claims."
+    p "Subdivision (c) is new and specifies the notice required for a hearing on dismissal or suspension pursuant to § 305 of the Code. The suspension to which this subdivision refers is that of the case; it does not concern abstention of the court in hearing an adversary proceeding pursuant to [former] 28 U.S.C. § 1478(b)."
+    p "Subdivision (d). Any proceeding, whether by a debtor or other party, to dismiss or convert a case under §§ 706, 707, 1112, or 1307 is commenced by a motion pursuant to Rule 9014."
+    hash "fd23a952996be8c7cab7a6f8a099565385a5516601b2706472b001ffa81fa81b"
+  }
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (d) is amended to provide that dismissal or conversion pursuant to §§ 706(a), 707(b), 1112(a), and 1307(b) is not automatically a contested matter under Rule 9014. Conversion or dismissal under these sections is initiated by the filing and serving of a motion as required by Rule 9013. No hearing is required on these motions unless the court directs."
+    p "Conversion of a chapter 13 case to a chapter 7 case as authorized by § 1307(a) is accomplished by the filing of a notice of conversion. The notice of conversion procedure is modeled on the voluntary dismissal provision of Rule 41(a)(1) F.R.Civ.P. Conversion occurs on the filing of the notice. No court order is required."
+    p "Subdivision (e) is new and provides the procedure to be followed when a court on its own motion has made a preliminary determination that an individual debtor’s chapter 7 case may be dismissed pursuant to § 707(b) of the Code, which was added by the 1984 amendments. A debtor’s failure to attend the hearing is not a ground for dismissal pursuant to § 707(b)."
+    hash "e7e40f8ec5b0892e0af0b997baa7527f65bd579b5beea00ff695a14c15aede0e"
+  }
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is amended to clarify that all entities required to receive notice under Rule 2002, including but not limited to creditors, are entitled to the 20 day notice of the hearing to dismiss the case. The United States trustee receives the notice pursuant to Rule 2002(k)."
+    p "The word “petition” is changed to “case” in subdivisions (a), (b), and (c) to conform to §§ 707, 930, 1112, 1208, and 1307."
+    p "Subdivision (d) is amended to conform to § 348(c) of the Code which refers to the “conversion order.”"
+    p "Subdivisions (a) and (d) are amended to provide procedures for dismissal or conversion of a chapter 12 case. Procedures for dismissal or conversion under § 1208(a) and (b) are the same as the procedures for dismissal or conversion of a chapter 13 case under § 1307(a) and (b)."
+    p "Subdivision (e) is amended to conform to the 1986 amendment to § 707(b) of the Code which permits the United States trustee to make a motion to dismiss a case for substantial abuse. The time limit for such a motion is added by this subdivision. In general, the facts that are the basis for a motion to dismiss under § 707(b) exist at the time the case is commenced and usually can be discovered early in the case by reviewing the debtor’s schedules and examining the debtor at the meeting of creditors. Since dismissal for substantial abuse has the effect of denying the debtor a discharge in the chapter 7 case based on matters which may be discovered early, a motion to dismiss under § 707(b) is analogous to an objection to discharge pursuant to Rule 4004 and, therefore, should be required to be made within a specified time period. If matters relating to substantial abuse are not discovered within the time period specified in subdivision (e) because of the debtor’s false testimony, refusal to obey a court order, fraudulent schedules or other fraud, and the debtor receives a discharge, the debtor’s conduct may constitute the basis for revocation of the discharge under § 727(d) and (e) of the Code."
+    hash "01af164c54a3ed632bcb7b7199b49fe5530618435bdb1b6408bfcdee2b7d033f"
+  }
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "Subdivision (d) is amended to clarify that the date of the filing of a notice of conversion in a chapter 12 or chapter 13 case is treated as the date of the conversion order for the purpose of applying Rule 1019. Other amendments are stylistic and make no substantive change."
+    hash "ead046dc7cd6e225a2cf2b3efdda51a5c374e97377d502dce961ce8dbfc0772f"
+  }
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "Subdivision (b)(3), which provides that notice of dismissal for failure to pay the filing fee shall be sent to all creditors within 30 days after the dismissal, is deleted as unnecessary. Rule 2002(f) provides for notice to creditors of the dismissal of a case."
+    p "Rule 2002(a) and this rule currently require notice to all creditors of a hearing on dismissal of a voluntary chapter 7 case for the debtor’s failure to file a list of creditors, schedules, and statement of financial affairs within the time provided in § 707(a)(3) of the Code. A new subdivision (c) is added to provide that the United States trustee, who is the only entity with standing to file a motion to dismiss under § 707(a)(3) or § 1307(c)(9), is required to serve the motion on only the debtor, the trustee, and any other entities as the court directs. This amendment, and the amendment to Rule 2002, will have the effect of avoiding the expense of sending notices of the motion to all creditors in a chapter 7 case."
+    p "New subdivision (f) is the same as current subdivision (d), except that it provides that a motion to suspend all proceedings in a case or to dismiss a case for substantial abuse of chapter 7 under § 707(b) is governed by Rule 9014."
+    p "Other amendments to this rule are stylistic or for clarification."
+    p "GAP Report on Rule 1017. No changes since publication, except for stylistic changes in Rule 1017(e) and (f)."
+    hash "3d6817357499b0003be899915e456f49ef98afb11f8ec5ec49e3b83fd2197744"
+  }
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2000 Amendment"
+    p "This rule is amended to permit the court to grant a timely request filed by the United States trustee for an extension of time to file a motion to dismiss a chapter 7 case under § 707(b), whether the court rules on the request before or after the expiration of the 60-day period."
+    p "Reporter’s Note on Text of Rule 1017(e). The above text of Rule 1017(e) is not based on the text of the rule in effect on this date. The above text embodies amendments that have been promulgated by the Supreme Court in April 1999 and, unless Congress acts with respect to the amendments, will become effective on December 1, 1999."
+    p "GAP Report on Rule 1017(e). No changes since publication."
+    hash "8e3d9b6e491aa6ff5a6dcb6c7e1e924a7db69c9ccdc2493e70514bd35917201b"
+  }
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subdivision (e) is amended to implement the 2005 amendments to § 707 of the Code. These statutory amendments permit conversion of a chapter 7 case to a case under chapter 11 or 13, change the basis for dismissal or conversion from “substantial abuse” to “abuse,” authorize parties other than the United States trustee to bring motions under § 707(b) under certain circumstances, and add § 707(c) to create an explicit ground for dismissal based on the request of a victim of a crime of violence or drug trafficking. The conforming amendments to subdivision (e) preserve the time limits already in place for § 707(b) motions, except to the extent that § 704(b)(2) sets the deadline for the United States trustee to act. In contrast to the grounds for a motion to dismiss under § 707(b)(2), which are quite specific, the grounds under § 707(b)(1) and (3) are very general. Therefore, to enable the debtor to respond, subdivision (e) requires that motions to dismiss under § 707(b)(1) and (3) state with particularity the circumstances alleged to constitute abuse."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "3bee5347adee013cf066d43ada41865c7e6ad63b68553315e2995c70b02b451b"
+  }
+  note "/us/usc/ptI/rule1017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1017 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "c23e0c0df049a61648fcaaa64fe0c5cb62e931152b0d1c289e547b1ee698cf82"
+  }
+  layers {
+    operative "373ee8dda34d955ed14104529cc39f321404ff0d3c92aa360473c2107f3bf0f2"
+    enacted "c27082e2936ad5bdcbbd584dab1ec08679274d3871f9103c2deb94831fe4ec02"
+    editorial "cc2a419823c8b69c306e48aff4340516e67749cda3b6f55b1b64b1aec8f6d19c"
+  }
+}

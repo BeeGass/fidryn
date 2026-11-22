@@ -1,0 +1,27 @@
+edition 2
+module "/us/usc/ptVI" {
+  within "/us/usc/t11a/~courtRules.1"
+  source "usc11a.xml"
+  positive_law false
+  container "/us/usc/ptVI" part {
+    num "VI" "PART VI—"
+    heading "COLLECTING AND LIQUIDATING THE ESTATE"
+    member "/us/usc/ptVI/rule6001"
+    member "/us/usc/ptVI/rule6002"
+    member "/us/usc/ptVI/rule6003"
+    member "/us/usc/ptVI/rule6004"
+    member "/us/usc/ptVI/rule6005"
+    member "/us/usc/ptVI/rule6006"
+    member "/us/usc/ptVI/rule6007"
+    member "/us/usc/ptVI/rule6008"
+    member "/us/usc/ptVI/rule6009"
+    member "/us/usc/ptVI/rule6010"
+    member "/us/usc/ptVI/rule6011"
+    hash "a01d8ca3e1c83c72c84b39139d545260274f3dfc880e77c1070a91fc0e90c1c6"
+  }
+  layers {
+    operative "a01d8ca3e1c83c72c84b39139d545260274f3dfc880e77c1070a91fc0e90c1c6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

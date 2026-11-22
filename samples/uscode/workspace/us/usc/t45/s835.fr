@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s835" {
+  within "/us/usc/t45/ch17/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s835" section {
+    num "835" "§ 835."
+    heading "Repealed. " ["Pub. L. 97–375, title I, § 111(d)" -> "/us/pl/97/375/tI/s111/d"] ", Dec. 21, 1982, " ["96 Stat. 1821" -> "/us/stat/96/1821"] "; " ["Pub. L. 105–178, title VII, § 7203(a)(2)" -> "/us/pl/105/178/tVII/s7203/a/2"] ", June 9, 1998, " ["112 Stat. 477" -> "/us/stat/112/477"]
+    status repealed
+    hash "6e8f6e53bec4861856183efc7e07806d3d73e547bdadbcd2486383ac4e581007"
+  }
+  note "/us/usc/t45/s835/note/ungrouped/pl.94.210/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 94–210, title V, § 515" -> "/us/pl/94/210/tV/s515"] ", Feb. 5, 1976, " ["90 Stat. 82" -> "/us/stat/90/82"] ", directed Secretary to report to Congress within 90 days following end of each fiscal year on financial condition and operations of Fund and of obligation guarantee fund during such fiscal year, and on anticipated condition and operations of Fund and of obligation guarantee fund during current fiscal year."
+    hash "fcaa1fb51060dff94e3eb5bea381f942d880dc1c8eb358220abd4777e6015b67"
+  }
+  layers {
+    operative "6e8f6e53bec4861856183efc7e07806d3d73e547bdadbcd2486383ac4e581007"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e1c3fb67ca939431f38a5eb2f4457e1dd0da6f44190bcfa4cb7c3bc93a4c591e"
+  }
+}

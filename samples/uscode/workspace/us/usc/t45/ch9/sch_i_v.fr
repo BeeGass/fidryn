@@ -1,0 +1,48 @@
+edition 2
+module "/us/usc/t45/ch9/schIV" {
+  within "/us/usc/t45/ch9"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch9/schIV" subchapter {
+    num "IV" "SUBCHAPTER IV—"
+    heading "RAILROAD RETIREMENT ACT OF 1974"
+    member "/us/usc/t45/s231"
+    member "/us/usc/t45/s231a"
+    member "/us/usc/t45/s231b"
+    member "/us/usc/t45/s231c"
+    member "/us/usc/t45/s231d"
+    member "/us/usc/t45/s231e"
+    member "/us/usc/t45/s231f"
+    member "/us/usc/t45/s231f–1"
+    member "/us/usc/t45/s231g"
+    member "/us/usc/t45/s231h"
+    member "/us/usc/t45/s231i"
+    member "/us/usc/t45/s231j"
+    member "/us/usc/t45/s231k"
+    member "/us/usc/t45/s231l"
+    member "/us/usc/t45/s231m"
+    member "/us/usc/t45/s231n"
+    member "/us/usc/t45/s231n–1"
+    member "/us/usc/t45/s231o"
+    member "/us/usc/t45/s231p"
+    member "/us/usc/t45/s231q"
+    member "/us/usc/t45/s231r"
+    member "/us/usc/t45/s231s"
+    member "/us/usc/t45/s231t"
+    member "/us/usc/t45/s231u"
+    member "/us/usc/t45/s231v"
+    hash "3cfe29e5b2ed442731c0d7a4b8c4e60f05c1396b48680d065d2e841263c07c90"
+  }
+  note "/us/usc/t45/ch9/schIV/note/editorialNotes/act.1935-08-29.ch812/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "This subchapter is comprised of " ["act Aug. 29, 1935, ch. 812" -> "/us/act/1935-08-29/ch812"] ", as amended in its entirety and completely revised by " ["act June 24, 1937, ch. 382, part I" -> "/us/act/1937-06-24/ch382/ptI"] ", " ["50 Stat. 307" -> "/us/stat/50/307"] ", and as further amended in its entirety and completely revised by " ["Pub. L. 93–445, title I, § 101" -> "/us/pl/93/445/tI/s101"] ", Oct. 16, 1974, " ["88 Stat. 1305" -> "/us/stat/88/1305"] ", eff. Jan. 1, 1975. The Act, as restated by " ["Pub. L. 93–445" -> "/us/pl/93/445"] ", was redesignated the Railroad Retirement Act of 1974. See " ["section 231t of this title" -> "/us/usc/t45/s231t"] ". The Act is set out in this subchapter carrying a statutory credit showing restatement by act June 24, 1937 and a further restatement by " ["Pub. L. 93–445" -> "/us/pl/93/445"] " without reference to amendments made to the Act between its original enactment in 1935 and 1974. For history of the Act, credits, and note material, see subchapters II and III of this chapter."
+    hash "b377b0a510d95e219883f4c4cd7ec8073efa344b754cffeb37b9f39425d5964a"
+  }
+  layers {
+    operative "3cfe29e5b2ed442731c0d7a4b8c4e60f05c1396b48680d065d2e841263c07c90"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0aec281bb5b7208cea9359c82e5151101be112d5394cf2c8d02735e367036d5f"
+  }
+}

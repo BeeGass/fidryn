@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s58" {
+  within "/us/usc/t45/ch2"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s58" section {
+    num "58" "§ 58."
+    heading "Duty or liability of common carriers and rights of employees under other acts not impaired"
+    content "Nothing in this chapter shall be held to limit the duty or liability of common carriers or to impair the rights of their employees under any other Act or Acts of Congress."
+    hash "331651ec51beccc52bce4a2f96edd7fed991ea9a76467d8a38e87a1b27405c31"
+  }
+  credit "(" ["Apr. 22, 1908, ch. 149, § 8" -> "/us/act/1908-04-22/ch149/s8"] ", " ["35 Stat. 66" -> "/us/stat/35/66"] ".)"
+  layers {
+    operative "331651ec51beccc52bce4a2f96edd7fed991ea9a76467d8a38e87a1b27405c31"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e55dc2179f7f634327ac7fe0bf7cd97e2e1e6d03638cc6b8f43add778ccb8ed5"
+  }
+}

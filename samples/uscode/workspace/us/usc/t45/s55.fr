@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s55" {
+  within "/us/usc/t45/ch2"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s55" section {
+    num "55" "§ 55."
+    heading "Contract, rule, regulation, or device exempting from liability; set-off"
+    content "Any contract, rule, regulation, or device whatsoever, the purpose or intent of which shall be to enable any common carrier to exempt itself from any liability created by this chapter, shall to that extent be void: Provided, That in any action brought against any such common carrier under or by virtue of any of the provisions of this chapter, such common carrier may set off therein any sum it has contributed or paid to any insurance, relief benefit, or indemnity that may have been paid to the injured employee or the person entitled thereto on account of the injury or death for which said action was brought."
+    hash "55ab8ef4872baade913e944fd6d2e874d6f76edfe307ff41497bec85a3b63d1f"
+  }
+  credit "(" ["Apr. 22, 1908, ch. 149, § 5" -> "/us/act/1908-04-22/ch149/s5"] ", " ["35 Stat. 66" -> "/us/stat/35/66"] ".)"
+  layers {
+    operative "55ab8ef4872baade913e944fd6d2e874d6f76edfe307ff41497bec85a3b63d1f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "6ad6b46ea7883b93454dc739036cafdb78a337e5bd3e170279c570ad1fe3d4fe"
+  }
+}

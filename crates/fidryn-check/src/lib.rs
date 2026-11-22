@@ -1,4 +1,7 @@
-//! Type, effect, authority, time, and stratification checking.
+//! Type, effect, authority, time, and stratification checking; and, in
+//! [`e2`], the lowering and the checks of one module of edition 2.
+
+pub mod e2;
 
 use fidryn_core::ir::{
     ClauseSelector, Consequence, CoreDecl, CoreDuty, CoreEffect, CoreEffectDecl, CoreEffectOp,

@@ -1,0 +1,115 @@
+edition 2
+module "/us/usc/ptII/rule2015.1" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2015.1" courtRule {
+    num "2015.1" "Rule 2015.1."
+    heading "Patient-Care Ombudsman"
+    provision "/us/usc/ptII/rule2015.1/a" subsection {
+      num "a" "(a)"
+      heading "Notice of the Report."
+      chapeau "Unless the court orders otherwise, a patient-care ombudsman must give at least 14 days’ notice before making a report under § 333(b)(2)."
+      provision "/us/usc/ptII/rule2015.1/a/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "Recipients of the Notice. The notice must be sent to the United States trustee, posted conspicuously at the health-care facility that is the report’s subject, and served on:"
+          p "• the debtor;"
+          p "• the trustee;"
+          p "• all patients;"
+          p "• any committee elected under § 705 or appointed under § 1102 or its authorized agent;"
+          p "• in a Chapter 9 or 11 case, the creditors on the list filed under Rule 1007(d) if no committee of unsecured creditors has been appointed under § 1102; and"
+          p "• any other entity as the court orders."
+        }
+        hash "b703937bce59f95d4634cc961ef3db6a45db885259e72cb3f8a85cf47371b40b"
+      }
+      provision "/us/usc/ptII/rule2015.1/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Content of the Notice. The notice must state:"
+        provision "/us/usc/ptII/rule2015.1/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "the date and time when the report will be made;"
+          hash "698693de31316705df9aa734db84eaff1ad55f6c919751a1ffecf693991f3fb4"
+        }
+        provision "/us/usc/ptII/rule2015.1/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "the manner in which it will be made; and"
+          hash "fb9b054734cdb11c58be5df0b1114b26d359ac1e0c754f45d33b299ae1de07ea"
+        }
+        provision "/us/usc/ptII/rule2015.1/a/2/C" subparagraph {
+          num "C" "(C)"
+          content "if it will be in writing, the name, address, telephone number, email address, and any website of the person from whom a copy may be obtained at the debtor’s expense."
+          hash "31f4f52b3aa655a5e27269cea4b6d671a0dd204813ea96de12d0a0c2e086ed5c"
+        }
+        hash "39de3d72539357dca92d1d52ff8fa22bee7ef324c579e2a0bbe0f405e6e0ec10"
+      }
+      hash "390b65e43f50be3660ff25d49f5ac0fbf81c60fdda21971aaedeff9ac68600c7"
+    }
+    provision "/us/usc/ptII/rule2015.1/b" subsection {
+      num "b" "(b)"
+      heading "Authorization to Review Confidential Patient Records."
+      provision "/us/usc/ptII/rule2015.1/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "Motion to Review; Service. Rule 9014 governs a patient-care ombudsman’s motion under § 333(c) to review confidential patient records. The motion must:"
+        provision "/us/usc/ptII/rule2015.1/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "be served on the patient;"
+          hash "f59593354fda9f54b8daba287acd57f29550023b3b83edef62d9f980cb28f3f3"
+        }
+        provision "/us/usc/ptII/rule2015.1/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "be served on any family member or other contact person whose name and address have been given to the trustee or the debtor in order to provide information about the patient’s health care; and"
+          hash "5ccd635dc4b31ad87fc4eca516d68366565ccc6c88a262c6cafe4cf539830ecf"
+        }
+        provision "/us/usc/ptII/rule2015.1/b/1/C" subparagraph {
+          num "C" "(C)"
+          content "be sent to the United States trustee, subject to applicable nonbankruptcy law concerning patient privacy."
+          hash "4bdee8094fd1ab3c96f686c9276e4bb3766a26bb4d14f7d4e9084a37b85764e9"
+        }
+        hash "9c15b0a1762b70832db8a6deeb370bf729e772fc0f6f927d97d1d43548c1e0e7"
+      }
+      provision "/us/usc/ptII/rule2015.1/b/2" paragraph {
+        num "2" "(2)"
+        content "Time for a Hearing. Unless the court orders otherwise, a hearing on the motion may not commence earlier than 14 days after the motion is served."
+        hash "c1c25ae75aff82833df86458113899d1faa771927750107fd16df02dc7c00857"
+      }
+      hash "1d6d986dc6cee0b40327eb0b7c442c1cd6ad03144e60a10b2134a20487f46861"
+    }
+    hash "786ede075b1b1198dc57d33ae39f6fc1c6d5fee73540f77e2cf25fa4b2f30ec7"
+  }
+  credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2015.1/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008"
+    p "This rule is new and implements § 333 of the Code, added by the 2005 amendments. Subdivision (a) is designed to give parties in interest, including patients or their representatives, sufficient notice so that they will be able to review written reports or attend hearings at which reports are made. The rule permits a notice to relate to a single report or to periodic reports to be given during the case. For example, the ombudsman may give notice that reports will be made at specified intervals or dates during the case."
+    p "Subdivision (a) of the rule also requires that the notice be posted conspicuously at the health care facility in a place where it will be seen by patients and their families or others visiting the patients. This may require posting in common areas and patient rooms within the facility. Because health care facilities and the patients they serve can vary greatly, the locations of the posted notice should be tailored to the specific facility that is the subject of the report."
+    p "Subdivision (b) requires the ombudsman to notify the patient and the United States trustee that the ombudsman is seeking access to confidential patient records so that they will be able to appear and be heard on the matter. This procedure should assist the court in reaching its decision both as to access to the records and appropriate restrictions on that access to ensure continued confidentiality. Notices given under this rule are subject to the provisions of applicable federal and state law that relate to the protection of patients’ privacy, such as the Health Insurance Portability and Accountability Act of 1996, Pub. L. No. 104–191 (HIPAA)."
+    p "Changes Made After Publication. Two stylistic changes were made to the rule. The reference to the court’s authority to order otherwise was moved from the beginning to the end of the first sentence of subdivision (a). On line 19, the word “patient” was substituted for “health” to be consistent with the Code."
+    hash "dc252fa9efddb07197bac0c46c734ede09868c9e83a5fc58a0e08b0d2873551d"
+  }
+  note "/us/usc/ptII/rule2015.1/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptII/rule2015.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2015.1 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "b43660f01938a921e7aab8555bb050ed43dcf535a841ba28b2e23b4ec3dbd1bd"
+  }
+  layers {
+    operative "786ede075b1b1198dc57d33ae39f6fc1c6d5fee73540f77e2cf25fa4b2f30ec7"
+    enacted "06460fe2824a380ec4506429cfed39ba93af77209c58363db33dcfd2a88404d5"
+    editorial "a7a87ea82ce26b6544cc3c69e822448f599834e4961f55d5c8be47261511261c"
+  }
+}

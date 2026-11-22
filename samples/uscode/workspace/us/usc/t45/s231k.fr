@@ -1,0 +1,27 @@
+edition 2
+module "/us/usc/t45/s231k" {
+  within "/us/usc/t45/ch9/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s231k" section {
+    num "231k" "§ 231k."
+    heading "Incompetence"
+    provision "/us/usc/t45/s231k/a" subsection {
+      num "a" "(a)"
+      content "Every individual receiving or claiming benefits, or to whom any right or privilege is extended, under this subchapter or any other Act of Congress now or hereafter administered, in whole or in part, by the Board shall be conclusively presumed to have been competent until the date on which the Board receives written notice, in a form and manner acceptable to the Board, that he is an incompetent, or a minor, for whom a guardian or other person legally vested with the care of his person or estate has been appointed: Provided, however, That, regardless of the legal competency or incompetency of an individual entitled to a benefit administered by the Board, the Board may, if it finds the interest of such individual to be served thereby, recognize actions by, and conduct transactions with, and make payments to, such individual, or recognize actions by, and conduct transactions with, and make payments to, a relative or some other person for such individual’s use and benefit."
+      hash "c5bc88603b220754199c5217e1148f383cb7c94fc2a7251f1e5047bf5406ec2f"
+    }
+    provision "/us/usc/t45/s231k/b" subsection {
+      num "b" "(b)"
+      content "Every guardian or other person legally vested with the care of the person or estate of an incompetent or minor who is receiving or claiming benefits, or to whom any right or privilege is extended, under this subchapter or any other Act of Congress now or hereafter administered, in whole or in part, by the Board shall have power everywhere, in the manner and to the extent prescribed by the Board, but subject to the provisions of the preceding subsection, to take any action necessary or appropriate to perfect any right or exercise any privilege of the incompetent or minor and to conduct all transactions on his behalf under this subchapter or any other Act of Congress now or hereafter administered, in whole or in part, by the Board. Any payment made pursuant to the provisions of this section shall be a complete settlement and satisfaction of any claim, right, or interest in and to such payment."
+      hash "44594973969839ebab0a62385bf6f22f2a842810d3c9926aeaa0a8a31677103e"
+    }
+    hash "823a473605b2641cf2c2593d79be8a429500dcb484db199c2e067a445b1331b7"
+  }
+  credit "(" ["Aug. 29, 1935, ch. 812, § 12" -> "/us/act/1935-08-29/ch812/s12"] ", as restated " ["June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", pt. I, " ["50 Stat. 307" -> "/us/stat/50/307"] ", as restated " ["Pub. L. 93–445, title I, § 101" -> "/us/pl/93/445/tI/s101"] ", Oct. 16, 1974, " ["88 Stat. 1345" -> "/us/stat/88/1345"] ".)"
+  layers {
+    operative "823a473605b2641cf2c2593d79be8a429500dcb484db199c2e067a445b1331b7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "50c36827fd6b9dd658c42e75dd1a608f38c0aee877fdc5f41c1d74477cf59f78"
+  }
+}

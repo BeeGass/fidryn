@@ -1,0 +1,21 @@
+edition 2
+module "/zz/demo/curated/widgets" {
+  import "/zz/demo/curated/gadgets" as gadgets
+  import "/zz/demo/curated/sprockets" { sprocket_rule, sprocket_size }
+  citation widget_rule -> "/zz/demo/t1/s8/a"
+  citation widget_sizes -> "/zz/demo/t1/s8/b"
+  binding widget_binding {
+    binds widget_rule
+    release "demo-1"
+    provision_hash "ec085e67853dd9ced4dafa9836e747dc158ae35ed76f628d9b1eacbd6937be77"
+    notes_hash "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    pending
+  }
+  binding sizes_binding {
+    binds "/zz/demo/t1/s8/b"
+    release "demo-1"
+    provision_hash "f36533507953a8ee2c81864d9db0cda382347b2322c0df95de608eef5c5c62a3"
+    notes_hash "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    pending
+  }
+}

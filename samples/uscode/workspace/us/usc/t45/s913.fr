@@ -1,0 +1,68 @@
+edition 2
+module "/us/usc/t45/s913" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s913" section {
+    num "913" "§ 913."
+    heading "Authorization of appropriations"
+    provision "/us/usc/t45/s913/a" subsection {
+      num "a" "(a)"
+      content "There is authorized to be appropriated to provide supplementary unemployment insurance under " ["section 909 of this title" -> "/us/usc/t45/s909"] " not to exceed $5,000,000."
+      hash "257833e2bfcedaeb827ac31eb7a74d835d19c42fbcd92dce1df46bb8041430a5"
+    }
+    provision "/us/usc/t45/s913/b" subsection {
+      num "b" "(b)"
+      content "There is authorized to be appropriated for new career training assistance under " ["section 911 of this title" -> "/us/usc/t45/s911"] " not to exceed $1,500,000."
+      hash "730010037ca560cf9db1d9edf090fb0c29364ea89db669b2b64e511d8d05f367"
+    }
+    provision "/us/usc/t45/s913/c" subsection {
+      num "c" "(c)"
+      content "There is authorized to be appropriated to the Board to carry out its administrative expenses under this chapter and the Rock Island Railroad Transition and Employee Assistance Act [" ["45 U.S.C. 1001" -> "/us/usc/t45/s1001"] " et seq.] not to exceed $750,000. Effective October 1, 1980, there is authorized to be appropriated to the Board an additional $1,000,000 to carry out its administrative expenses under this chapter and the Rock Island Railroad Transition and Employee Assistance Act [" ["45 U.S.C. 1001" -> "/us/usc/t45/s1001"] " et seq.]."
+      hash "e5410254eee1d0383b478e5532ea1aea3de1b9a486745e140d7e14d79c78e65c"
+    }
+    provision "/us/usc/t45/s913/d" subsection {
+      num "d" "(d)"
+      content "There are authorized to be appropriated $15,000,000 for purposes of providing transaction assistance in accordance with section 825(h)(1)(A) and (B) of this title."
+      hash "8014cf5e6a032f5b7be4f42a72e867e646a079e1acd1ce9fd622b0be66db650e"
+    }
+    provision "/us/usc/t45/s913/e" subsection {
+      num "e" "(e)"
+      content "Amounts appropriated under this section are authorized to remain available until expended."
+      hash "7932bbff6de1cb183867cca0c7d950e7cc40b83fb69db6eb8ab2d3fdb15370a4"
+    }
+    hash "b651af19fe8fd4a53c2a5a98c098ef6e26b6f9c1c7a4f68a0ad088cc5bb58ffa"
+  }
+  credit "(" ["Pub. L. 96–101, § 14" -> "/us/pl/96/101/s14"] ", Nov. 4, 1979, " ["93 Stat. 743" -> "/us/stat/93/743"] "; " ["Pub. L. 96–254, title I, § 109" -> "/us/pl/96/254/tI/s109"] ", May 30, 1980, " ["94 Stat. 403" -> "/us/stat/94/403"] "; " ["Pub. L. 96–448, title VII, § 701(c)(2)" -> "/us/pl/96/448/tVII/s701/c/2"] ", Oct. 14, 1980, " ["94 Stat. 1961" -> "/us/stat/94/1961"] "; " ["Pub. L. 97–468, title II, § 234(b)" -> "/us/pl/97/468/tII/s234/b"] ", Jan. 14, 1983, " ["96 Stat. 2547" -> "/us/stat/96/2547"] ".)"
+  note "/us/usc/t45/s913/note/editorialNotes/pl.96.101/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 909 of this title" -> "/us/usc/t45/s909"] ", referred to in subsec. (a), was in the original “section 10”, meaning " ["section 10 of Pub. L. 96–101" -> "/us/pl/96/101/s10"] ", Nov. 4, 1979, " ["93 Stat. 741" -> "/us/stat/93/741"] ". Subsecs. (a) to (g) of section 10 are classified to " ["section 909 of this title" -> "/us/usc/t45/s909"] ". Subsec. (h) of section 10 amended " ["section 231f(b)(7) of this title" -> "/us/usc/t45/s231f/b/7"] "."
+    p "The Rock Island Railroad Transition and Employee Assistance Act, referred to in subsec. (c), is title I of " ["Pub. L. 96–254" -> "/us/pl/96/254"] ", May 30, 1980, " ["94 Stat. 399" -> "/us/stat/94/399"] ", which is classified principally to chapter 19 (§ 1001 et seq.) of this title. For complete classification of this Act to the Code, see Short Title note set out under " ["section 1001 of this title" -> "/us/usc/t45/s1001"] " and Tables."
+    p ["Section 825 of this title" -> "/us/usc/t45/s825"] ", referred to in subsec. (d), was repealed by " ["Pub. L. 105–178, title VII, § 7203(a)(2)" -> "/us/pl/105/178/tVII/s7203/a/2"] ", June 9, 1998, " ["112 Stat. 477" -> "/us/stat/112/477"] "."
+    hash "5b2728fef075c94121eedb0a1ecfc2258990b15af50319f1150a3ee02a67d6a1"
+  }
+  note "/us/usc/t45/s913/note/editorialNotes/pl.97.468/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1983—Subsec. (b). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " struck out provision that, effective Oct. 1, 1980, there was authorized to be appropriated an additional $1,500,000 for new career training assistance under " ["section 911 of this title" -> "/us/usc/t45/s911"] " and " ["section 1014 of this title" -> "/us/usc/t45/s1014"] "."
+    p "1980—Subsec. (b). " ["Pub. L. 96–254, § 109(b)" -> "/us/pl/96/254/s109/b"] ", inserted provisions authorizing an appropriation of an additional $1,500,000, effective Oct. 1, 1980, for career training assistance under " ["section 911 of this title" -> "/us/usc/t45/s911"] " and " ["section 1014 of this title" -> "/us/usc/t45/s1014"] "."
+    p "Subsec. (c). " ["Pub. L. 96–254, § 109(a)" -> "/us/pl/96/254/s109/a"] ", inserted provisions authorizing the use of previously appropriated funds to carry out administrative expenses under the Rock Island Railroad Transition and Employee Assistance Act and authorizing an appropriation of an additional $1,000,000, effective Oct. 1, 1980, to carry out administrative expenses under this chapter and the Rock Island Railroad Transition and Employee Assistance Act."
+    p "Subsecs. (d), (e). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " added subsec. (d) and redesignated former subsec. (d) as (e)."
+    hash "5ed633ca0d767c0ae4fb1cde5cfe81cccd8dbac9aae8db633fc41ef1d41d904e"
+  }
+  note "/us/usc/t45/s913/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1980 Amendment"
+    p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 14, 1980, see " ["section 710(d) of Pub. L. 96–448" -> "/us/pl/96/448/s710/d"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
+    hash "5bd57dc238e4804a5a01c5250e2074da2589039fa458d2c6ff972282781779c6"
+  }
+  layers {
+    operative "b651af19fe8fd4a53c2a5a98c098ef6e26b6f9c1c7a4f68a0ad088cc5bb58ffa"
+    enacted "49c9cebde76b9a1ead32da48a9e65d5820ab4f84124a765190a4df3918ca065c"
+    editorial "4e79b8abaedc7cfb857267d35bd3e4f68e72d8ad607cef6b771e20cdf0a37a6f"
+  }
+}

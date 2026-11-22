@@ -1,0 +1,111 @@
+edition 2
+module "/us/usc/ptIII/rule3017.1" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3017.1" courtRule {
+    num "3017.1" "Rule 3017.1."
+    heading "Disclosure Statement in a Small Business Case or a Case Under Subchapter V of Chapter 11"
+    provision "/us/usc/ptIII/rule3017.1/a" subsection {
+      num "a" "(a)"
+      heading "Conditionally Approving a Disclosure Statement."
+      chapeau "This section (a)" mark "1" 1 " applies in a small business case or in a case under Subchapter V of Chapter 11 in which the court has ordered that § 1125 applies. The court may, on motion of the plan proponent or on its own, conditionally approve a disclosure statement filed under Rule 3016. On or before doing so, the court must:"
+      provision "/us/usc/ptIII/rule3017.1/a/1" paragraph {
+        num "1" "(1)"
+        content "set the time within which the claim holders and interest holders may accept or reject the plan;"
+        hash "f44245ff285c8dd57998da790d692fada7cb5fca38e3c4a9432584a6a2ec2645"
+      }
+      provision "/us/usc/ptIII/rule3017.1/a/2" paragraph {
+        num "2" "(2)"
+        content "set the time to file an objection to the disclosure statement;"
+        hash "1b06d0da92f424ded1f1cd0aafe02a6d03a101919136bf5607e16c34d4b8b09e"
+      }
+      provision "/us/usc/ptIII/rule3017.1/a/3" paragraph {
+        num "3" "(3)"
+        content "if a timely objection is filed, set the date to hold the hearing on final approval of the disclosure statement; and"
+        hash "99f18273376753c9ed7e33f24bdc12689e987791c139655ae36477dc5d9377a8"
+      }
+      provision "/us/usc/ptIII/rule3017.1/a/4" paragraph {
+        num "4" "(4)"
+        content "set a date for the confirmation hearing."
+        hash "2174e64e5640ff724341f5b2ab22cd7625f729a958dfac42b50cca3385e38512"
+      }
+      hash "1cadcee8b568cd804eedfc09fbdbe74858dfb3880f13f8d6e391dbc531e0f95c"
+    }
+    provision "/us/usc/ptIII/rule3017.1/b" subsection {
+      num "b" "(b)"
+      heading "Effect of a Conditional Approval."
+      content "Rule 3017(a)–(c) and (e) do not apply to a conditionally approved disclosure statement. But conditional approval is considered approval in applying Rule 3017(d)."
+      hash "8303233818eb67e8a0a29afa61dbe8408979231edb2607e3798e887dea52a158"
+    }
+    provision "/us/usc/ptIII/rule3017.1/c" subsection {
+      num "c" "(c)"
+      heading "Time to File an Objection; Date of a Hearing."
+      provision "/us/usc/ptIII/rule3017.1/c/1" paragraph {
+        num "1" "(1)"
+        content "Notice. Notice must be given under Rule 2002(b) of the time to file an objection and the date of a hearing to consider final approval of the disclosure statement. The notice may be combined with notice of the confirmation hearing."
+        hash "992f73938d0ad303481a52aedfa544f48114017d09c0b3a144b7b548ea7f555b"
+      }
+      provision "/us/usc/ptIII/rule3017.1/c/2" paragraph {
+        num "2" "(2)"
+        content {
+          p "Time to File an Objection to the Disclosure Statement. An objection to the disclosure statement must be filed before it is finally approved or by an earlier date set by the court. The objection must be served on:"
+          p "• the debtor;"
+          p "• the trustee;"
+          p "• any appointed committee; and"
+          p "• any other entity the court designates."
+        }
+        continuation "A copy must also be sent to the United States trustee."
+        hash "0d8db12d5dd6cbb036d0dd6f811336763b0509fee2b376856354d72547aba08c"
+      }
+      provision "/us/usc/ptIII/rule3017.1/c/3" paragraph {
+        num "3" "(3)"
+        content "Hearing on an Objection to the Disclosure Statement. If a timely objection to the disclosure statement is filed, the court must hold a hearing on final approval either before or combined with the confirmation hearing."
+        hash "684c2a60a79de93245ae0f70c82fc1a3eea579f450f11d73b4aca79152c4ff61"
+      }
+      hash "063bc601c599a46fe6140be81f2c9f6561f9bf1d710883de9f6e61e6a551bfa5"
+    }
+    hash "30a2fd66d45b52d5fa9c08160fe5fff6a44f78dabd100db0d12e80a0da0736f1"
+  }
+  credit "(Added Apr. 11, 1997, eff. Dec. 1, 1997; amended Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997"
+    p "This rule is added to implement § 1125(f) that was added to the Code by the Bankruptcy Reform Act of 1994."
+    p "The procedures for electing to be considered a small business are set forth in Rule 1020. If the debtor is a small business and has elected to be considered a small business, § 1125(f) permits the court to conditionally approve a disclosure statement subject to final approval after notice and a hearing. If a disclosure statement is conditionally approved, and no timely objection to the disclosure statement is filed, it is not necessary for the court to hold a hearing on final approval."
+    p "GAP Report on Rule 3017.1. No change to the published draft."
+    hash "2170a7039f0f6349fa5b8628472e98d5351cccf498942f9f9ece1a141c2fa80b"
+  }
+  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Section 101 of the Code, as amended in 2005, defines a “small business case” and “small business debtor,” and eliminates any need to elect that status. Therefore, the reference in the rule to an election is deleted."
+    p "As provided in the amendment to Rule 3016(b), a plan intended to provide adequate information in a small business case under § 1125(f)(1) may be conditionally approved and is otherwise treated as a disclosure statement under this rule."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "947317c806cfaf00f41e23d992d577193f5399a46a2474b0d1a8a26a7c318da5"
+  }
+  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022 Amendment"
+    p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. The title and subdivision (a) of the rule are amended to cover such cases when the court orders that § 1125 of the Code applies."
+    hash "01f83af4058fbcdf435ddefe08e5e9877bdd50ee6465e21a7bd7c4cea22fee24"
+  }
+  note "/us/usc/ptIII/rule3017.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3017.1 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "ba854312a71f129a38a3d8c8ac79aa50efee516f5eb472b55915759541a82888"
+  }
+  footnote 1 "1" {
+    p "So in original. Probably should be “This subdivision (a)”."
+  }
+  layers {
+    operative "30a2fd66d45b52d5fa9c08160fe5fff6a44f78dabd100db0d12e80a0da0736f1"
+    enacted "c51f55a931083ee6e129d87f7a9c143348f49eb0170986c80419f2de90c0bbb9"
+    editorial "a56b425e9936a1bbe43ea3265864725ef4672c1b5be3cf1e4633f0aa161a9bf5"
+  }
+}

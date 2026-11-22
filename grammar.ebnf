@@ -1,4 +1,4 @@
-(* Fidryn 0.2 grammar. The parser enforces closed field sets only for source blocks, rule bodies and judgment request blocks; see docs/implementation-status.md. *)
+(* Fidryn 0.3 grammar. The parser enforces closed field sets only for source blocks, rule bodies and judgment request blocks; see docs/implementation-status.md. *)
 
 File            ::= Module EOF
 

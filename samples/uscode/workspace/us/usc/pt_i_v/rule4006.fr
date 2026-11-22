@@ -1,0 +1,61 @@
+edition 2
+module "/us/usc/ptIV/rule4006" {
+  within "/us/usc/ptIV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIV/rule4006" courtRule {
+    num "4006" "Rule 4006."
+    heading "Notice When No Discharge Is Granted"
+    chapeau "The clerk must promptly notify in the manner provided by Rule 2002(f) all parties in interest of an order:"
+    provision "/us/usc/ptIV/rule4006/a" subsection {
+      num "a" "(a)"
+      content "denying a discharge;"
+      hash "51bacbd91ffb8a1959fcffbb0e9877c5de5c43d99f6a0d1d58c3f8da2f55ab68"
+    }
+    provision "/us/usc/ptIV/rule4006/b" subsection {
+      num "b" "(b)"
+      content "revoking a discharge;"
+      hash "ccb166ff0e410a193d98fd6282777f404e003e3dc5d65531e5a0ffe7b1f09b9f"
+    }
+    provision "/us/usc/ptIV/rule4006/c" subsection {
+      num "c" "(c)"
+      content "approving a waiver of discharge; or"
+      hash "bb82e44e667c43c7ff0be5dfdfe5c1580b4399c1bec4ae5a10d224ca38900ff4"
+    }
+    provision "/us/usc/ptIV/rule4006/d" subsection {
+      num "d" "(d)"
+      content "closing an individual debtor’s case without entering a discharge."
+      hash "de251aafb64940c2b84502a21a9fb36dcfaa2289bc6d5d7c9bec8289af7eddb8"
+    }
+    hash "e54863f93b057abab47990ad0e37744a9a9c48b356aeb74785021c4cd6e93f34"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIV/rule4006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "The suspension by § 108(c) of the Code of the statute of limitations affecting any debt of a debtor terminates within 30 days after the debtor is denied a discharge or otherwise loses his right to a discharge. If, however, a debtor’s failure to receive a discharge does not come to the attention of his creditors until after the statutes of limitations have run, the debtor obtains substantially the same benefits from his bankruptcy as a debtor who is discharged."
+    p "This rule requires the clerk to notify creditors if a debtor fails to obtain a discharge because a waiver of discharge was filed under § 727(a)(10) or as a result of an order denying or revoking the discharge under § 727(a) or (d)."
+    hash "18f2c75dd4dec93161f3224ce7b72d934a94e2fb18e0aa29b1e1fc6554962bf1"
+  }
+  note "/us/usc/ptIV/rule4006/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "This amendment was necessary because the 2005 amendments to the Code require that individual debtors in a chapter 7 or 13 case complete a course in personal financial management as a condition to the entry of a discharge. If the debtor fails to complete the course, the case may be closed and no discharge will be entered. Reopening the case is governed by § 350 and Rule 5010. The rule is amended to provide notice to parties in interest, including the debtor, that no discharge was entered."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "0f82ebf81b589b51792667017a398b24f487459d784927206b0d7301c010e07c"
+  }
+  note "/us/usc/ptIV/rule4006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 4006 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "2f41c2450d791167887edd68981d240804033da22dad3e60d2222fa597d10e10"
+  }
+  layers {
+    operative "e54863f93b057abab47990ad0e37744a9a9c48b356aeb74785021c4cd6e93f34"
+    enacted "eeaf0e982be612d6633a753be64aca0daa6ca6bdce45546aadecded7961562c6"
+    editorial "30ce1f81e8d550d3e2498d3fc346e4067d5f2f3375ac4d71e441753b6313823b"
+  }
+}

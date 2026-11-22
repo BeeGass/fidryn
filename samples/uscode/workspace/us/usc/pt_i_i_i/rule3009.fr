@@ -1,0 +1,51 @@
+edition 2
+module "/us/usc/ptIII/rule3009" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3009" courtRule {
+    num "3009" "Rule 3009."
+    heading "Chapter 7—Paying Dividends"
+    chapeau "In a Chapter 7 case, dividends to creditors on claims that have been allowed must be paid as soon as practicable. A dividend check must be made payable to and mailed to the creditor. But if a power of attorney authorizing another entity to receive payment has been filed under Rule 9010, the check must be:"
+    provision "/us/usc/ptIII/rule3009/a" subsection {
+      num "a" "(a)"
+      content "made payable to both the creditor and the other entity; and"
+      hash "eef5a01699320713b8ebca696ac26a6bfb9ba3370dc57f934ddbb808f9b52f18"
+    }
+    provision "/us/usc/ptIII/rule3009/b" subsection {
+      num "b" "(b)"
+      content "mailed to the other entity."
+      hash "d22ba7fb5105ef262a9a52903e97d43cc6cbfa4bac9f2efef60eeb4c8928d85f"
+    }
+    hash "22352bb7e25a75332275280b0e22b85b23cecec9395231fc0c0b55bd4483569a"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from former Rules 308 and 11–35(a). The preparation of records showing dividends declared and to whom payable is subject to prescription by the Director of the Administrative Office pursuant to Rule 5003(e). The rule governs distributions to creditors having priority as well as to general unsecured creditors. Notwithstanding the detailed statutory provisions regulating the declaration of dividends, a necessarily wide discretion over this matter has been recognized to reside in the court. See 3A Collier, Bankruptcy ¶65.03 (14th ed. 1975): 1 Proceedings of Seminar for Newly Appointed Referees in Bankruptcy 173 (1964). Although the rule leaves to the discretion of the court the amount and the times of dividend payments, it recognizes the creditors’ right to as prompt payment as practicable."
+    p "The second and third sentences of the rule make explicit the method of payment of dividends and afford protection of the interests of the creditor and the holder of a power of attorney authorized to receive payment."
+    p "The rule does not permit variance at local option. This represents a marked change from former Bankruptcy Rule 308."
+    hash "62da2d7115567f22d98f705c9743f8d9a78c4ee2793db5a9e235894b300b4639"
+  }
+  note "/us/usc/ptIII/rule3009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "This rule is amended to delete the requirement that the court approve the amounts and times of distributions in chapter 7 cases. This change recognizes the role of the United States trustee in supervising trustees. Other amendments are stylistic and make no substantive change."
+    hash "67602496cfeda7aa7157d70f382a947e0b658262dc9666dba31e4a740a1f858f"
+  }
+  note "/us/usc/ptIII/rule3009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3009 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "06e4fafd5324bc576ad8b1a417c39681ec8fb0a6d19e689d2f1a239306199c8d"
+  }
+  layers {
+    operative "22352bb7e25a75332275280b0e22b85b23cecec9395231fc0c0b55bd4483569a"
+    enacted "9bbbf1f448de051186f02a2ca00c5a68b763567c7093bb465115fd68f6b11fac"
+    editorial "c734d1ab7ce48a94b19d6058bb8b3b3122f6f8f94e75380cea8c8c2354529f4c"
+  }
+}

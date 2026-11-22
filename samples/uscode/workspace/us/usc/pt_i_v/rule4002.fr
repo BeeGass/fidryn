@@ -1,0 +1,172 @@
+edition 2
+module "/us/usc/ptIV/rule4002" {
+  within "/us/usc/ptIV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIV/rule4002" courtRule {
+    num "4002" "Rule 4002."
+    heading "Debtor’s Duties"
+    provision "/us/usc/ptIV/rule4002/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      chapeau "In addition to performing other duties that are required by the Code or these rules, the debtor must:"
+      provision "/us/usc/ptIV/rule4002/a/1" paragraph {
+        num "1" "(1)"
+        content "attend and submit to an examination when the court orders;"
+        hash "bda4a2ac7d17d6df830290aae3396ceddad82eb50e3eff7877f48c171211d31e"
+      }
+      provision "/us/usc/ptIV/rule4002/a/2" paragraph {
+        num "2" "(2)"
+        content "attend the hearing on a complaint objecting to discharge and, if called, testify as a witness;"
+        hash "cd144127a7d050ba69181a13ab05d832f24537c9c03cb21307c1d0353a03e633"
+      }
+      provision "/us/usc/ptIV/rule4002/a/3" paragraph {
+        num "3" "(3)"
+        chapeau "if a schedule of property has not yet been filed under Rule 1007, report to the trustee immediately in writing:"
+        provision "/us/usc/ptIV/rule4002/a/3/A" subparagraph {
+          num "A" "(A)"
+          content "the location of any real property in which the debtor has an interest; and"
+          hash "83e0980e5697f9dfea8dbc894fc28c60f83e9c1a0380adf7a8b0039b20da6b04"
+        }
+        provision "/us/usc/ptIV/rule4002/a/3/B" subparagraph {
+          num "B" "(B)"
+          content "the name and address of every person holding money or property subject to the debtor’s withdrawal or order;"
+          hash "24d3835d8c5ea27a9c8e5ce802b8e0de24cad1e375af41345d3b9a3591ea8da3"
+        }
+        hash "e03128c6e9d850db00fe8b697150e20521018bec6248ef9bb79b797464b66666"
+      }
+      provision "/us/usc/ptIV/rule4002/a/4" paragraph {
+        num "4" "(4)"
+        content "cooperate with the trustee in preparing an inventory, examining proofs of claim, and administering the estate; and"
+        hash "7badd5cb29585ae62b029c894d21ad7bfa655fe45832caa29eb51c209533a436"
+      }
+      provision "/us/usc/ptIV/rule4002/a/5" paragraph {
+        num "5" "(5)"
+        content "file a statement of any change in the debtor’s address."
+        hash "2eae3fbc81cd14e33361706d8aa362a4f65c72c2936f8183f76de098d2359d4d"
+      }
+      hash "612fde47422561a8cfc51169665a75425d9c3569bc7faaded7cd6518249a94db"
+    }
+    provision "/us/usc/ptIV/rule4002/b" subsection {
+      num "b" "(b)"
+      heading "Individual Debtor’s Duty to Provide Documents."
+      provision "/us/usc/ptIV/rule4002/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "Personal Identifying Information. An individual debtor must bring to the § 341 meeting of creditors:"
+        provision "/us/usc/ptIV/rule4002/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "a government-issued identification with the debtor’s picture, or other personal information that establishes the debtor’s identity; and"
+          hash "48be6ab658e6f8fc481f7b576ae65ed7ac2fcfb257b55d3b1a3faec1d812d523"
+        }
+        provision "/us/usc/ptIV/rule4002/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "evidence of any social-security number, or a written statement that no such evidence exists."
+          hash "b232e6774e1dafa2bc28278c553743ee42b6b11d2809786e5eb1338ccee61d09"
+        }
+        hash "82b1ad52623bf216c483820bbf2206395f96b4873fe3461744249a710d635640"
+      }
+      provision "/us/usc/ptIV/rule4002/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Financial Documents. An individual debtor must bring the following documents (or copies) to the § 341 meeting of creditors and make them available to the trustee—or provide a written statement that they do not exist or are not in the debtor’s possession:"
+        provision "/us/usc/ptIV/rule4002/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "evidence of current income, such as the most recent payment advice;"
+          hash "61c95569975be8529efea576f8f68dee8ca0817baec14d7c7084fb5c8541b90a"
+        }
+        provision "/us/usc/ptIV/rule4002/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "unless the trustee or the United States trustee instructs otherwise, a statement for each depository or investment account—including a checking, savings, or money-market account, mutual fund or brokerage account—for the period that includes the petition’s filing date; and"
+          hash "0e8db3a0f588d86cd97c993a4618ca5a6f880e520dd5aa64c7baf518395eac5e"
+        }
+        provision "/us/usc/ptIV/rule4002/b/2/C" subparagraph {
+          num "C" "(C)"
+          content "if required by § 707(b)(2)(A) or (B), documents showing claimed monthly expenses."
+          hash "37094b8ff2488e95e0e70353549b9cce55b8a4d81a72efafdd5a90f7c042eb2c"
+        }
+        hash "df73f56ab8e3edf4977a446fe8ddbe37e354b3731626185acfc9941a584005d5"
+      }
+      provision "/us/usc/ptIV/rule4002/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Tax Return to Be Provided to the Trustee. At least 7 days before the first date set for the § 341 meeting of creditors, the debtor must provide the trustee with:"
+        provision "/us/usc/ptIV/rule4002/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "a copy of the debtor’s federal income-tax return, including any attachments to it, for the most recent tax year ending before the case was commenced and for which the debtor filed a return;"
+          hash "5aa664d9dac99fe7ccf02f128db9cc29416b6a986b6042fbb323f2c63315c10a"
+        }
+        provision "/us/usc/ptIV/rule4002/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "a transcript of the return; or"
+          hash "9fa407bfd8b812eeba70e4ba753c151563d8f9390020cd3c836f7cb69f2d2eed"
+        }
+        provision "/us/usc/ptIV/rule4002/b/3/C" subparagraph {
+          num "C" "(C)"
+          content "a written statement that the documents do not exist."
+          hash "cc63c0cf942ccf2a2c955371bcf23d57af02897697fe7baf8f9f3914d3749aed"
+        }
+        hash "ab93aeb4b0efbbed4419f70b256f94d93c2dd576fb0aa3ff1522f91eca747fb4"
+      }
+      provision "/us/usc/ptIV/rule4002/b/4" paragraph {
+        num "4" "(4)"
+        content "Tax Return to Be Provided to a Creditor. Upon a creditor’s request at least 14 days before the first date set for the § 341 meeting of creditors, the debtor must provide the creditor with the documents to be provided to the trustee under (3). The debtor must do so at least 7 days before the meeting."
+        hash "9ccbe5db5f1b06888f4cb7f760eda8ebddd5acf6deeb94b0ec7351bff958ea7e"
+      }
+      provision "/us/usc/ptIV/rule4002/b/5" paragraph {
+        num "5" "(5)"
+        content "Safeguarding Confidential Tax Information. The debtor’s obligation to provide tax returns under (3) and (4) is subject to procedures established by the Director of the Administrative Office of the United States Courts for safeguarding confidential tax information."
+        hash "64a314022191d4201c8abb31a8c23ceb5859a9af1b2cc3f76b5cd9ddd4364f01"
+      }
+      hash "02b60a688547b81e5f50560873d59286b1271c39bf255762ab3a25ef96a7a02a"
+    }
+    hash "c761f3d0458ec472c9fd059a324b39134975573e9485c65ad631a7f8d9452cf5"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule should be read together with §§ 343 and 521 of the Code and Rule 1007, all of which impose duties on the debtor. Clause (3) of this rule implements the provisions of Rule 2015(a)."
+    hash "428beb7e7f07204447b5b8b434b00e0798ac9b0bd2b02df6cef674b69ed7cbc6"
+  }
+  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "New clause (5) of the rule imposes on the debtor the duty to advise the clerk of any change of the debtor’s address."
+    hash "659e47f5dc5461f4e96e3dd129555d2720674ae7f3043cf09967efc5d2f3a942"
+  }
+  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "This rule is amended to implement § 521(a)(1)(B)(iv) and (e)(2), added to the Code by the 2005 amendments. These Code amendments expressly require the debtor to file with the court, or provide to the trustee, specific documents. The amendments to the rule implement these obligations and establish a time frame for creditors to make requests for a copy of the debtor’s Federal income tax return. The rule also requires the debtor to provide documentation in support of claimed expenses under § 707(b)(2)(A) and (B)."
+    p "Subdivision (b) of the rule is also amended to require the debtor to cooperate with the trustee by providing materials and documents necessary to assist the trustee in the performance of the trustee’s duties. Nothing in the rule, however, is intended to limit or restrict the debtor’s duties under § 521, or to limit the access of the Attorney General to any information provided by the debtor in the case. Subdivision (b)(2) does not require that the debtor create documents or obtain documents from third parties; rather, the debtor’s obligation is to bring to the meeting of creditors under § 341 the documents which the debtor possesses. Under subdivision (b)(2)(B), the trustee or the United States trustee can instruct debtors that they need not provide the documents described in that subdivision. Under subdivisions (b)(3) and (b)(4), the debtor must obtain and provide copies of tax returns or tax transcripts to the appropriate person, unless no such documents exist. Any written statement that the debtor provides indicating either that documents do not exist or are not in the debtor’s possession must be verified or contain an unsworn declaration as required under Rule 1008."
+    p "Because the amendment implements the debtor’s duty to cooperate with the trustee, the materials provided to the trustee would not be made available to any other party in interest at the § 341 meeting of creditors other than the Attorney General. Some of the documents may contain otherwise private information that should not be disseminated. For example, pay stubs and financial account statements might include the social-security numbers of the debtor and the debtor’s spouse and dependents, as well as the names of the debtor’s children. The debtor should redact all but the last four digits of all social-security numbers and the names of any minors when they appear in these documents. This type of information would not usually be needed by creditors and others who may be attending the meeting. If a creditor perceives a need to review specific documents or other evidence, the creditor may proceed under Rule 2004."
+    p "Tax information produced under this rule is subject to procedures for safeguarding confidentiality established by the Director of the Administrative Office of the United States Courts."
+    p "Changes Made After Publication. The second paragraph of the Committee Note was amended to clarify that the debtor’s duty to provide copies of tax returns or tax transcripts are governed by a different standard than the debtor’s duty to provide other financial information."
+    hash "09ec53384eeb9c140d85274e17bd4f594760f0de8cc5923f6321484c5c1c820a"
+  }
+  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 4002 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "fe339f48c1e65ad776222baf03843d40173850fdb104ba86515f6305db92e08c"
+  }
+  layers {
+    operative "c761f3d0458ec472c9fd059a324b39134975573e9485c65ad631a7f8d9452cf5"
+    enacted "7f9ce899d89209bb654bb155010d794b9e1c574c880c3b86e75a3594a50aae96"
+    editorial "c1b087086bbd7659831b9dfee63f846ac5714e63b2a5305f898d3cc6dce69b8d"
+  }
+}

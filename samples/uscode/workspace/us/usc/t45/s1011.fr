@@ -1,0 +1,34 @@
+edition 2
+module "/us/usc/t45/s1011" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1011" section {
+    num "1011" "§ 1011."
+    heading "Authority of Railroad Retirement Board"
+    provision "/us/usc/t45/s1011/a" subsection {
+      num "a" "(a)"
+      content "The Board may prescribe such regulations as may be necessary to carry out its duties under this chapter."
+      hash "9b9de5bb527f52326ee92a247a52d7cd53e4f4568bbf0a98e875d140b353ab6c"
+    }
+    provision "/us/usc/t45/s1011/b" subsection {
+      num "b" "(b)"
+      content "In carrying out its duties under this chapter, the Board may exercise such of the powers, duties, and remedies provided in subsections (a), (b), and (d) of " ["section 362 of this title" -> "/us/usc/t45/s362"] " as are not inconsistent with the provisions of this chapter."
+      hash "bb5da65d6a75432dcd42912355752f0514a3e07e8f0dc279f1b7455862e5740b"
+    }
+    hash "09d88f5a31dc599f7a647c40073b71eee9afaae9a951467cef70e72a098c5975"
+  }
+  credit "(" ["Pub. L. 96–254, title I, § 114" -> "/us/pl/96/254/tI/s114"] ", May 30, 1980, " ["94 Stat. 405" -> "/us/stat/94/405"] ".)"
+  note "/us/usc/t45/s1011/note/editorialNotes/pl.96.254/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This chapter, referred to in text, was in the original “this title”, meaning title I (§ 101 et seq.) of " ["Pub. L. 96–254" -> "/us/pl/96/254"] ", May 30, 1980, " ["94 Stat. 399" -> "/us/stat/94/399"] ", known as the Rock Island Railroad Transition and Employee Assistance Act, which is classified principally to this chapter. For complete classification of title I to the Code, see Short Title note set out under " ["section 1001 of this title" -> "/us/usc/t45/s1001"] " and Tables."
+    hash "58f32671ae49711724a32b17cd7dac5b8f77824d95e1b6b5cc4860dcff8b5044"
+  }
+  layers {
+    operative "09d88f5a31dc599f7a647c40073b71eee9afaae9a951467cef70e72a098c5975"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "46f52a5921eea7961b53ca21ef57e6539a73657d8b4111f39585b9849dd93e59"
+  }
+}

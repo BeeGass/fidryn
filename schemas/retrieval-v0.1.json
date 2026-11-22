@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/retrieval-v0.1.json",
+  "title": "fidryn.retrieval/v0.1",
+  "description": "The retrieval record retrieval.json, which stands beside the archives of one release and is written when they are downloaded.",
+  "type": "object",
+  "required": ["schema", "release", "archives"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "fidryn.retrieval/v0.1" },
+    "release": { "type": "string" },
+    "archives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "url", "retrieved_at", "bytes", "sha256", "blake3"],
+        "additionalProperties": false,
+        "properties": {
+          "file": { "type": "string" },
+          "url": { "type": "string" },
+          "retrieved_at": { "type": "string" },
+          "bytes": { "type": "integer", "minimum": 0 },
+          "sha256": { "$ref": "#/$defs/digest" },
+          "blake3": { "$ref": "#/$defs/digest" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

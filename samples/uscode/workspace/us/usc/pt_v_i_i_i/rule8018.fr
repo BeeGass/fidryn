@@ -1,0 +1,185 @@
+edition 2
+module "/us/usc/ptVIII/rule8018" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8018" courtRule {
+    num "8018" "Rule 8018."
+    heading "Serving and Filing Briefs and Appendices"
+    provision "/us/usc/ptVIII/rule8018/a" subsection {
+      num "a" "(a)"
+      heading "Time to Serve and File a Brief."
+      chapeau "Unless the district court or BAP by order in a particular case excuses the filing of briefs or sets a different time, the following time limits apply:"
+      provision "/us/usc/ptVIII/rule8018/a/1" paragraph {
+        num "1" "(1)"
+        content "Appellant’s Brief. The appellant must serve and file a brief within 30 days after the docketing of notice that the record has been sent or that it is available electronically."
+        hash "932c101261e973c21ead2244e546ac5177ed0fb82bc8719f61e40ce82a4b1392"
+      }
+      provision "/us/usc/ptVIII/rule8018/a/2" paragraph {
+        num "2" "(2)"
+        content "Appellee’s Brief. The appellee must serve and file a brief within 30 days after the appellant’s brief is served."
+        hash "949547d2da9656a4627456b9fe8f6e035d12702dd68cc120c66968965ad7a0b0"
+      }
+      provision "/us/usc/ptVIII/rule8018/a/3" paragraph {
+        num "3" "(3)"
+        content "Appellant’s Reply Brief. The appellant may serve and file a reply brief within 14 days after service of the appellee’s brief but at least 7 days before scheduled argument—unless the district court or BAP, for cause, allows a later filing."
+        hash "acde534257a0455a567d839853c4fd148b66ced587282b4e7edd8bf30fdb0e78"
+      }
+      provision "/us/usc/ptVIII/rule8018/a/4" paragraph {
+        num "4" "(4)"
+        content "Consequence of Failure to File. If an appellant fails to file a brief on time or within an extended time authorized under (a)(3), the district court or BAP may—on its own after notice or on the appellee’s motion—dismiss the appeal. An appellee who fails to file a brief will not be heard at oral argument unless the district court or BAP grants permission."
+        hash "73e32d5e4b9c3f44a47dbe00ca65a0463a94d3bece82ebe1cd24183c28890a43"
+      }
+      hash "48776282470e471faeeba841c9cc8c32b7e386a2e0dc0511bfe54084ccf9d5e9"
+    }
+    provision "/us/usc/ptVIII/rule8018/b" subsection {
+      num "b" "(b)"
+      heading "Duty to Serve and File an Appendix."
+      provision "/us/usc/ptVIII/rule8018/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "Appellant’s Duty. Subject to (e) and Rule 8009(d), the appellant must serve and file with its principal brief an appendix containing excerpts from the record. It must contain:"
+        provision "/us/usc/ptVIII/rule8018/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "the relevant docket entries;"
+          hash "4f4f94450a924c16abab0e95579efdd69235ef73d9e0503ec2e5d3379837685b"
+        }
+        provision "/us/usc/ptVIII/rule8018/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "the complaint and answer, or equivalent filings;"
+          hash "a93635d6cf7c65211a6c23c2d48f40ab46e93ff6aae5a21736b9d5dd245a063e"
+        }
+        provision "/us/usc/ptVIII/rule8018/b/1/C" subparagraph {
+          num "C" "(C)"
+          content "the judgment, order, or decree from which the appeal is taken;"
+          hash "571138bdc7a7af10f639ab3c211d8acdef68d10805a27f23eeb6d593116b5ba0"
+        }
+        provision "/us/usc/ptVIII/rule8018/b/1/D" subparagraph {
+          num "D" "(D)"
+          content "any other orders, pleadings, jury instructions, findings, conclusions, or opinions relevant to the appeal;"
+          hash "769dc0b87637fa14025e78ddaad148160540c2f1b5bbcd657d42ca343480d86f"
+        }
+        provision "/us/usc/ptVIII/rule8018/b/1/E" subparagraph {
+          num "E" "(E)"
+          content "the notice of appeal; and"
+          hash "3d0f4b9d0cd26ea1861d81b09157c5b048c4e55644b0788d060d15e8001a01b9"
+        }
+        provision "/us/usc/ptVIII/rule8018/b/1/F" subparagraph {
+          num "F" "(F)"
+          content "any relevant transcript or portion of it."
+          hash "4d132a7276874d6dd4029387504fa76eaeb81dbb4ab9dc790912f742c1239fa6"
+        }
+        hash "64562c14a17670bc9939596c63fcdfa2e49012c98510a9d3b7af5a516dc432aa"
+      }
+      provision "/us/usc/ptVIII/rule8018/b/2" paragraph {
+        num "2" "(2)"
+        content "Appellee’s Appendix. The appellee may serve and file with its brief an appendix containing any material that is required to be included or is relevant to the appeal or cross-appeal but that is omitted from the appellant’s appendix."
+        hash "4f1557bd7077f1ec6bfef08af08835730286a13ec0a02a6b346f19aba8ad4ef7"
+      }
+      provision "/us/usc/ptVIII/rule8018/b/3" paragraph {
+        num "3" "(3)"
+        content "Cross-Appellee’s Appendix. The appellant—as cross-appellee—may also serve and file with its response an appendix containing material that is relevant to matters raised initially by the cross-appeal but that is omitted by the cross-appellant."
+        hash "9851466dd22debddaa6d15ef1679add7400259ccd38de13b074c7ef6d3be596f"
+      }
+      hash "0e62e068ed0d1cbe9ea67d3bb6b85def8e7a2d025ce561eda17d367a9b094620"
+    }
+    provision "/us/usc/ptVIII/rule8018/c" subsection {
+      num "c" "(c)"
+      heading "Format of the Appendix."
+      provision "/us/usc/ptVIII/rule8018/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "Content. The appendix must:"
+        provision "/us/usc/ptVIII/rule8018/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "begin with a table of contents identifying the page at which each part begins;"
+          hash "418ba80b78829ca01dc04108083f87222a5500e31ca1d81db3c8ae117a7faefa"
+        }
+        provision "/us/usc/ptVIII/rule8018/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "put the relevant docket entries after the table of contents;"
+          hash "9be5f15a86f2bd41d34e56bdbb386523781d80d07df94bc98aab5deff65018fa"
+        }
+        provision "/us/usc/ptVIII/rule8018/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "then put other parts of the record chronologically;"
+          hash "d1ce1ca7ab8675f14258b0e8f1ad78ff22ba9af45932308fd00118060fa252aa"
+        }
+        provision "/us/usc/ptVIII/rule8018/c/1/D" subparagraph {
+          num "D" "(D)"
+          content "when transcript pages are included, show the transcript page numbers in brackets immediately before the included pages; and"
+          hash "a08a543de6a3bba6647cbd5db03cf10759770e25dfd4f89d2a4315bfcf65221c"
+        }
+        provision "/us/usc/ptVIII/rule8018/c/1/E" subparagraph {
+          num "E" "(E)"
+          content "indicate omissions from the text of a document or of the transcript by asterisks."
+          hash "8559a79a997bdd4b69a8696b34110ab61b03fe635dd47196da33df3de86ebb49"
+        }
+        hash "95533b62bc36ec7101fe39f81ad8d4791fdd84cd88d3aa3dce1a558871a583b5"
+      }
+      provision "/us/usc/ptVIII/rule8018/c/2" paragraph {
+        num "2" "(2)"
+        content "Immaterial Formal Matters. The appendix should not include immaterial formal matters, such as captions, subscriptions, and acknowledgments."
+        hash "126c39ced3c07aa86839053e6fe57aad0df0aa90c722b2070369c326be731211"
+      }
+      hash "7f83f1788d3ab9a86828113a00b886d942917ac033a6317d075ceec2f8e437c4"
+    }
+    provision "/us/usc/ptVIII/rule8018/d" subsection {
+      num "d" "(d)"
+      heading "Reproducing Exhibits."
+      content "Exhibits designated for inclusion in the appendix may be reproduced in a separate volume or volumes, suitably indexed."
+      hash "807298d0ec0ced37f9a2142ebee67cfcb42266ed252673a18e120dbe40deb928"
+    }
+    provision "/us/usc/ptVIII/rule8018/e" subsection {
+      num "e" "(e)"
+      heading "Appeal on the Original Record Without an Appendix."
+      chapeau "The district court or BAP may, either by rule for all cases or classes of cases or by order in a particular case:"
+      provision "/us/usc/ptVIII/rule8018/e/1" paragraph {
+        num "1" "(1)"
+        content "dispense with the appendix; and"
+        hash "7ca6288b813cbc144b437dff1b45cc1fa4c0e1ef063c15f48ad16ac3f40e6c36"
+      }
+      provision "/us/usc/ptVIII/rule8018/e/2" paragraph {
+        num "2" "(2)"
+        content "permit an appeal to proceed on the original record with the submission of any relevant parts that the district court or BAP orders the parties to file."
+        hash "2cc795991c20480fba88af1fac2871dd896a225b97b30fe3153faeed32749356"
+      }
+      hash "eada1cab5b45675b52d5cc02a94dc261db439cc00b5f0e2e891f48e6effc4d91"
+    }
+    hash "e067441d80a4295cf1e355d79fa046c0a11a25c91fdea64a9402d05306b70269"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8018/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8018, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 27, 1995, eff. Dec. 1, 1995, related to rules by circuit councils and district courts and procedure when there is no controlling law, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "62bac71cc96c01225a20257f091768543b637563690775c047c0fe48a1ffd453"
+  }
+  note "/us/usc/ptVIII/rule8018/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8009 and F.R.App.P. 30 and 31. Like former Rule 8009, it addresses the timing of serving and filing briefs and appendices, as well as the content and format of appendices. Rule 8011 governs the methods of filing and serving briefs and appendices."
+    p "The rule retains the bankruptcy practice of permitting the appellee to file its own appendix, rather than requiring the appellant to include in its appendix matters designated by the appellee. Rule 8016 governs the timing of serving and filing briefs when a cross-appeal is taken. This rule’s provisions about appendices apply to all appeals, including cross-appeals."
+    p "Subdivision (a) retains former Rule 8009’s provision that allows the district court or BAP to dispense with briefing or to provide different time periods than this rule specifies. It increases some of the time periods for filing briefs from the periods prescribed by the former rule, while still retaining shorter time periods than some provided by F.R.App.P. 31(a). The time for filing the appellant’s brief is increased from 14 to 30 days after the docketing of the notice of the transmission of the record or notice of the availability of the record. That triggering event is equivalent to docketing the appeal under former Rule 8007. Appellate Rule 31(a)(1), by contrast, provides the appellant 40 days after the record is filed to file its brief. The shorter time period for bankruptcy appeals reflects the frequent need for greater expedition in the resolution of bankruptcy appeals, while still providing the appellant more time to prepare its brief than the former rule provided."
+    p "Subdivision (a)(2) similarly expands the time period for filing the appellee’s brief from 14 to 30 days after the service of the appellant’s brief. This period is the same as F.R.App.P. 31(a)(1) provides."
+    p "Subdivision (a)(3) retains the 14-day time period for filing a reply brief that the former rule prescribed, but it qualifies that period to ensure that the final brief is filed at least 7 days before oral argument."
+    p "If a district court or BAP has a mediation procedure for bankruptcy appeals, that procedure could affect when briefs must be filed. See Rule 8027."
+    p "Subdivision (a)(4) is new. Based on F.R.App.P. 31(c), it provides for actions that may be taken—dismissal of the appeal or denial of participation in oral argument—if the appellant or appellee fails to file its brief."
+    p "Subdivisions (b) and (c) govern the content and format of the appendix to a brief. Subdivision (b) is similar to former Rule 8009(b), and subdivision (c) is derived from F.R.App.P. 30(d)."
+    p "Subdivision (d), which addresses the inclusion of exhibits in the appendix, is derived from F.R.App.P. 30(e)."
+    p "Changes Made After Publication and Comment. Subdivision (a)(4) was revised to provide more detail about the procedure for dismissing an appeal due to appellant’s failure to timely file a brief."
+    hash "557c9e9839a0aacb0f48e56a34812831484740bd7b8bf53a3c044dcf218d5200"
+  }
+  note "/us/usc/ptVIII/rule8018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8018 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "2eef3a8600a49f4f6d0a084deb59ccfadb510145bc43e596b7d1c85960cc37eb"
+  }
+  layers {
+    operative "e067441d80a4295cf1e355d79fa046c0a11a25c91fdea64a9402d05306b70269"
+    enacted "d80d38e51fcd62717475723ff560c74857f6afa8666c7c82b210740958758c6b"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

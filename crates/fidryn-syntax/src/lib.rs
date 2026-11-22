@@ -3,6 +3,8 @@
 use fidryn_core::Diagnostic;
 
 pub mod ast;
+pub mod e2;
+pub mod edition;
 pub mod lexer;
 pub mod parser;
 pub mod syntax;

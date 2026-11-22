@@ -1,0 +1,25 @@
+edition 2
+module "/us/usc/t45/s922" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s922" section {
+    num "922" "§ 922."
+    heading "Employee stock ownership plan for surviving portion of Milwaukee Railroad"
+    content "If an event described in " ["section 920(b) of this title" -> "/us/usc/t45/s920/b"] " occurs, resulting in the survival of less than the entire Milwaukee Railroad system, then any relief provided for such surviving Milwaukee Railroad system under the Emergency Rail Services Act of 1970 [" ["45 U.S.C. 661" -> "/us/usc/t45/s661"] " et seq.] or any other Federal legislation shall be conditioned upon good faith efforts by the trustee or the Milwaukee Railroad, or both, to establish an employee stock ownership plan which shall embrace the purchase or acquisition of qualifying employer securities of the Milwaukee Railroad equal in value to 25 per centum of the amount of such relief provided."
+    hash "73536fbd36b1958302d2f3598e6c3838b9b0c25f68fc69f0ed78ab552a207787"
+  }
+  credit "(" ["Pub. L. 96–101, § 26" -> "/us/pl/96/101/s26"] ", Nov. 4, 1979, " ["93 Stat. 747" -> "/us/stat/93/747"] ".)"
+  note "/us/usc/t45/s922/note/editorialNotes/pl.91.663/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Emergency Rail Services Act of 1970, referred to in text, is " ["Pub. L. 91–663" -> "/us/pl/91/663"] ", Jan. 8, 1971, " ["84 Stat. 1975" -> "/us/stat/84/1975"] ", which is classified generally to chapter 15 (§ 661 et seq.) of this title. For complete classification of this Act to the Code, see Short Title note set out under " ["section 661 of this title" -> "/us/usc/t45/s661"] " and Tables."
+    hash "77c08639d4e51acc4f5b917881c9e88185e47aa6649dc632e2e806c918b4dba4"
+  }
+  layers {
+    operative "73536fbd36b1958302d2f3598e6c3838b9b0c25f68fc69f0ed78ab552a207787"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "70319a1c003331dd1cc227f125246ee7dcf24b7e8e64ca7a7b14976a9aeb9433"
+  }
+}

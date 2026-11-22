@@ -1,0 +1,139 @@
+edition 2
+module "/us/usc/t45/s727" {
+  within "/us/usc/t45/ch16/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s727" section {
+    num "727" "§ 727."
+    heading "Additional purchases of Series A preferred stock"
+    provision "/us/usc/t45/s727/a" subsection {
+      num "a" "(a)"
+      heading "Federal investment"
+      content "In addition to the authority provided under " ["section 726 of this title" -> "/us/usc/t45/s726"] ", the Association shall purchase shares of Series A preferred stock and accounts receivable of the Corporation after August 13, 1981, in amounts not to exceed a total of $137,000,000."
+      hash "d136b6297355f588bafd141a940f76d7bd62d2d68ad35e2ccc66b5b03250cb06"
+    }
+    provision "/us/usc/t45/s727/b" subsection {
+      num "b" "(b)"
+      heading "Accounts receivable"
+      provision "/us/usc/t45/s727/b/1" paragraph {
+        num "1" "(1)"
+        content "In any further purchase under this section or " ["section 726 of this title" -> "/us/usc/t45/s726"] " the Association shall purchase accounts receivable of the Corporation attributable to the dispute over the right-of-way related costs described in section 1111" mark "1" 1 " of this title until the Commission resolves such dispute under such section, and accounts receivable of the Corporation attributable to delays in reimbursement from commuter authorities."
+        hash "50d2cf00ee6c07c630feabbd8da37daf486f34100a17bf04e8521d46f40d1af1"
+      }
+      provision "/us/usc/t45/s727/b/2" paragraph {
+        num "2" "(2)"
+        content "From funds provided under this section or " ["section 726 of this title" -> "/us/usc/t45/s726"] ", the Association shall purchase Series A preferred stock of the Corporation, to the extent of losses on commuter service, in an amount not to exceed $15,000,000."
+        hash "d19bddf49a0866ed3ed104408c662f7595547504d62568453e8282c65b8aee0c"
+      }
+      hash "f3ed83a48e2da7559dc8a19489213ba88a1075843d29b2f8ba07255177f7f9ea"
+    }
+    provision "/us/usc/t45/s727/c" subsection {
+      num "c" "(c)"
+      heading "States and localities"
+      content "The Corporation shall be exempt from liability for any State tax, except for any tax imposed by any political subdivision of a State applicable to any taxable period commencing before January 1, 1987."
+      hash "b1dd9b5bd424487c8306cb9b3075cba1140ece40055d64b7a596b1842e453d8e"
+    }
+    provision "/us/usc/t45/s727/d" subsection {
+      num "d" "(d)"
+      heading "Debentures"
+      content "The Association shall return debentures to the Corporation in an amount equal to the value of the properties conveyed by the Corporation to Amtrak Commuter and any commuter authority."
+      hash "819ee39965c134870abc2debd2c74090c344ea307598cdf0c0cac8822c04e016"
+    }
+    provision "/us/usc/t45/s727/e" subsection {
+      num "e" "(e)"
+      heading "Rights retained"
+      content "The Corporation shall retain the right to collect any accounts receivable attributable to delays in reimbursement from commuter authorities that are purchased by the Association under this section. No agency or instrumentality of the United States shall be required to collect such accounts."
+      hash "f63e629aa1494290801c2cb363992532db3940af2d530088555d0eb48d2b6ecd"
+    }
+    provision "/us/usc/t45/s727/f" subsection {
+      num "f" "(f)"
+      heading "Authorization of appropriations"
+      provision "/us/usc/t45/s727/f/1" paragraph {
+        num "1" "(1)"
+        chapeau "There is authorized to be appropriated not to exceed $262,000,000—"
+        provision "/us/usc/t45/s727/f/1/A" subparagraph {
+          num "A" "(A)"
+          content "of which not to exceed $137,000,000 shall be appropriated to the Association for purposes of purchasing securities and accounts receivable of the Corporation under this section, such sums to remain available until the Secretary transfers the Corporation under subchapter IV " sup "1" " of this chapter;"
+          hash "a882a55ec0af0aa252febbe6a58e3b916277fce45028d873f21174d03306cebc"
+        }
+        provision "/us/usc/t45/s727/f/1/B" subparagraph {
+          num "B" "(B)"
+          content "of which not to exceed $75,000,000 shall be appropriated to the Secretary, to facilitate the transfer of rail commuter services from the Corporation to other operators, for distribution under the statutory provisions of section 1139(b) of the Northeast Rail Service Act of 1981;"
+          hash "c0577905841935c59597cc934ab4062b94306c0d86beb3648c08759b77ae6d2c"
+        }
+        provision "/us/usc/t45/s727/f/1/C" subparagraph {
+          num "C" "(C)"
+          content "of which not to exceed $35,000,000 shall be appropriated to the Secretary to be allocated for employee protection under " ["section 1005 of this title" -> "/us/usc/t45/s1005"] "; and"
+          hash "9c9ab0fdd0fabadb29c4e7c673417c1ed90ed65e52491e87651dc2ce42a0342a"
+        }
+        provision "/us/usc/t45/s727/f/1/D" subparagraph {
+          num "D" "(D)"
+          content "of which not to exceed $15,000,000 shall be appropriated to the Secretary to facilitate the transfer of rail commuter services from railroads that entered reorganization after calendar year 1974 to any commuter authority that was providing commuter service, operated by a railroad that entered reorganization after calendar year 1974, as of January 1, 1979."
+          hash "617541a297e9338a4ad3759ad73dbeb950686ac316a99a3da45e0b341b8fc83b"
+        }
+        hash "0a0bac3ec845e0114b113d4f7d24aa39cbcfe4abacc89ff501bfb5d13e5941e2"
+      }
+      provision "/us/usc/t45/s727/f/2" paragraph {
+        num "2" "(2)"
+        content "All sums received on account of the holding or disposition of any securities or accounts receivable referred to in paragraph (1)(A) of this subsection shall be deposited in the general fund of the Treasury."
+        hash "ca265764471ae35e1dc12c8b676ccb2fc12877a838733410c07e86b22b85cf0e"
+      }
+      provision "/us/usc/t45/s727/f/3" paragraph {
+        num "3" "(3)"
+        content "The amount authorized to be appropriated under paragraph (1)(B) of this subsection shall be reduced, in an amount equal to any amounts reappropriated under the authority of " ["section 726(g)(2) of this title" -> "/us/usc/t45/s726/g/2"] ", upon the date of enactment of any Act which reappropriates such amounts."
+        hash "296669029e96703bfa0f1635e81f032ac66a03b1127a5395a89edb5d52f1cfc0"
+      }
+      hash "030c65327f336c3612c55b6d3c9762e92f27e16d76d2a44561b8b31fa37190b3"
+    }
+    hash "4cf290f3c20b563ca5b05d0e02a8822588f4aef72f604d02a798e14ce34295f8"
+  }
+  credit "(" ["Pub. L. 93–236, title II, § 217" -> "/us/pl/93/236/tII/s217"] ", as added " ["Pub. L. 97–35, title XI, § 1140(a)" -> "/us/pl/97/35/tXI/s1140/a"] ", Aug. 13, 1981, " ["95 Stat. 653" -> "/us/stat/95/653"] "; amended " ["Pub. L. 97–468, title V, § 504(c)" -> "/us/pl/97/468/tV/s504/c"] ", Jan. 14, 1983, " ["96 Stat. 2552" -> "/us/stat/96/2552"] "; " ["Pub. L. 99–509, title IV, § 4033(b)(2)" -> "/us/pl/99/509/tIV/s4033/b/2"] ", (3), Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] ".)"
+  note "/us/usc/t45/s727/note/editorialNotes/pl.105.134/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 1111 of this title" -> "/us/usc/t45/s1111"] ", referred to in subsec. (b)(1), was repealed by " ["Pub. L. 105–134, title IV, § 408" -> "/us/pl/105/134/tIV/s408"] ", Dec. 2, 1997, " ["111 Stat. 2586" -> "/us/stat/111/2586"] "."
+    p "Subchapter IV of this chapter, referred to in subsec. (f)(1)(A), was repealed by " ["Pub. L. 99–509, title IV, § 4033(a)(1)" -> "/us/pl/99/509/tIV/s4033/a/1"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] "."
+    p "Section 1139(b) of the Northeast Rail Service Act of 1981, referred to in subsec. (f)(1)(B), is " ["section 1139(b) of Pub. L. 97–35" -> "/us/pl/97/35/s1139/b"] ", title XI, Aug. 13, 1981, " ["95 Stat. 652" -> "/us/stat/95/652"] ", which is set out as a note under " ["section 744a of this title" -> "/us/usc/t45/s744a"] "."
+    hash "bd829327fa08e279d1b70966f0105a370fc5b42e0949aedb9f7d3223c9635a2a"
+  }
+  note "/us/usc/t45/s727/note/editorialNotes/pl.99.509/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1986—Subsec. (c). " ["Pub. L. 99–509, § 4033(b)(2)" -> "/us/pl/99/509/s4033/b/2"] ", substituted “applicable to any taxable period commencing before January 1, 1987” for “, until the property of the Corporation is transferred by the Secretary under subchapter IV of this chapter”."
+    p "Subsec. (e). " ["Pub. L. 99–509, § 4033(b)(3)" -> "/us/pl/99/509/s4033/b/3"] ", struck out “and shall collect” after “right to collect”."
+    p "1983—Subsec. (a). " ["Pub. L. 97–468, § 504(c)(1)" -> "/us/pl/97/468/s504/c/1"] ", substituted “$137,000,000” for “$262,000,000”."
+    p "Subsec. (f). " ["Pub. L. 97–468, § 504(c)(2)" -> "/us/pl/97/468/s504/c/2"] ", designated existing provisions as pars. (1)(A) and (2), in (1)(A) as so designated, substituted $137,000,000 for $262,000,000 as limit of appropriations for purchase of securities and accounts receivable, and added pars. (1)(B) to (D) and (3)."
+    hash "a1e44d5ad0eb3bbf35cf6ae4a19fe05bae520bdb633e1aa75e9c4c7999119e99"
+  }
+  note "/us/usc/t45/s727/note/statutoryNotes/pl.97.35/effective-date" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date"
+    p "Section effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as a note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
+    hash "c0941333df7fda0a7e45f1a15726e04b8f5639248b2b6fb747963faa50869950"
+  }
+  note "/us/usc/t45/s727/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  note "/us/usc/t45/s727/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "4cf290f3c20b563ca5b05d0e02a8822588f4aef72f604d02a798e14ce34295f8"
+    enacted "d932ffc73f180371f2555431b2c04cc08422170eacf0081150cf4fc51e237d9e"
+    editorial "c02f56625bec9c74bc5c9c68c4f4f396c2246a1b2992d39861857b23332ad623"
+  }
+}

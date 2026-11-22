@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s645" {
+  within "/us/usc/t45/ch14/schVIII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s645" section {
+    num "645" "§ 645."
+    heading "Repealed. " ["Pub. L. 99–272, title IV, § 4007(b)" -> "/us/pl/99/272/tIV/s4007/b"] ", Apr. 7, 1986, " ["100 Stat. 108" -> "/us/stat/100/108"]
+    status repealed
+    hash "20159d3ecade75c78bebd836f501d71b0c433a5f142ac6c44099794dc7bc85e4"
+  }
+  note "/us/usc/t45/s645/note/ungrouped/pl.91.518/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 91–518, title VIII, § 806" -> "/us/pl/91/518/tVIII/s806"] ", as added " ["Pub. L. 92–316, § 12" -> "/us/pl/92/316/s12"] ", June 22, 1972, " ["86 Stat. 233" -> "/us/stat/86/233"] ", provided for a report by Secretary of Transportation to Congress evaluating intercity rail passenger service operations."
+    hash "1f7665335f8c8be225e45ea980a90f80b85da5e2e82c3c5a0e58d3ac04a6777b"
+  }
+  layers {
+    operative "20159d3ecade75c78bebd836f501d71b0c433a5f142ac6c44099794dc7bc85e4"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f889e10ec7d022b6b048d2821ec1fcc1a15232d4e7b1f3b9ee0f7bab1a608aab"
+  }
+}

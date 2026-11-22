@@ -1,0 +1,118 @@
+edition 2
+module "/us/usc/t45/s165" {
+  within "/us/usc/t45/ch8/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s165" section {
+    num "165" "§ 165."
+    heading "Evaluation and audit of Mediation Board"
+    provision "/us/usc/t45/s165/a" subsection {
+      num "a" "(a)"
+      heading "Evaluation and audit of Mediation Board"
+      provision "/us/usc/t45/s165/a/1" paragraph {
+        num "1" "(1)"
+        heading "In general"
+        content "In order to promote economy, efficiency, and effectiveness in the administration of the programs, operations, and activities of the Mediation Board, the Comptroller General of the United States shall evaluate and audit the programs and expenditures of the Mediation Board. Such an evaluation and audit shall be conducted not less frequently than every 2 years, but may be conducted as determined necessary by the Comptroller General or the appropriate congressional committees."
+        hash "78c24807ddf744a77121d53a7e49807d403556f106dd66288afecda935dfc2ae"
+      }
+      provision "/us/usc/t45/s165/a/2" paragraph {
+        num "2" "(2)"
+        heading "Responsibility of Comptroller General"
+        chapeau "In carrying out the evaluation and audit required under paragraph (1), the Comptroller General shall evaluate and audit the programs, operations, and activities of the Mediation Board, including, at a minimum—"
+        provision "/us/usc/t45/s165/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "information management and security, including privacy protection of personally identifiable information;"
+          hash "3e7efb75b644d7d73ed48147e3a8dd6bfd75efd79d659192878a181dbf0b3f38"
+        }
+        provision "/us/usc/t45/s165/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "resource management;"
+          hash "5a15bb34a7ffea88be7ad024c8bc72a31b0dbae671ee18cb4ab65ac8e1d91681"
+        }
+        provision "/us/usc/t45/s165/a/2/C" subparagraph {
+          num "C" "(C)"
+          content "workforce development;"
+          hash "7a5050308ea98907ebaa742afdc4fdb96870986eda55dde03699ef16b51b491b"
+        }
+        provision "/us/usc/t45/s165/a/2/D" subparagraph {
+          num "D" "(D)"
+          content "procurement and contracting planning, practices, and policies;"
+          hash "9872c1bad429cbc17eaa803d82f58a89094d188cf44f532bac21bc8dbed9d7d2"
+        }
+        provision "/us/usc/t45/s165/a/2/E" subparagraph {
+          num "E" "(E)"
+          content "the extent to which the Mediation Board follows leading practices in selected management areas; and"
+          hash "aa439e757dde6fc2a2e91a7c5c0a5fd7ba6c0690a0a82cc943e109c8b792c932"
+        }
+        provision "/us/usc/t45/s165/a/2/F" subparagraph {
+          num "F" "(F)"
+          chapeau "the processes the Mediation Board follows to address challenges in—"
+          provision "/us/usc/t45/s165/a/2/F/i" clause {
+            num "i" "(i)"
+            content "initial investigations of applications requesting that an organization or individual be certified as the representative of any craft or class of employees;"
+            hash "f2e0ab0b8e69e95f65263065e66f7d9f9391af984265402315a7c776cfca6669"
+          }
+          provision "/us/usc/t45/s165/a/2/F/ii" clause {
+            num "ii" "(ii)"
+            content "determining and certifying representatives of employees; and"
+            hash "897722cb241c86b43ca322554cc699b802cadbcdb7ac3828f1dd2e5c721be84f"
+          }
+          provision "/us/usc/t45/s165/a/2/F/iii" clause {
+            num "iii" "(iii)"
+            content "ensuring that the process occurs without interference, influence, or coercion."
+            hash "ac869215a6d361739cdf4341004e85ca08cf32bb7680e96f829d04691f5b2d51"
+          }
+          hash "536a4edd1c112d4125b2e9d4a7143480205bbb0cb1f5ebe33a9e015489ccd0bd"
+        }
+        hash "076e5899da37a264c7fd159e9af3f5152aa3090d29d125db63dfeaeb6bbd612c"
+      }
+      hash "f1e2e1efeecec1a0dac05a7ca2ce80f1a47a628aa42815ae8c385a3bf7636c50"
+    }
+    provision "/us/usc/t45/s165/b" subsection {
+      num "b" "(b)"
+      heading "Immediate review of certification procedures"
+      chapeau "Not later than 180 days after February 14, 2012, the Comptroller General shall review the processes applied by the Mediation Board to certify or decertify representation of employees by a labor organization and make recommendations to the Board and appropriate congressional committees regarding actions that may be taken by the Board or Congress to ensure that the processes are fair and reasonable for all parties. Such review shall be conducted separately from any evaluation and audit under subsection (a) and shall include, at a minimum—"
+      provision "/us/usc/t45/s165/b/1" paragraph {
+        num "1" "(1)"
+        content "an evaluation of the existing processes and changes to such processes that have occurred since the establishment of the Mediation Board and whether those changes are consistent with congressional intent; and"
+        hash "8e7c5079f5a1dce4bd678c1f0d29e8a7eb2f0a512e91ad66123d5874b762726f"
+      }
+      provision "/us/usc/t45/s165/b/2" paragraph {
+        num "2" "(2)"
+        content "a description of the extent to which such processes are consistent with similar processes applied to other Federal or State agencies with jurisdiction over labor relations, and an evaluation of any justifications for any discrepancies between the processes of the Mediation Board and such similar Federal or State processes."
+        hash "c4a7b18a2b09d72d25933155057e72c8ea78ef36dd4e08fab50f53d55675023f"
+      }
+      hash "a5bfbdc2dc6fd54842a0c4c0b29001832bb7cc5b5d177b133c99648e0691e976"
+    }
+    provision "/us/usc/t45/s165/c" subsection {
+      num "c" "(c)"
+      heading "Appropriate congressional committee defined"
+      content "In this section, the term “appropriate congressional committees” means the Committee on Transportation and Infrastructure of the House of Representatives, the Committee on Commerce, Science, and Transportation of the Senate, and the Committee on Health, Education, Labor, and Pensions of the Senate."
+      hash "f13b0135653a97a880e8b7b799284eed20ff28ae7d6b7db1a227f12137f53cc1"
+    }
+    hash "546c028fdae955cf471af5f6a369d8ef7c2aefe30cf7da2ca7e8835d41654938"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 15" -> "/us/act/1926-05-20/ch347/s15"] ", as added " ["Pub. L. 112–95, title X, § 1004" -> "/us/pl/112/95/tX/s1004"] ", Feb. 14, 2012, " ["126 Stat. 147" -> "/us/stat/126/147"] ".)"
+  note "/us/usc/t45/s165/note/statutoryNotes/stat.138.1057/biannual-gao-audit" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Biannual GAO Audit"
+    p ["Pub. L. 118–63, title II, § 218" -> "/us/pl/118/63/tII/s218"] "(o), May 16, 2024, " ["138 Stat. 1057" -> "/us/stat/138/1057"] ", provided that:"
+    quoted "/us/stat/138/1057" {
+      p "“Any provision of the FAA Modernization and Reform Act of 2012 (" ["Public Law 112–95" -> "/us/pl/112/95"] ") [see Short Title of 2012 Amendment note set out under " ["section 40101 of Title 49" -> "/us/usc/t49/s40101"] ", Transportation], including any amendment made by such Act, that requires the Comptroller General [of the United States] to conduct an audit (including a recurring audit) shall have no force or effect.”"
+    }
+    hash "fd6c409fecaa36d03f2356cf48f31a26ec4da5204e2935ff1e60576f4025c720"
+  }
+  definition "/us/usc/t45/s165/c" {
+    term "appropriate congressional committees"
+    kind means
+    words "In this section"
+    region "/us/usc/t45/s165"
+    basis restated
+  }
+  layers {
+    operative "546c028fdae955cf471af5f6a369d8ef7c2aefe30cf7da2ca7e8835d41654938"
+    enacted "615b05667fea278fb567dc9a0a0d11478fa915282647c3295e108489f2bfb7c9"
+    editorial "cfa32f1bed07902591a8919a8b5143a41bc0f5113a4159424542a4afb4bbada8"
+  }
+}

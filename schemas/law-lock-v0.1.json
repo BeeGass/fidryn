@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/law-lock-v0.1.json",
+  "title": "fidryn.law-lock/v0.1",
+  "description": "The lock of a generated workspace, the file law.lock.json at its top: the archives it was made from, what the importer counted, and the BLAKE3 of the bytes of every module file by its path.",
+  "type": "object",
+  "required": [
+    "schema",
+    "prefix",
+    "release",
+    "generator",
+    "artifacts",
+    "addresses",
+    "not_imported",
+    "modules"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "fidryn.law-lock/v0.1" },
+    "prefix": { "$ref": "#/$defs/address" },
+    "release": { "type": "string" },
+    "generator": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/artifact" }
+    },
+    "addresses": {
+      "type": "object",
+      "required": ["aliases", "disambiguated", "assigned"],
+      "additionalProperties": false,
+      "properties": {
+        "aliases": { "$ref": "#/$defs/count" },
+        "disambiguated": { "$ref": "#/$defs/count" },
+        "assigned": { "$ref": "#/$defs/count" }
+      }
+    },
+    "not_imported": {
+      "type": "object",
+      "required": [
+        "tables_of_contents",
+        "footnotes_in_tables_of_contents",
+        "links_in_tables_of_contents",
+        "release_notes",
+        "links_without_words",
+        "note_group_headings"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tables_of_contents": { "$ref": "#/$defs/count" },
+        "footnotes_in_tables_of_contents": { "$ref": "#/$defs/count" },
+        "links_in_tables_of_contents": { "$ref": "#/$defs/count" },
+        "release_notes": { "$ref": "#/$defs/count" },
+        "links_without_words": { "$ref": "#/$defs/count" },
+        "note_group_headings": { "$ref": "#/$defs/count" }
+      }
+    },
+    "modules": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/module_path" },
+      "additionalProperties": { "$ref": "#/$defs/digest" }
+    }
+  },
+  "$defs": {
+    "address": {
+      "$comment": "A slash followed by segments separated by slashes; a segment is ASCII letters, digits, '-', '.', '~' and the en dash, and is never '.' or '..'.",
+      "type": "string",
+      "pattern": "^(/(?!\\.\\.?(/|$))[A-Za-z0-9.~–-]+)+$"
+    },
+    "module_path": {
+      "$comment": "The file path of a module, relative to the workspace's directory: segments of lower-case letters, digits, '~', '.', '_', '-' and '%' with two upper-case hexadecimal digits, none beginning with a full stop, joined by '/', followed by '.fr'.",
+      "type": "string",
+      "pattern": "^([a-z0-9~_%A-F-][a-z0-9~._%A-F-]*/)*[a-z0-9~_%A-F-][a-z0-9~._%A-F-]*\\.fr$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["file", "url", "retrieved_at", "bytes", "blake3", "sha256", "members"],
+      "additionalProperties": false,
+      "properties": {
+        "file": { "type": "string" },
+        "url": { "type": "string" },
+        "retrieved_at": { "type": "string" },
+        "bytes": { "$ref": "#/$defs/count" },
+        "blake3": { "$ref": "#/$defs/digest" },
+        "sha256": { "$ref": "#/$defs/digest" },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "bytes", "blake3"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "bytes": { "$ref": "#/$defs/count" },
+              "blake3": { "$ref": "#/$defs/digest" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

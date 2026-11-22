@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/t45/s907" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s907" section {
+    num "907" "§ 907."
+    heading "Railroad hiring"
+    content "Each person who is an employee of the Milwaukee Railroad on September 30, 1979, and who is separated or furloughed from his employment with such railroad (other than for cause) prior to April 1, 1984, as a result of a reduction of service by such railroad shall, unless found to be less qualified than other applicants, have the first right of hire by any other rail carrier that is subject to regulation by the Commission for any vacancy that is not covered by (1) an affirmative action plan, or a hiring plan designed to eliminate discrimination, that is required by Federal or State statute, regulation, or executive order, or by the order of a Federal court or agency, or (2) a permissible voluntary affirmative action plan. For purposes of this section, a rail carrier shall not be considered to be hiring new employees when it recalls any of its own furloughed employees."
+    hash "69ed82ceaea8ab1970905023e234da268b15621809d13331e7d651df790c3ae7"
+  }
+  credit "(" ["Pub. L. 96–101, § 8" -> "/us/pl/96/101/s8"] ", Nov. 4, 1979, " ["93 Stat. 740" -> "/us/stat/93/740"] "; " ["Pub. L. 97–468, title II, § 236(a)" -> "/us/pl/97/468/tII/s236/a"] ", Jan. 14, 1983, " ["96 Stat. 2547" -> "/us/stat/96/2547"] ".)"
+  note "/us/usc/t45/s907/note/editorialNotes/pl.97.468/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1983—" ["Pub. L. 97–468" -> "/us/pl/97/468"] " substituted “April 1, 1984” for “April 1, 1981”."
+    hash "77c3c6b965bc0e16923023010fcc4695c9b2108cd14a123aa17d5b3c18dd14fc"
+  }
+  note "/us/usc/t45/s907/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  note "/us/usc/t45/s907/note/statutoryNotes/pl.99.272/exemption-of-national-railroad-passenger-corporation-in-hiri" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Exemption of National Railroad Passenger Corporation in Hiring Qualified Train and Engine Employees"
+    p "Section inapplicable to National Railroad Passenger Corporation in hiring of qualified train and engine employees holding seniority rights to work in intercity rail passenger service in connection with the assumption by such Corporation of functions previously performed under contract by other carriers, see " ["section 4011(c) of Pub. L. 99–272" -> "/us/pl/99/272/s4011/c"] ", set out as a note under " ["section 797b of this title" -> "/us/usc/t45/s797b"] "."
+    hash "165027267562ff6bbe6613e7e7cde1fda56a5246ffefaa7fd4df1439c829db09"
+  }
+  layers {
+    operative "69ed82ceaea8ab1970905023e234da268b15621809d13331e7d651df790c3ae7"
+    enacted "642b0ff723de15aa1cd9eadcd976c1ed4608d1c926a8c2ad27241c663a953b42"
+    editorial "24408ac6ae737e91cff0482c576fab1227f6d50de9e66f9414e83ef4ef87394d"
+  }
+}

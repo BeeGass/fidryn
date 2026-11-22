@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s669" {
+  within "/us/usc/t45/ch15"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s669" section {
+    num "669" "§ 669."
+    heading "Repealed. " ["Pub. L. 97–375, title I, § 111(e)" -> "/us/pl/97/375/tI/s111/e"] ", Dec. 21, 1982, " ["96 Stat. 1821" -> "/us/stat/96/1821"]
+    status repealed
+    hash "734901a747e3fb2f780b17b51e78c191416bdee6d5bf78c56ba4160dc4e2d1a5"
+  }
+  note "/us/usc/t45/s669/note/ungrouped/pl.91.663/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 91–663, § 10" -> "/us/pl/91/663/s10"] ", Jan. 8, 1971, " ["84 Stat. 1978" -> "/us/stat/84/1978"] "; " ["Pub. L. 96–470, title I, § 112(h)" -> "/us/pl/96/470/tI/s112/h"] ", Oct. 19, 1980, " ["94 Stat. 2240" -> "/us/stat/94/2240"] ", directed the Secretary to make a report to the President and Congress on financial condition of each railroad except Central Railroad Company of New Jersey and Penn Central Transportation Company, having a loan guaranteed under this chapter ninety days after the making of such guarantee and annually thereafter throughout existence of such loan."
+    hash "e9303db29aa6e5e49ffdc181d39391668bd67ef29246016c2cdf5e4d1de13df4"
+  }
+  layers {
+    operative "734901a747e3fb2f780b17b51e78c191416bdee6d5bf78c56ba4160dc4e2d1a5"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3733ee4bc0f462be0be875367be62cffd590762865630a70c1dab459841a0ff2"
+  }
+}

@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s182" {
+  within "/us/usc/t45/ch8/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s182" section {
+    num "182" "§ 182."
+    heading "Duties, penalties, benefits, and privileges of subchapter I applicable"
+    content "The duties, requirements, penalties, benefits, and privileges prescribed and established by the provisions of subchapter I of this chapter except " ["section 153 of this title" -> "/us/usc/t45/s153"] " shall apply to said carriers by air and their employees in the same manner and to the same extent as though such carriers and their employees were specifically included within the definition of “carrier” and “employee”, respectively, in " ["section 151 of this title" -> "/us/usc/t45/s151"] "."
+    hash "1541603a9345a8256c79b7b445ec729e816dbbb28ddc4b8559f0c24225679da3"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 202" -> "/us/act/1926-05-20/ch347/s202"] ", as added " ["Apr. 10, 1936, ch. 166" -> "/us/act/1936-04-10/ch166"] ", " ["49 Stat. 1189" -> "/us/stat/49/1189"] ".)"
+  layers {
+    operative "1541603a9345a8256c79b7b445ec729e816dbbb28ddc4b8559f0c24225679da3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1b05e537f3b45979ae3d29f1c564c9d259740c61d8368b36d1bdda3b22248e57"
+  }
+}

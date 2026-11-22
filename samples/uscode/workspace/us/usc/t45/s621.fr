@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s621" {
+  alias "/us/usc/t45/s622"
+  within "/us/usc/t45/ch14/schVII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s621" section {
+    num "621, 622" "§§ 621, 622."
+    heading "Repealed. " ["Pub. L. 99–272, title IV, § 4007(c)" -> "/us/pl/99/272/tIV/s4007/c"] ", Apr. 7, 1986, " ["100 Stat. 108" -> "/us/stat/100/108"]
+    status repealed
+    hash "e4bb31d7fecf45585e7c39863bf74f98a9fd5d43277a63531d7b3f3e8fac51cd"
+  }
+  note "/us/usc/t45/s621/note/ungrouped/pl.91.518/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 621, " ["Pub. L. 91–518, title VII, § 701" -> "/us/pl/91/518/tVII/s701"] ", Oct. 30, 1970, " ["84 Stat. 1339" -> "/us/stat/84/1339"] "; " ["Pub. L. 94–25, § 12" -> "/us/pl/94/25/s12"] ", May 26, 1975, " ["89 Stat. 93" -> "/us/stat/89/93"] ", provided for interim authority to provide emergency financial assistance for railroads operating passenger service."
+    hash "468a00d185a3735f47260dcaa3fc99a2ef9bba09fc2fc42597354c9941e9e5ce"
+  }
+  note "/us/usc/t45/s621/note/ungrouped/pl.91.518/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 622, " ["Pub. L. 91–518, title VII, § 702" -> "/us/pl/91/518/tVII/s702"] ", Oct. 30, 1970, " ["84 Stat. 1339" -> "/us/stat/84/1339"] ", authorized appropriations for this subchapter."
+    hash "3c53db0d217a984308ab574c9c3c4193f1d3e8c79446e2d2b7f88bf1e3224f25"
+  }
+  layers {
+    operative "e4bb31d7fecf45585e7c39863bf74f98a9fd5d43277a63531d7b3f3e8fac51cd"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "7f6ac63c5a96422205d61766d4bac11f1a2ac11b887591fe3bcb2bbee5d585ff"
+  }
+}

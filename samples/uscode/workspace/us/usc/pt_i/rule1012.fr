@@ -1,0 +1,56 @@
+edition 2
+module "/us/usc/ptI/rule1012" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1012" courtRule {
+    num "1012" "Rule 1012."
+    heading "Contesting a Petition in a Chapter 15 Case"
+    provision "/us/usc/ptI/rule1012/a" subsection {
+      num "a" "(a)"
+      heading "Who May Contest the Petition."
+      content "A debtor or a party in interest may contest a Chapter 15 petition for recognition of a foreign proceeding."
+      hash "995d322f0e0b117df435263831dd6a5e7157f9bf5a617659c21623759fc4b272"
+    }
+    provision "/us/usc/ptI/rule1012/b" subsection {
+      num "b" "(b)"
+      heading "Time to File a Response."
+      content "Unless the court sets a different time, a response to the petition must be filed at least 7 days before the date set for a hearing on the petition."
+      hash "577921ece432efa758fb9622718d44f026b5ce337b6c3f0b052f834838a06199"
+    }
+    provision "/us/usc/ptI/rule1012/c" subsection {
+      num "c" "(c)"
+      heading "Corporate-Ownership Statement."
+      content "A corporation that responds to the petition must file a corporate-ownership statement containing the information described in Rule 7007.1. The corporation must do so with its first appearance, pleading, motion, or response, or other first request to the court."
+      hash "7e523f3921ee427687294f545ec79f90faea9316e7e3982eab3e4e47ab3d1061"
+    }
+    hash "be13ab17bd09ea3054a35679be5cccc1340b9be04811f7bba650c765464a5eaa"
+  }
+  credit "(Added Apr. 28, 2016, eff. Dec. 1, 2016; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987"
+    p "This rule [former Rule 1012—Examination of Debtor, Including Discovery, on Issue of Nonpayment of Debts in Involuntary Cases] is abrogated [abrogated Mar. 30, 1987, eff. Aug. 1, 1987]. The discovery rules apply whenever an involuntary petition is contested. Rule 1018."
+    hash "d5cab8a05375dd7a0ba2a3b1e917d8274f8ccca73bd13cc6433749e0e8fdecb6"
+  }
+  note "/us/usc/ptI/rule1012/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2016 Amendment"
+    p "This rule is added to govern responses to petitions for recognition in cross-border cases. It incorporates provisions formerly found in Rule 1011. Subdivision (a) provides that the debtor or a party in interest may contest the petition. Subdivision (b) provides for presentation of responses no later than 7 days before the hearing on the petition, unless the court directs otherwise. Subdivision (c) governs the filing of corporate ownership statements by entities responding to the petition."
+    hash "bac63a52e6d0415002148735abea007941c6570e9ea03a0234d8b3b7483c714b"
+  }
+  note "/us/usc/ptI/rule1012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1012 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "a6e936dde31340463ec3631e8dfd7350844f1bf5a33067cbe0fb077208ff49ce"
+  }
+  layers {
+    operative "be13ab17bd09ea3054a35679be5cccc1340b9be04811f7bba650c765464a5eaa"
+    enacted "568433355643770b370045f57d441463ca252f861389a9928e00c5471564c32f"
+    editorial "c12d46c4f8a1497f7297457bc0bc0f26702c41b16f0966a7f1effaf7e5fd1fe3"
+  }
+}

@@ -1,0 +1,37 @@
+edition 2
+module "/us/usc/t45" {
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45" title {
+    num "45" "Title 45—"
+    heading "RAILROADS"
+    member "/us/usc/t45/ch1"
+    member "/us/usc/t45/ch2"
+    member "/us/usc/t45/ch3"
+    member "/us/usc/t45/ch4"
+    member "/us/usc/t45/ch5"
+    member "/us/usc/t45/ch6"
+    member "/us/usc/t45/ch7"
+    member "/us/usc/t45/ch8"
+    member "/us/usc/t45/ch9"
+    member "/us/usc/t45/ch10"
+    member "/us/usc/t45/ch11"
+    member "/us/usc/t45/ch12"
+    member "/us/usc/t45/ch13"
+    member "/us/usc/t45/ch14"
+    member "/us/usc/t45/ch15"
+    member "/us/usc/t45/ch16"
+    member "/us/usc/t45/ch17"
+    member "/us/usc/t45/ch18"
+    member "/us/usc/t45/ch19"
+    member "/us/usc/t45/ch20"
+    member "/us/usc/t45/ch21"
+    member "/us/usc/t45/ch22"
+    hash "f2a7fb43327a7a6fed2ae280ed72159e39a1c73b34a995a62a4061cf57d51c4a"
+  }
+  layers {
+    operative "f2a7fb43327a7a6fed2ae280ed72159e39a1c73b34a995a62a4061cf57d51c4a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

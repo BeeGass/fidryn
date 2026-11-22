@@ -1,0 +1,118 @@
+edition 2
+module "/us/usc/ptII/rule2007" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2007" courtRule {
+    num "2007" "Rule 2007."
+    heading "Reviewing the Appointment of a Creditors’ Committee Organized Before a Chapter 9 or 11 Case Is Commenced"
+    provision "/us/usc/ptII/rule2007/a" subsection {
+      num "a" "(a)"
+      heading "Motion to Review the Appointment."
+      content "If, in a Chapter 9 or 11 case, a committee appointed by the United States trustee under § 1102(a) consists of the members of a committee organized by creditors before the case commenced, the court may determine whether the committee’s appointment satisfies the requirements of § 1102(b)(1). The court may do so on a party in interest’s motion and after a hearing on notice to the United States trustee and other entities as the court orders."
+      hash "551bb3c6e2459cec34d41bac226a28b4de18890871207b883a5c590700f5e893"
+    }
+    provision "/us/usc/ptII/rule2007/b" subsection {
+      num "b" "(b)"
+      heading "Determining Whether the Committee Was Fairly Chosen."
+      chapeau "The court may find that the committee was fairly chosen if:"
+      provision "/us/usc/ptII/rule2007/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "it was selected by a majority in number and amount of claims of unsecured creditors who are entitled to vote under § 702(a) and who were present or represented at a meeting where:"
+        provision "/us/usc/ptII/rule2007/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "all creditors with unsecured claims of over $1,000—or the 100 unsecured creditors with the largest claims—had at least 7 days’ written notice; and"
+          hash "507cd5e7e81713b12eff4a45b6e3c989712972a2113cefade32142d3c39686dc"
+        }
+        provision "/us/usc/ptII/rule2007/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "written minutes reporting the voting creditors’ names and the amounts of their claims are available for inspection;"
+          hash "0afb30ff3fa9b0688ef966c7a4c7e7347621ef3b61da717940a29bcf445120c9"
+        }
+        hash "70580e48e098559a3e39ad4f9684c1bc19e3d7ab9fd484e5d3c56cf818ecac78"
+      }
+      provision "/us/usc/ptII/rule2007/b/2" paragraph {
+        num "2" "(2)"
+        content "all proxies voted at the meeting were solicited under Rule 2006;"
+        hash "8a949a5b8a2188ae12beb15900dca5e25ebfb636535c671be6b28ba65ab2d2dc"
+      }
+      provision "/us/usc/ptII/rule2007/b/3" paragraph {
+        num "3" "(3)"
+        content "the lists and statements required by Rule 2006(e) have been sent to the United States trustee; and"
+        hash "cfa34fdaf75971196410821f2b0760eaa997ba7d0719729a9cf6e5fec052e4a1"
+      }
+      provision "/us/usc/ptII/rule2007/b/4" paragraph {
+        num "4" "(4)"
+        content "the committee’s organization was in all other respects fair and proper."
+        hash "7334e4ab8f96d1c168a35cb53ca92910a3e6f7403b7f4dd1951a6a0acea104a2"
+      }
+      hash "44c75c531f9ad7cbf85dd6590efd11a08d014a846325b5345c9be075ea8fca69"
+    }
+    provision "/us/usc/ptII/rule2007/c" subsection {
+      num "c" "(c)"
+      heading "Failure to Comply with Appointment Requirements."
+      chapeau "If, after a hearing on notice under (a), the court finds that a committee appointment fails to satisfy the requirements of § 1102(b)(1), it:"
+      provision "/us/usc/ptII/rule2007/c/1" paragraph {
+        num "1" "(1)"
+        content "must order the United States trustee to vacate the appointment; and"
+        hash "bb2eaeca39b51dcdbe6acfaf48ef1d7d3b82a46808f757955fcfefe8b098364a"
+      }
+      provision "/us/usc/ptII/rule2007/c/2" paragraph {
+        num "2" "(2)"
+        content "may order other appropriate action."
+        hash "7f855bfea0d931f7f3d45ac1b58d15973dbb32c2fd37669cfd9f18e89ea0af7b"
+      }
+      hash "e4d7948896a28505f2c50e3aa69b5fceddb4737de42605b6856f2c475c8c6e62"
+    }
+    hash "07ba3a0abe1538d5069eb36dcbb171dce0e7e6cc8e64dd067ab439aa25c698cd"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Section 1102(b)(1) of the Code permits the court to appoint as the unsecured creditors’ committee, the committee that was selected by creditors before the order for relief. This provision recognizes the propriety of continuing a “prepetition” committee in an official capacity. Such a committee, however, must be found to have been fairly chosen and representative of the different kinds of claims to be represented."
+    p "Subdivision (a) does not necessarily require a hearing but does require a party in interest to bring to the court’s attention the fact that a prepetition committee had been organized and should be appointed. An application would suffice for this purpose. Party in interest would include the committee, any member of the committee, or any of its agents acting for the committee. Whether or not notice of the application should be given to any other party is left to the discretion of the court."
+    p "Subdivision (b) implements § 1102(b)(1). The Code provision allows the court to appoint, as the official § 1102(a) committee, a “prepetition” committee if its members were fairly chosen and the committee is representative of the different kinds of claims. This subdivision of the rule indicates some of the factors the court may consider in determining whether the requirements of § 1102(b)(1) have been satisfied. In effect, the subdivision provides various factors which are similar to those set forth in Rule 2006 with respect to the solicitation and voting of proxies in a chapter 7 liquidation case."
+    hash "36b7509504a31971ef53fdd9dd986905282a3ca2999acfba744e87c87b2504dc"
+  }
+  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The rule is amended to conform to the 1984 amendments to § 1102(b)(1) of the Code."
+    hash "2ea04edc8b5dd053e37c18a0bb7c5742aa7cecb9daf098969ff9d5fe981df606"
+  }
+  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to conform to the 1986 amendments to § 1102(a). The United States trustee appoints committees pursuant to § 1102 in chapter 11 cases. Section 1102 is applicable in chapter 9 cases pursuant to § 901(a)."
+    p "Although § 1102(b)(1) of the Code permits the United States trustee to appoint a prepetition committee as the statutory committee if its members were fairly chosen and it is representative of the different kinds of claims to be represented, the amendment to this rule provides a procedure for judicial review of the appointment. The factors that may be considered by the court in determining whether the committee was fairly chosen are not new. A finding that a prepetition committee has not been fairly chosen does not prohibit the appointment of some or all of its members to the creditors’ committee. Although this rule deals only with judicial review of the appointment of prepetition committees, it does not preclude judicial review under Rule 2020 regarding the appointment of other committees."
+    hash "3ad29c9bc62937c7133a96c137475c528f00d1dbc966fc8fd2c1477156a65967"
+  }
+  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptII/rule2007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2007 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "76c7d8601858c629db24f20780caf554cc718e35aaf22179c953f8c7256e48f6"
+  }
+  layers {
+    operative "07ba3a0abe1538d5069eb36dcbb171dce0e7e6cc8e64dd067ab439aa25c698cd"
+    enacted "37f36565790fe6919d9142547403d199c51dcc049b8aba2e0fd01d56e72bba88"
+    editorial "1a7de5495e7afd35f6be0d9eb0ffdb4c2bf8bf18f7dc774596bb52d169ac5179"
+  }
+}

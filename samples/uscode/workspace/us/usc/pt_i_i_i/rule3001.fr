@@ -1,0 +1,325 @@
+edition 2
+module "/us/usc/ptIII/rule3001" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3001" courtRule {
+    num "3001" "Rule 3001."
+    heading "Proof of Claim"
+    provision "/us/usc/ptIII/rule3001/a" subsection {
+      num "a" "(a)"
+      heading "Definition and Form."
+      content "A proof of claim is a written statement of a creditor’s claim. It must substantially conform to Form 410."
+      hash "a7312b5ebc7d9ff2750bc8f69463ff63c4c850c088ac120a7d3a3544a7ad0464"
+    }
+    provision "/us/usc/ptIII/rule3001/b" subsection {
+      num "b" "(b)"
+      heading "Who May Sign a Proof of Claim."
+      content "Only a creditor or the creditor’s agent may sign a proof of claim—except as provided in Rules 3004 and 3005."
+      hash "04b905c0c5bc2c19695bac1e4916f87e5e3025744ac47c0655d87ceb4ac89d48"
+    }
+    provision "/us/usc/ptIII/rule3001/c" subsection {
+      num "c" "(c)"
+      heading "Required Supporting Information."
+      provision "/us/usc/ptIII/rule3001/c/1" paragraph {
+        num "1" "(1)"
+        content "Claim or Interest Based on a Writing. If a claim or an interest in the debtor’s property securing the claim is based on a writing, the creditor must file a copy with the proof of claim—except for a claim based on a consumer-credit agreement under (4). If the writing has been lost or destroyed, a statement explaining the loss or destruction must be filed with the claim."
+        hash "b81e3af9c935fd94cd7e4d5918cc87f819689b216ff9f551c079c8b90e4da13a"
+      }
+      provision "/us/usc/ptIII/rule3001/c/2" paragraph {
+        num "2" "(2)"
+        chapeau "Additional Information in an Individual Debtor’s Case. If the debtor is an individual, the creditor must file with the proof of claim:"
+        provision "/us/usc/ptIII/rule3001/c/2/A" subparagraph {
+          num "A" "(A)"
+          content "an itemized statement of the principal amount and any interest, fees, expenses, or other charges incurred before the petition was filed;"
+          hash "39b1253d93ebb5db6fe1ce8efd9e7bc48c94c792201f1b335de57660eb4b000a"
+        }
+        provision "/us/usc/ptIII/rule3001/c/2/B" subparagraph {
+          num "B" "(B)"
+          content "for any claimed security interest in the debtor’s property, the amount needed to cure any default as of the date the petition was filed; and"
+          hash "a3671f274ec219f845eadbcc3957b54418c968ffc444ad3c11958e80ede68271"
+        }
+        provision "/us/usc/ptIII/rule3001/c/2/C" subparagraph {
+          num "C" "(C)"
+          chapeau "for any claimed security interest in the debtor’s principal residence:"
+          provision "/us/usc/ptIII/rule3001/c/2/C/i" clause {
+            num "i" "(i)"
+            content "Form 410A; and"
+            hash "c015aeb720b2d76c979fc32bafdbaaee57b907f96232b97b436c7633fbd64e02"
+          }
+          provision "/us/usc/ptIII/rule3001/c/2/C/ii" clause {
+            num "ii" "(ii)"
+            content "if there is an escrow account connected with the claim, an escrow-account statement, prepared as of the date the petition was filed, that is consistent in form with applicable nonbankruptcy law."
+            hash "a9a69cd193e08fcfc6079bc8551a707e24d747a04d3b0ed8b1109d8e92674092"
+          }
+          hash "214da38dfd7e1b8a52007e7ca52f50f7bfcd987e969b601bd1013ab35c7784a3"
+        }
+        hash "85b81ee010471b7fde4cfe42b95b212175d1f20abacab881a0be8ca34805ba9b"
+      }
+      provision "/us/usc/ptIII/rule3001/c/3" paragraph {
+        num "3" "(3)"
+        chapeau "Sanctions in an Individual-Debtor Case. If the debtor is an individual and a claim holder fails to provide any information required by (1) or (2), the court may, after notice and a hearing, take one or both of these actions:"
+        provision "/us/usc/ptIII/rule3001/c/3/A" subparagraph {
+          num "A" "(A)"
+          content "preclude the holder from presenting the information in any form as evidence in any contested matter or adversary proceeding in the case—unless the court determines that the failure is substantially justified or is harmless; and"
+          hash "5124a07520111998595d967aaf4b731d3bda8070d4d80582a7c0dc3adcc9d326"
+        }
+        provision "/us/usc/ptIII/rule3001/c/3/B" subparagraph {
+          num "B" "(B)"
+          content "award other appropriate relief, including reasonable expenses and attorney’s fees caused by the failure."
+          hash "bd4951643106fa9f6ad3155771a900c108c579be67c1e92b2e085b02fba69c4f"
+        }
+        hash "1a12e93a6483c8575c327b5752b433f3b84a914be57eb4cc1ff80932190351d9"
+      }
+      provision "/us/usc/ptIII/rule3001/c/4" paragraph {
+        num "4" "(4)"
+        chapeau "Claim Based on an Open-End or Revolving Consumer-Credit Agreement."
+        provision "/us/usc/ptIII/rule3001/c/4/A" subparagraph {
+          num "A" "(A)"
+          chapeau "Required Statement. Except when the claim is secured by an interest in the debtor’s real property, a proof of claim for a claim based on an open-end or revolving consumer-credit agreement must be accompanied by a statement that shows the following information about the credit account:"
+          provision "/us/usc/ptIII/rule3001/c/4/A/i" clause {
+            num "i" "(i)"
+            content "the name of the entity from whom the creditor purchased the account;"
+            hash "734a8b641f4dfa7053245c7b3a2d94f6fefbfb20720ce186223d37ddc7931357"
+          }
+          provision "/us/usc/ptIII/rule3001/c/4/A/ii" clause {
+            num "ii" "(ii)"
+            content "the name of the entity to whom the debt was owed at the time of an account holder’s last transaction on the account;"
+            hash "ebbfd7709cd5e9d52c504238161c3a1a4de622ebce3e544c536729aa0b10f6b9"
+          }
+          provision "/us/usc/ptIII/rule3001/c/4/A/iii" clause {
+            num "iii" "(iii)"
+            content "the date of that last transaction;"
+            hash "d1d408f46c1c293abaec84a671ceca7fe7d7a7cfdd1f1d2a0efed35e5fa83639"
+          }
+          provision "/us/usc/ptIII/rule3001/c/4/A/iv" clause {
+            num "iv" "(iv)"
+            content "the date of the last payment on the account; and"
+            hash "3416a50ce33ac965cedbd01e12b769a12459782dab564cc56a985c543a954f8a"
+          }
+          provision "/us/usc/ptIII/rule3001/c/4/A/v" clause {
+            num "v" "(v)"
+            content "the date that the account was charged to profit and loss."
+            hash "5b9ea503119e5e1c87d4f2f1f7190f874c3a953e219e3d36c0ff833c031897d9"
+          }
+          hash "d2cb185e6bad3011bee3fd2fad175f1a220dc72f4a5468d58c14a0d16ffbd435"
+        }
+        provision "/us/usc/ptIII/rule3001/c/4/B" subparagraph {
+          num "B" "(B)"
+          content "Copy to a Party in Interest. On a party in interest’s written request, the creditor must send a copy of the writing described in (1) to that party within 30 days after the request is sent."
+          hash "e330f46efac641b68e181d54153b8f8839028f7b9400659b2d75ea997d94d709"
+        }
+        hash "9ed7bcc80d2f792d883514f2db9e714f5cac4fffc0c90370a7976131a1e84108"
+      }
+      hash "c199734fc5b44e2a00f895b687bd1403a0cf009563ccb8deace16cad1e0a822a"
+    }
+    provision "/us/usc/ptIII/rule3001/d" subsection {
+      num "d" "(d)"
+      heading "Claim Based on a Security Interest in the Debtor’s Property."
+      content "If a creditor claims a security interest in the debtor’s property, the proof of claim must be accompanied by evidence that the security interest has been perfected."
+      hash "5525710c83fc894e23f68d83f8336a148f646f66bc5fa33f568cccfa425de103"
+    }
+    provision "/us/usc/ptIII/rule3001/e" subsection {
+      num "e" "(e)"
+      heading "Transferred Claim."
+      provision "/us/usc/ptIII/rule3001/e/1" paragraph {
+        num "1" "(1)"
+        content "Claim Transferred Before a Proof of Claim Is Filed. Unless the transfer was made for security, if a claim was transferred before a proof of claim is filed, only the transferee or an indenture trustee may file a proof of claim."
+        hash "5977f4235e14246d088b63cba7d4434de2d6a11cfc3268e0db5a2bbf2a31aa34"
+      }
+      provision "/us/usc/ptIII/rule3001/e/2" paragraph {
+        num "2" "(2)"
+        chapeau "Claim Transferred After a Proof of Claim Was Filed."
+        provision "/us/usc/ptIII/rule3001/e/2/A" subparagraph {
+          num "A" "(A)"
+          content "Filing Evidence of the Transfer. Unless the transfer was made for security, the transferee of a claim that was transferred after a proof of claim is filed must file evidence of the transfer—except for a claim based on a publicly traded note, bond, or debenture."
+          hash "8fcdfd4343d1dc3d6658d6f5256a487388f18e3a1095192091568c50fb012a44"
+        }
+        provision "/us/usc/ptIII/rule3001/e/2/B" subparagraph {
+          num "B" "(B)"
+          content "Notice of the Filing and the Time for Objecting. The clerk must immediately notify the alleged transferor, by mail, that evidence of the transfer has been filed and that the alleged transferor has 21 days after the notice is mailed to file an objection. The court may extend the time to file it."
+          hash "9e287bedfc562700468159b4fee03499b10d8940cc484d75df681c645bfdcf63"
+        }
+        provision "/us/usc/ptIII/rule3001/e/2/C" subparagraph {
+          num "C" "(C)"
+          content "Hearing on an Objection; Substituting the Transferee. If, on timely objection by the alleged transferor and after notice and a hearing, the court finds that the claim was transferred other than for security, the court must substitute the transferee for the transferor. If the alleged transferor does not file a timely objection, the transferee must be substituted for the transferor."
+          hash "b759729b89e993a0fc6258b6f7d82b603e3b58f38498895ae0a8290ff218e84f"
+        }
+        hash "1bf11804b4e207bb59ba53ab920fe867f8d9940f4af8bc3ebda51dbd0fd8ce44"
+      }
+      provision "/us/usc/ptIII/rule3001/e/3" paragraph {
+        num "3" "(3)"
+        chapeau "Claim Transferred for Security Before a Proof of Claim Is Filed."
+        provision "/us/usc/ptIII/rule3001/e/3/A" subparagraph {
+          num "A" "(A)"
+          content "Right to File a Proof of Claim. If a claim (except one based on a publicly traded note, bond, or debenture) was transferred for security before the proof of claim is filed, either the transferor or transferee (or both) may file a proof of claim for the full amount. The proof of claim must include a statement setting forth the terms of the transfer."
+          hash "59cdebb52126ee35394165944267026e98c4d7bb9919015182b76b553000a6d8"
+        }
+        provision "/us/usc/ptIII/rule3001/e/3/B" subparagraph {
+          num "B" "(B)"
+          content "Notice of a Right to Join in a Proof of Claim; Consolidating Proofs. If either the transferor or transferee files a proof of claim, the clerk must, by mail, immediately notify the other of the right to join in the claim. If both file proofs of the same claim, the claims must be consolidated."
+          hash "a768c179fd99cdbd8960a92a6ad8e91ce6cbd378be0145e144a0d32db6065fe3"
+        }
+        provision "/us/usc/ptIII/rule3001/e/3/C" subparagraph {
+          num "C" "(C)"
+          content "Failure to File an Agreement About the Rights of the Transferor and Transferee. On a party in interest’s motion and after notice and a hearing, the court must issue appropriate orders regarding the rights of the transferor and transferee if either one fails to file an agreement on voting the claim, receiving dividends on it, or participating in the estate’s administration."
+          hash "8f5dd04e25a4303f2bf4d32d97e399df6cf28a361d35996f8105f29f872d1f80"
+        }
+        hash "ff2f1a93031f1b48e89950d2ad0f46da3f3e57f1fa17ce68e26b97595e05adf9"
+      }
+      provision "/us/usc/ptIII/rule3001/e/4" paragraph {
+        num "4" "(4)"
+        chapeau "Claim Transferred for Security After a Proof of Claim Was Filed."
+        provision "/us/usc/ptIII/rule3001/e/4/A" subparagraph {
+          num "A" "(A)"
+          content "Filing Evidence of the Transfer. If a claim (except one based on a publicly traded note, bond, or debenture) was transferred for security after a proof of claim was filed, the transferee must file a statement setting forth the terms of the transfer."
+          hash "f30e515581c818703c702ecb131dceee6b1ca1d7f04d63f847f7ac8d459c03fb"
+        }
+        provision "/us/usc/ptIII/rule3001/e/4/B" subparagraph {
+          num "B" "(B)"
+          content "Notice of the Filing and the Time for Objecting. The clerk must immediately notify the alleged transferor, by mail, that evidence of the transfer has been filed and that the alleged transferor has 21 days after the notice is mailed to file an objection. The court may extend the time to file it."
+          hash "9e287bedfc562700468159b4fee03499b10d8940cc484d75df681c645bfdcf63"
+        }
+        provision "/us/usc/ptIII/rule3001/e/4/C" subparagraph {
+          num "C" "(C)"
+          content "Hearing on an Objection. If the alleged transferor files a timely objection, the court must, after notice and a hearing, determine whether the transfer was for security."
+          hash "3e840e941ad2e3c61c31e42185a78426f8a87a9fbf995bba16f5a404647fc5fb"
+        }
+        provision "/us/usc/ptIII/rule3001/e/4/D" subparagraph {
+          num "D" "(D)"
+          content "Failure to File an Agreement About the Rights of the Transferor and Transferee. On a party in interest’s motion and after notice and a hearing, the court must issue appropriate orders regarding the rights of the transferor and transferee if either one fails to file an agreement on voting the claim, receiving dividends on it, or participating in the estate’s administration."
+          hash "eab69707e12d5d794f6fbbc9998b1e41d3dbc15d78876e0360361c6b8702c9c0"
+        }
+        hash "7d96076ab547172782d01ad61723fdbb30089a1703befebf445f1b497dd30cf5"
+      }
+      provision "/us/usc/ptIII/rule3001/e/5" paragraph {
+        num "5" "(5)"
+        content "Serving an Objection or Motion; Notice of a Hearing. At least 30 days before a hearing, a copy of any objection filed under (2) or (4) or any motion filed under (3) or (4) must be mailed or delivered to either the transferor or transferee as appropriate, together with notice of the hearing."
+        hash "c1a69183ff9a555aa4212b0ba5b5437a975ba945abb624b40a04d32f2c546c97"
+      }
+      hash "3a879cbd8354157f036b050b5ee693b60e3dbc609b353a04119c750ee9a48ecc"
+    }
+    provision "/us/usc/ptIII/rule3001/f" subsection {
+      num "f" "(f)"
+      heading "Proof of Claim as Prima Facie Evidence of a Claim and Its Amount."
+      content "A proof of claim signed and filed in accordance with these rules is prima facie evidence of the claim’s validity and amount."
+      hash "ecbdd8aa49b00b47b7741a069ea993259a372b57abdec899d980a4706a0d79d8"
+    }
+    provision "/us/usc/ptIII/rule3001/g" subsection {
+      num "g" "(g)"
+      heading "Proving the Ownership and Quantity of Grain."
+      content "To the extent not inconsistent with the United States Warehouse Act or applicable State law, a warehouse receipt, scale ticket, or similar document of the type routinely issued as evidence of title by a grain storage facility, as defined in " ["section 557 of title 11" -> "/us/usc/t11/s557"] ", shall constitute prima facie evidence of the validity and amount of a claim of ownership of a quantity of grain."
+      hash "aae8fca2a5c0382d638882f856dcc37a9858de9d4bc62a0d489c4a461c2edf98"
+    }
+    hash "af074ecee23495966375743cd971f39adab7d0ffc5c5dbf930c5d92dd361ff60"
+  }
+  credit "(As amended " ["Pub. L. 98–353, title III, § 354" -> "/us/pl/98/353/tIII/s354"] ", July 10, 1984, " ["98 Stat. 361" -> "/us/stat/98/361"] "; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 23, 2012, eff. Dec. 1, 2012; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Bankruptcy Rules 301 and 302. The Federal Rules of Evidence, made applicable to cases under the Code by Rule 1101, do not prescribe the evidentiary effect to be accorded particular documents. Subdivision (f) of this rule supplements the Federal Rules of Evidence as they apply to cases under the Code."
+    p "Subdivision (c). This subdivision is similar to former Bankruptcy Rule 302(c) and continues the requirement for the filing of any written security agreement and provides that the filing of a duplicate of a writing underlying a claim authenticates the claim with the same effect as the filing of the original writing. Cf. Rules 1001(4) and 1003 of F.R. of Evid. Subdivision (d) together with the requirement in the first sentence of subdivision (c) for the filing of any written security agreement, is designed to facilitate the determination whether the claim is secured and properly perfected so as to be valid against the trustee."
+    p "Subdivision (d). “Satisfactory evidence” of perfection, which is to accompany the proof of claim, would include a duplicate of an instrument filed or recorded, a duplicate of a certificate of title when a security interest is perfected by notation on such a certificate, a statement that pledged property has been in possession of the secured party since a specified date, or a statement of the reasons why no action was necessary for perfection. The secured creditor may not be required to file a proof of claim under this rule if he is not seeking allowance of a claim for a deficiency. But see § 506(d) of the Code."
+    p "Subdivision (e). The rule recognizes the differences between an unconditional transfer of a claim and a transfer for the purpose of security and prescribes a procedure for dealing with the rights of the transferor and transferee when the transfer is for security. The rule clarifies the procedure to be followed when a transfer precedes or follows the filing of the petition. The interests of sound administration are served by requiring the post-petition transferee to file with the proof of claim a statement of the transferor acknowledging the transfer and the consideration for the transfer. Such a disclosure will assist the court in dealing with evils that may arise out of post-bankruptcy traffic in claims against an estate. Monroe v. Scofield, 135 F.2d 725 (10th Cir. 1943); In re Philadelphia & Western Ry., 64 F. Supp. 738 (E.D. Pa. 1946); cf. In re Latham Lithographic Corp., 107 F.2d 749 (2d Cir. 1939). Both paragraphs (1) and (3) of this subdivision, which deal with a transfer before the filing of a proof of claim, recognize that the transferee may be unable to obtain the required statement from the transferor, but in that event a sound reason for such inability must accompany the proof of claim filed by the transferee."
+    p "Paragraphs (3) and (4) clarify the status of a claim transferred for the purpose of security. An assignee for security has been recognized as a rightful claimant in bankruptcy. Feder v. John Engelhorn & Sons, 202 F.2d 411 (2d Cir. 1953). An assignor’s right to file a claim notwithstanding the assignment was sustained in In re R & L Engineering Co., 182 F. Supp. 317 (S.D. Cal. 1960). Facilitation of the filing of proofs by both claimants as holders of interests in a single claim is consonant with equitable treatment of the parties and sound administration. See In re Latham Lithographic Corp., 107 F.2d 749 (2d Cir. 1939)."
+    p "Paragraphs (2) and (4) of subdivision (e) deal with the transfer of a claim after proof has been filed. Evidence of the terms of the transfer required to be disclosed to the court will facilitate the court’s determination of the appropriate order to be entered because of the transfer."
+    p "Paragraph (5) describes the procedure to be followed when an objection is made by the transferor to the transferee’s filed evidence of transfer."
+    hash "9217801951050d8df78ce348ccf9ef9bc35f90b6781cecd1fdb4dc0cc840375e"
+  }
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987"
+    p "Subdivision (g) was added by § 354 of the 1984 amendments."
+    hash "d0da011a2de075356c8319eebaaa50c1ec37ebc019794e7bb8980ab9b1d2d18b"
+  }
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is amended in anticipation of future revision and renumbering of the Official Forms."
+    p "Subdivision (e) is amended to limit the court’s role to the adjudication of disputes regarding transfers of claims. If a claim has been transferred prior to the filing of a proof of claim, there is no need to state the consideration for the transfer or to submit other evidence of the transfer. If a claim has been transferred other than for security after a proof of claim has been filed, the transferee is substituted for the transferor in the absence of a timely objection by the alleged transferor. In that event, the clerk should note the transfer without the need for court approval. If a timely objection is filed, the court’s role is to determine whether a transfer has been made that is enforceable under nonbankruptcy law. This rule is not intended either to encourage or discourage postpetition transfers of claims or to affect any remedies otherwise available under nonbankruptcy law to a transferor or transferee such as for misrepresentation in connection with the transfer of a claim. “After notice and a hearing” as used in subdivision (e) shall be construed in accordance with paragraph (5)."
+    p "The words “with the clerk” in subdivision (e)(2) and (e)(4) are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
+    hash "f26f449467d31216bd8bec4e2b82e3ef272bbc3c5b26674b711acfa9461edc82"
+  }
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2011 Amendment"
+    p "Subdivision (c). Subdivision (c) is amended to prescribe with greater specificity the supporting information required to accompany certain proofs of claim and, in cases in which the debtor is an individual, the consequences of failing to provide the required information."
+    p "Existing subdivision (c) is redesignated as (c)(1)."
+    p "Subdivision (c)(2) is added to require additional information to accompany proofs of claim filed in cases in which the debtor is an individual. When the holder of a claim seeks to recover—in addition to the principal amount of a debt—interest, fees, expenses, or other charges, the proof of claim must be accompanied by a statement itemizing these additional amounts with sufficient specificity to make clear the basis for the claimed amount."
+    p "If a claim is secured by a security interest in the property of the debtor and the debtor defaulted on the claim prior to the filing of the petition, the proof of claim must be accompanied by a statement of the amount required to cure the prepetition default."
+    p "If the claim is secured by a security interest in the debtor’s principal residence, the proof of claim must be accompanied by the attachment prescribed by the appropriate Official Form. In that attachment, the holder of the claim must provide the information required by subparagraphs (A) and (B) of this paragraph (2). In addition, if an escrow account has been established in connection with the claim, an escrow account statement showing the account balance, and any amount owed, as of the date the petition was filed must be submitted in accordance with subparagraph (C). The statement must be prepared in a form consistent with the requirements of nonbankruptcy law. See, e.g., 12 U.S.C. § 2601 et seq. (Real Estate Settlement Procedure Act). Thus the holder of the claim may provide the escrow account statement using the same form it uses outside of bankruptcy for this purpose."
+    p "Subparagraph (D) of subdivision (c)(2) sets forth sanctions that the court may impose on a creditor in an individual debtor case that fails to provide information required by subdivision (c). Failure to provide the required information does not itself constitute a ground for disallowance of a claim. See § 502(b) of the Code. But when an objection to the allowance of a claim is made or other litigation arises concerning the status or treatment of a claim, if the holder of that claim has not complied with the requirements of this subdivision, the court may preclude it from presenting as evidence any of the omitted information, unless the failure to comply with this subdivision was substantially justified or harmless. The court retains discretion to allow an amendment to a proof of claim under appropriate circumstances or to impose a sanction different from or in addition to the preclusion of the introduction of evidence."
+    p "Changes Made After Publication."
+    p "Subdivision (c)(1). The requirement that the last account statement sent to the debtor be filed with the proof of claim was deleted."
+    p "Subdivision (c)(2). In subparagraph (C), a provision was added requiring the use of the appropriate Official Form for the attachment filed by a holder of a claim secured by a security interest in a debtor’s principal residence."
+    p "In subdivision (c)(2)(D), the clause “the holder shall be precluded” was deleted, and the provision was revised to state that “the court may, after notice and hearing, take either or both” of the specified actions."
+    p "Committee Note. In the discussion of subdivision (c)(2), the term “security interest” was added to the sentence that discusses the required filing of a statement of the amount necessary to cure a prepetition default."
+    p "The discussion of subdivision (c)(2)(D) was expanded to clarify that failure to provide required documentation, by itself, is not a ground for disallowance of a claim and that the court has several options in responding to a creditor’s failure to provide information required by subdivision (c)."
+    p "Other changes. Stylistic changes were made to the rule and the Committee Note."
+    hash "caade8a1662c10db62f2d14b762a80f1ca793e63708187578b609d5e9ba7aab3"
+  }
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2012 Amendment"
+    p "Subdivision (c). Subdivision (c) is amended in several respects. The former requirement in paragraph (1) to file an original or duplicate of a supporting document is amended to reflect the current practice of filing only copies. The proof of claim form instructs claimants not to file the original of a document because it may be destroyed by the clerk’s office after scanning."
+    p "Subdivision (c) is further amended to add paragraph (3). Except with respect to claims secured by a security interest in the debtor’s real property (such as a home equity line of credit), paragraph (3) specifies information that must be provided in support of a claim based on an open-end or revolving consumer credit agreement (such as an agreement underlying the issuance of a credit card). Because a claim of this type may have been sold one or more times prior to the debtor’s bankruptcy, the debtor may not recognize the name of the person filing the proof of claim. Disclosure of the information required by paragraph (3) will assist the debtor in associating the claim with a known account. It will also provide a basis for assessing the timeliness of the claim. The date, if any, on which the account was charged to profit and loss (“charge-off” date) under subparagraph (A)(v) should be determined in accordance with applicable standards for the classification and account management of consumer credit. A proof of claim executed and filed in accordance with subparagraph (A), as well as the applicable provisions of subdivisions (a), (b), (c)(2), and (e), constitutes prima facie evidence of the validity and amount of the claim under subdivision (f)."
+    p "To the extent that paragraph (3) applies to a claim, paragraph (1) of subdivision (c) is not applicable. A party in interest, however, may obtain the writing on which an open-end or revolving consumer credit claim is based by requesting in writing that documentation from the holder of the claim. The holder of the claim must provide the documentation within 30 days after the request is sent. The court, for cause, may extend or reduce that time period under Rule 9006."
+    p "Changes Made After Publication."
+    p "Subdivision (c)(1). The requirement for the attachment of a writing on which a claim is based was changed to require that a copy, rather than the original or a duplicate, of the writing be provided."
+    p "Subdivision (c)(3). An exception to subparagraph (A) was added for open-end or revolving consumer credit agreements that are secured by the debtor’s real property."
+    p "A time limit of 30 days for responding to a written request under subparagraph (B) was added."
+    p "Committee Note. A statement was added to clarify that if a proof of claim complies with subdivision (c)(3)(A), as well as with subdivisions (a), (b), (c)(2), and (e), it constitutes prima facie evidence of the validity and amount of the claim under subdivision (f)."
+    p "Other changes. Stylistic changes were also made to the rule."
+    hash "702e7a54fb9d7bb745f726ae9f6bd60376644aa5380acde12f335d7b13b519e4"
+  }
+  note "/us/usc/ptIII/rule3001/note/ungrouped/pl.98.353/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of most provisions in Rule 3001 have been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only. Rule 3001(g) has not been restyled (except to add a title) because it was enacted by Congress, " ["P.L. 98–353" -> "/us/pl/98/353"] ", " ["98 Stat. 361" -> "/us/stat/98/361"] ", Sec. 354 (1984). The Bankruptcy Rules Enabling Act, 28 U.S.C. § 2075, provides no authority to modify statutory language."
+    hash "7318d9c7155c25f2198eecf74fc06214fb07f62704104db97d474d125121ebb1"
+  }
+  note "/us/usc/ptIII/rule3001/note/ungrouped/act.1916-08-11.ch313/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The United States Warehouse Act, referred to in subd. (g), is Part C of " ["act Aug. 11, 1916, ch. 313" -> "/us/act/1916-08-11/ch313"] ", " ["39 Stat. 486" -> "/us/stat/39/486"] ", which is classified generally to chapter 10 (§ 241 et seq.) of Title 7, Agriculture. For complete classification of this Act to the Code, see Short Title note set out under " ["section 241 of Title 7" -> "/us/usc/t7/s241"] " and Tables."
+    hash "32d5d4d35c91f0553aeff37d17e69c74120337422220db09f99ad0be574978a8"
+  }
+  note "/us/usc/ptIII/rule3001/note/ungrouped/pl.98.353/amendment-by-public-law" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Amendment by Public Law"
+    p "1984—Subd. (g). " ["Pub. L. 98–353" -> "/us/pl/98/353"] " added subd. (g)."
+    hash "4579fb17c5e28566afeb15682bbab340ae2fa71474b3c655036a8d3b908912dd"
+  }
+  note "/us/usc/ptIII/rule3001/note/ungrouped/pl.98.353/effective-date-of-1984-amendment" enacted {
+    group ungrouped
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1984 Amendment"
+    p "Amendment by " ["Pub. L. 98–353" -> "/us/pl/98/353"] " effective with respect to cases filed 90 days after July 10, 1984, see " ["section 552(a) of Pub. L. 98–353" -> "/us/pl/98/353/s552/a"] ", set out as a note under " ["section 101 of this title" -> "/us/usc/t11/s101"] "."
+    hash "ce0d3f0532a1eb696f487e052457b2f07ca42e506eec33fe1e8e762fc8a0e5a2"
+  }
+  layers {
+    operative "af074ecee23495966375743cd971f39adab7d0ffc5c5dbf930c5d92dd361ff60"
+    enacted "1189075e247eb3daac3aaf9f5aae5622c20cdc84ad23dd1275ebfefdef7b98f1"
+    editorial "d9c747670fca0c58efddd888560d46adc5b1df7c156d1a42387c437ec5a69404"
+  }
+}

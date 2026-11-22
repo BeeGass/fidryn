@@ -1,0 +1,49 @@
+edition 2
+module "/us/usc/ptVII/rule7013" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7013" courtRule {
+    num "7013" "Rule 7013."
+    heading "Counterclaim and Crossclaim"
+    chapeau "Fed. R. Civ. P. 13 applies in an adversary proceeding. But a party sued by a trustee or debtor in possession need not state as a counterclaim any claim the party has against the debtor, the debtor’s property, or the estate, unless the claim arose after the order for relief. If, through oversight, inadvertence, or excusable neglect, a trustee or debtor in possession fails to plead a counterclaim—or when justice so requires—the court may permit the trustee or debtor in possession to:"
+    provision "/us/usc/ptVII/rule7013/a" subsection {
+      num "a" "(a)"
+      content "amend the pleading; or"
+      hash "84d5f5461fcd4aec32d5b10fa7606a68c104f291a4694e1022679b7ad0a8851c"
+    }
+    provision "/us/usc/ptVII/rule7013/b" subsection {
+      num "b" "(b)"
+      content "commence a new adversary proceeding or separate action."
+      hash "41a2a568ee9a0cb8054d2ca41f7d5b8ce86210ca77207bfa582a9a4ffcc37c84"
+    }
+    hash "4f644ff5c31d64c09e352f874c9c8530a8fb810f1adca09cd4178d4bb1a1fda7"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Rule 13(h) F.R.Civ.P. refers to Rule 19 F.R.Civ.P. Pursuant to Rule 7002 this reference is to Rule 19 F.R.Civ.P. as incorporated and modified by Rule 7019."
+    hash "1b67358f99a1a4d4d9d4d0ed7a2cd0dda3716a26df7792eb596b945be7c9790a"
+  }
+  note "/us/usc/ptVII/rule7013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7013 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "2f449e44c5b2174609bb348e50fcbf46374a6a7a8d9168df2dc290c02cf6ed99"
+  }
+  note "/us/usc/ptVII/rule7013/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "4f644ff5c31d64c09e352f874c9c8530a8fb810f1adca09cd4178d4bb1a1fda7"
+    enacted "d40afd37e6a2d7a4221a3cadd1c309c9c2a5955d371ad2f251c56f79adfb7339"
+    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+  }
+}

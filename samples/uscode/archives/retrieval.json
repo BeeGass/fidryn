@@ -1,0 +1,30 @@
+{
+  "schema": "fidryn.retrieval/v0.1",
+  "release": "119-142",
+  "archives": [
+    {
+      "file": "xml_usc01@119-142.zip",
+      "url": "https://uscode.house.gov/download/releasepoints/us/pl/119/142/xml_usc01@119-142.zip",
+      "retrieved_at": "2026-11-17T18:44:23Z",
+      "bytes": 42241,
+      "sha256": "e54272bf8ad175992759ed6bf5cd30cf93c2c8ddc5501ba8c4992da8b929d618",
+      "blake3": "db2a1d5877cda7613a5f190aae5ea9d87c06024d56f107613103fc6a5f530eed"
+    },
+    {
+      "file": "xml_usc11a@119-142.zip",
+      "url": "https://uscode.house.gov/download/releasepoints/us/pl/119/142/xml_usc11a@119-142.zip",
+      "retrieved_at": "2026-11-17T18:44:24Z",
+      "bytes": 375834,
+      "sha256": "edb9e509f8c076462c4d72c5a6378ba1417266312c92cea3c10f570eece08501",
+      "blake3": "a6acf19b94bd9d39fabdf9226b0507fe201d8ece077a3bdb989aa0295c4dba6e"
+    },
+    {
+      "file": "xml_usc45@119-142.zip",
+      "url": "https://uscode.house.gov/download/releasepoints/us/pl/119/142/xml_usc45@119-142.zip",
+      "retrieved_at": "2026-11-17T18:44:24Z",
+      "bytes": 524586,
+      "sha256": "74e49fdc18e01b0505de5370d6a125153f6e6b804d09dee132ed18dbdb733187",
+      "blake3": "e02953355ad93c7180d436d108fe407c6502d930fe1f1e1d54b06c4adcf0cd66"
+    }
+  ]
+}

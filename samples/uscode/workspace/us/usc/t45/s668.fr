@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s668" {
+  within "/us/usc/t45/ch15"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s668" section {
+    num "668" "§ 668."
+    heading "Guarantee fees; amount; deposit"
+    content "The Secretary shall prescribe a guarantee fee in connection with each loan guaranteed under this chapter which shall be collected from the railroad upon repayment of the loan guaranteed. Such fee shall be in an amount that the Secretary estimates to be necessary to cover the administrative costs of carrying out the provisions of this chapter with respect to such loan. Sums realized from such fees shall be deposited in the Treasury as miscellaneous receipts."
+    hash "7c7ce3c0e0862545bafcb27f31958ea37fcd80ce526fc45bf67e609a7240fa8b"
+  }
+  credit "(" ["Pub. L. 91–663, § 9" -> "/us/pl/91/663/s9"] ", Jan. 8, 1971, " ["84 Stat. 1978" -> "/us/stat/84/1978"] ".)"
+  layers {
+    operative "7c7ce3c0e0862545bafcb27f31958ea37fcd80ce526fc45bf67e609a7240fa8b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e0907e0f21463adee43d5c20e92eab77a46b50c09bee4b8b289e61240590ea68"
+  }
+}

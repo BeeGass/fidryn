@@ -1,0 +1,35 @@
+edition 2
+module "/us/usc/ptIII/rule3008" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3008" courtRule {
+    num "3008" "Rule 3008."
+    heading "Reconsidering an Order Allowing or Disallowing a Claim"
+    content "A party in interest may move to reconsider an order allowing or disallowing a claim. After notice and a hearing, the court must issue an appropriate order."
+    hash "ccbbaecf0c3ecad5baae858b7df31efdd511b866c72fcddc3ca13a89d9755920"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Section 502(j) of the Code deals only with the reconsideration of allowed claims as did former § 57k of the Act and General Order 21(b). It had sometimes been held that a referee had no jurisdiction to reconsider a disallowed claim, or the amount or priority of an allowed claim, at the instance of the claimant. See, e.g., In re Gouse, 7 F. Supp. 106 (M.D. Pa. 1934); In re Tomlinson & Dye, Inc., 3 F. Supp. 800 (N.D. Okla. 1933). This view disregarded § 2a(2) of the Act and the “ancient and elementary power” of a referee as a court to reconsider orders. In re Pottasch Brow. Co., Inc., 79 F.2d 613, 616 (2d Cir. 1935); Castaner v. Mora, 234 F.2d 710 (1st Cir. 1956). This rule recognizes, as did former Bankruptcy Rule 307, the power of the court to reconsider an order of disallowance on appropriate motion."
+    p "Reconsideration of a claim that has been previously allowed or disallowed after objection is discretionary with the court. The right to seek reconsideration of an allowed claim, like the right to object to its allowance, is generally exercised by the trustee if one has qualified and is performing the duties of that office with reasonable diligence and fidelity. A request for reconsideration of a disallowance would, on the other hand, ordinarily come from the claimant."
+    p "A proof of claim executed and filed in accordance with the rules in this Part III is prima facie evidence of the validity and the amount of the claim notwithstanding a motion for reconsideration of an order of allowance. Failure to respond does not constitute an admission, though it may be deemed a consent to a reconsideration. In re Goble Boat Co., 190 Fed. 92 (N.D.N.Y. 1911). The court may decline to reconsider an order of allowance or disallowance without notice to any adverse party and without affording any hearing to the movant. If a motion to reconsider is granted, notice and hearing must be afforded to parties in interest before the previous action in the claim taken in respect to the claim may be vacated or modified. After reconsideration, the court may allow or disallow the claim, increase or decrease the amount of a prior allowance, accord the claim a priority different from that originally assigned it, or enter any other appropriate order."
+    p "The rule expands § 502(j) which provides for reconsideration of an allowance only before the case is closed. Authorities have disagreed as to whether reconsideration may be had after a case has been reopened. Compare 3 Collier Bankruptcy ¶57.23[4] (14th ed. 1964), see generally 3 id. ¶502.10 (15th ed. 1979), with 2 Remington, Bankruptcy 498 (Henderson ed. 1956). If a case is reopened as provided in § 350(b) of the Code, reconsideration of the allowance or disallowance of a claim may be sought and granted in accordance with this rule."
+    hash "556e0e6ffbe511517d3437c49f832fedb0d100b5478964c6447230047d651ead"
+  }
+  note "/us/usc/ptIII/rule3008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3008 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "3e6b37e9dff7fcaf19e79073df7ba2bc1988851de34fc565f4e03863a1846337"
+  }
+  layers {
+    operative "ccbbaecf0c3ecad5baae858b7df31efdd511b866c72fcddc3ca13a89d9755920"
+    enacted "256fbf54dbaaded6f7bc6ca03ac2d6d3d7a50ddce4daef6b64c1fc8e13453b8d"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

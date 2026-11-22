@@ -1,0 +1,20 @@
+edition 2
+module "/us/usc/t45/ch16/schVI" {
+  within "/us/usc/t45/ch16"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch16/schVI" subchapter {
+    num "VI" "SUBCHAPTER VI—"
+    heading "MISCELLANEOUS PROVISIONS"
+    member "/us/usc/t45/s791"
+    member "/us/usc/t45/s792"
+    member "/us/usc/t45/s793"
+    member "/us/usc/t45/s794"
+    hash "a7d8acf15b6c36d606fff42cf48b0ac73a601857d5401d4deca70773ccb56dd7"
+  }
+  layers {
+    operative "a7d8acf15b6c36d606fff42cf48b0ac73a601857d5401d4deca70773ccb56dd7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

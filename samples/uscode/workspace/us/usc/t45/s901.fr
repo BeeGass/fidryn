@@ -1,0 +1,127 @@
+edition 2
+module "/us/usc/t45/s901" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s901" section {
+    num "901" "§ 901."
+    heading "Congressional findings"
+    provision "/us/usc/t45/s901/a" subsection {
+      num "a" "(a)"
+      chapeau "Congress hereby finds that—"
+      provision "/us/usc/t45/s901/a/1" paragraph {
+        num "1" "(1)"
+        content "the severe operating losses and the deteriorating plant and equipment of the Milwaukee Railroad threaten to cause cessation of its operations in the near future;"
+        hash "ce322f054334c9c1392aadee3f28ddcb233b7b874b2b9897fcfa06eb1085f828"
+      }
+      provision "/us/usc/t45/s901/a/2" paragraph {
+        num "2" "(2)"
+        content "a cessation of operations by the Milwaukee Railroad would have serious repercussions on the economies of the States in which such railroad principally operates (the States of Washington, Montana, Idaho, North Dakota, South Dakota, Illinois, Iowa, Missouri, Michigan, Indiana, Minnesota, and Wisconsin);"
+        hash "9ddfc54bd7ebb512ed01663fae9eb61717279554ecbf859a75c77332a45f76de"
+      }
+      provision "/us/usc/t45/s901/a/3" paragraph {
+        num "3" "(3)"
+        content "a cessation of operations of the Milwaukee Railroad would result in the loss of many thousands of jobs of railroad workers and other workers whose employment is dependent upon rail service over the lines presently operated by the Milwaukee Railroad;"
+        hash "68a340da35ed9098776f0cfd3275f322b4ea71d8d0a2c350956dc987242adbf1"
+      }
+      provision "/us/usc/t45/s901/a/4" paragraph {
+        num "4" "(4)"
+        content "experienced railroad employees make a valuable contribution toward strengthening the railroad industry; and other railroads have the ability and willingness to employ displaced employees of the Milwaukee Railroad;"
+        hash "7510350d728b09abaefef8073680467c9469e867d5ffab02e9b20dc24fb0fea4"
+      }
+      provision "/us/usc/t45/s901/a/5" paragraph {
+        num "5" "(5)"
+        content "the ownership by employees or by employees and shippers of part or all of the Milwaukee Railroad may be a valuable tool in reorganization and should be given serious consideration;"
+        hash "0ae47e4691a65050a235bf38bf13fe31a16b822f94610c2e24896c11404ad838"
+      }
+      provision "/us/usc/t45/s901/a/6" paragraph {
+        num "6" "(6)"
+        content "cessation of essential transportation services by the Milwaukee Railroad would endanger the public welfare;"
+        hash "95c5529c05d91ddd3c9800c2482eea3ba1fc8c45e0e206b2e7ca71a435a27e60"
+      }
+      provision "/us/usc/t45/s901/a/7" paragraph {
+        num "7" "(7)"
+        content "cessation of such services is imminent; and"
+        hash "3d07db0fc38df41618a47a750da13b933dba289b01b1832e408e17feabdc2da9"
+      }
+      provision "/us/usc/t45/s901/a/8" paragraph {
+        num "8" "(8)"
+        content "there is no other practicable means of obtaining funds to meet payroll and other expenses necessary for continuation of services and reorganization of the Milwaukee Railroad."
+        hash "1c46ee9db6f3b4613537ee408c56e77e49fd878df3f86b2b86c2af618e8f26ef"
+      }
+      hash "ae9f80595ce45375a09fae75500376734e4c0ad1a04e3263f1e3229a1f718f3b"
+    }
+    provision "/us/usc/t45/s901/b" subsection {
+      num "b" "(b)"
+      content "The Congress declares that emergency measures set forth in this chapter must be taken to restructure the Milwaukee Railroad and to avoid the potential unemployment and damage to the economy of the region and of the Nation which a cessation of essential services by the Milwaukee Railroad would otherwise cause."
+      hash "b1364e059db64411e9526d6731dd4091c45c32821ebfc15ffc25d7be022f057e"
+    }
+    hash "8b2410da153f12cd34205491c231ff766170caa3266cbd001be5554eea0a1b6f"
+  }
+  credit "(" ["Pub. L. 96–101, § 2" -> "/us/pl/96/101/s2"] ", Nov. 4, 1979, " ["93 Stat. 736" -> "/us/stat/93/736"] ".)"
+  note "/us/usc/t45/s901/note/editorialNotes/pl.96.101/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This chapter, referred to in subsec. (b), was in the original “this Act”, meaning " ["Pub. L. 96–101" -> "/us/pl/96/101"] ", Nov. 4, 1979, " ["93 Stat. 736" -> "/us/stat/93/736"] ", known as the Milwaukee Railroad Restructuring Act, which enacted this chapter and amended sections 231f, 662, 721, former section 821, and " ["section 825 of this title" -> "/us/usc/t45/s825"] ". For complete classification of this Act to the Code, see Short Title note set out below and Tables."
+    hash "1a1ef7c8669a88720361a9504719203b304107723592428afc8de8fed03a4bc7"
+  }
+  note "/us/usc/t45/s901/note/statutoryNotes/pl.97.468/short-title-of-1983-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 1983 Amendment"
+    p ["Pub. L. 97–468, title II, § 201" -> "/us/pl/97/468/tII/s201"] ", Jan. 14, 1983, " ["96 Stat. 2543" -> "/us/stat/96/2543"] ", provided that:"
+    quoted "/us/pl/97/468/tII/s201" {
+      p "“This title [amending sections 797c, 907, 913, 915, 1004, 1005, 1007, 1014, and 1017 of this title, repealing " ["section 1008 of this title" -> "/us/usc/t45/s1008"] " and enacting provisions set out as notes under this section] may be referred to as the ‘Bankrupt Railroad Service Preservation and Employee Protection Act of 1982’.”"
+    }
+    hash "41618484ea9bdf9fab485535a642b383ebdee3635b52c7f00a0b56fa8f2450ad"
+  }
+  note "/us/usc/t45/s901/note/statutoryNotes/pl.96.101/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p ["Pub. L. 96–101, § 1" -> "/us/pl/96/101/s1"] ", Nov. 4, 1979, " ["93 Stat. 736" -> "/us/stat/93/736"] ", provided:"
+    quoted "/us/pl/96/101/s1" {
+      p "“That this Act [enacting this chapter and amending sections 231f, 662, 721, 821, and 825 of this title] may be cited as the ‘Milwaukee Railroad Restructuring Act’.”"
+    }
+    hash "784302c12c072d1f99053bc9fe50f8f8681ac6668e19baa42629fc85fe9c3d1c"
+  }
+  note "/us/usc/t45/s901/note/statutoryNotes/pl.97.468/statement-of-purpose" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Statement of Purpose"
+    p ["Pub. L. 97–468, title II" -> "/us/pl/97/468/tII"] ", subtitle A, § 211, Jan. 14, 1983, " ["96 Stat. 2543" -> "/us/stat/96/2543"] ", provided that:"
+    quoted "/us/pl/97/468/tII" {
+      p "“It is the purpose of this subtitle [amending sections 915 and 1017 of this title and enacting provisions set out as notes under this section] to continue the effort by Congress to assure service over the lines of rail carriers subject to liquidation in instances where rail carriers are willing to provide service over such lines and financially responsible persons are willing to purchase the lines for continued rail operations.”"
+    }
+    hash "bc4d058c2b96d4b4e93eca46b3f83e251f40e24cfa0b5f5e81759b4424fc81c8"
+  }
+  note "/us/usc/t45/s901/note/statutoryNotes/pl.97.468/congressional-findings" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Congressional Findings"
+    p ["Pub. L. 97–468, title II, § 212" -> "/us/pl/97/468/tII/s212"] ", Jan. 14, 1983, " ["96 Stat. 2543" -> "/us/stat/96/2543"] ", provided that:"
+    quoted "/us/pl/97/468/tII/s212" {
+      p "“The Congress finds that—"
+      level paragraph {
+        num "1" "“(1)"
+        content "it is necessary to establish procedures to facilitate and expedite the acquisition of rail lines of carriers subject to liquidation by financially responsible persons in instances where service is not being provided over the line by the carrier and where the financially responsible person seeks to provide rail service over the line;"
+      }
+      level paragraph {
+        num "2" "“(2)"
+        content "procedures set forth in the amendments made by this title [see Short Title of 1983 Amendment note above] represent an exercise of the powers of the Congress under the Constitution to regulate commerce among the several States which will provide a practicable means for preserving rail service, thus benefiting shippers, employees, and the economies of the States in which such carriers subject to liquidation have operated service, and for facilitating interstate commerce, while at the same time providing safeguards to protect the interest of the estates of such carriers by requiring compensation which is not less than the constitutionally required minimum; and"
+      }
+      level paragraph {
+        num "3" "“(3)"
+        content "it is in the public interest that the Interstate Commerce Commission’s authority to issue orders involving temporary authority to operate service over lines of carriers subject to liquidation be clarified.”"
+      }
+    }
+    p "[Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ".]"
+    hash "3f8121a707c61bd755f8ebf05f87c7b3386b5cefedb34d0bdfd0753d3a8dd94b"
+  }
+  layers {
+    operative "8b2410da153f12cd34205491c231ff766170caa3266cbd001be5554eea0a1b6f"
+    enacted "1e3da37ab1df8d66d72ca33ac7366f71d10145a845402cd485ca42bf73e759d7"
+    editorial "bcf8a73567b0a5886ace23cd0b2ba8e8fac29f0f0560d974cf12af1a7ec16c80"
+  }
+}

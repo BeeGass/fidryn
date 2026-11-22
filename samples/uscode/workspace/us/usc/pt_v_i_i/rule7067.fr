@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/ptVII/rule7067" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7067" courtRule {
+    num "7067" "Rule 7067."
+    heading "Deposit into Court"
+    content "Fed. R. Civ. P. 67 applies in an adversary proceeding."
+    hash "4549ec5501eb68695d39013f59fa274fa3073c89733ade309d634d4a75c8730d"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7067/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7067 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "bfbb177e8ec90bd5427dfd3626146da90bfe9712b6c2f3a0a10b2f4d25e02660"
+  }
+  note "/us/usc/ptVII/rule7067/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "4549ec5501eb68695d39013f59fa274fa3073c89733ade309d634d4a75c8730d"
+    enacted "dd1b0bf895f9497075e66b810ce369a8165e94c65e1f9ce3334d4a4b6eceb531"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

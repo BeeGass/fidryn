@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s1008" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1008" section {
+    num "1008" "§ 1008."
+    heading "Repealed. " ["Pub. L. 97–468, title II, § 234(a)" -> "/us/pl/97/468/tII/s234/a"] ", Jan. 14, 1983, " ["96 Stat. 2547" -> "/us/stat/96/2547"]
+    status repealed
+    hash "dc7d539e891bf203723eb8935cc2e6e409624369096ad0cec220380c5445cd98"
+  }
+  note "/us/usc/t45/s1008/note/ungrouped/pl.96.254/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 96–254, title I, § 110" -> "/us/pl/96/254/tI/s110"] ", May 30, 1980, " ["94 Stat. 403" -> "/us/stat/94/403"] "; " ["Pub. L. 96–448, title VII, § 701(a)(2)" -> "/us/pl/96/448/tVII/s701/a/2"] ", Oct. 14, 1980, " ["94 Stat. 1959" -> "/us/stat/94/1959"] ", related to authorization, etc., for obligation guarantees."
+    hash "677a5870fae66bc5e7b9d0c6146bdeba36b19e236f0d5184e55dd46626e999a6"
+  }
+  layers {
+    operative "dc7d539e891bf203723eb8935cc2e6e409624369096ad0cec220380c5445cd98"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3358a033bbf83c1ad3f3afc718dbfc5c7023347833e15794b717a8d99ad53d83"
+  }
+}

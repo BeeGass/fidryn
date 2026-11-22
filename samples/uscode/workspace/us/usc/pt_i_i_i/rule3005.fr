@@ -1,0 +1,74 @@
+edition 2
+module "/us/usc/ptIII/rule3005" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3005" courtRule {
+    num "3005" "Rule 3005."
+    heading "Filing a Proof of Claim or Accepting or Rejecting a Plan by a Surety, Endorser, Guarantor, or Other Codebtor"
+    provision "/us/usc/ptIII/rule3005/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content "If a creditor fails to file a proof of claim within the time prescribed by Rule 3002(c) or Rule 3003(c), it may be filed by an entity that, along with the debtor, is or may be liable to the creditor or has given security for the creditor’s debt. The entity must do so within 30 days after the creditor’s time to file expires. A distribution on such a claim may be made only on satisfactory proof that the distribution will diminish the original debt."
+      hash "dd7156613ccce550b656aa5cdf96881b3e61f27f24b60105a17f4f4e36cecbfa"
+    }
+    provision "/us/usc/ptIII/rule3005/b" subsection {
+      num "b" "(b)"
+      heading "Accepting or Rejecting a Plan in a Creditor’s Name."
+      chapeau "An entity that has filed a proof of claim on a creditor’s behalf under (a) may accept or reject a plan in the creditor’s name. If the creditor’s name is unknown, the entity may do so in its own name. But the creditor must be substituted for the entity on that claim if the creditor:"
+      provision "/us/usc/ptIII/rule3005/b/1" paragraph {
+        num "1" "(1)"
+        content "files a proof of claim within the time permitted by Rule 3003(c); or"
+        hash "4214854c5580b9c73d7a1836134b20dcefc4ad9f11128bbf02a502a7b1a68b40"
+      }
+      provision "/us/usc/ptIII/rule3005/b/2" paragraph {
+        num "2" "(2)"
+        content "files notice, before the plan is confirmed, of an intent to act on the creditor’s own behalf."
+        hash "d23257e7b14893e65f3a32f52c0e2ff31784a15ee10eba2dea19f8d086b38a95"
+      }
+      hash "0e8d90a46513afd7636577e22b9cf452361cf8feda8120747aa41e180305a9d3"
+    }
+    hash "ddc740efe04109a12c89bb60307b679a7ce137ad756416a65f65fbd3451dd5fd"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Rules 304 and 10–402. Together with § 501(b) of the Code, the rule makes clear that anyone who may be liable on a debt of the debtor, including a surety, guarantor, indorser, or other codebtor, is authorized to file in the name of the creditor of the debtor."
+    p "Subdivision (a). Rule 3002(c) provides the time period for filing proofs of claim in chapter 7 and 13 cases; Rule 3003(c) provides the time, when necessary, for filing claims in a chapter 9 or 11 case."
+    p "Subdivision (b). This subdivision applies in chapter 9 and 11 cases as distinguished from chapter 7 cases. It permits voting for or against a plan by an obligor who files a claim in place of the creditor."
+    hash "f1bf2f505bd52fbc68960e686146bb36bfc4ce8b84c58fe268e714b92825350a"
+  }
+  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "The words “with the court” in subdivision (b) are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
+    hash "0b0be67f86629a4e5d80b571bf7af5e18cff97f879c4b891034fe14bf4d5d427"
+  }
+  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2005 Amendment"
+    p "The rule is amended to delete the last sentence of subdivision (a). The sentence is unnecessary because if a creditor has filed a timely claim under Rule 3002 or 3003(c), the codebtor cannot file a proof of such claim. The codebtor, consistent with § 501(b) of the Code, may file a proof of such claim only after the creditor’s time to file has expired. Therefore, the rule no longer permits the creditor to file a superseding claim. The rule leaves to the courts the issue of whether to permit subsequent amendment of the proof of claim."
+    p "The amendment conforms the rule to § 501(b) by deleting language providing that the codebtor files proof of the claim in the name of the creditor."
+    p "Other amendments are stylistic."
+    p "Changes Made After Publication and Comment:"
+    p "(a) The reference on line 2 of Rule 3005 to “Rule 3002 or 3003(c)” was changed to read “Rule 3002(c) or 3003(c)” to make it parallel to the language in Rule 3004."
+    p "(b) The phrase “file a proof of the claim” from line 7 of the proposed rule was moved up to line 4 of the proposed amendment immediately after the word “may”. This makes the structure of Rules 3004 and 3005 more consistent."
+    hash "670c33bc764653801aaca24cc3606a6aad58f59817c842de75abb43d5a295de2"
+  }
+  note "/us/usc/ptIII/rule3005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3005 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "250af599ae0d90939db596fbb7ed403cc91b3a4c3d2d24bbc790f3cbb8ee809c"
+  }
+  layers {
+    operative "ddc740efe04109a12c89bb60307b679a7ce137ad756416a65f65fbd3451dd5fd"
+    enacted "33f39b25d0ff114e28886524f2f3575cfbddcc2d03e1f4a0b3708f3823b36a0c"
+    editorial "b33e4704e90c2e89903581052e264905ab9c58475d4c7a6bfea2d3782fb9d3a3"
+  }
+}

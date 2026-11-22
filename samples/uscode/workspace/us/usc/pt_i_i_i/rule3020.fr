@@ -1,0 +1,167 @@
+edition 2
+module "/us/usc/ptIII/rule3020" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3020" courtRule {
+    num "3020" "Rule 3020."
+    heading "In a Chapter 11 Case, Depositing Funds Before the Plan is Confirmed; Confirmation in a Chapter 9 or 11 Case"
+    provision "/us/usc/ptIII/rule3020/a" subsection {
+      num "a" "(a)"
+      heading "Chapter 11—Depositing Funds Before the Plan is Confirmed."
+      content "Before a plan is confirmed in a Chapter 11 case, the court may order that the consideration required to be distributed upon confirmation be deposited with the trustee or debtor in possession. Any funds deposited must be kept in a special account established for the sole purpose of making the distribution."
+      hash "4127d09b0483d19b3cf4c4787c53a23848642705da1d3e9b85a72f740c40a311"
+    }
+    provision "/us/usc/ptIII/rule3020/b" subsection {
+      num "b" "(b)"
+      heading "Chapter 9 or 11—Objecting to Confirmation; Confirmation Hearing."
+      provision "/us/usc/ptIII/rule3020/b/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "Objecting to Confirmation. In a Chapter 9 or 11 case, an objection to confirmation is governed by Rule 9014. The objection must be filed and served within the time set by the court and be served on:"
+          p "• the debtor;"
+          p "• the trustee;"
+          p "• the plan proponent;"
+          p "• any appointed committee; and"
+          p "• any other entity the court designates."
+        }
+        hash "b31ece8b48440afb3113910b54789ee45141f554ed9aba4928b22245243cbac8"
+      }
+      provision "/us/usc/ptIII/rule3020/b/2" paragraph {
+        num "2" "(2)"
+        content "Copy to the United States Trustee. In a Chapter 11 case, the objecting party must send a copy of the objection to the United States trustee within the time set to file an objection."
+        hash "d1ada1494ec0ccc967ef74f19d1af1f501b0e20fe0e2e4807489c1e6eaf90561"
+      }
+      provision "/us/usc/ptIII/rule3020/b/3" paragraph {
+        num "3" "(3)"
+        content "Hearing on the Objection; Procedure If No Objection Is Filed. After notice and a hearing as provided in Rule 2002, the court must rule on confirmation. If no objection is timely filed, the court may, without receiving evidence, determine that the plan was proposed in good faith and not by any means forbidden by law."
+        hash "5e31828bc8e5e17032604ee71d02c9faea542e35a2aaa5456051190fa7865964"
+      }
+      hash "a31b8d2eccf7cd3e7b51f580b025606f87daa9ed2a8d28ea9b3ba09adcc8d1bf"
+    }
+    provision "/us/usc/ptIII/rule3020/c" subsection {
+      num "c" "(c)"
+      heading "Confirmation Order."
+      provision "/us/usc/ptIII/rule3020/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "Form of the Order; Injunctive Relief. A confirmation order must conform to Form 315. If the plan provides for an injunction against conduct not otherwise enjoined under the Code, the order must:"
+        provision "/us/usc/ptIII/rule3020/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "describe the acts enjoined in reasonable detail;"
+          hash "82aa36e24d1835b09aadd8073058897b87b357fa09e51e9de08f5e35fe561bbb"
+        }
+        provision "/us/usc/ptIII/rule3020/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "be specific in its terms regarding the injunction; and"
+          hash "185985f13dcd3b31060d82ba8fcc293f117c28091a60dd811cf52a8f7f09206b"
+        }
+        provision "/us/usc/ptIII/rule3020/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "identify the entities subject to the injunction."
+          hash "6dc13371f813e0b0ecdb85584719f6387849c02a31fb0be248f5928ed19b85a8"
+        }
+        hash "3f7e61181f680798599a3ec0d30c7412642a9a936b6b168ddd2af36576ff69ce"
+      }
+      provision "/us/usc/ptIII/rule3020/c/2" paragraph {
+        num "2" "(2)"
+        content {
+          p "Notice of Confirmation. Notice of entry of a confirmation order must be promptly mailed to:"
+          p "• the debtor;"
+          p "• the trustee;"
+          p "• creditors;"
+          p "• equity security holders;"
+          p "• other parties in interest; and"
+          p "• if known, identified entities subject to an injunction described in (1)."
+        }
+        hash "7674a0dcd4063dae7a691a3d1778dbe10c951fd8f38b79b4ca8b74c9da3d0cc6"
+      }
+      provision "/us/usc/ptIII/rule3020/c/3" paragraph {
+        num "3" "(3)"
+        content "Copy to the United States Trustee. In a Chapter 11 case, a copy of the order must be sent to the United States trustee under Rule 2002(k)."
+        hash "f89eb324b008a0617ae61abb1088b27557d642afc43fb592773c605f8ea1d02c"
+      }
+      hash "9179b181d7067b03ff4ad7a369820315181ab0ef6bf7e6b40ea970817e1093e6"
+    }
+    provision "/us/usc/ptIII/rule3020/d" subsection {
+      num "d" "(d)"
+      heading "Retained Power to Issue Future Orders Relating to Administration."
+      content "After a plan is confirmed, the court may continue to issue orders needed to administer the estate."
+      hash "024642170aefea6495d878953891a645e04515521f03193d9af1f06b9ce9d787"
+    }
+    provision "/us/usc/ptIII/rule3020/e" subsection {
+      num "e" "(e)"
+      heading "Staying a Confirmation Order."
+      content "Unless the court orders otherwise, a confirmation order is stayed for 14 days after its entry."
+      hash "5adc4885a6f0fac42743ebc5784e3d017c4ca9573ebc4f07fe2c118bebeba5df"
+    }
+    hash "132fbb97716323ffd1a75c19a7c947708c54d33374b221796ad906b736b952e6"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 23, 2001, eff. Dec. 1, 2001; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Rules 10–307, 11–38, and 13–213. It applies to cases filed under chapters 9, 11 and 13. Certain subdivisions of the earlier rules have not been included, such as, a subdivision revesting title in the debtor because § 541 of the Code does not transfer title out of the debtor as did § 70a of the Bankruptcy Act; see also §§ 1141(b), 1327(b). Subdivision (b) of former Rule 13–213 is not included because its provisions are contained in the statute; see §§ 1322, 1325(b) [now 1325(c)], 105."
+    p "Subdivision (a) gives discretion to the court to require in chapter 11 cases the deposit of any consideration to be distributed on confirmation. If money is to be distributed, it is to be deposited in a special account to assure that it will not be used for any other purpose. The Code is silent in chapter 11 with respect to the need to make a deposit or the person with whom any deposit is to be made. Consequently, there is no statutory authority for any person to act in a capacity similar to the disbursing agent under former Chapter XI practice. This rule provides that only the debtor in possession or trustee should be appointed as the recipient of the deposit. Any consideration other than money, e.g., notes or stock may be given directly to the debtor in possession or trustee and need not be left in any kind of special account. In chapter 9 cases, § 944(b) provides for deposit with a disbursing agent appointed by the court of any consideration to be distributed under the plan."
+    p "Subdivision (d) clarifies the authority of the court to conclude matters pending before it prior to confirmation and to continue to administer the estate as necessary, e.g., resolving objections to claims."
+    hash "a6a2d1e94eb9232758e32eb6ae3593d00803e4c2549509b05a66b96504ca83a6"
+  }
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "The United States trustee monitors chapter 11, chapter 12, and chapter 13 plans and has standing to be heard regarding confirmation of a plan. See 28 U.S.C. § 586(a)(3). The amendments to subdivisions (b)(1) and (c) of this rule facilitate that role of the United States trustee. Subdivision (b)(1) is also amended to require service on the proponent of the plan of objections to confirmation. The words “with the court” in subdivision (b)(1) are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
+    p "In a chapter 12 case, the court is required to conduct and conclude the hearing on confirmation of the plan within the time prescribed in § 1224 of the Code."
+    p "Subdivision (c) is also amended to require that the confirmation order be mailed to the trustee. Reference to the Official Form number is deleted in anticipation of future revision and renumbering of the Official Forms."
+    hash "4b9ab60c876af49abf015a01711a2df7c9647c865d0e92c59a34ac233e4f34bb"
+  }
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "This rule is amended to limit its application to chapter 9 and chapter 11 cases. The procedures relating to confirmation of plans in chapter 12 and chapter 13 cases are provided in Rule 3015. Other amendments are stylistic and make no substantive change."
+    hash "d1ae73df24f214b1892969ff3feda942dd734d9ccd8ed4f19fa4f073ff83b356"
+  }
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "Subdivision (e) is added to provide sufficient time for a party to request a stay pending appeal of an order confirming a plan under chapter 9 or chapter 11 of the Code before the plan is implemented and an appeal becomes moot. Unless the court orders otherwise, any transfer of assets, issuance of securities, and cash distributions provided for in the plan may not be made before the expiration of the 10-day period. The stay of the confirmation order under subdivision (e) does not affect the time for filing a notice of appeal from the confirmation order in accordance with Rule 8002."
+    p "The court may, in its discretion, order that Rule 3020(e) is not applicable so that the plan may be implemented and distributions may be made immediately. Alternatively, the court may order that the stay under Rule 3020(e) is for a fixed period less than 10 days."
+    p "GAP Report on Rule 3020. No changes since publication."
+    hash "0d787ce47479b99fc195b1675004e0ce3b8d8ca58fcff321216a3a191346c32e"
+  }
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2001 Amendment"
+    p "Subdivision (c) is amended to provide notice to an entity subject to an injunction provided for in a plan against conduct not otherwise enjoined by operation of the Code. This requirement is not applicable to an injunction contained in a plan if it is substantially the same as an injunction provided under the Code. The validity and effect of any injunction provided for in a plan are substantive law matters that are beyond the scope of these rules."
+    p "The requirement that the order of confirmation identify the entities subject to the injunction requires only reasonable identification under the circumstances. If the entities that would be subject to the injunction cannot be identified by name, the order may describe them by class or category if reasonable under the circumstances. For example, it may be sufficient to identify the entities as “all creditors of the debtor.”"
+    p "Changes Made After Publication and Comments. No changes were made in the text of the proposed amendments. The Committee Note was revised to put in a more prominent position the statement that the validity and effect of injunctions provided for in plans is beyond the scope of the rules."
+    hash "e4d62411675036d587007b2ddc9a5e8b396efe5bdb9ea2fdcfbdd72c44d3a7ce"
+  }
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptIII/rule3020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3020 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "511bd2fd852b1fb53ae1f05836b4057daa057115934e7a0754f0f2dd3ada52f3"
+  }
+  layers {
+    operative "132fbb97716323ffd1a75c19a7c947708c54d33374b221796ad906b736b952e6"
+    enacted "170850b8cc12466b92167b37ae0a6a9ef047d78d9fcbd1fea06cd553c1218492"
+    editorial "f2038d28ba770b7f743a978c3c500b3ad880364ab76e3f48e9fc15cff7113b4b"
+  }
+}

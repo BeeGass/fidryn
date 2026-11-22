@@ -1,0 +1,19 @@
+edition 2
+module "/us/usc/t45/ch22/schII" {
+  within "/us/usc/t45/ch22"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch22/schII" subchapter {
+    num "II" "SUBCHAPTER II—"
+    heading "CONRAIL"
+    member "/us/usc/t45/ch22/schII/ptA"
+    member "/us/usc/t45/ch22/schII/ptB"
+    member "/us/usc/t45/ch22/schII/ptC"
+    hash "02206056f0e6e86c8fe85fa8a995caeb0ec52a75057bfda14b424349ff3e4a3e"
+  }
+  layers {
+    operative "02206056f0e6e86c8fe85fa8a995caeb0ec52a75057bfda14b424349ff3e4a3e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

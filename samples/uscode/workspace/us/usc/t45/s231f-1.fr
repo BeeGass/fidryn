@@ -1,0 +1,53 @@
+edition 2
+module "/us/usc/t45/s231f–1" {
+  within "/us/usc/t45/ch9/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s231f–1" section {
+    num "231f–1" "§ 231f–1."
+    heading "Annual actuarial report"
+    chapeau "As part of the annual report required under " ["section 231u(a) of this title" -> "/us/usc/t45/s231u/a"] ", the Railroad Retirement Board shall submit to the Congress a report on the actuarial status of the railroad retirement system under various economic and employment assumptions. Such report shall include any recommendation for financing changes which might be advisable, including—"
+    provision "/us/usc/t45/s231f–1/1" paragraph {
+      num "1" "(1)"
+      content "any adjustment the Railroad Retirement Board recommends regarding the rates of taxes imposed by sections 3201(b), 3211(a)(2), and 3221(b) of the Internal Revenue Code of 1986 [" ["26 U.S.C. 3201(b)" -> "/us/usc/t26/s3201/b"] ", 3211(a)(2), 3221(b)], and"
+      hash "48b1254acd7918f640f18d5d60dc2b3be517f9d354bbd93ecd5f7b633faf042d"
+    }
+    provision "/us/usc/t45/s231f–1/2" paragraph {
+      num "2" "(2)"
+      chapeau "if there are sufficient reserves in the Railroad Retirement Account, whether—"
+      provision "/us/usc/t45/s231f–1/2/A" subparagraph {
+        num "A" "(A)"
+        content "the rates of such taxes should be reduced, or"
+        hash "4ed5d0a794eb6ae4f3d6cd613c142d007d0ecaa2032f78393b12850cf0a6ed2e"
+      }
+      provision "/us/usc/t45/s231f–1/2/B" subparagraph {
+        num "B" "(B)"
+        content "any part of the tax imposed by section 3221(b) of such Code should be diverted to the Railroad Unemployment Insurance Account to aid in the repayment of its debt to the Railroad Retirement Account."
+        hash "69b665e584e3966035c5e926903e25daf308c9800e621ac74af72686d8a29293"
+      }
+      hash "f74a3795cb5532100e1ff486134bff44187bc3d60288993e03ef6b68fe8f21d6"
+    }
+    hash "22008241dd809046ba327f05f17464a2430ee2ad3a4cf46da1579a20411de66c"
+  }
+  credit "(" ["Pub. L. 98–76, title V, § 502" -> "/us/pl/98/76/tV/s502"] ", Aug. 12, 1983, " ["97 Stat. 440" -> "/us/stat/97/440"] "; " ["Pub. L. 99–514, § 2" -> "/us/pl/99/514/s2"] ", Oct. 22, 1986, " ["100 Stat. 2095" -> "/us/stat/100/2095"] "; " ["Pub. L. 104–66, title II, § 2221(a)" -> "/us/pl/104/66/tII/s2221/a"] ", Dec. 21, 1995, " ["109 Stat. 733" -> "/us/stat/109/733"] ".)"
+  note "/us/usc/t45/s231f–1/note/editorialNotes/nolaw/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Section was enacted as part of the Railroad Retirement Solvency Act of 1983, and not as part of the Railroad Retirement Act of 1974 which comprises this subchapter."
+    hash "b111a350aa6f81d3355579a659d3e257921421ad4fafd027b262736a652065a4"
+  }
+  note "/us/usc/t45/s231f–1/note/editorialNotes/pl.104.66/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1995—" ["Pub. L. 104–66" -> "/us/pl/104/66"] " which directed the amendment of this section by substituting “As part of the annual report required under " ["section 231u(a) of this title" -> "/us/usc/t45/s231u/a"] "” for “On or before July 1, 1985, and each calendar year thereafter”, was executed by making the substitution for “On or before July 1 of 1985, and of each calendar year thereafter”, to reflect the probable intent of Congress."
+    p "1986—Par. (1). " ["Pub. L. 99–514" -> "/us/pl/99/514"] " substituted “Internal Revenue Code of 1986” for “Internal Revenue Code of 1954”."
+    hash "799e46479fe64b056195aaf56d95b6b6f89d6eb62bab056b079c89f1633e4a2f"
+  }
+  layers {
+    operative "22008241dd809046ba327f05f17464a2430ee2ad3a4cf46da1579a20411de66c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "19fb2ee4aadcded6743f72bff94562fa3d6ff08a78d7c89c8b273654ff0a7a09"
+  }
+}

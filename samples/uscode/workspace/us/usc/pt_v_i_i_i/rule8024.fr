@@ -1,0 +1,75 @@
+edition 2
+module "/us/usc/ptVIII/rule8024" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8024" courtRule {
+    num "8024" "Rule 8024."
+    heading "Clerk’s Duties on Disposition of the Appeal"
+    provision "/us/usc/ptVIII/rule8024/a" subsection {
+      num "a" "(a)"
+      heading "Preparing the Judgment."
+      chapeau "After receiving the court’s opinion—or instructions if there is no opinion—the district or BAP clerk must:"
+      provision "/us/usc/ptVIII/rule8024/a/1" paragraph {
+        num "1" "(1)"
+        content "prepare and sign the judgment; and"
+        hash "2cc009d17d290a013f7eb79efb49789eeda75177fec4806e4f9d845b1c7a3ef2"
+      }
+      provision "/us/usc/ptVIII/rule8024/a/2" paragraph {
+        num "2" "(2)"
+        content "note it on the docket, which act constitutes entry of judgment."
+        hash "36271f4aac6bc63864b4bd5ba4a77803c94f1163d3d07a2ccdc39e594cdbdc14"
+      }
+      hash "bd5db6192edcdde473cf5a840fcf86f288c3d60e6540c97780701221311c9419"
+    }
+    provision "/us/usc/ptVIII/rule8024/b" subsection {
+      num "b" "(b)"
+      heading "Giving Notice of the Judgment."
+      chapeau "Immediately after a judgment is entered, the district or BAP clerk must:"
+      provision "/us/usc/ptVIII/rule8024/b/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "send notice of its entry, together with a copy of any opinion, to:"
+          p "• the parties to the appeal;"
+          p "• the United States trustee; and"
+          p "• the bankruptcy clerk; and"
+        }
+        hash "ec2fbff63dd01310021c385b5dda8276cdf566e947c5f80fca63917dbb7134b2"
+      }
+      provision "/us/usc/ptVIII/rule8024/b/2" paragraph {
+        num "2" "(2)"
+        content "note on the docket the date the notice was sent."
+        hash "b04e01b75b5308c2d6c23ba0b629cdcf65c29ad8f48f9b5d3e1f4043eb201be1"
+      }
+      hash "943e98d4e248640b7a1772c7de58739e08350e663389f4fdbe26ba631c2ecb9d"
+    }
+    provision "/us/usc/ptVIII/rule8024/c" subsection {
+      num "c" "(c)"
+      heading "Returning Physical Items."
+      content "On disposition of the appeal, the district or BAP clerk must return to the bankruptcy clerk any physical items sent as the record on appeal."
+      hash "8a21903ec1d0cca2949dacbd672d6615d3077a092f48ee290229d8474cfb5909"
+    }
+    hash "22cf4738434e49a390e4d60c2fe0377886ead55800525d6b88a6641c6825d5e0"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8024/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8016, which was adapted from F.R.App.P. 36 and 45(c) and (d). The rule is reworded to reflect that only items in the record that are physically, as opposed to electronically, transmitted to the district court or BAP need to be returned to the bankruptcy clerk. Other changes to the former rule are stylistic."
+    p "Changes Made After Publication and Comment. Stylistic changes were made to subdivision (c) and the Committee Note."
+    hash "342bd40e97ea325fca1363b9312044f7462da8846d5aa4a406440117dc9e4a6f"
+  }
+  note "/us/usc/ptVIII/rule8024/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8024 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "1b6054302280da838c4792f56bbf7ee02afa824f9c829d8b5651ee213968bc17"
+  }
+  layers {
+    operative "22cf4738434e49a390e4d60c2fe0377886ead55800525d6b88a6641c6825d5e0"
+    enacted "9e935b77d5909efbdcfba1036fad956295bc26c229b3c70ab5747137395239d8"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

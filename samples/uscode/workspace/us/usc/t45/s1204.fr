@@ -1,0 +1,100 @@
+edition 2
+module "/us/usc/t45/s1204" {
+  within "/us/usc/t45/ch21"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1204" section {
+    num "1204" "§ 1204."
+    heading "Transition period"
+    provision "/us/usc/t45/s1204/a" subsection {
+      num "a" "(a)"
+      heading "Joint report by Secretary and Governor of Alaska; contents, preparation, etc."
+      content "Within 6 months after January 14, 1983, the Secretary and the Governor of Alaska shall jointly prepare and deliver to the Congress of the United States and the legislature of the State a report that describes to the extent possible the rail properties of the Alaska Railroad, the liabilities and obligations to be assumed by the State, the sum of money, if any, in the Alaska Railroad Revolving Fund to be withheld from the State pursuant to section 1202(10)(C)" mark "1" 1 " of this title, and any personal property to be withheld pursuant to section 1202(10)(D)" mark "1" 1 " of this title. The report shall separately identify by the best available descriptions (1) the rail properties of the Alaska Railroad to be transferred pursuant to section 1203(b)(1)(A), (B), and (D) of this title; (2) the rail properties to be subject to the license granted pursuant to " ["section 1203(b)(1)(C) of this title" -> "/us/usc/t45/s1203/b/1/C"] "; and (3) the easements to be reserved pursuant to " ["section 1203(c)(2) of this title" -> "/us/usc/t45/s1203/c/2"] ". The Secretaries of Agriculture, Defense, and the Interior and the Administrator of the General Services Administration shall provide the Secretary with all information and assistance necessary to allow the Secretary to complete the report within the time required."
+      hash "ff834f45598e045f6167606fd069348a325046b7b6dee213073d28b5c437fda5"
+    }
+    provision "/us/usc/t45/s1204/b" subsection {
+      num "b" "(b)"
+      heading "Inspection, etc., of rail properties and records; terms and conditions; restrictions"
+      chapeau "During the period from January 14, 1983, until the date of transfer, the State shall have the right to inspect, analyze, photograph, photocopy and otherwise evaluate all of the rail properties of the Alaska Railroad and all records related to the rail properties of the Alaska Railroad maintained by any agency of the United States under conditions established by the Secretary to protect the confidentiality of proprietary business data, personnel records, and other information, the public disclosure of which is prohibited by law. During that period, the Secretary and the Alaska Railroad shall not, without the consent of the State and only in conformity with applicable law and the Memorandum of Understanding referred to in " ["section 1205(b)(3) of this title" -> "/us/usc/t45/s1205/b/3"] "—"
+      provision "/us/usc/t45/s1204/b/1" paragraph {
+        num "1" "(1)"
+        content "make or incur any obligation to make any individual capital expenditure of money from the Alaska Railroad Revolving Fund in excess of $300,000;"
+        hash "4a8fcee64cc5604104b029af623563fe534398053aa90340b1f755412c0841df"
+      }
+      provision "/us/usc/t45/s1204/b/2" paragraph {
+        num "2" "(2)"
+        content "(except as required by law) sell, exchange, give, or otherwise transfer any real property included in the rail properties of the Alaska Railroad; or"
+        hash "d05cce34c6b82f95f457c6e36570d035a0fe2641e3a4d98d44b816d434deefcc"
+      }
+      provision "/us/usc/t45/s1204/b/3" paragraph {
+        num "3" "(3)"
+        content "lease any rail property of the Alaska Railroad for a term in excess of five years."
+        hash "7c9dc2eb6ef21cd1bce6912596efb51492e71f8790a852c1ceb927f344e036f4"
+      }
+      hash "73397cba1e70386aa17a9710847a14c72d31dde2aa39438a1fd45a25593bceaa"
+    }
+    provision "/us/usc/t45/s1204/c" subsection {
+      num "c" "(c)"
+      heading "Format for accounting practices and systems"
+      content "Prior to transfer of the rail properties of the Alaska Railroad to the State, the Alaska Railroad’s accounting practices and systems shall be capable of reporting data to the Interstate Commerce Commission in formats required of comparable rail carriers subject to the jurisdiction of the Interstate Commerce Commission."
+      hash "3cb8fd40735d8e315e01350dc99252b3310c9cf894f7e5b896c0ef8aa68aa2b6"
+    }
+    provision "/us/usc/t45/s1204/d" subsection {
+      num "d" "(d)"
+      heading "Fair market value; determination, terms and conditions, etc."
+      provision "/us/usc/t45/s1204/d/1" paragraph {
+        num "1" "(1)"
+        content "Within nine months after January 14, 1983, the United States Railway Association (hereinafter in this section referred to as the “Association”) shall determine the fair market value of the Alaska Railroad under the terms and conditions of this chapter, applying such procedures, methods and standards as are generally accepted as normal and common practice. Such determination shall include an appraisal of the real and personal property to be transferred to the State pursuant to this chapter. Such appraisal by the Association shall be conducted in the usual manner in accordance with generally accepted industry standards, and shall consider the current fair market value and potential future value if used in whole or in part for other purposes. The Association shall take into account all obligations imposed by this chapter and other applicable law upon operation and ownership of the State-owned railroad. In making such determination, the Association shall use to the maximum extent practicable all relevant data and information, including, if relevant, that contained in the report prepared pursuant to subsection (a) of this section."
+        hash "8d057410003e62b1c725d7cf8e12e7359546aa5ba99675945f4d19493cd56ab6"
+      }
+      provision "/us/usc/t45/s1204/d/2" paragraph {
+        num "2" "(2)"
+        content "The determination made pursuant to paragraph (1) of this subsection shall not be construed to affect, enlarge, modify, or diminish any inventory, valuation, or classification required by the Interstate Commerce Commission pursuant to subchapter V" mark "2" 2 " of chapter 107 of title 49."
+        hash "75cee86f78699cbe47ae14d312169e07170e4d18d8bf17355b64595659aa1c22"
+      }
+      hash "825ecbcf9d120dbe4623f7e29a552ad412325058ca141576eab65d00620828fb"
+    }
+    hash "10a254037a862d356dc66cc69849eceaee004cc3ff40ed5c28728b485b496199"
+  }
+  credit "(" ["Pub. L. 97–468, title VI, § 605(a)" -> "/us/pl/97/468/tVI/s605/a"] "–(d), Jan. 14, 1983, " ["96 Stat. 2562" -> "/us/stat/96/2562"] ", 2563.)"
+  note "/us/usc/t45/s1204/note/editorialNotes/pl.104.88/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Subchapter V of chapter 107 of title 49, referred to in subsec. (d)(2), was omitted in the general amendment of subtitle IV of Title 49, Transportation, by " ["Pub. L. 104–88, title I, § 102(a)" -> "/us/pl/104/88/tI/s102/a"] ", Dec. 29, 1995, " ["109 Stat. 804" -> "/us/stat/109/804"] "."
+    hash "166211f8700fdd87cc5457e4ff928c85c45f3da702008f75a8a4cf7eec80f791"
+  }
+  note "/us/usc/t45/s1204/note/editorialNotes/pl.97.468/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "In subsec. (a), references to section 1202(10)(C) and (D) of this title were in the original references to section 603(8)(C) and (D) of title VI of " ["Pub. L. 97–468" -> "/us/pl/97/468"] ", and were editorially translated as section 1202(10)(C) and (D), as the probable intent of Congress, in view of section 1202(8) containing no subpars. (C) and (D) and the subject matter of section 1202(10)(C), which relates to money in the Alaska Railroad Revolving Fund being withheld from the State, and section 1202(10)(D), which relates to personal property being withheld."
+    p "Section is comprised of subsecs. (a) to (d) of " ["section 605 of Pub. L. 97–468" -> "/us/pl/97/468/s605"] ". Subsec. (e) of " ["section 605 of Pub. L. 97–468" -> "/us/pl/97/468/s605"] " amended " ["section 712 of this title" -> "/us/usc/t45/s712"] "."
+    hash "b2f3c89d842e30b0eb7542a6bf0ecf9d55ba2643448a3d83e614221fdc403cde"
+  }
+  note "/us/usc/t45/s1204/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  note "/us/usc/t45/s1204/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  footnote 1 "1" {
+    p "See Codification note below."
+  }
+  footnote 2 "2" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "10a254037a862d356dc66cc69849eceaee004cc3ff40ed5c28728b485b496199"
+    enacted "ce041e4c8aae902ae095387eee6c7d346fdb5fbefd95add5bada5a0b4d2cd298"
+    editorial "5093ae6c09ded309fa87241deebb0377bb6f55eb552559808915498e142fedfc"
+  }
+}

@@ -1,0 +1,139 @@
+edition 2
+module "/us/usc/t45/s662" {
+  within "/us/usc/t45/ch15"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s662" section {
+    num "662" "§ 662."
+    heading "Guarantee of certificates"
+    provision "/us/usc/t45/s662/a" subsection {
+      num "a" "(a)"
+      heading "Authority of Secretary; prerequisites; procedures; waiver"
+      chapeau "The trustees of any railroad undergoing reorganization under section 77 of the Bankruptcy Act, as amended, upon approval of the court, may apply to the Secretary for the guarantee of certificates. The Secretary, after consultation with the Board, is authorized to guarantee such certificates upon findings in writing that—"
+      provision "/us/usc/t45/s662/a/1" paragraph {
+        num "1" "(1)"
+        content "cessation of essential transportation services by the railroad would endanger the public welfare;"
+        hash "5a4979f19b8bb7fbbbebf9ca3a81706efa33733fc121419bc229f34b1dc172e7"
+      }
+      provision "/us/usc/t45/s662/a/2" paragraph {
+        num "2" "(2)"
+        content "cessation of such services is imminent;"
+        hash "4ce28e9db14a6965aa159881b4834c0c214d033151024c33832b8d0c040eb7b2"
+      }
+      provision "/us/usc/t45/s662/a/3" paragraph {
+        num "3" "(3)"
+        content "there is no other practicable means of obtaining funds to meet payroll and other expenses necessary to provide such services than the issuance of such certificates;"
+        hash "8ba8a09ff0b5cf8649b88ebad2e922217199b5c604bf7843465e5929793a7fdd"
+      }
+      provision "/us/usc/t45/s662/a/4" paragraph {
+        num "4" "(4)"
+        content "such certificates cannot be sold without a guarantee;"
+        hash "7d153e7358bb0844b0d29bd75db19c04097318d364604a06bf008ac484b7cf73"
+      }
+      provision "/us/usc/t45/s662/a/5" paragraph {
+        num "5" "(5)"
+        content "the railroad can reasonably be expected to become self-sustaining; and"
+        hash "3b14fcdf346f1e6da56760d95e33cc9dad6e40e71bc4294db7246df28f0c7cf6"
+      }
+      provision "/us/usc/t45/s662/a/6" paragraph {
+        num "6" "(6)"
+        content "the probable value of the assets of the railroad in the event of liquidation provides reasonable protection to the United States."
+        hash "e7285f7e8c2c7e639574545be2d94b560f237eab2cb61c26e8509872fdc9d77e"
+      }
+      continuation "The Secretary shall publish notice of his intention to make such finding in the Federal Register not less than fifteen days prior to such finding, give interested persons, including agencies of the Federal Government, an opportunity to submit written data, views, or arguments (with or without opportunity for oral presentation), and give consideration to the relevant matter presented. The Secretary for good cause shown and upon a finding that extraordinary circumstances warrant doing so may waive the requirements of the preceding sentence. Notwithstanding any other provision of this section, the Secretary, in guaranteeing certificates under this section, is authorized to waive the findings required by paragraphs (1), (5), and (6) of this subsection."
+      hash "9de56920c95b729abcd2ccc120a5ed03ba7db4ae5520086f8bfa719f69420c22"
+    }
+    provision "/us/usc/t45/s662/b" subsection {
+      num "b" "(b)"
+      heading "Conditions to guarantee"
+      chapeau "As a condition to a guarantee, the Secretary, after consultation with the Board, shall require that:"
+      provision "/us/usc/t45/s662/b/1" paragraph {
+        num "1" "(1)"
+        content "the proceeds of the sale of certificates guaranteed under this chapter, will be used solely for meeting payroll and other expenses which, if not met, would preclude continued provision of essential transportation services by the railroad;"
+        hash "4d42351d4af98534dec14b6d742ce327ff0db36cee739c99aea629494845b9b6"
+      }
+      provision "/us/usc/t45/s662/b/2" paragraph {
+        num "2" "(2)"
+        content "other revenues of the railroad will be used, to the fullest extent possible, for such expenses;"
+        hash "4997a107444d76cae5d5a44e8f9ce8a2d845d404e3b2c47f166e2bb4b3b927a3"
+      }
+      provision "/us/usc/t45/s662/b/3" paragraph {
+        num "3" "(3)"
+        content "proceeds from the sale of assets will be devoted to the fullest extent possible to the provision of essential transportation services by the railroad; and"
+        hash "67c637ca8cc82296af905ab3149c04239525cbf6edb5d2dce722fcd371321284"
+      }
+      provision "/us/usc/t45/s662/b/4" paragraph {
+        num "4" "(4)"
+        content "in the event of actual or threatened cessation of essential transportation services by the railroad, the Secretary shall have the option to procure by purchase or lease trackage rights over the lines of the railroad and such equipment as may be necessary to provide such services by the Secretary or his assignee, and, in the event of a default in the payment of principal or interest as provided by the certificates, the money paid or expenses incurred by the United States as a result thereof shall be deemed to have been applied to the purchase or lease price. The terms of purchase or lease shall be subject to the approval of the reorganization court and the operation over the lines shall be subject to the approval of the Board pursuant to subchapter II of chapter 113 of title 49, but in no event shall the rendition of services by the Secretary or his assignee await the outcome of proceedings before the reorganization court or the Board."
+        hash "3e69a5588ba753e7276d9911031bb27abcc271e26de640a558626dab90a355f7"
+      }
+      hash "756d9388c0396295f594cbdaa7a00cf358397317e35ac911a0000b00d5d96583"
+    }
+    provision "/us/usc/t45/s662/c" subsection {
+      num "c" "(c)"
+      heading "Certificate as administrative expense; priority of certificate"
+      content "The Secretary shall not guarantee any certificate under this section unless such certificate is treated as an expense of administration and receives the highest lien on the railroad’s property and priority in payment under the Bankruptcy Act, except that this subsection shall not apply to certificates guaranteed for a railroad that is actively engaged in restructuring, as defined by the Secretary. For purposes of this subsection, the term “restructuring” includes an employee ownership plan or an employee-shipper ownership plan."
+      hash "6df7829041c431d419e6c1fb87f450505c70becbaabb6f93a8e3eb2700c9b279"
+    }
+    provision "/us/usc/t45/s662/d" subsection {
+      num "d" "(d)"
+      heading "Interest rate; date of maturity; other terms and conditions"
+      content "A certificate under this chapter shall bear interest at such per annum rate as the Secretary deems reasonable, taking into account the range of interest rates prevailing in the private market for similar loans and the risks assumed by the Federal Government; nor may its maturity date, including all extensions and renewals thereof, be later than fifteen years from the date of original issuance. The Secretary may prescribe such other terms and conditions as he deems appropriate. In each case, the Secretary shall consider the feasibility of requiring the railroad to dispose of nonrailroad assets as a condition to a guarantee."
+      hash "cc166d119b2f0aeb66f662ea1fc6a7e386e3fc6356362236e7676cf6040fed31"
+    }
+    provision "/us/usc/t45/s662/e" subsection {
+      num "e" "(e)"
+      heading "Maximum aggregate principal amount outstanding"
+      content "At any one time the outstanding aggregate principal amount of all certificates guaranteed under this chapter shall not exceed $200,000,000."
+      hash "46d8bacb486ac949316f208be71adfb951853680b6602a0a4f66206472374849"
+    }
+    provision "/us/usc/t45/s662/f" subsection {
+      num "f" "(f)"
+      heading "Rules and regulations"
+      content "The Secretary shall issue such rules and regulations as are appropriate to carry out the authority granted by this chapter."
+      hash "fc8c6576c9b4f8cadc594be3182d98a5bbd9adf6c1f03ab86a3b43416ff429f3"
+    }
+    hash "3ccb7b767cc4c0f20e0ee9d5a132f2a29fff7861134f45ab9408343831a7265a"
+  }
+  credit "(" ["Pub. L. 91–663, § 3" -> "/us/pl/91/663/s3"] ", Jan. 8, 1971, " ["84 Stat. 1975" -> "/us/stat/84/1975"] "; " ["Pub. L. 95–598, title III, § 333" -> "/us/pl/95/598/tIII/s333"] ", Nov. 6, 1978, " ["92 Stat. 2679" -> "/us/stat/92/2679"] "; " ["Pub. L. 95–611, § 3(b)" -> "/us/pl/95/611/s3/b"] ", Nov. 8, 1978, " ["92 Stat. 3089" -> "/us/stat/92/3089"] "; " ["Pub. L. 96–86, § 115(a)" -> "/us/pl/96/86/s115/a"] ", Oct. 12, 1979, " ["93 Stat. 662" -> "/us/stat/93/662"] "; " ["Pub. L. 96–101, § 7(a)" -> "/us/pl/96/101/s7/a"] "–(c), Nov. 4, 1979, " ["93 Stat. 739" -> "/us/stat/93/739"] ", 740; " ["Pub. L. 104–88, title III, § 325(2)" -> "/us/pl/104/88/tIII/s325/2"] ", Dec. 29, 1995, " ["109 Stat. 951" -> "/us/stat/109/951"] ".)"
+  note "/us/usc/t45/s662/note/editorialNotes/act.1898-07-01.ch541/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Bankruptcy Act, referred to in subsecs. (a) and (c), is " ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ", which was classified generally to former Title 11, Bankruptcy. Section 77 of this Act was classified to section 205 of former Title 11. The Act was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    hash "fe6117b428ed40e9c48cce4b32f6f744d6642940c7503c35ba4add064ab4d5db"
+  }
+  note "/us/usc/t45/s662/note/editorialNotes/pl.104.88/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1995—Subsec. (a). " ["Pub. L. 104–88, § 325(2)(B)" -> "/us/pl/104/88/s325/2/B"] ", substituted “Board” for “Commission” in introductory provisions."
+    p "Subsec. (b). " ["Pub. L. 104–88" -> "/us/pl/104/88"] " substituted “Board” for “Commission” wherever appearing and “subchapter II of chapter 113 of title 49” for “the provisions of section 5 of the Interstate Commerce Act” in par. (4)."
+    p "1979—Subsec. (a). " ["Pub. L. 96–101, § 7(a)" -> "/us/pl/96/101/s7/a"] ", struck out “upon a finding that the guarantee of certificates is necessary in order for a railroad which has received continued loan advances, pursuant to " ["section 721(d)(1) of this title" -> "/us/usc/t45/s721/d/1"] ", to maintain rail services in the region (as such term is defined in " ["section 702(15) of this title" -> "/us/usc/t45/s702/15"] ")” after “of this subsection” and provision requiring that Secretary not make any waiver under preceding sentence after Dec. 31, 1979."
+    p "Subsec. (c). " ["Pub. L. 96–101, § 7(b)" -> "/us/pl/96/101/s7/b"] ", added subsec. (c). Former subsec. (c) was repealed by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ". See 1978 Amendment note below."
+    p "Subsec. (e). " ["Pub. L. 96–101, § 7(c)" -> "/us/pl/96/101/s7/c"] ", substituted “$200,000,000” for “$125,000,000” and struck out provision requiring that with respect to a railroad which filed a petition for reorganization during fiscal year 1978, during period Oct. 1, 1979, through Nov. 30, 1979, certificates be issued without regard to limitations of subsec. (a) of this section and with such priority in payment as Secretary deems appropriate to secure repayment, for purpose of continuing service on railroad system at level in effect on Oct. 1, 1979."
+    p ["Pub. L. 96–86" -> "/us/pl/96/86"] " provided that, with respect to a railroad which filed a petition for reorganization during fiscal year 1978, during period Oct. 1, 1979, through Nov. 30, 1979, certificates shall be issued without regard to limitations of subsec. (a) of this section and with such priority in payment as Secretary deems appropriate to secure repayment, for purpose of continuing service on railroad system at level in effect on Oct. 1, 1979."
+    p "1978—Subsec. (a). " ["Pub. L. 95–611" -> "/us/pl/95/611"] " inserted provision authorizing Secretary to waive requirements of paragraphs (1), (5), and (6) of subsec. (a) until Dec. 31, 1979."
+    p "Subsec. (c). " ["Pub. L. 95–598" -> "/us/pl/95/598"] " struck out subsec. (c) which related to treatment of a certificate as an administrative expense and priority of the certificate."
+    hash "3e5b4e0d0c7c3e74f2d3286cdba08ae787068f3e8cd38dfc25c8f5b3d61901d1"
+  }
+  note "/us/usc/t45/s662/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1995 Amendment"
+    p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
+    hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
+  }
+  note "/us/usc/t45/s662/note/statutoryNotes/pl.95.598/effective-date-of-1978-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1978 Amendment"
+    p "Amendment by " ["Pub. L. 95–598" -> "/us/pl/95/598"] " effective Oct. 1, 1979, see " ["section 402(a) of Pub. L. 95–598" -> "/us/pl/95/598/s402/a"] ", set out as an Effective Date note preceding " ["section 101 of Title 11" -> "/us/usc/t11/s101"] ", Bankruptcy."
+    hash "1cd3cd5227a5d4bc7ba6b777bb609ca70159ae48a42afcafdfe6384011fb8737"
+  }
+  layers {
+    operative "3ccb7b767cc4c0f20e0ee9d5a132f2a29fff7861134f45ab9408343831a7265a"
+    enacted "6c16909df1e562b63335cc5f3f66191dae1c6bb8b13bd3debdcc264cc6a50472"
+    editorial "4545eb0edf57bc7342b13bbc006eeef4fda07162848e9229cb1570b11a994b91"
+  }
+}

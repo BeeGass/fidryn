@@ -63,26 +63,28 @@
     <ol>
       <li><a href="/docs/language"><span class="n">&sect;2</span><span class="t">Language</span><span class="d">Modules, queries, rules, duties</span></a></li>
       <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="d">Records, valid-at, known-at</span></a></li>
+      <li><a href="/docs/law-modules"><span class="n">&sect;4</span><span class="t">Law modules</span><span class="d">Provisions of law as data</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Run</p>
     <ol>
-      <li><a href="/docs/cli"><span class="n">&sect;4</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
-      <li><a href="/docs/mill" aria-current="page"><span class="n">&sect;5</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
+      <li><a href="/docs/cli"><span class="n">&sect;5</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
+      <li><a href="/docs/mill" aria-current="page"><span class="n">&sect;6</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Read results</p>
     <ol>
-      <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
-      <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+      <li><a href="/docs/outcomes"><span class="n">&sect;7</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
+      <li><a href="/docs/examples"><span class="n">&sect;8</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+      <li><a href="/docs/coverage"><span class="n">&sect;9</span><span class="t">Coverage</span><span class="d">What the sample of the Code holds</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Contribute</p>
     <ol>
-      <li><a href="/docs/contributing"><span class="n">&sect;8</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+      <li><a href="/docs/contributing"><span class="n">&sect;10</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
     </ol>
   </div>
   <div class="group">
@@ -95,9 +97,9 @@
   </div>
 </nav>
   <article class="doc" aria-labelledby="doc-title">
-    <p class="kicker">&sect; 5 &middot; Run</p>
+    <p class="kicker">&sect; 6 &middot; Run</p>
     <h1 id="doc-title">Fidryn mill</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#start"><span class="n">5.1</span> Start</a></li><li class="lvl-2"><a href="#routes"><span class="n">5.2</span> Routes</a></li><li class="lvl-2"><a href="#json-field-names"><span class="n">5.3</span> JSON field names</a></li><li class="lvl-3"><a href="#post-apicheck"><span class="n">5.3.1</span> POST /api/check</a></li><li class="lvl-3"><a href="#post-apirun-and-post-apiexplore"><span class="n">5.3.2</span> POST /api/run and POST /api/explore</a></li><li class="lvl-3"><a href="#post-apirender"><span class="n">5.3.3</span> POST /api/render</a></li><li class="lvl-2"><a href="#in-memory-compile-versus-path-compile"><span class="n">5.4</span> In-memory compile versus path compile</a></li><li class="lvl-2"><a href="#no-live-filing"><span class="n">5.5</span> No live filing</a></li><li class="lvl-2"><a href="#the-html-page"><span class="n">5.6</span> The HTML page</a></li><li class="lvl-2"><a href="#see-also"><span class="n">5.7</span> See also</a></li><li class="lvl-3"><a href="#post-apiinputs"><span class="n">5.7.1</span> POST /api/inputs</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#start"><span class="n">6.1</span> Start</a></li><li class="lvl-2"><a href="#routes"><span class="n">6.2</span> Routes</a></li><li class="lvl-2"><a href="#json-field-names"><span class="n">6.3</span> JSON field names</a></li><li class="lvl-3"><a href="#post-apicheck"><span class="n">6.3.1</span> POST /api/check</a></li><li class="lvl-3"><a href="#post-apirun-and-post-apiexplore"><span class="n">6.3.2</span> POST /api/run and POST /api/explore</a></li><li class="lvl-3"><a href="#post-apirender"><span class="n">6.3.3</span> POST /api/render</a></li><li class="lvl-2"><a href="#in-memory-compile-versus-path-compile"><span class="n">6.4</span> In-memory compile versus path compile</a></li><li class="lvl-2"><a href="#no-live-filing"><span class="n">6.5</span> No live filing</a></li><li class="lvl-2"><a href="#the-html-page"><span class="n">6.6</span> The HTML page</a></li><li class="lvl-2"><a href="#see-also"><span class="n">6.7</span> See also</a></li><li class="lvl-3"><a href="#post-apiinputs"><span class="n">6.7.1</span> POST /api/inputs</a></li></ol></details>
     <div class="prose">
 <p>The mill is a loopback-only web UI for checking, running, exploring, and
 rendering Fidryn source on this machine. Start it with the CLI:</p>
@@ -108,7 +110,7 @@ filing is not available from the mill.</p>
 <p>See <a href="/docs/getting-started">getting started</a> for a first module, and the
 <a href="/docs/cli">CLI</a> for path-based <code>check</code> / <code>run</code> / <code>explore</code> / <code>render</code> /
 <code>file</code>.</p>
-<h2 id="start"><span class="hn">5.1</span> Start <a class="anchor" href="#start" aria-label="Link to this section">#</a></h2>
+<h2 id="start"><span class="hn">6.1</span> Start <a class="anchor" href="#start" aria-label="Link to this section">#</a></h2>
 <p>From a clone:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> run <span class="tk-ty">-p</span> fidryn-cli <span class="tk-ty">--</span> ui <span class="tk-ty">--no-open</span></code></pre></figure>
 <p>Or, after <code>cargo install --path crates/fidryn-cli</code>:</p>
@@ -121,7 +123,7 @@ and you should open the URL locally. This build does not launch a
 browser. Ctrl-C shuts the server down. If the port is taken, the process
 exits 1 with
 <code>127.0.0.1:PORT is already in use. Stop that process or pass --port.</code></p>
-<h2 id="routes"><span class="hn">5.2</span> Routes <a class="anchor" href="#routes" aria-label="Link to this section">#</a></h2>
+<h2 id="routes"><span class="hn">6.2</span> Routes <a class="anchor" href="#routes" aria-label="Link to this section">#</a></h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Method</th><th>Path</th><th>Body</th><th>Success</th></tr></thead><tbody>
 <tr><td><code>GET</code></td><td><code>/</code></td><td>none</td><td><code>web/index.html</code> (<code>text/html; charset=utf-8</code>), with the security headers below</td></tr>
 <tr><td><code>GET</code></td><td><code>/assets/fidryn.css</code></td><td>none</td><td><code>site/assets/fidryn.css</code>, the design system the site also uses (<code>text/css; charset=utf-8</code>)</td></tr>
@@ -152,10 +154,10 @@ parsed object); <code>expect</code> is the outcome kind that <code>action</code>
 for it.</p>
 <p>There is no <code>POST /api/file</code>, <code>/api/filing</code>, <code>/api/submit</code>, or
 <code>/api/live</code>. Those paths return 404.</p>
-<h2 id="json-field-names"><span class="hn">5.3</span> JSON field names <a class="anchor" href="#json-field-names" aria-label="Link to this section">#</a></h2>
+<h2 id="json-field-names"><span class="hn">6.3</span> JSON field names <a class="anchor" href="#json-field-names" aria-label="Link to this section">#</a></h2>
 <p>Names below are the serde fields the mill actually reads. <code>EvalRequest</code>
 uses camelCase. <code>CheckRequest</code> and <code>RenderRequest</code> do not.</p>
-<h3 id="post-apicheck"><span class="hn">5.3.1</span> <code>POST /api/check</code> <a class="anchor" href="#post-apicheck" aria-label="Link to this section">#</a></h3>
+<h3 id="post-apicheck"><span class="hn">6.3.1</span> <code>POST /api/check</code> <a class="anchor" href="#post-apicheck" aria-label="Link to this section">#</a></h3>
 <figure class="code" data-lang="json"><figcaption><span>json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span><span class="tk-ty">&quot;source&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;&lt;fidryn module text&gt;&quot;</span><span class="tk-pu">}</span></code></pre></figure>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th></tr></thead><tbody>
 <tr><td><code>source</code></td><td>string</td><td>yes</td></tr>
@@ -165,7 +167,7 @@ uses camelCase. <code>CheckRequest</code> and <code>RenderRequest</code> do not.
 A failed check is <code>{"ok": false, "diagnostics": [...]}</code>. Each diagnostic
 object has <code>code</code>, <code>message</code>, <code>primary_span</code>, <code>related_spans</code>, and
 <code>suggestion</code> (Rust field names, snake_case).</p>
-<h3 id="post-apirun-and-post-apiexplore"><span class="hn">5.3.2</span> <code>POST /api/run</code> and <code>POST /api/explore</code> <a class="anchor" href="#post-apirun-and-post-apiexplore" aria-label="Link to this section">#</a></h3>
+<h3 id="post-apirun-and-post-apiexplore"><span class="hn">6.3.2</span> <code>POST /api/run</code> and <code>POST /api/explore</code> <a class="anchor" href="#post-apirun-and-post-apiexplore" aria-label="Link to this section">#</a></h3>
 <figure class="code" data-lang="json"><figcaption><span>json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span>
   <span class="tk-ty">&quot;source&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;&lt;fidryn module text&gt;&quot;</span><span class="tk-pu">,</span>
   <span class="tk-ty">&quot;query&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;q&quot;</span><span class="tk-pu">,</span>
@@ -225,7 +227,7 @@ when the engine kind is <code>Internal</code>):</p>
 <p><code>error</code> here is the engine kind (<code>UnknownQuery</code>, <code>Unsupported</code>,
 <code>FuelExhausted</code>, <code>InvalidInput</code>, <code>Internal</code>), not a legal outcome kind.
 It is not rewritten as <code>inconsistent</code>.</p>
-<h3 id="post-apirender"><span class="hn">5.3.3</span> <code>POST /api/render</code> <a class="anchor" href="#post-apirender" aria-label="Link to this section">#</a></h3>
+<h3 id="post-apirender"><span class="hn">6.3.3</span> <code>POST /api/render</code> <a class="anchor" href="#post-apirender" aria-label="Link to this section">#</a></h3>
 <figure class="code" data-lang="json"><figcaption><span>json</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-pu">{</span><span class="tk-ty">&quot;source&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;&lt;fidryn module text&gt;&quot;</span><span class="tk-pu">,</span> <span class="tk-ty">&quot;template&quot;</span><span class="tk-pu">:</span> <span class="tk-st">&quot;{{module}}@{{version}}&quot;</span><span class="tk-pu">}</span></code></pre></figure>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th></tr></thead><tbody>
 <tr><td><code>source</code></td><td>string</td><td>yes</td></tr>
@@ -238,7 +240,7 @@ is <code>{"ok": false, "error": "..."}</code>. Template variables are <code>modu
 <code>version</code>, typed <code>outside_scope</code>, and <code>outside_scope_label</code>. An optional JSON
 <code>data</code> field is available under the template key <code>data</code>; typed arrays and record
 fields are preserved. Missing keys and collection type mismatches fail closed.</p>
-<h2 id="in-memory-compile-versus-path-compile"><span class="hn">5.4</span> In-memory compile versus path compile <a class="anchor" href="#in-memory-compile-versus-path-compile" aria-label="Link to this section">#</a></h2>
+<h2 id="in-memory-compile-versus-path-compile"><span class="hn">6.4</span> In-memory compile versus path compile <a class="anchor" href="#in-memory-compile-versus-path-compile" aria-label="Link to this section">#</a></h2>
 <p>Mill <code>source</code> is compiled with <code>compile_source</code> against
 <code>SourceManifest::default()</code>. A <code>source_manifest</code> header in the pasted
 text is not loaded. No artifact files are read. Hex import digests are
@@ -254,12 +256,12 @@ files next to the module. Mill pasted source does neither. A module that
 digest the empty default manifest does not supply. Mill check of a
 snippet never proves that on-disk artifacts are intact. Mill must not
 gain filesystem access from paste.</p>
-<h2 id="no-live-filing"><span class="hn">5.5</span> No live filing <a class="anchor" href="#no-live-filing" aria-label="Link to this section">#</a></h2>
+<h2 id="no-live-filing"><span class="hn">6.5</span> No live filing <a class="anchor" href="#no-live-filing" aria-label="Link to this section">#</a></h2>
 <p>The mill does not call filing adapters. <code>fidryn file</code> on the <a href="/docs/cli">CLI</a>
 is the only submit path, and even there live HTTP needs <code>--live</code> and
 <code>FIDRYN_ALLOW_LIVE_FILING=1</code>. A transport receipt is still not <code>Filed</code>.
 The HTML page states that live filing is not available from the UI.</p>
-<h2 id="the-html-page"><span class="hn">5.6</span> The HTML page <a class="anchor" href="#the-html-page" aria-label="Link to this section">#</a></h2>
+<h2 id="the-html-page"><span class="hn">6.6</span> The HTML page <a class="anchor" href="#the-html-page" aria-label="Link to this section">#</a></h2>
 <p><code>GET /</code> serves <code>web/index.html</code>, which loads <code>/assets/fidryn.css</code> (the
 site's design system), <code>/assets/mill.css</code>, and <code>/assets/mill.js</code>. Those
 files, the fonts, and the samples are compiled into the binary, and the
@@ -310,12 +312,12 @@ input, and an unreachable server are shown in place of a result.</li>
 browser's local storage, so a reload keeps your work. <code>Explore</code> sends
 the same body as <code>Run</code> and no separate <code>bounds</code> field; put finite
 completions on the case JSON.</p>
-<h2 id="see-also"><span class="hn">5.7</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
+<h2 id="see-also"><span class="hn">6.7</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="/docs/getting-started">Getting started</a></li>
 <li><a href="/docs/cli">CLI</a></li>
 </ul>
-<h3 id="post-apiinputs"><span class="hn">5.7.1</span> <code>POST /api/inputs</code> <a class="anchor" href="#post-apiinputs" aria-label="Link to this section">#</a></h3>
+<h3 id="post-apiinputs"><span class="hn">6.7.1</span> <code>POST /api/inputs</code> <a class="anchor" href="#post-apiinputs" aria-label="Link to this section">#</a></h3>
 <p>Accepts <code>source</code> and <code>query</code> and returns <code>{ok: true, schema: ...}</code> with the input
 schema derived from checked declarations, including evidence and effect request
 metadata. Unsupported input representations return an explicit error. <code>/api/check</code>
@@ -324,16 +326,16 @@ UTF-16 editor ranges when available. These ranges identify the exact submitted
 source; unavailable locations stay explicit.</p>
 
     </div>
-    <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/cli"><span class="label">Previous &middot; &sect;4</span><span class="t">CLI</span></a><a class="next" href="/docs/outcomes"><span class="label">Next &middot; &sect;6</span><span class="t">Outcomes</span></a></nav>
+    <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/cli"><span class="label">Previous &middot; &sect;5</span><span class="t">CLI</span></a><a class="next" href="/docs/outcomes"><span class="label">Next &middot; &sect;7</span><span class="t">Outcomes</span></a></nav>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/mill.md">Edit this page on GitHub</a><a href="/docs/mill.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#start"><span class="n">5.1</span> Start</a></li><li class="lvl-2"><a href="#routes"><span class="n">5.2</span> Routes</a></li><li class="lvl-2"><a href="#json-field-names"><span class="n">5.3</span> JSON field names</a></li><li class="lvl-3"><a href="#post-apicheck"><span class="n">5.3.1</span> POST /api/check</a></li><li class="lvl-3"><a href="#post-apirun-and-post-apiexplore"><span class="n">5.3.2</span> POST /api/run and POST /api/explore</a></li><li class="lvl-3"><a href="#post-apirender"><span class="n">5.3.3</span> POST /api/render</a></li><li class="lvl-2"><a href="#in-memory-compile-versus-path-compile"><span class="n">5.4</span> In-memory compile versus path compile</a></li><li class="lvl-2"><a href="#no-live-filing"><span class="n">5.5</span> No live filing</a></li><li class="lvl-2"><a href="#the-html-page"><span class="n">5.6</span> The HTML page</a></li><li class="lvl-2"><a href="#see-also"><span class="n">5.7</span> See also</a></li><li class="lvl-3"><a href="#post-apiinputs"><span class="n">5.7.1</span> POST /api/inputs</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#start"><span class="n">6.1</span> Start</a></li><li class="lvl-2"><a href="#routes"><span class="n">6.2</span> Routes</a></li><li class="lvl-2"><a href="#json-field-names"><span class="n">6.3</span> JSON field names</a></li><li class="lvl-3"><a href="#post-apicheck"><span class="n">6.3.1</span> POST /api/check</a></li><li class="lvl-3"><a href="#post-apirun-and-post-apiexplore"><span class="n">6.3.2</span> POST /api/run and POST /api/explore</a></li><li class="lvl-3"><a href="#post-apirender"><span class="n">6.3.3</span> POST /api/render</a></li><li class="lvl-2"><a href="#in-memory-compile-versus-path-compile"><span class="n">6.4</span> In-memory compile versus path compile</a></li><li class="lvl-2"><a href="#no-live-filing"><span class="n">6.5</span> No live filing</a></li><li class="lvl-2"><a href="#the-html-page"><span class="n">6.6</span> The HTML page</a></li><li class="lvl-2"><a href="#see-also"><span class="n">6.7</span> See also</a></li><li class="lvl-3"><a href="#post-apiinputs"><span class="n">6.7.1</span> POST /api/inputs</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.3.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

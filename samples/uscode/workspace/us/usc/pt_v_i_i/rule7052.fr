@@ -1,0 +1,48 @@
+edition 2
+module "/us/usc/ptVII/rule7052" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7052" courtRule {
+    num "7052" "Rule 7052."
+    heading "Findings and Conclusions by the Court; Judgment on Partial Findings"
+    content "Fed. R. Civ. P. 52 applies in an adversary proceeding—except that a motion under Fed. R. Civ. P. 52(b) to amend or add findings must be filed within 14 days after the judgment is entered. The reference in Fed. R. Civ. P. 52(a) to entering a judgment under Fed. R. Civ. P. 58 must be read as referring to entering a judgment or order under Rule 5003(a)."
+    hash "de158bf906a166c5411f16ed593ab2357d3b1b6a94b9c2fc0eec76252a825643"
+  }
+  credit "(As amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7052/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Rule 52(a) F.R.Civ.P. refers to Rule 12 F.R.Civ.P. Pursuant to Rule 7002 this reference is to Rule 12 F.R.Civ.P. as incorporated and modified by Rule 7012."
+    hash "fb94c788e4e95068d1b5cbb593cede890f23a4d820a109c7b1cc44f8a21ec2d6"
+  }
+  note "/us/usc/ptVII/rule7052/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended by limiting the time for filing post judgment motions for amended or additional findings. In 2009, Rule 52 F. R. Civ. P. was amended to extend the deadline for filing those post judgment motions to no later than 28 days after entry of the judgment. That deadline corresponds to the 30-day deadline for filing a notice of appeal in a civil case under Rule 4(a)(1)(A) F. R. App. P. In a bankruptcy case, the deadline for filing a notice of appeal is 14 days. Therefore, the 28-day deadline for filing a motion for amended or additional findings would effectively override the notice of appeal deadline under Rule 8002(a) but for this amendment."
+    p "The rule is amended to clarify that the reference in Rule 52 F. R. Civ. P. to Rule 58 F. R. Civ. P. and its provisions is construed as a reference to the entry of a judgment or order under Rule 5003(a)."
+    p "Changes Made After Publication. No changes since publication."
+    hash "fefdf1b1b913a753a31595748aeda4e2b3a6b412158f9ccc1c2de6804f718e56"
+  }
+  note "/us/usc/ptVII/rule7052/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7052 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "e42c74896ccbfdfe5da9ff11d6ca2535096bf9e966c6fee71806258040040680"
+  }
+  note "/us/usc/ptVII/rule7052/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "de158bf906a166c5411f16ed593ab2357d3b1b6a94b9c2fc0eec76252a825643"
+    enacted "810e799249cedff8fd0d1b906a7b50a2acd585562a9dea727427a9a56195fcae"
+    editorial "1413f91e97dad31632062b0b89e82df86950d43ee19a722e2dc6256bfe3c85b6"
+  }
+}

@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/ptVII/rule7010" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7010" courtRule {
+    num "7010" "Rule 7010."
+    heading "Form of Pleadings in an Adversary Proceeding"
+    content "Fed. R. Civ. P. 10 applies in an adversary proceeding—except that a pleading’s caption must substantially conform to the appropriate version of Form 416."
+    hash "a6ca8292180400a228820dd901a4bfe0e7433d47c47915eee585fa5287b5a2be"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Reference to the Official Form number is deleted in anticipation of future revision and renumbering of the Official Forms."
+    hash "52442a076009196e6a2b2d867281fd4e269c30b1b658ab961039c969e7314a5c"
+  }
+  note "/us/usc/ptVII/rule7010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7010 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "1f6f9db65bce13019c4c1b8a09748021085f87813e77fdcee64a6bb57d40480e"
+  }
+  note "/us/usc/ptVII/rule7010/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "a6ca8292180400a228820dd901a4bfe0e7433d47c47915eee585fa5287b5a2be"
+    enacted "a9051188b7d1c8ac9aa47181a936d92978a5150df47e9844de1f6beed4e26c23"
+    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+  }
+}

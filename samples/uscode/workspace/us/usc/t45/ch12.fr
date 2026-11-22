@@ -1,0 +1,20 @@
+edition 2
+module "/us/usc/t45/ch12" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch12" chapter {
+    num "12" "CHAPTER 12—"
+    heading "TEMPORARY RAILROAD UNEMPLOYMENT INSURANCE PROGRAM"
+    member "/us/usc/t45/s401"
+    member "/us/usc/t45/s402"
+    member "/us/usc/t45/s403"
+    member "/us/usc/t45/s404"
+    hash "ed0ef2bb4f68afef22e308d86f1f5ea5bbe1b809f5c3208384e12e132bac504f"
+  }
+  layers {
+    operative "ed0ef2bb4f68afef22e308d86f1f5ea5bbe1b809f5c3208384e12e132bac504f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

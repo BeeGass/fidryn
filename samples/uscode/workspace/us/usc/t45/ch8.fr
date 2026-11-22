@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/ch8" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch8" chapter {
+    num "8" "CHAPTER 8—"
+    heading "RAILWAY LABOR"
+    member "/us/usc/t45/ch8/schI"
+    member "/us/usc/t45/ch8/schII"
+    hash "fb133f9afd2a8ca62aa5c1c81a27cb49bd54da1b623b0cd5481a954bbcbb9f77"
+  }
+  layers {
+    operative "fb133f9afd2a8ca62aa5c1c81a27cb49bd54da1b623b0cd5481a954bbcbb9f77"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

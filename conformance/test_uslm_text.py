@@ -1,0 +1,1118 @@
+"""Hold the independent text of the Code's official XML to its hand-written fixtures.
+
+Each fixture in `fixtures/uslm/` is one invented document, read as the member
+`usc99.xml` (the fixture `two-files` is two members packed into one archive). Its
+expected records, `<name>.records.jsonl`, are written by hand from the reading
+rules, not by running the script.
+"""
+
+from __future__ import annotations
+
+import json
+import shutil
+import struct
+import subprocess
+import sys
+import tempfile
+import unittest
+import zipfile
+import zlib
+from pathlib import Path
+
+import blake3
+
+HERE = Path(__file__).resolve().parent
+FIXTURES = HERE / "fixtures" / "uslm"
+TEXT_SCRIPT = HERE / "uslm_text.py"
+MEMBER = "usc99.xml"
+
+# One fixture for each case of the reading rules, and what it holds.
+CASES = {
+    "section": "a section with a heading, a chapeau, three subsections and paragraphs below one",
+    "continuation": "continuation after the last child, between two children, inside a content",
+    "proviso": "a proviso as a child of a level and inside a content",
+    "content": "a content of text only, of several p, of text then a p, of a p holding a table",
+    "links": "a link to the Code, a link to a public law, a link whose words are white space",
+    "footnotes": "a marker and its footnote, a second marker, one between two spaces, "
+    "one at the start of a heading, one in a number",
+    "inline": "a superscript, a subscript, a bare superscript beside a footnote of its number, "
+    "the numerator of a fraction, dropped typography",
+    "table": "a header row, a footer row, column and row spans, an empty cell, one and two p",
+    "images": "an image in a unit and one in a note",
+    "statuses": "each status of a section, a status on a paragraph and a chapter, none",
+    "unit-kinds": "a court rule, a reorganization plan, a generic level that is a unit",
+    "containers": "the container kinds of a title nested as the Code nests them, a level",
+    "appendix-containers": "an appendix, a compiled act with a title, court rules, an article",
+    "repeated-identifiers": "two sections with one identifier, two paragraphs with one",
+    "identifier-lists": "a list of two, a range of whole numbers, a range whose ends carry "
+    "letters, an alias that is another element's address",
+    "no-identifier": "a container, a section and a small level without an identifier",
+    "section-in-section": "a section inside a section",
+    "no-title-segment": "identifiers without a title segment",
+    "no-units": "a file with no units, whose appendix has no identifier",
+    "notes-groups": "notes in each of the four groups and before any group",
+    "notes-anchors": "a note directly under a section, under a paragraph, under a chapter",
+    "not-imported": "the release note under a title, a table of contents with a footnote and a link",
+    "notes-content": "a quoted section with a bracketed note, a table, a signature, a second "
+    "heading, a proviso and a chapeau directly in a note, a content directly in a quoted note",
+    "notes-addresses": "the law and heading that name a note, ordinals, a note named by its hash",
+    "notes-group-headings": "group headings that hold text: one with a link to a law, one with "
+    "neither a law nor a heading",
+    "source-credit": "a source credit with links and a date, and a container's credit",
+    "characters": "U+00A0 in a number, U+202F, U+2000, a composing sequence, U+200B, [sic]",
+    "empty-labels": "a quoted section with an empty number, a number with a value and no text, "
+    "an empty heading, an empty source credit",
+    "notes-unknown-group": "a group heading with a group word the rules do not know",
+    "marker-labels": "a number, a heading and a source credit that hold only a footnote marker",
+    "subheadings": "a subheading and a heading inside a p in a note with no heading, a heading "
+    "directly in quoted content, a heading inside a p of a quoted note with no heading",
+    "quoted-operative": "quoted content in operative text with an origin, a paragraph, a quoted "
+    "section with a number and a heading, a note with no heading that holds a content and a "
+    "heading inside a p, and a note with a heading and a subheading",
+    "meta-dash-name": "a publication name that writes the release with an en dash",
+    "meta-no-flag": "a file without the property is-positive-law, with a chapter and a section",
+    "definitions-sentence": "definitions in the sentence form with and without a reach of their "
+    "own, a link in the reach, and paragraphs the definition rules do not extract, in operative "
+    "text, in quoted content and in a note",
+    "definitions-chapeau": "definitions in the list form and the sentence form under a chapeau "
+    "that states a reach, with a lead-in, above a provision with a heading, under chapeaus that "
+    "state none, and two definitions in the parts of one provision",
+    "definitions-restated": "definitions in a file whose positive-law flag is no, with notes "
+    "headed References in Text in the editorial group, in quoted content and in the statutory "
+    "group",
+    "notes-empty-topic": "a note whose topic attribute is empty, and one whose topic is one space",
+    "notes-spaced-topics": "topics with two spaces between them, with a line break between them, "
+    "and with spaces before, between and after them in a note named by its hash",
+    "quoted-empty-origin": "quoted content whose origin is empty, in operative text and in a note "
+    "that cites a law by a link after it",
+}
+TWO_FILES = "two-files"
+UNNAMED = "unnamed-appendices"
+# Fixtures of several members, each a directory that the test packs into one archive.
+MEMBER_SETS = (TWO_FILES, UNNAMED)
+# Two documents of the releases 999-1 and 999-2 that differ in every element id, in the
+# publication name, in the creation time of the metadata and in the release note, and in
+# nothing else.
+REISSUE = "reissue"
+REISSUE_DOCUMENTS = ("old.xml", "new.xml")
+
+
+def run_script(script: Path, path: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(script), str(path), *args],
+        capture_output=True,
+        check=False,
+        encoding="utf-8",
+    )
+
+
+def fixture_input(name: str, directory: Path) -> Path:
+    """The fixture as the scripts read it: a member file, or for several members an archive."""
+    if name in MEMBER_SETS:
+        release = directory / "release"
+        release.mkdir()
+        with zipfile.ZipFile(release / f"{name}.zip", "w", zipfile.ZIP_DEFLATED) as archive:
+            for member in sorted((FIXTURES / name).glob("*.xml")):
+                archive.write(member, member.name)
+        return release
+    target = directory / MEMBER
+    shutil.copyfile(FIXTURES / f"{name}.xml", target)
+    return target
+
+
+def expected_lines(name: str) -> list[str]:
+    return (FIXTURES / f"{name}.records.jsonl").read_text(encoding="utf-8").splitlines()
+
+
+class TextFixtures(unittest.TestCase):
+    def text_of(self, name: str, *args: str) -> list[str]:
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-text-") as directory:
+            result = run_script(TEXT_SCRIPT, fixture_input(name, Path(directory)), *args)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, "")
+        return result.stdout.split("\n")[:-1] if result.stdout else []
+
+    def check(self, name: str) -> None:
+        self.assertEqual(self.text_of(name), expected_lines(name))
+
+    def test_section(self) -> None:
+        self.check("section")
+
+    def test_continuation(self) -> None:
+        self.check("continuation")
+
+    def test_proviso(self) -> None:
+        self.check("proviso")
+
+    def test_content(self) -> None:
+        self.check("content")
+
+    def test_links(self) -> None:
+        self.check("links")
+
+    def test_footnotes(self) -> None:
+        self.check("footnotes")
+
+    def test_inline(self) -> None:
+        self.check("inline")
+
+    def test_table(self) -> None:
+        self.check("table")
+
+    def test_images(self) -> None:
+        self.check("images")
+
+    def test_statuses(self) -> None:
+        self.check("statuses")
+
+    def test_unit_kinds(self) -> None:
+        self.check("unit-kinds")
+
+    def test_containers(self) -> None:
+        self.check("containers")
+
+    def test_appendix_containers(self) -> None:
+        self.check("appendix-containers")
+
+    def test_repeated_identifiers(self) -> None:
+        self.check("repeated-identifiers")
+
+    def test_identifier_lists(self) -> None:
+        self.check("identifier-lists")
+
+    def test_no_identifier(self) -> None:
+        self.check("no-identifier")
+
+    def test_section_in_section(self) -> None:
+        self.check("section-in-section")
+
+    def test_no_title_segment(self) -> None:
+        self.check("no-title-segment")
+
+    def test_no_units(self) -> None:
+        self.check("no-units")
+
+    def test_notes_groups(self) -> None:
+        self.check("notes-groups")
+
+    def test_notes_anchors(self) -> None:
+        self.check("notes-anchors")
+
+    def test_not_imported(self) -> None:
+        self.check("not-imported")
+
+    def test_notes_content(self) -> None:
+        self.check("notes-content")
+
+    def test_notes_addresses(self) -> None:
+        self.check("notes-addresses")
+
+    def test_notes_group_headings(self) -> None:
+        self.check("notes-group-headings")
+
+    def test_source_credit(self) -> None:
+        self.check("source-credit")
+
+    def test_characters(self) -> None:
+        self.check("characters")
+
+    def test_empty_labels(self) -> None:
+        self.check("empty-labels")
+
+    def test_notes_unknown_group(self) -> None:
+        self.check("notes-unknown-group")
+
+    def test_marker_labels(self) -> None:
+        self.check("marker-labels")
+
+    def test_subheadings(self) -> None:
+        self.check("subheadings")
+
+    def test_quoted_operative(self) -> None:
+        self.check("quoted-operative")
+
+    def test_meta_dash_name(self) -> None:
+        self.check("meta-dash-name")
+
+    def test_meta_no_flag(self) -> None:
+        self.check("meta-no-flag")
+
+    def test_definitions_sentence(self) -> None:
+        self.check("definitions-sentence")
+
+    def test_definitions_chapeau(self) -> None:
+        self.check("definitions-chapeau")
+
+    def test_definitions_restated(self) -> None:
+        self.check("definitions-restated")
+
+    def test_notes_empty_topic(self) -> None:
+        self.check("notes-empty-topic")
+
+    def test_notes_spaced_topics(self) -> None:
+        self.check("notes-spaced-topics")
+
+    def test_quoted_empty_origin(self) -> None:
+        self.check("quoted-empty-origin")
+
+    def test_top_elements_without_an_identifier_are_numbered_over_the_release(self) -> None:
+        expected = expected_lines(UNNAMED)
+        self.assertIn('"address":"/us/usc/~appendix.2"', expected[2])
+        for jobs in ("1", "2"):
+            with self.subTest(jobs=jobs):
+                self.assertEqual(self.text_of(UNNAMED, "--jobs", jobs), expected)
+
+    def test_two_files_are_numbered_over_the_release_for_any_number_of_workers(self) -> None:
+        expected = expected_lines(TWO_FILES)
+        self.assertIn('"address":"/us/usc/t99/s1~2"', expected[2])
+        for jobs in ("1", "2"):
+            with self.subTest(jobs=jobs):
+                self.assertEqual(self.text_of(TWO_FILES, "--jobs", jobs), expected)
+
+    def test_every_fixture_is_tested(self) -> None:
+        names = {path.stem for path in FIXTURES.glob("*.xml")}
+        self.assertEqual(names, set(CASES))
+        for name in [*CASES, *MEMBER_SETS]:
+            self.assertTrue((FIXTURES / f"{name}.records.jsonl").is_file(), name)
+            self.assertTrue((FIXTURES / f"{name}.profile.json").is_file(), name)
+        members = [path for name in MEMBER_SETS for path in (FIXTURES / name).glob("*.xml")]
+        self.assertEqual(
+            sorted(path.name for path in (FIXTURES / REISSUE).iterdir()), sorted(REISSUE_DOCUMENTS)
+        )
+        members += [FIXTURES / REISSUE / name for name in REISSUE_DOCUMENTS]
+        for path in [*FIXTURES.glob("*.xml"), *members]:
+            first = path.read_text(encoding="utf-8").split("\n", 1)[0]
+            self.assertIn("Invented for tests", first, path.name)
+
+    def test_a_reissue_that_changes_only_ids_and_the_release_reads_to_the_same_records(
+        self,
+    ) -> None:
+        printed = []
+        for name in REISSUE_DOCUMENTS:
+            with tempfile.TemporaryDirectory(prefix="fidryn-uslm-reissue-") as directory:
+                target = Path(directory) / MEMBER
+                shutil.copyfile(FIXTURES / REISSUE / name, target)
+                result = run_script(TEXT_SCRIPT, target)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stderr, "")
+            printed.append(result.stdout)
+        old, new = printed
+        self.assertGreaterEqual(len(old.splitlines()), 4, old)
+        self.assertEqual(old, new)
+
+    def test_a_note_with_neither_law_nor_heading_is_named_by_its_hash(self) -> None:
+        # The note hash, written out frame by frame: one tag byte, the length of the
+        # value as eight bytes little-endian, the value.
+        #   00 | 0e 00 00 00 00 00 00 00 | "fidryn.note/v1"        domain
+        #   70 | 0e 00 00 00 00 00 00 00 | "statutoryNotes"        group
+        #   71 | 0d 00 00 00 00 00 00 00 | "miscellaneous"         topics
+        #   1f | 00 00 00 00 00 00 00 00 |                         no heading
+        #   20 | 25 00 00 00 00 00 00 00 | the text below          a paragraph
+        #        10 | 1c 00 00 00 00 00 00 00 | "Neither a law nor a heading."
+        frames = (
+            bytes([0x00, 0x0E, 0, 0, 0, 0, 0, 0, 0])
+            + b"fidryn.note/v1"
+            + bytes([0x70, 0x0E, 0, 0, 0, 0, 0, 0, 0])
+            + b"statutoryNotes"
+            + bytes([0x71, 0x0D, 0, 0, 0, 0, 0, 0, 0])
+            + b"miscellaneous"
+            + bytes([0x1F, 0, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x20, 0x25, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x10, 0x1C, 0, 0, 0, 0, 0, 0, 0])
+            + b"Neither a law nor a heading."
+        )
+        address = (
+            "/us/usc/t99/s1/note/statutoryNotes/nolaw/h." + blake3.blake3(frames).hexdigest()[:16]
+        )
+        records = [json.loads(line) for line in expected_lines("notes-addresses")]
+        named = [r for r in records if r["address"] == address]
+        self.assertEqual(len(named), 1, address)
+        self.assertIsNone(named[0]["heading"])
+        self.assertEqual(named[0]["blocks"][0]["p"], "Neither a law nor a heading.")
+
+    def test_the_text_a_group_heading_holds_is_a_note_named_by_its_hash(self) -> None:
+        # The statutory group heading of the fixture holds one paragraph and gives a
+        # note with no heading and no topics:
+        #   00 | 0e 00 00 00 00 00 00 00 | "fidryn.note/v1"        domain
+        #   70 | 0e 00 00 00 00 00 00 00 | "statutoryNotes"        group
+        #   71 | 00 00 00 00 00 00 00 00 |                         no topics
+        #   1f | 00 00 00 00 00 00 00 00 |                         no heading
+        #   20 | 22 00 00 00 00 00 00 00 | the text below          a paragraph
+        #        10 | 19 00 00 00 00 00 00 00 | "These notes are invented."
+        frames = (
+            bytes([0x00, 0x0E, 0, 0, 0, 0, 0, 0, 0])
+            + b"fidryn.note/v1"
+            + bytes([0x70, 0x0E, 0, 0, 0, 0, 0, 0, 0])
+            + b"statutoryNotes"
+            + bytes([0x71, 0, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x1F, 0, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x20, 0x22, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x10, 0x19, 0, 0, 0, 0, 0, 0, 0])
+            + b"These notes are invented."
+        )
+        address = (
+            "/us/usc/t99/s1/note/statutoryNotes/nolaw/h." + blake3.blake3(frames).hexdigest()[:16]
+        )
+        records = [json.loads(line) for line in expected_lines("notes-group-headings")]
+        named = [r for r in records if r["address"] == address]
+        self.assertEqual(len(named), 1, address)
+        self.assertEqual(named[0]["topics"], [])
+        self.assertIsNone(named[0]["heading"])
+
+    def test_the_hash_of_a_note_joins_its_topics_with_one_space(self) -> None:
+        # The topic attribute "  miscellaneous   effectiveDate " gives two topics, and
+        # the note hash holds them joined by one space:
+        #   00 | 0e 00 00 00 00 00 00 00 | "fidryn.note/v1"                domain
+        #   70 | 09 00 00 00 00 00 00 00 | "ungrouped"                     group
+        #   71 | 1b 00 00 00 00 00 00 00 | "miscellaneous effectiveDate"   topics
+        #   1f | 00 00 00 00 00 00 00 00 |                                 no heading
+        #   20 | 38 00 00 00 00 00 00 00 | the text below                  a paragraph
+        #        10 | 2f 00 00 00 00 00 00 00 | "Neither a law nor a heading, and spaced topics."
+        frames = (
+            bytes([0x00, 0x0E, 0, 0, 0, 0, 0, 0, 0])
+            + b"fidryn.note/v1"
+            + bytes([0x70, 0x09, 0, 0, 0, 0, 0, 0, 0])
+            + b"ungrouped"
+            + bytes([0x71, 0x1B, 0, 0, 0, 0, 0, 0, 0])
+            + b"miscellaneous effectiveDate"
+            + bytes([0x1F, 0, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x20, 0x38, 0, 0, 0, 0, 0, 0, 0])
+            + bytes([0x10, 0x2F, 0, 0, 0, 0, 0, 0, 0])
+            + b"Neither a law nor a heading, and spaced topics."
+        )
+        address = "/us/usc/t99/s1/note/ungrouped/nolaw/h." + blake3.blake3(frames).hexdigest()[:16]
+        records = [json.loads(line) for line in expected_lines("notes-spaced-topics")]
+        named = [r for r in records if r["address"] == address]
+        self.assertEqual(len(named), 1, address)
+        self.assertEqual(named[0]["topics"], ["miscellaneous", "effectiveDate"])
+
+    def test_text_records_are_sorted_and_match_the_schema_shape(self) -> None:
+        for name in [*CASES, *MEMBER_SETS]:
+            with self.subTest(fixture=name):
+                records = [json.loads(line) for line in self.text_of(name)]
+                keys = [record_key(r) for r in records]
+                self.assertEqual(keys, sorted(keys))
+                for record in records:
+                    check_record(self, record)
+
+
+# The scripts whose reading the refusal test holds to the rules.
+PROFILE_SCRIPT = HERE / "usc_profile.py"
+SCRIPTS = [TEXT_SCRIPT, PROFILE_SCRIPT]
+
+DOCUMENT = """<!-- Invented for tests: this document is not the text of any law. -->
+{doctype}<{root} xmlns="{namespace}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \
+xsi:schemaLocation="http://xml.house.gov/schemas/uslm/1.0 {schema}">
+<meta><docPublicationName>{release}</docPublicationName>\
+<property role="is-positive-law">{flag}</property></meta>
+<main><title identifier="/us/usc/t99"><num value="99">Title 99</num><heading>Invented</heading>
+{body}
+</title></main>
+</{root}>
+"""
+SECTION = (
+    '<section identifier="/us/usc/t99/s1"><num value="1">§ 1.</num><heading>Refused</heading>'
+    "{inner}</section>"
+)
+
+FOOTNOTE = '<note type="footnote" id="f1"><num>1</num> A footnote.</note>'
+
+
+def document(**changes: str) -> str:
+    fields = {
+        "doctype": "",
+        "root": "uscDoc",
+        "namespace": "http://xml.house.gov/schemas/uslm/1.0",
+        "schema": "USLM-1.0.15.xsd",
+        "release": "Online@999-1",
+        "flag": "yes",
+        "body": SECTION.format(inner=changes.pop("inner", "<content>Text.</content>")),
+    }
+    fields.update(changes)
+    return DOCUMENT.format(**fields)
+
+
+FLAG = '<property role="is-positive-law">yes</property>'
+NAME = "<docPublicationName>Online@999-1</docPublicationName>"
+
+
+def with_names(*releases: str) -> str:
+    """The document above with one docPublicationName for each release name, in order."""
+    names = "".join(f"<docPublicationName>{release}</docPublicationName>" for release in releases)
+    return document().replace(NAME, names)
+
+
+def with_flags(*values: str) -> str:
+    """The document above with one property is-positive-law for each value, in order."""
+    properties = "".join(f'<property role="is-positive-law">{value}</property>' for value in values)
+    return document().replace(FLAG, properties)
+
+
+def archive(directory: Path, name: str, members: dict[str, str]) -> None:
+    with zipfile.ZipFile(directory / name, "w", zipfile.ZIP_DEFLATED) as opened:
+        for member, text in members.items():
+            opened.writestr(member, text)
+
+
+def oversized_archive(directory: Path) -> None:
+    """An archive whose one member is 513 MiB of zeros, which deflate to little."""
+    chunk = bytes(1024 * 1024)
+    path = directory / "large.zip"
+    with (
+        zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED, compresslevel=1) as opened,
+        opened.open(MEMBER, "w", force_zip64=True) as stream,
+    ):
+        for _ in range(513):
+            stream.write(chunk)
+
+
+def understated_archive(directory: Path, crc_of_prefix: bool) -> None:
+    """An archive whose one member's local header and central directory entry declare
+    the bytes of a whole document and not the comment after it, with the CRC-32 of the
+    whole member or, when `crc_of_prefix`, of the bytes they declare: a short read of
+    the member is a document that is read."""
+    whole = document().encode("utf-8")
+    data = whole + b"<!-- Invented bytes past the declared size. -->\n"
+    path = directory / "understated.zip"
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as opened:
+        opened.writestr(MEMBER, data)
+    raw = bytearray(path.read_bytes())
+    size = len(whole)
+    crc = zlib.crc32(data[:size] if crc_of_prefix else data)
+    patched = 0
+    for at in range(len(raw) - 4):
+        signature = bytes(raw[at : at + 4])
+        if signature == b"PK\x03\x04":
+            crc_at, size_at = at + 14, at + 22
+        elif signature == b"PK\x01\x02":
+            crc_at, size_at = at + 16, at + 24
+        else:
+            continue
+        raw[size_at : size_at + 4] = struct.pack("<I", size)
+        raw[crc_at : crc_at + 4] = struct.pack("<I", crc)
+        patched += 1
+    if patched != 2:
+        raise AssertionError(patched)
+    path.write_bytes(bytes(raw))
+
+
+COMPOSED = "composes across the boundary"
+# The combining acute accent, which composes with the `e` before it into U+00E9.
+ACUTE = chr(0x0301)
+# A white-space character other than U+0020.
+NO_BREAK_SPACE = chr(0x00A0)
+# A document whose only fault is an entity declaration cannot be written: an entity
+# declaration stands only inside a document type declaration, and the XML reader
+# refuses the declaration of the document type as soon as it opens, before it reads
+# any declaration inside it. So the documents below, each with an entity declaration
+# of another kind, are refused as a document type declaration, and no document
+# reaches the refusal of an entity declaration of its own.
+ENTITY_DECLARATIONS = {
+    "an internal entity": (
+        '<!DOCTYPE uscDoc [<!ENTITY w "widget">]>\n',
+        "<content>A &w;.</content>",
+    ),
+    "an external entity": (
+        '<!DOCTYPE uscDoc [<!ENTITY w SYSTEM "file:///widget.txt">]>\n',
+        "<content>A &w;.</content>",
+    ),
+    "a parameter entity": (
+        '<!DOCTYPE uscDoc [<!ENTITY % w "widget">]>\n',
+        "<content>Text.</content>",
+    ),
+}
+
+DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
+    "document type declaration": (document(doctype="<!DOCTYPE uscDoc>\n"), "document type"),
+    **{
+        f"entity declaration, {kind}": (
+            document(doctype=doctype, inner=inner),
+            "a document type declaration",
+        )
+        for kind, (doctype, inner) in ENTITY_DECLARATIONS.items()
+    },
+    "root that is not uscDoc": (document(root="uscDocument"), "not uscDoc"),
+    "root in another namespace": (document(namespace="http://example.invalid/other"), "not uscDoc"),
+    "schema location naming another file": (document(schema="USLM-1.0.14.xsd"), "schema"),
+    "publication name not beginning Online@": (document(release="Print@999-1"), "Online@"),
+    "publication name with white space before it": (
+        document(release=" Online@999-1"),
+        "does not begin Online@",
+    ),
+    "two publication names of one release": (
+        with_names("Online@999-1", "Online@999-1"),
+        "more than one docPublicationName",
+    ),
+    "two publication names, the first of another release": (
+        with_names("Online@999-2", "Online@999-1"),
+        "more than one docPublicationName",
+    ),
+    "positive-law flag that is neither yes nor no": (document(flag="maybe"), "is-positive-law"),
+    "positive-law flag that is empty": (document(flag=""), "neither yes nor no"),
+    "positive-law flag with white space before it": (document(flag=" yes"), "neither yes nor no"),
+    "positive-law flag with white space after it": (document(flag="no\n"), "neither yes nor no"),
+    "positive-law flag whose markup holds another value": (
+        document(flag="<i>maybe</i>"),
+        "is 'maybe', neither yes nor no",
+    ),
+    "two positive-law flags of one value": (with_flags("yes", "yes"), "more than one property"),
+    "two positive-law flags of two values": (with_flags("yes", "no"), "more than one property"),
+    "element in no class": (document(inner="<widget>Text.</widget>"), "does not stand"),
+    "element where its class does not stand": (
+        document(
+            body='<subsection identifier="/us/usc/t99/s1/a"><content>Text.</content></subsection>'
+        ),
+        "does not stand in a container",
+    ),
+    "top element that is not a title": (
+        document(body="")
+        .replace("<main><title", "<main><chapter")
+        .replace("</title></main>", "</chapter></main>"),
+        "not a title",
+    ),
+    "ref with neither an href nor the class footnoteRef": (
+        document(inner="<content>See <ref>this</ref>.</content>"),
+        "neither an href nor the class footnoteRef",
+    ),
+    "ref that is both a link and a footnote marker": (
+        document(
+            inner='<content>A widget<ref class="footnoteRef" href="/us/usc/t99/s2" idref="f1">'
+            f"1</ref> is red.{FOOTNOTE}</content>"
+        ),
+        "both a link, with an href, and a footnote marker",
+    ),
+    "status that is not one of the schema's": (
+        document(body=SECTION.format(inner="").replace("<section ", '<section status="gone" ')),
+        "status",
+    ),
+    "img with another attribute": (
+        document(inner='<content><img src="file:///a.eps" alt="a"/></content>'),
+        "attribute other than src",
+    ),
+    "img with text": (
+        document(inner='<content><img src="file:///a.eps">A picture</img></content>'),
+        "holds text",
+    ),
+    "marker whose idref names no footnote": (
+        document(inner='<content>Text<ref class="footnoteRef" idref="none">1</ref>.</content>'),
+        "names no footnote",
+    ),
+    "two footnotes of one module with one id": (
+        document(
+            inner='<content>Text<ref class="footnoteRef" idref="f1">1</ref>'
+            f"{FOOTNOTE}.</content><content>More{FOOTNOTE}.</content>"
+        ),
+        "two footnotes of the module have the id 'f1'",
+    ),
+    "note citing a law in fewer than four segments": (
+        document(
+            inner='<notes type="uscNote"><note topic="miscellaneous"><heading>Odd</heading>'
+            '<p><ref href="/us/pl/999">Pub. L. 999</ref></p></note></notes>'
+        ),
+        "fewer than four segments",
+    ),
+    "note citing a law with a character a segment cannot hold": (
+        document(
+            inner='<notes type="uscNote"><note topic="miscellaneous"><heading>Odd</heading>'
+            '<p><ref href="/us/pl/999/1(5)">Pub. L. 999-1</ref></p></note></notes>'
+        ),
+        "a character an address segment cannot hold",
+    ),
+    "cross heading with no topic": (
+        document(
+            inner='<notes type="uscNote"><note role="crossHeading"><heading>Notes</heading>'
+            "</note></notes>"
+        ),
+        "not one word of ASCII letters",
+    ),
+    "cross heading whose topic is not one word": (
+        document(
+            inner='<notes type="uscNote"><note role="crossHeading" topic="editorial-notes">'
+            "<heading>Notes</heading></note></notes>"
+        ),
+        "not one word of ASCII letters",
+    ),
+    "note whose topic holds a no-break space": (
+        document(
+            inner='<content>Text.</content><notes type="uscNote"><note topic="amendments'
+            + NO_BREAK_SPACE
+            + 'effectiveDate"><heading>Odd</heading><p>Text.</p></note></notes>'
+        ),
+        "holds a white-space character other than U+0020",
+    ),
+    "link inside a link": (
+        document(
+            inner='<content>See <ref href="/us/usc/t99/s2">section <ref href="/us/usc/t99/s3">'
+            "3</ref></ref>.</content>"
+        ),
+        "inside another",
+    ),
+    "superscript inside a subscript": (
+        document(inner="<content>A<sub>b<sup>c</sup></sub>.</content>"),
+        "inside another",
+    ),
+    "footnote marker inside a superscript": (
+        document(
+            inner='<content>Text<sup><ref class="footnoteRef" idref="f1">1</ref></sup>'
+            f"{FOOTNOTE}.</content>"
+        ),
+        "marker inside",
+    ),
+    "footnote marker that holds an element": (
+        document(
+            inner='<content>Text<ref class="footnoteRef" idref="f1"><i>1</i></ref>'
+            f"{FOOTNOTE}.</content>"
+        ),
+        "marker that holds an element",
+    ),
+    "second num": (
+        document(inner='<num value="2">§ 2.</num><content>Text.</content>'),
+        "second num",
+    ),
+    "second heading": (
+        document(inner="<heading>Again</heading><content>Text.</content>"),
+        "second heading",
+    ),
+    "identifier that gives no address": (
+        document(body=SECTION.format(inner="<content>Text.</content>").replace("/s1", "/s(1)")),
+        "not an address",
+    ),
+    "identifier of a unit that holds a tilde": (
+        document(body=SECTION.format(inner="<content>Text.</content>").replace("/s1", "/s1~2")),
+        "holds ~",
+    ),
+    "identifier of a provision that holds a tilde": (
+        document(
+            inner='<subsection identifier="/us/usc/t99/s1/a~2"><content>Text.</content>'
+            "</subsection>"
+        ),
+        "holds ~",
+    ),
+    "character composed across the start of a link": (
+        document(inner=f'<content>cafe<ref href="/us/usc/t99/s2">{ACUTE} owner</ref></content>'),
+        COMPOSED,
+    ),
+    "character composed across the end of a link": (
+        document(inner=f'<content><ref href="/us/usc/t99/s2">cafe</ref>{ACUTE} owner</content>'),
+        COMPOSED,
+    ),
+    "character composed across the boundary of a superscript": (
+        document(inner=f"<content>cafe<sup>{ACUTE}</sup> owner</content>"),
+        COMPOSED,
+    ),
+    "character composed across the boundary of a subscript": (
+        document(inner=f"<content>cafe<sub>{ACUTE}</sub> owner</content>"),
+        COMPOSED,
+    ),
+    "character composed across a footnote marker": (
+        document(
+            inner=f'<content>cafe<ref class="footnoteRef" idref="f1">1</ref>{ACUTE} owner'
+            f"{FOOTNOTE}</content>"
+        ),
+        COMPOSED,
+    ),
+    "span that is not a whole number": (
+        document(
+            inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><tr>'
+            '<td colspan="two">A</td></tr></table></content>'
+        ),
+        "whole number written in ASCII digits",
+    ),
+    "span written in digits that are not ASCII": (
+        document(
+            inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><tr>'
+            '<td rowspan="\u0662">A</td></tr></table></content>'
+        ),
+        "whole number written in ASCII digits",
+    ),
+    "br with content": (
+        document(inner="<content>A<br>b</br>c.</content>"),
+        "a br that holds",
+    ),
+    "column with content": (
+        document(
+            inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><colgroup>'
+            "<col>A</col></colgroup><tr><td>A</td></tr></table></content>"
+        ),
+        "column",
+    ),
+    "signature that holds something other than name and role": (
+        document(
+            inner='<content>Text.</content><notes type="uscNote"><note topic="miscellaneous">'
+            "<heading>Signed</heading><p>Text.</p><signature><name>A. Person.</name>"
+            "<date>2099</date></signature></note></notes>"
+        ),
+        "signature",
+    ),
+    "text where only elements may stand": (
+        document(inner="stray words<content>Text.</content>"),
+        "text where only elements may stand",
+    ),
+    "second source credit": (
+        document(inner="<sourceCredit>(One.)</sourceCredit><sourceCredit>(Two.)</sourceCredit>"),
+        "second source credit",
+    ),
+    # The section stands at depth 1 of its module, so the content inside 63 levels stands
+    # at 65; each container is a module of its own, and the title stands at depth 1 among
+    # the containers of its file.
+    "element nested 65 deep in its module": (
+        document(inner="<level>" * 63 + "<content>Text.</content>" + "</level>" * 63),
+        "<content> stands 65 deep in its unit or container, deeper than the 64 the reading",
+    ),
+    "element nested 5000 deep in its module": (
+        document(inner="<level>" * 5000 + "<content>Text.</content>" + "</level>" * 5000),
+        "<level> stands 65 deep in its unit or container, deeper than the 64 the reading",
+    ),
+    "container nested 65 deep in its file": (
+        document(body="<chapter>" * 64 + SECTION.format(inner="") + "</chapter>" * 64),
+        "<chapter> stands 65 containers deep in its file, deeper than the 64 the reading",
+    ),
+    "source credit that is not the direct child of its unit": (
+        document(
+            inner='<subsection identifier="/us/usc/t99/s1/a"><content>Text.</content>'
+            "<sourceCredit>(One.)</sourceCredit></subsection>"
+        ),
+        "not the direct child",
+    ),
+}
+
+
+def assert_refused(case: unittest.TestCase, path: Path, phrase: str) -> None:
+    """Both scripts refuse the input at `path`, with a message that holds `phrase`."""
+    for script in SCRIPTS:
+        with case.subTest(script=script.name):
+            result = run_script(script, path)
+            case.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            case.assertTrue(result.stderr.startswith("refused: "), result.stderr)
+            case.assertIn(phrase, result.stderr)
+            case.assertEqual(result.stdout, "")
+
+
+class Refusals(unittest.TestCase):
+    def refused(self, path: Path, phrase: str) -> None:
+        assert_refused(self, path, phrase)
+
+    def test_the_scripts_refuse_what_the_rules_refuse(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-refused-") as name:
+            directory = Path(name)
+            for label, (text, phrase) in DOCUMENT_REFUSALS.items():
+                with self.subTest(refusal=label):
+                    path = directory / MEMBER
+                    path.write_text(text, encoding="utf-8")
+                    self.refused(path, phrase)
+            for member in ("x.txt", "dir/usc99.xml", "../usc99.xml", "usc999.xml"):
+                with self.subTest(refusal="member name", member=member):
+                    case = directory / member.replace("/", "_").replace(".", "_")
+                    case.mkdir()
+                    archive(case, "a.zip", {member: document()})
+                    self.refused(case, "is not named usc")
+            with self.subTest(refusal="a member two archives hold"):
+                case = directory / "twice"
+                case.mkdir()
+                archive(case, "a.zip", {MEMBER: document()})
+                archive(case, "b.zip", {MEMBER: document()})
+                self.refused(case, "held by two archives")
+            with self.subTest(refusal="a member whose release differs from the first's"):
+                case = directory / "releases"
+                case.mkdir()
+                other = document(release="Online@999-2").replace("t99", "t99a")
+                archive(case, "a.zip", {MEMBER: document(), "usc99a.xml": other})
+                self.refused(case, "the first member says 999-1")
+            with self.subTest(refusal="a member larger than 512 MiB"):
+                case = directory / "large"
+                case.mkdir()
+                oversized_archive(case)
+                self.refused(case, "larger than 512 MiB")
+            # A header that understates the size of a deflated member is seen at the end
+            # of its compressed stream, whatever CRC-32 it gives.
+            for crc_of_prefix in (False, True):
+                with self.subTest(refusal="an understated member", crc_of_prefix=crc_of_prefix):
+                    case = directory / f"understated-{crc_of_prefix}"
+                    case.mkdir()
+                    understated_archive(case, crc_of_prefix)
+                    self.refused(case, "bytes, and its header declares")
+
+
+# The entries of the refusal table that concern the positive-law flag.
+FLAG_REFUSALS = (
+    "positive-law flag that is neither yes nor no",
+    "positive-law flag that is empty",
+    "positive-law flag with white space before it",
+    "positive-law flag with white space after it",
+    "positive-law flag whose markup holds another value",
+    "two positive-law flags of one value",
+    "two positive-law flags of two values",
+)
+EN_DASH = chr(0x2013)
+# Characters that stand in the place of the hyphen of a release name and are not an en
+# dash: the em dash, the figure dash, the hyphen, the non-breaking hyphen, the minus sign,
+# the small and the fullwidth hyphen-minus, a space and a low line.
+OTHER_DASHES = tuple(
+    chr(code) for code in (0x2014, 0x2012, 0x2010, 0x2011, 0x2212, 0xFE63, 0xFF0D, 0x20, 0x5F)
+)
+
+
+class Metadata(unittest.TestCase):
+    """The release name and the positive-law flag of a document, as both scripts read them.
+
+    The scripts read no retrieval record: the release is what the first member names
+    after `Online@`, and every other member must name the same.
+    """
+
+    def printed(self, script: Path, path: Path) -> str:
+        result = run_script(script, path)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, "")
+        return result.stdout
+
+    def test_a_release_name_with_an_en_dash_is_read(self) -> None:
+        dashed = document(release=f"Online@999{EN_DASH}1")
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-meta-") as name:
+            directory = Path(name)
+            path = directory / MEMBER
+            for script in SCRIPTS:
+                with self.subTest(script=script.name):
+                    path.write_text(document(), encoding="utf-8")
+                    hyphenated = self.printed(script, path)
+                    path.write_text(dashed, encoding="utf-8")
+                    self.assertEqual(self.printed(script, path), hyphenated)
+            self.assertEqual(
+                json.loads(self.printed(PROFILE_SCRIPT, path))["import"]["release"], "999-1"
+            )
+            # A member named with an en dash and one named with a hyphen are of one release.
+            case = directory / "dashed"
+            case.mkdir()
+            second = dashed.replace("t99", "t99a")
+            archive(case, "a.zip", {MEMBER: document(), "usc99a.xml": second})
+            for script in SCRIPTS:
+                with self.subTest(script=script.name, members="dashed"):
+                    self.printed(script, case)
+            # No other character is read as another: a member that writes one of them in
+            # the place of the hyphen names another release, and alone it is read as one.
+            for index, other in enumerate(OTHER_DASHES):
+                with self.subTest(other=other):
+                    case = directory / f"other-{index}"
+                    case.mkdir()
+                    second = document(release=f"Online@999{other}1").replace("t99", "t99a")
+                    archive(case, "a.zip", {MEMBER: document(), "usc99a.xml": second})
+                    assert_refused(self, case, "the first member says 999-1")
+                    alone = case / MEMBER
+                    alone.write_text(document(release=f"Online@999{other}1"), encoding="utf-8")
+                    profile = json.loads(self.printed(PROFILE_SCRIPT, alone))
+                    self.assertEqual(profile["import"]["release"], f"999{other}1")
+
+    def test_the_name_and_the_flag_are_read_as_their_whole_text(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-meta-") as name:
+            directory = Path(name)
+            path = directory / MEMBER
+            # Markup inside the name or the flag is read as the words it holds.
+            marked = document(release="Online@<i>999</i>-1", flag="y<b>es</b>")
+            for script in SCRIPTS:
+                with self.subTest(script=script.name):
+                    for plain, text in (
+                        (document(), marked),
+                        (document(flag="no"), document(flag="<i>n</i>o")),
+                    ):
+                        path.write_text(plain, encoding="utf-8")
+                        expected = self.printed(script, path)
+                        path.write_text(text, encoding="utf-8")
+                        self.assertEqual(self.printed(script, path), expected)
+            # White space after the name is part of it: such a member names another
+            # release, and alone it is read as one.
+            for index, after in enumerate((" ", "\n")):
+                with self.subTest(after=after):
+                    case = directory / f"after-{index}"
+                    case.mkdir()
+                    second = document(release=f"Online@999-1{after}").replace("t99", "t99a")
+                    archive(case, "a.zip", {MEMBER: document(), "usc99a.xml": second})
+                    assert_refused(self, case, "the first member says 999-1")
+                    alone = case / MEMBER
+                    alone.write_text(document(release=f"Online@999-1{after}"), encoding="utf-8")
+                    profile = json.loads(self.printed(PROFILE_SCRIPT, alone))
+                    self.assertEqual(profile["import"]["release"], f"999-1{after}")
+
+    def test_a_document_without_the_flag_has_none(self) -> None:
+        # The document of the refusal table without its property is read: the record of
+        # its unit has null, and nothing else of what the scripts print changes.
+        self.assertNotIn("is-positive-law", with_flags())
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-meta-") as name:
+            path = Path(name) / MEMBER
+            printed: dict[str, list[str]] = {}
+            profiles: list[str] = []
+            for flag, text in (
+                ("none", with_flags()),
+                ("yes", document()),
+                ("no", with_flags("no")),
+            ):
+                path.write_text(text, encoding="utf-8")
+                printed[flag] = self.printed(TEXT_SCRIPT, path).splitlines()
+                profiles.append(self.printed(PROFILE_SCRIPT, path))
+        records = [json.loads(line) for line in printed["none"]]
+        self.assertEqual([r["address"] for r in records], ["/us/usc/t99", "/us/usc/t99/s1"])
+        self.assertNotIn("positive_law", records[0])
+        self.assertIn("positive_law", records[1])
+        self.assertIsNone(records[1]["positive_law"])
+        for flag, value in (("yes", "true"), ("no", "false")):
+            self.assertEqual(printed[flag][0], printed["none"][0])
+            self.assertEqual(
+                printed[flag][1].replace(f'"positive_law":{value}}}', '"positive_law":null}'),
+                printed["none"][1],
+            )
+        # The profile prints no flag.
+        self.assertEqual(profiles, [profiles[0]] * 3)
+
+    def test_two_flags_and_another_value_are_still_refused(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-meta-") as name:
+            path = Path(name) / MEMBER
+            for label in FLAG_REFUSALS:
+                text, phrase = DOCUMENT_REFUSALS[label]
+                with self.subTest(refusal=label):
+                    path.write_text(text, encoding="utf-8")
+                    assert_refused(self, path, phrase)
+
+
+def record_key(record: dict[str, object]) -> tuple[bytes, int, int]:
+    address = record["address"]
+    ordinal = record.get("ordinal", 0)
+    if not isinstance(address, str) or not isinstance(ordinal, int):
+        raise AssertionError(record)
+    rank = {"credit": 1, "footnote": 2}.get(str(record.get("record")), 0)
+    return address.encode("utf-8"), rank, ordinal
+
+
+PROVISION_KEYS = ["address", "layer", "kind", "status", "num", "heading", "items"]
+UNIT_KEYS = [*PROVISION_KEYS, "aliases", "within", "source", "positive_law"]
+CONTAINER_KEYS = [
+    "address", "layer", "kind", "status", "num", "heading", "aliases", "within", "members",
+]  # fmt: skip
+NOTE_KEYS = ["address", "layer", "group", "topics", "heading", "blocks"]
+FOOTNOTE_KEYS = ["address", "record", "ordinal", "shown", "blocks"]
+
+
+def check_record(case: unittest.TestCase, record: dict[str, object]) -> None:
+    keys = list(record)
+    if record.get("record") == "credit":
+        case.assertEqual(keys[:2], ["address", "record"])
+        check_text(case, {k: record[k] for k in keys[2:]}, "p")
+    elif record.get("record") == "footnote":
+        case.assertEqual(keys, FOOTNOTE_KEYS)
+        case.assertIsInstance(record["shown"], str)
+        check_blocks(case, record["blocks"])
+    elif "group" in record:
+        case.assertEqual(keys, NOTE_KEYS)
+        case.assertIn(record["layer"], ("enacted", "editorial"))
+        case.assertIsInstance(record["topics"], list)
+        check_optional_text(case, record["heading"])
+        check_blocks(case, record["blocks"])
+    else:
+        case.assertIn(keys, (PROVISION_KEYS, UNIT_KEYS, CONTAINER_KEYS))
+        case.assertEqual(record["layer"], "operative")
+        case.assertIsInstance(record["kind"], str)
+        case.assertTrue(record["status"] is None or isinstance(record["status"], str))
+        check_num(case, record["num"])
+        check_optional_text(case, record["heading"])
+        if keys == CONTAINER_KEYS:
+            case.assertIsInstance(record["members"], list)
+        else:
+            items = record["items"]
+            if not isinstance(items, list):
+                raise AssertionError(items)
+            for item in items:
+                if "child" in item:
+                    case.assertEqual(list(item), ["child"])
+                else:
+                    check_part(case, item)
+        if keys == UNIT_KEYS:
+            case.assertIsInstance(record["source"], str)
+            flag = record["positive_law"]
+            case.assertTrue(flag is None or isinstance(flag, bool), flag)
+
+
+def check_text(case: unittest.TestCase, value: object, key: str = "text") -> None:
+    if not isinstance(value, dict):
+        raise AssertionError(value)
+    keys = list(value)
+    case.assertIn(keys, ([key, "refs", "sup", "sub"], [key, "refs", "sup", "sub", "marks"]))
+    plain = value[key]
+    if not isinstance(plain, str):
+        raise AssertionError(plain)
+    case.assertEqual(plain, " ".join(plain.split(" ")).strip(" "))
+    for start, end, target in value["refs"]:
+        case.assertTrue(0 <= start < end <= len(plain) and isinstance(target, str))
+    for start, end in [*value["sup"], *value["sub"]]:
+        case.assertTrue(0 <= start < end <= len(plain))
+    for offset, shown, footnote in value.get("marks", []):
+        case.assertTrue(0 <= offset <= len(plain) and isinstance(shown, str) and footnote >= 1)
+
+
+def check_optional_text(case: unittest.TestCase, value: object) -> None:
+    if value is not None:
+        check_text(case, value)
+
+
+def check_num(case: unittest.TestCase, value: object) -> None:
+    if value is None:
+        return
+    if not isinstance(value, list) or len(value) != 2 or not isinstance(value[0], str):
+        raise AssertionError(value)
+    if not isinstance(value[1], str):
+        check_text(case, value[1])
+
+
+def check_part(case: unittest.TestCase, value: object) -> None:
+    if not isinstance(value, dict):
+        raise AssertionError(value)
+    case.assertEqual(list(value), ["part", "blocks"])
+    case.assertIn(value["part"], ("chapeau", "content", "continuation", "proviso"))
+    case.assertTrue(value["blocks"])
+    check_blocks(case, value["blocks"])
+
+
+def check_blocks(case: unittest.TestCase, blocks: object) -> None:
+    if not isinstance(blocks, list):
+        raise AssertionError(blocks)
+    for block in blocks:
+        check_block(case, block)
+
+
+def check_block(case: unittest.TestCase, block: object) -> None:
+    if not isinstance(block, dict):
+        raise AssertionError(block)
+    first = next(iter(block))
+    if first in ("p", "subheading"):
+        check_text(case, block, first)
+    elif first == "image":
+        case.assertEqual(list(block), ["image"])
+    elif first == "table":
+        case.assertEqual(list(block), ["table"])
+        for group, cells in block["table"]:
+            case.assertIn(group, ("head", "body", "foot"))
+            for header, colspan, rowspan, inner in cells:
+                case.assertIsInstance(header, bool)
+                case.assertTrue(colspan >= 1 and rowspan >= 1)
+                check_blocks(case, inner)
+    elif first == "quoted":
+        case.assertEqual(list(block), ["quoted"])
+        case.assertEqual(list(block["quoted"]), ["origin", "items"])
+        check_quoted_items(case, block["quoted"]["items"])
+    else:
+        raise AssertionError(block)
+
+
+def check_quoted_items(case: unittest.TestCase, items: object) -> None:
+    if not isinstance(items, list):
+        raise AssertionError(items)
+    for item in items:
+        if "part" in item:
+            check_part(case, item)
+        elif "level" in item:
+            case.assertEqual(list(item), ["level", "num", "heading", "items"])
+            check_num(case, item["num"])
+            check_optional_text(case, item["heading"])
+            check_quoted_items(case, item["items"])
+        else:
+            check_block(case, item)
+
+
+if __name__ == "__main__":
+    unittest.main()

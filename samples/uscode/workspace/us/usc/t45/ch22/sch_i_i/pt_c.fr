@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/ch22/schII/ptC" {
+  within "/us/usc/t45/ch22/schII"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch22/schII/ptC" part {
+    num "C" "Part C—"
+    heading "Miscellaneous Provisions"
+    member "/us/usc/t45/s1341"
+    member "/us/usc/t45/s1342"
+    member "/us/usc/t45/s1343"
+    member "/us/usc/t45/s1344"
+    member "/us/usc/t45/s1345"
+    member "/us/usc/t45/s1346"
+    member "/us/usc/t45/s1347"
+    hash "28d118c83e5a3b5aaa5476bc72a7af437572d01cf1ec591ae50e7f34315f75ea"
+  }
+  layers {
+    operative "28d118c83e5a3b5aaa5476bc72a7af437572d01cf1ec591ae50e7f34315f75ea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

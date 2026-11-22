@@ -1,0 +1,28 @@
+edition 2
+module "/us/usc/ptV" {
+  within "/us/usc/t11a/~courtRules.1"
+  source "usc11a.xml"
+  positive_law false
+  container "/us/usc/ptV" part {
+    num "V" "PART V—"
+    heading "COURTS AND CLERKS"
+    member "/us/usc/ptV/rule5001"
+    member "/us/usc/ptV/rule5002"
+    member "/us/usc/ptV/rule5003"
+    member "/us/usc/ptV/rule5004"
+    member "/us/usc/ptV/rule5005"
+    member "/us/usc/ptV/rule5006"
+    member "/us/usc/ptV/rule5007"
+    member "/us/usc/ptV/rule5008"
+    member "/us/usc/ptV/rule5009"
+    member "/us/usc/ptV/rule5010"
+    member "/us/usc/ptV/rule5011"
+    member "/us/usc/ptV/rule5012"
+    hash "667805e1fe6291e2f8012a42aa4e7d657e3231021de8d06e1067d3451b7a14ec"
+  }
+  layers {
+    operative "667805e1fe6291e2f8012a42aa4e7d657e3231021de8d06e1067d3451b7a14ec"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

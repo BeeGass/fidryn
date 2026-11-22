@@ -1,0 +1,93 @@
+edition 2
+module "/us/usc/t45/s1321" {
+  within "/us/usc/t45/ch22/schII/ptB"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1321" section {
+    num "1321" "§ 1321."
+    heading "Rail service obligations"
+    provision "/us/usc/t45/s1321/a" subsection {
+      num "a" "(a)"
+      heading "Obligations of Corporation"
+      chapeau "During a period of 5 years beginning on October 21, 1986, the following obligations shall apply to the Corporation:"
+      provision "/us/usc/t45/s1321/a/1" paragraph {
+        num "1" "(1)"
+        content "The Corporation shall spend in each fiscal year the greater of (A) an amount equal to the Corporation’s depreciation for financial reporting purposes for such year or (B) $500,000,000, in capital expenditures. With respect to any fiscal year, the Corporation’s Board of Directors may reduce the required capital expenditures for such year to an amount which the Board determines is justified by prudent business and engineering practices, except that the Corporation’s capital expenditures shall not be less than $350,000,000 for its first fiscal year beginning after the sale date, a total of $700,000,000 for its first two fiscal years beginning after the sale date, a total of $1,050,000,000 for its first three fiscal years beginning after the sale date, a total of $1,400,000,000 for its first four fiscal years beginning after the sale date, and a total of $1,750,000,000 for its first five fiscal years beginning after the sale date."
+        hash "4f52f0fa6062ae815ee8b8fa8bcb36aec8563d736e60c02ba955a4a90ff67a6f"
+      }
+      provision "/us/usc/t45/s1321/a/2" paragraph {
+        num "2" "(2)"
+        content "Repealed. " ["Pub. L. 101–213, § 2(b)(3)" -> "/us/pl/101/213/s2/b/3"] ", Dec. 11, 1989, " ["103 Stat. 1843" -> "/us/stat/103/1843"] "."
+        hash "9e3319dd15c7cc48137b357ceb6d89741e50709c5c3e83b50b37faede7dbe4e6"
+      }
+      provision "/us/usc/t45/s1321/a/3" paragraph {
+        num "3" "(3)"
+        content "The Corporation shall continue its affirmative action program and its minority vendor program, substantially as such programs were being conducted by the Corporation as of February 8, 1985, subject to any provisions of applicable law."
+        hash "a42e1bc68e02060c987fdb0b485cbc59de898342c5ca36747d3bec88c2f74755"
+      }
+      provision "/us/usc/t45/s1321/a/4" paragraph {
+        num "4" "(4)"
+        content "The Corporation shall not permit to occur any transaction or series of transactions (other than in the ordinary course of business of the Corporation and its subsidiaries) whereby all or any substantial part of the railroad assets and business of the Corporation and its subsidiaries taken as a whole are sold, leased, transferred, or otherwise disposed of to any corporation or entity other than to a wholly owned subsidiary of the Corporation."
+        hash "f62ead74475da5eba6397022eebf5622ec7e89eef2d8ebac1249b5cdddcf319d"
+      }
+      provision "/us/usc/t45/s1321/a/5" paragraph {
+        num "5" "(5)"
+        content "The Corporation shall offer any line for which an abandonment certificate is issued by the Commission to a purchaser who agrees to provide interconnecting rail service. Such offer shall last for the 120-day period following the date of issuance of the abandonment certificate and the price for such abandoned line shall be equal to 75 percent of net liquidation value as determined by the Commission, pursuant to regulations that had been issued under " ["section 748 of this title" -> "/us/usc/t45/s748"] "."
+        hash "9bf429e830f604617f1fd68a604b0560c15950db578e6dc90cc22a5c34a10a63"
+      }
+      provision "/us/usc/t45/s1321/a/6" paragraph {
+        num "6" "(6)"
+        content "The Corporation and its subsidiaries shall maintain, preserve, protect, and keep their respective properties in good repair, working order, and condition, and shall not permit deferral of normal and prudent maintenance necessary to provide and maintain rail service."
+        hash "e6da1a0dba75f9968e88b99c60b8aa3338ac9afad11f16cbf619ba3557db48c7"
+      }
+      hash "30863aae8a39104d052c988b37f9829e2ba74536ccdbeeacf84ec56544f00ff0"
+    }
+    provision "/us/usc/t45/s1321/b" subsection {
+      num "b" "(b)"
+      heading "Compliance certificates"
+      provision "/us/usc/t45/s1321/b/1" paragraph {
+        num "1" "(1)"
+        content "Within 90 days after the close of each of its fiscal years, or at the time its financial statements have been audited, whichever occurs later, the Corporation shall deliver to the Secretary of Transportation a certificate executed by an executive officer of the Corporation. Such certificate shall certify that, as of such date, the Corporation is in compliance with all requirements (other than the requirement regarding a common stock dividend or a preferred stock dividend) set forth in this section. Such certificate shall include audited consolidated financial statements."
+        hash "cab8bc3d151fbbf626c90d70ebaafc96ef1b85d48bfeefa61eaa5bca4585018b"
+      }
+      provision "/us/usc/t45/s1321/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Within 5 days after the declaration of any common stock dividend or preferred stock dividend, the Corporation shall deliver to the Secretary of Transportation a certificate executed by an executive officer of the Corporation. Such certificate shall certify that, after giving effect to any such dividend, the Corporation shall be in compliance with any requirement regarding a common stock dividend or a preferred stock dividend set forth in this section. Such certificate shall include—"
+        provision "/us/usc/t45/s1321/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "quarterly financial statements; and"
+          hash "bb7d0ee329c257518b9be6ff38da6bfb2c50adedab6f2feae320c33ea2444dda"
+        }
+        provision "/us/usc/t45/s1321/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "a report of the Corporation’s total capital expenditures,"
+          hash "8c51fcb1fe71562c0f946a30b3b705e598e7a2d7c95b555da991904c4f284265"
+        }
+        continuation "for the period with respect to which the dividend has been declared, and the fiscal year to date, and shall compare such capital expenditures to the budgeted capital expenditures and to the capital expenditures during the comparable periods of the previous fiscal year."
+        hash "a98c659242e8a674dfc4a3145a1707c9f5b48426f3d810f7ded1f11d56893b7b"
+      }
+      hash "e23c0390a27661288b4fc8d8bb4de5095fc303151d8248818be49b1ffbfd7fd6"
+    }
+    hash "f8c9c1260cfdf710d0ca4a6a176b2c0ab9b5029b9395857606d8d68e6a6ed296"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4021" -> "/us/pl/99/509/tIV/s4021"] ", Oct. 21, 1986, " ["100 Stat. 1898" -> "/us/stat/100/1898"] "; " ["Pub. L. 101–213, § 2(b)(3)" -> "/us/pl/101/213/s2/b/3"] ", Dec. 11, 1989, " ["103 Stat. 1843" -> "/us/stat/103/1843"] ".)"
+  note "/us/usc/t45/s1321/note/editorialNotes/pl.101.213/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1989—Subsec. (a)(2). " ["Pub. L. 101–213" -> "/us/pl/101/213"] " struck out par. (2) which set forth circumstances under which Corporation could declare or pay a common or preferred stock dividend and defined terms “common stock dividend” and “preferred stock dividend”."
+    hash "82ee991a8166e3181250555b89ff1c2e4223d08fd9d6c6ab2083e32d15ac7cc3"
+  }
+  note "/us/usc/t45/s1321/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  layers {
+    operative "f8c9c1260cfdf710d0ca4a6a176b2c0ab9b5029b9395857606d8d68e6a6ed296"
+    enacted "033110ac738c000d7be93b74a931a9d655372b543b61129250274b0601890954"
+    editorial "b6ffde268533da726c08b42e21fd60bcc3b026e8969eec5d23d0a5934478690a"
+  }
+}

@@ -1,0 +1,54 @@
+edition 2
+module "/us/usc/t45/s797g" {
+  within "/us/usc/t45/ch16/schVII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s797g" section {
+    num "797g" "§ 797g."
+    heading "New collective-bargaining agreements"
+    provision "/us/usc/t45/s797g/a" subsection {
+      num "a" "(a)"
+      heading "Agreement"
+      content "Not later than 60 days after the effective date of any conveyance pursuant to the provisions of this chapter, the representatives of the various classes or crafts of employees of a railroad in reorganization involved in a conveyance and representatives of the Corporation shall commence negotiation of a new single collective bargaining agreement for each class and craft of employees covering the rate of pay, rules, and working conditions of employees who are the employees of the Corporation. Such collective bargaining agreement shall include appropriate provisions concerning rates of pay, rules, and working conditions, but shall not, before April 1, 1984, include any provisions for job stabilization which may exceed or conflict with those established herein. Negotiations with respect to such single collective bargaining agreement, and any successor thereto, shall be conducted systemwide."
+      hash "8497a4297f0adc7215045a62507d74f4558fd292fe8ce78993b06cc2b38ec296"
+    }
+    provision "/us/usc/t45/s797g/b" subsection {
+      num "b" "(b)"
+      heading "Procedure"
+      provision "/us/usc/t45/s797g/b/1" paragraph {
+        num "1" "(1)"
+        content "Any procedure for finally determining the components of the first single collective bargaining agreement for any class or craft, agreed upon before August 13, 1981, shall be completed no later than 45 days after August 13, 1981. Such agreed upon procedure shall be deemed to satisfy the requirements of sections 157 and 158 of this title. The National Mediation Board shall appoint any person as provided for by such agreements."
+        hash "6ef5ae0b17fee2150e1727669cde66e91d7c94c1b467db54cab64764891ae629"
+      }
+      provision "/us/usc/t45/s797g/b/2" paragraph {
+        num "2" "(2)"
+        content "Nothing in this section shall be construed to require the parties to enter into a new single collective bargaining agreement if the agreement between the parties in effect immediately prior to August 13, 1981, complied with section 774(d)" mark "1" 1 " of this title as in effect immediately prior to such date."
+        hash "e922757ca9e150be5d07d8075625792d55b94549afc3b9bad8ab3df9c7da545f"
+      }
+      hash "15ac922fd1c7244ce98335cfd40a2c68c303f9667310a547348fba7924080392"
+    }
+    provision "/us/usc/t45/s797g/c" subsection {
+      num "c" "(c)"
+      heading "Railway Labor Act notices"
+      content "Employees of the Corporation may not serve notices under " ["section 156 of this title" -> "/us/usc/t45/s156"] " for the purpose of negotiating job stabilization or other protective agreements with the Corporation until after April 1, 1984."
+      hash "8d7dfbcf424b04aa3146670a7ebd7839606014678da192f9319a98d272a85f40"
+    }
+    hash "10c59e75b2b63b211c8e1370c7c9e74166a895c600809b0b913c811eb66ae812"
+  }
+  credit "(" ["Pub. L. 93–236, title VII, § 708" -> "/us/pl/93/236/tVII/s708"] ", as added " ["Pub. L. 97–35, title XI, § 1143(a)" -> "/us/pl/97/35/tXI/s1143/a"] ", Aug. 13, 1981, " ["95 Stat. 665" -> "/us/stat/95/665"] ".)"
+  note "/us/usc/t45/s797g/note/editorialNotes/pl.97.35/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 774 of this title" -> "/us/usc/t45/s774"] ", referred to in subsec. (b)(2), was repealed by " ["Pub. L. 97–35, title XI, § 1144(a)(1)" -> "/us/pl/97/35/tXI/s1144/a/1"] ", Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"] "."
+    hash "1b9f6bdbe074d9c647a0933115fb0060f0d375444ba8d2830af75b9c5c3c2eac"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "10c59e75b2b63b211c8e1370c7c9e74166a895c600809b0b913c811eb66ae812"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f4cc4f6ff04c4b82113e10ac5a6e30fef53761e0ba2c63b1e0952c398a95795d"
+  }
+}

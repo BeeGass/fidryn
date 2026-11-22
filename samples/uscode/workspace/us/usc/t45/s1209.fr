@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s1209" {
+  within "/us/usc/t45/ch21"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1209" section {
+    num "1209" "§ 1209."
+    heading "Repealed. " ["Pub. L. 108–7, div. I, title III, § 345(5)" -> "/us/pl/108/7/dI/tIII/s345/5"] ", Feb. 20, 2003, " ["117 Stat. 418" -> "/us/stat/117/418"]
+    status repealed
+    hash "c5173d4cacc797784a0299f765954b6e570cf062a6c8e21a5510406b716d24e4"
+  }
+  note "/us/usc/t45/s1209/note/ungrouped/pl.97.468/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 97–468, title VI, § 610" -> "/us/pl/97/468/tVI/s610"] ", Jan. 14, 1983, " ["96 Stat. 2575" -> "/us/stat/96/2575"] ", related to reversion from the State of railroad property to the United States."
+    hash "36fabc990a11b8513cbfc892867eef621cfeda22a2b3618a58f096f3df6769a0"
+  }
+  layers {
+    operative "c5173d4cacc797784a0299f765954b6e570cf062a6c8e21a5510406b716d24e4"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e3199b53a3f468fb4fc7fecaf1f06435e4bdcbe4cd41dc8b6d2ab031b8b09900"
+  }
+}

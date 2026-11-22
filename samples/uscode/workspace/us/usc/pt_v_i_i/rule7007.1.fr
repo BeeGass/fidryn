@@ -1,0 +1,72 @@
+edition 2
+module "/us/usc/ptVII/rule7007.1" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7007.1" courtRule {
+    num "7007.1" "Rule 7007.1."
+    heading "Corporate Ownership Statement"
+    provision "/us/usc/ptVII/rule7007.1/a" subsection {
+      num "a" "(a)"
+      heading "Required Disclosure."
+      content "Any nongovernmental corporation—other than the debtor—that is a party to an adversary proceeding must file a statement identifying any parent corporation and any publicly held corporation that owns 10% or more of its stock or stating that there is no such corporation. The same requirement applies to a nongovernmental corporation that seeks to intervene."
+      hash "b78946947af7cbdd2421a2009dbc338c07ee7d454187e74bd77b2a6730aa4af2"
+    }
+    provision "/us/usc/ptVII/rule7007.1/b" subsection {
+      num "b" "(b)"
+      heading "Time for Filing; Supplemental Filing."
+      chapeau "The statement must:"
+      provision "/us/usc/ptVII/rule7007.1/b/1" paragraph {
+        num "1" "(1)"
+        content "be filed with the corporation’s first appearance, pleading, motion, response, or other request to the court; and"
+        hash "eb5c2fe476309d68ac9ca33543cb39471d731b889e34edac14fe4eda4594364c"
+      }
+      provision "/us/usc/ptVII/rule7007.1/b/2" paragraph {
+        num "2" "(2)"
+        content "be supplemented whenever the information required by this rule changes."
+        hash "06bb06d8ee00eb3e08450eae9dcd1328fa81d865f8156ce5b6e499f807a7fef9"
+      }
+      hash "277453486caed24ea700ade90184a9db0d32563b0eacb96494348cb6ef01593a"
+    }
+    hash "65c04bf711cbfadb4d7896ba2e25ce4e168aacfe8b86c9af21103e57f8307a68"
+  }
+  credit "(Added Mar. 27, 2003, eff. Dec. 1, 2003; amended Apr. 30, 2007, eff. Dec. 1, 2007; Apr. 14, 2021, eff. Dec. 1, 2021; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2003" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2003"
+    p "This rule is derived from Rule 26.1 of the Federal Rules of Appellate Procedure. The information that parties shall supply will support properly informed disqualification decisions in situations that call for automatic disqualification under Canon 3C(1)(c) of the Code of Conduct for United States Judges. This rule does not cover all of the circumstances that may call for disqualification under the subjective financial interest standard of Canon 3C, and does not deal at all with other circumstances that may call for disqualification. Nevertheless, the required disclosures are calculated to reach the majority of circumstances that are likely to call for disqualification under Canon 3C(1)(c)."
+    p "The rule directs nongovernmental corporate parties to list those corporations that hold significant ownership interests in them. This includes listing membership interests in limited liability companies and similar entities that fall under the definition of a corporation in Bankruptcy Code § 101."
+    p "Under subdivision (b), parties must file the statement with the first document that they file in any adversary proceeding. The rule also requires parties and other persons to file supplemental statements promptly whenever changed circumstances require disclosure of new or additional information."
+    p "The rule does not prohibit the adoption of local rules requiring disclosures beyond those called for in Rule 7007.1."
+    p "Changes Made After Publication and Comments. No changes since publication."
+    hash "2de51c0e4353e0ba400a8c40a7cbf9eed793a9415edb9a452def3af8716f7f17"
+  }
+  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2007 Amendment"
+    p "The rule is amended to clarify that a party must file a corporate ownership statement with its initial paper filed with the court in an adversary proceeding. The party’s initial filing may be a document that is not a “pleading” as defined in Rule 7 F. R. Civ. P., which is made applicable in adversary proceedings by Rule 7007. The amendment also brings Rule 7007.1 more closely in line with Rule 7.1 F. R. Civ. P."
+    p "Changes After Publication. No changes were made after publication."
+    hash "63352767f9f2832aea043eb99d78895d222c58ae4041625d39e8785c91c4cb62"
+  }
+  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2021 Amendment"
+    p "The rule is amended to conform to recent amendments to Fed. R. Bankr. P. 8012 and Fed. R. App. P. 26.1, and the anticipated amendment to Fed. R. Civ. P. 7.1. Subdivision (a) is amended to encompass nongovernmental corporations that seek to intervene. Stylistic changes are made to subdivision (b) to reflect that some statements will be filed by nonparties seeking to intervene."
+    hash "0ae3b19676965d4dc9cd616b171141f9fb711e947597fd159c8081376b7f5927"
+  }
+  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7007.1 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "f9e9f74a3ba1ed2e20dd98a576683405a0514b1451812fdf8d64f224013ed407"
+  }
+  layers {
+    operative "65c04bf711cbfadb4d7896ba2e25ce4e168aacfe8b86c9af21103e57f8307a68"
+    enacted "b0d33a021fdde62cd6619f5193656b2848d87b6b08341364860a8bf4ae8a9b54"
+    editorial "4fe4227f2c4e6591994902fe0c0c69c173d5fa410be61e972da81781ccd9ba65"
+  }
+}

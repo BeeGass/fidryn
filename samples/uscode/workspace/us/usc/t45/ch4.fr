@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/ch4" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch4" chapter {
+    num "4" "CHAPTER 4—"
+    heading "CARE OF ANIMALS IN TRANSIT"
+    member "/us/usc/t45/s71...74"
+    member "/us/usc/t45/s75"
+    hash "7f16d6aaefc79e84cce7e29f492b032990ab2da5141f361cd8a4e5a89bc10677"
+  }
+  layers {
+    operative "7f16d6aaefc79e84cce7e29f492b032990ab2da5141f361cd8a4e5a89bc10677"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

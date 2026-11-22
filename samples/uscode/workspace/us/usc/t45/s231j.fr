@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s231j" {
+  within "/us/usc/t45/ch9/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s231j" section {
+    num "231j" "§ 231j."
+    heading "Waiver of annuities"
+    content "Any person awarded an annuity under this subchapter may decline to accept all or any part of such annuity by a waiver signed and filed with the Board. Such a waiver may be revoked in writing at any time, but no payment of the annuity waived shall be made covering the period during which such waiver was in effect. Such a waiver will have no effect on entitlement to, or the amount of, any other annuity or benefit."
+    hash "bb8fcebdc347bf0477851f5ef2776f58657ac705b47264277de8873db7ad356f"
+  }
+  credit "(" ["Aug. 29, 1935, ch. 812, § 11" -> "/us/act/1935-08-29/ch812/s11"] ", as restated " ["June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", pt. I, " ["50 Stat. 307" -> "/us/stat/50/307"] ", as restated " ["Pub. L. 93–445, title I, § 101" -> "/us/pl/93/445/tI/s101"] ", Oct. 16, 1974, " ["88 Stat. 1344" -> "/us/stat/88/1344"] ".)"
+  layers {
+    operative "bb8fcebdc347bf0477851f5ef2776f58657ac705b47264277de8873db7ad356f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "bde77d8ae7a02bd779eeb51826db6d0ba11441d9e2e18db08452457f62a2b7de"
+  }
+}

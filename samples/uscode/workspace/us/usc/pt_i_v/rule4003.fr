@@ -1,0 +1,159 @@
+edition 2
+module "/us/usc/ptIV/rule4003" {
+  within "/us/usc/ptIV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIV/rule4003" courtRule {
+    num "4003" "Rule 4003."
+    heading "Exemptions"
+    provision "/us/usc/ptIV/rule4003/a" subsection {
+      num "a" "(a)"
+      heading "Claiming an Exemption."
+      content "A debtor must list the property claimed as exempt under § 522 on Form 106C filed under Rule 1007. If the debtor fails to do so within the time specified in Rule 1007(c), a debtor’s dependent may file the list within 30 days after the debtor’s time to file expires."
+      hash "17b6a9677f555ac60fbe61e5edc2c71d49d1a898cced96d1aeada3fab06f3e8f"
+    }
+    provision "/us/usc/ptIV/rule4003/b" subsection {
+      num "b" "(b)"
+      heading "Objecting to a Claimed Exemption."
+      provision "/us/usc/ptIV/rule4003/b/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "By a Party in Interest. Except as (2) and (3) provide, a party in interest may file an objection to a claimed exemption within 30 days after the later of:"
+          p "• the conclusion of the § 341 meeting of creditors;"
+          p "• the filing of an amendment to the list; or"
+          p "• the filing of a supplemental schedule."
+        }
+        continuation "On a party in interest’s motion filed before the time to object expires, the court may, for cause, extend the time to file an objection."
+        hash "c7f3d90443851c40a5a3b3689036669f541058a8268732ea9b4274a3b7ea1b2b"
+      }
+      provision "/us/usc/ptIV/rule4003/b/2" paragraph {
+        num "2" "(2)"
+        content {
+          p "By the Trustee for a Fraudulently Claimed Exemption. If the debtor has fraudulently claimed an exemption, the trustee may file an objection to it within one year after the case is closed. The trustee must deliver or mail the objection to:"
+          p "• the debtor;"
+          p "• the debtor’s attorney;"
+          p "• the person who filed the list of exempt property; and"
+          p "• that person’s attorney."
+        }
+        hash "34423e518ec8ca9076d599079e166c78a494e41b2ba978129ce8c57d034fd809"
+      }
+      provision "/us/usc/ptIV/rule4003/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Objection Based on § 522(q). An objection based on § 522(q) must be filed:"
+        provision "/us/usc/ptIV/rule4003/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "before the case is closed; or"
+          hash "728f6510c6b4be19ad6d75ab44f184ed3c927f08dba152a0c2841f3183c613f8"
+        }
+        provision "/us/usc/ptIV/rule4003/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "if an exemption is first claimed after a case has been reopened, before the reopened case is closed."
+          hash "cbc8023ae0dcbe7bae45dd9de05edbe221daf2cf5d20473ed92d973cd12114ed"
+        }
+        hash "0631e179c05f8dcedbe13fa28512c3a08d5572a0c06b1873438ca7e987878dc3"
+      }
+      provision "/us/usc/ptIV/rule4003/b/4" paragraph {
+        num "4" "(4)"
+        content {
+          p "Distributing Copies of the Objection. A copy of any objection, other than one filed by the trustee under (b)(2), must be delivered or mailed to:"
+          p "• the trustee;"
+          p "• the debtor;"
+          p "• the debtor’s attorney;"
+          p "• the person who filed the list of exempt property; and"
+          p "• that person’s attorney."
+        }
+        hash "bf5e557d4eaffe6b160f40b34c499383556dcaf79702ab269f97f1316f3a0869"
+      }
+      hash "686374a4041b6a7a0f9e896a5a5d45a6002921f445d93bc73eac1b68be9bfdd7"
+    }
+    provision "/us/usc/ptIV/rule4003/c" subsection {
+      num "c" "(c)"
+      heading "Burden of Proof."
+      content "In a hearing under this Rule 4003, the objecting party has the burden of proving that an exemption was not properly claimed. After notice and a hearing, the court must determine the issues presented."
+      hash "956e0799ea5e98807f78f31c4cd52f92a1e63604d1ec20afca3e043e4544e5cc"
+    }
+    provision "/us/usc/ptIV/rule4003/d" subsection {
+      num "d" "(d)"
+      heading "Avoiding a Lien or Other Transfer of Exempt Property."
+      provision "/us/usc/ptIV/rule4003/d/1" paragraph {
+        num "1" "(1)"
+        chapeau "Bringing a Proceeding. A proceeding under § 522(f) to avoid a lien or other transfer of exempt property must be commenced by:"
+        provision "/us/usc/ptIV/rule4003/d/1/A" subparagraph {
+          num "A" "(A)"
+          content "filing a motion under Rule 9014; or"
+          hash "220058b9bc48b50dba73ccc673cae9e5d3a545873ea54b02315e268cfe46486d"
+        }
+        provision "/us/usc/ptIV/rule4003/d/1/B" subparagraph {
+          num "B" "(B)"
+          content "serving a Chapter 12 or 13 plan on the affected creditors as Rule 7004 provides for serving a summons and complaint."
+          hash "988032a148a941128facc788a368de430bafbbbba1fc474303db045513392b74"
+        }
+        hash "5f3e79d12c2d9be408cef10ad0f7d39b5f12f3dceddd2f24e8e7f86545b451fd"
+      }
+      provision "/us/usc/ptIV/rule4003/d/2" paragraph {
+        num "2" "(2)"
+        content "Objecting to a Request Under § 522(f). As an exception to (b), a creditor may object to a request under § 522(f) by challenging the validity of the exemption asserted to be impaired by the lien."
+        hash "3d47265257e41518eb8fd9cacf114ab463f1002bce6276faa53eb6309ce657ba"
+      }
+      hash "18ee820610a49d663ba75a60fc65ce9a049fd6d50f6f854bd4fc68de75288c7f"
+    }
+    hash "20413b4e6fb178ef20adaa8b4fd39f991ed5b802cefdbd7dade53ff074bbb279"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 17, 2000, eff. Dec. 1, 2000; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from § 522(l) of the Code and, in part, former Bankruptcy Rule 403. The Code changes the thrust of that rule by making it the burden of the debtor to list his exemptions and the burden of parties in interest to raise objections in the absence of which “the property claimed as exempt on such list is exempt;” § 522(l)."
+    p "Subdivision (a). While § 522(l) refers to a list of property claimed as exempt, the rule incorporates such a list as part of Official Form No. 6, the schedule of the debtor’s assets, rather than requiring a separate list and filing. Rule 1007, to which subdivision (a) refers, requires that schedule to be filed within 15 days after the order for relief, unless the court extends the time."
+    p "Section 522(l) also provides that a dependent of the debtor may file the list if the debtor fails to do so. Subdivision (a) of the rule allows such filing from the expiration of the debtor’s time until 30 days thereafter. Dependent is defined in § 522(a)(1)."
+    p "Subdivision (d) provides that a proceeding by the debtor, permitted by § 522(f) of the Code, is a contested matter rather than the more formal adversary proceeding. Proceedings within the scope of this subdivision are distinguished from proceedings brought by the trustee to avoid transfers. The latter are classified as adversary proceedings by Rule 7001."
+    hash "a9eb3670f4be67faca9c93db3c52869a0f4aafe4f9fad83b31b5b6e66503752c"
+  }
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (b) is amended to facilitate the filing of objections to exemptions claimed on a supplemental schedule filed under Rule 1007(h)."
+    hash "dd27c266256734095ff60c125ea5797cbd3b8516c4e468f87f30f12f9e5178fd"
+  }
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2000 Amendment"
+    p "This rule is amended to permit the court to grant a timely request for an extension of time to file objections to the list of claimed exemptions, whether the court rules on the request before or after the expiration of the 30-day period. The purpose of this amendment is to avoid the harshness of the present rule which has been construed to deprive a bankruptcy court of jurisdiction to grant a timely request for an extension if it has failed to rule on the request within the 30-day period. See In re Laurain, 113 F.3d 595 (6th Cir. 1997), Matter of Stoulig, 45 F.3d 957 (5th Cir. 1995), In re Brayshaw, 912 F.2d 1255 (10th Cir. 1990). The amendments clarify that the extension may be granted only for cause. The amendments also conform the rule to § 522(l) of the Code by recognizing that any party in interest may file an objection or request for an extension of time under this rule. Other amendments are stylistic."
+    p "GAP Report on Rule 4003(b). The words “trustee or creditor” were replaced by “party in interest” to conform to § 522(l) of the Bankruptcy Code which permits any party in interest to object to claimed exemptions. Style revisions also were made to the published draft."
+    hash "ed71bffabfca1784506cc02d955709588c581c6bafa7ffbccb3605ba60822ae5"
+  }
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subdivision (b) is rewritten to include four paragraphs."
+    p "Subdivision (b)(2) is added to the rule to permit the trustee to object to an exemption at any time up to one year after the closing of the case if the debtor fraudulently claimed the exemption. Extending the deadline for trustees to object to an exemption when the exemption claim has been fraudulently made will permit the court to review and, in proper circumstances, deny improperly claimed exemptions, thereby protecting the legitimate interests of creditors and the bankruptcy estate. However, similar to the deadline set in § 727(e) of the Code for revoking a discharge which was fraudulently obtained, an objection to an exemption that was fraudulently claimed must be filed within one year after the closing of the case. Subdivision (b)(2) extends the objection deadline only for trustees."
+    p "Subdivision (b)(3) is added to the rule to reflect the addition of subsection (q) to § 522 of the Code by the 2005 Act. Section 522(q) imposes a $136,875 limit on a state homestead exemption if the debtor has been convicted of a felony or owes a debt arising from certain causes of action. Other revised provisions of the Code, such as § 727(a)(12) and § 1328(h), suggest that the court may consider issues relating to § 522(q) late in the case, and the 30-day period for objections would not be appropriate for this provision."
+    p "Subdivision (d) is amended to clarify that a creditor with a lien on property that the debtor is attempting to avoid on the grounds that the lien impairs an exemption may raise in defense to the lien avoidance action any objection to the debtor’s claimed exemption. The right to object is limited to an objection to the exemption of the property subject to the lien and for purposes of the lien avoidance action only. The creditor may not object to other exemption claims made by the debtor. Those objections, if any, are governed by Rule 4003(b)."
+    p "Other changes are stylistic."
+    p "Changes Made After Publication. The deadline for filing objections to exemptions under subdivision (b)(1) was returned to 30 days after the conclusion of the § 341 meeting of creditors rather than the 60 day period proposed in the published rule. The second paragraph of the Committee Note which discussed this change was therefore deleted. Subdivisions (b)(2) and (b)(3) were amended to add the debtor and the debtor’s attorney to the list of persons to whom objections to exemptions must be delivered."
+    hash "18149719835b18c9b612725843ffb35e94936f766e2b84e6a3936af86a3ee28e"
+  }
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017 Amendment"
+    p "Subdivision (d) is amended to provide that a request under § 522(f) to avoid a lien or other transfer of exempt property may be made by motion or by a chapter 12 or chapter 13 plan. A plan that proposes lien avoidance in accordance with this rule must be served as provided under Rule 7004 for service of a summons and complaint. Lien avoidance not governed by this rule requires an adversary proceeding."
+    hash "6fad7dde024e00c4cf5898ff7bf20e09b3b06574d70e67605abbf62e22168f2b"
+  }
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 4003 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "407a7fd8ac040ed74dcfcb8ba3018eea8720e5dbae5d741755c9af76260b8cb2"
+  }
+  layers {
+    operative "20413b4e6fb178ef20adaa8b4fd39f991ed5b802cefdbd7dade53ff074bbb279"
+    enacted "cfad8ec0a995f7a8256c8f3bf58674700a29c9617abb22ccd1483104d45dd9f0"
+    editorial "82cc12becee2a2ff7073850193973f4b97d248274024c3c13183141abc855616"
+  }
+}

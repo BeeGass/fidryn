@@ -1,0 +1,59 @@
+edition 2
+module "/us/usc/ptVI/rule6002" {
+  within "/us/usc/ptVI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVI/rule6002" courtRule {
+    num "6002" "Rule 6002."
+    heading "Custodian’s Report to the United States Trustee"
+    provision "/us/usc/ptVI/rule6002/a" subsection {
+      num "a" "(a)"
+      heading "Custodian’s Report and Account."
+      content "A custodian required by the Code to deliver property to the trustee must promptly file and send to the United States trustee a report and account about the property of the estate and its administration."
+      hash "5f968366b002911c687b4b4e119484922f7e8b8e1abf1892ebc327d6872c14a0"
+    }
+    provision "/us/usc/ptVI/rule6002/b" subsection {
+      num "b" "(b)"
+      heading "Examining the Administration."
+      content "After the custodian’s report and account has been filed and the superseded administration has been examined, the court must, after notice and a hearing, determine whether the custodian’s administration has been proper, including whether disbursements have been reasonable."
+      hash "5342392655c698f2fc534fe7732bad6ad3de5d7f3699a32a230eeee2d2bbd80d"
+    }
+    hash "2f1c2d0f7d103ed5ee9889f503a4774f879215d7731e826c703f26cebdef93e0"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "“Custodian” is defined in § 101(10) [now 101(11)] of the Code. The definition includes a trustee or receiver appointed in proceedings not under the Code, as well as an assignee for the benefit of creditors."
+    p "This rule prescribes the procedure to be followed by a custodian who under § 543 of the Code is required to deliver property to the trustee and to account for its disposition. The examination under subdivision (b) may be initiated (1) on the motion of the custodian required to account under subdivision (a) for an approval of his account and discharge thereon, (2) on the motion of, or the filing of an objection to the custodian’s account by, the trustee or any other party in interest, or (3) on the court’s own initiative. Rule 9014 applies to any contested matter arising under this rule."
+    p "Section 543(d) is similar to an abstention provision. It grants the bankruptcy court discretion to permit the custodian to remain in possession and control of the property. In that event, the custodian is excused from complying with § 543(a)–(c) and thus would not be required to turn over the property to the trustee. When there is no duty to turn over to the trustee, Rule 6002 would not be applicable."
+    hash "c5bb7b559b89a802d26096e95dd9ab18ab1ef761ca8429ccb0c4bc7618b055ea"
+  }
+  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to enable the United States trustee to review, object to, or to otherwise be heard regarding the custodian’s report and accounting. See §§ 307 and 543 of the Code."
+    hash "3f20320c7b49e138fd6cb8075917aed516bf82a9d2b0988065f3f43475fde0f8"
+  }
+  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "Subdivision (b) is amended to conform to the language of § 102(1) of the Code."
+    hash "796fe02fe6eec2b9437a7362d1ec0dd8a99831d3ac549635688d8c44803aa20a"
+  }
+  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 6002 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "0a80dbbdd2a794c050abea55a0b95517026b27e4f7e649af25b126118403569e"
+  }
+  layers {
+    operative "2f1c2d0f7d103ed5ee9889f503a4774f879215d7731e826c703f26cebdef93e0"
+    enacted "45fd84910d5aeb11227954355630d8de1819d7be3dfa22d46967e3c567f345d4"
+    editorial "10271f83e68212ef9e2dfade67957e8baaa7d60061cb0d952dbd3ccb94e7d028"
+  }
+}

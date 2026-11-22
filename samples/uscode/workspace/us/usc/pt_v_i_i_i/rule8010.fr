@@ -1,0 +1,155 @@
+edition 2
+module "/us/usc/ptVIII/rule8010" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8010" courtRule {
+    num "8010" "Rule 8010."
+    heading "Transcribing the Proceedings; Filing the Transcript; Sending the Record"
+    provision "/us/usc/ptVIII/rule8010/a" subsection {
+      num "a" "(a)"
+      heading "Reporter’s Duties."
+      provision "/us/usc/ptVIII/rule8010/a/1" paragraph {
+        num "1" "(1)"
+        content "Proceedings Recorded Without a Court Reporter Present. If proceedings are recorded without a reporter present, the person or service selected under bankruptcy court procedures to transcribe the recording is the reporter for purposes of this rule."
+        hash "b682e8bac612427f6a1dbe021900846bf90f6ab3e5557504bc31c01504b1346d"
+      }
+      provision "/us/usc/ptVIII/rule8010/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Preparing and Filing the Transcript. The reporter must prepare and file a transcript as follows:"
+        provision "/us/usc/ptVIII/rule8010/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "Initial Steps. Upon receiving a transcript order under Rule 8009(b), the reporter must file in the bankruptcy court an acknowledgment showing when the order was received and when the reporter expects to have the transcript completed."
+          hash "2a3062328275f4b2c4ba4412b1a5745b20e6f4c5d76aee2221a4936782585d99"
+        }
+        provision "/us/usc/ptVIII/rule8010/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "Filing the Transcript. After completing the transcript, the reporter must file it with the bankruptcy clerk, who will notify the district, BAP, or circuit clerk of its filing."
+          hash "21b1eb695f7f6974c1a6816ff59446b3ccbd20db1b603265df40a3c94af38fde"
+        }
+        provision "/us/usc/ptVIII/rule8010/a/2/C" subparagraph {
+          num "C" "(C)"
+          content "Extending the Time to Complete a Transcript. If the transcript cannot be completed within 30 days after the order has been received, the reporter must request an extension from the bankruptcy clerk. The clerk must enter on the docket and notify the parties whether the extension is granted."
+          hash "c629e54c15c8823c0aa5fe2f633bffd96699d2748744384e650338c8b08b2f14"
+        }
+        provision "/us/usc/ptVIII/rule8010/a/2/D" subparagraph {
+          num "D" "(D)"
+          content "Failure to File on Time. If the reporter fails to file the transcript on time, the bankruptcy clerk must notify the bankruptcy judge."
+          hash "7507cb26f6b4b69ae924b0756e9cbc78e976d20fd4787f6a19e0d4a8c5cf570d"
+        }
+        hash "c9a44d235a863b516aab346db30b814bd858fb1b5dec62d42c955b48a9d99c54"
+      }
+      hash "ffdc739e19cc4cb91a5bdebf2b803cd727e6ce153f7058fc8a799cede5dee2ad"
+    }
+    provision "/us/usc/ptVIII/rule8010/b" subsection {
+      num "b" "(b)"
+      heading "Clerk’s Duties."
+      provision "/us/usc/ptVIII/rule8010/b/1" paragraph {
+        num "1" "(1)"
+        content "Sending the Record. Subject to Rule 8009(f) and (5) below, when the record is complete, the bankruptcy clerk must send to the clerk of the court where the appeal is pending either the record or a notice that it is available electronically."
+        hash "dfe49f74b86d12e1f587af1ddcae6d33914dc33eda5a38f08584dfc286d924be"
+      }
+      provision "/us/usc/ptVIII/rule8010/b/2" paragraph {
+        num "2" "(2)"
+        content "Multiple Appeals. If there are multiple appeals from a judgment, order, or decree, the bankruptcy clerk must send a single record."
+        hash "7433ecc71d2fbddd85e5e6edc9db089c4440f5ea38beca9f604ce4ff4fa687fc"
+      }
+      provision "/us/usc/ptVIII/rule8010/b/3" paragraph {
+        num "3" "(3)"
+        content "Docketing the Record in the Appellate Court. Upon receiving the record—or a notice that it is available electronically—the district, BAP, or circuit clerk must enter that information on the docket and promptly notify all parties to the appeal."
+        hash "3484024d435e3a11307218c760dbe49749be0bb8ea8c8a791097cd02f4d97b65"
+      }
+      provision "/us/usc/ptVIII/rule8010/b/4" paragraph {
+        num "4" "(4)"
+        content "If the Court Orders Paper Copies. If the court where the appeal is pending orders that paper copies of the record be provided, the clerk of that court must so notify the appellant. If the appellant fails to provide them, the bankruptcy clerk must prepare them at the appellant’s expense."
+        hash "390411b3f52b753178584d1ada545a99f0463a20ef74b77245264241df5bbca5"
+      }
+      provision "/us/usc/ptVIII/rule8010/b/5" paragraph {
+        num "5" "(5)"
+        content "Motion for Leave to Appeal. Subject to (c), if a motion for leave to appeal is filed under Rule 8004, the bankruptcy clerk must prepare and send the record only after the motion is granted."
+        hash "8de30421ac985ed0ca168d4d79d4ab8a884cb998e39e43cad253fcf2031200ce"
+      }
+      hash "0ca1f968e2095dad6861e598190b702f31f904a5736a4a7bbc779dbdc9d9abf2"
+    }
+    provision "/us/usc/ptVIII/rule8010/c" subsection {
+      num "c" "(c)"
+      heading "When a Preliminary Motion Is Filed in the District Court, BAP, or Court of Appeals."
+      provision "/us/usc/ptVIII/rule8010/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. This subdivision (c) applies if, before the record is sent, a party moves in the district court, BAP, or court of appeals for:"
+        provision "/us/usc/ptVIII/rule8010/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "leave to appeal;"
+          hash "ecdc2f3ab0843628d5c38e3b65247032fad95a94f09e9b8bbbd00e8738ed266d"
+        }
+        provision "/us/usc/ptVIII/rule8010/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "dismissal;"
+          hash "2e3fc22d60fd64e147314efba022706951a8681d591653a1cc80852a2c1cdb12"
+        }
+        provision "/us/usc/ptVIII/rule8010/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "a stay pending appeal;"
+          hash "4a85ebf74be27ad1db189153e39ac6bb7c3d6d5edb06fb75c88a27bd6bb1cd2f"
+        }
+        provision "/us/usc/ptVIII/rule8010/c/1/D" subparagraph {
+          num "D" "(D)"
+          content "approval of a bond or other security provided to obtain a stay of judgment; or"
+          hash "8b8e237d82b90987550327e93e1b5389ae2d8761705708bc184aa58b922c5177"
+        }
+        provision "/us/usc/ptVIII/rule8010/c/1/E" subparagraph {
+          num "E" "(E)"
+          content "any other intermediate order."
+          hash "bea6dab0419cfcdbbab22b6cecfad0054a0875fd10db1775afd322af5ad5f133"
+        }
+        hash "affa2e958b0c725399ad805a4b9ae3c5d4be34010e145cd66ce52de35550389d"
+      }
+      provision "/us/usc/ptVIII/rule8010/c/2" paragraph {
+        num "2" "(2)"
+        content "Sending the Record. The bankruptcy clerk must send to the clerk of the court where the relief is sought any parts of the record designated by a party to the appeal—or send a notice that they are available electronically."
+        hash "7625b150d682cb666c8640348b08f42d332e62207fd75dfc7cbe6035ae0e1c39"
+      }
+      hash "fcdf342c1e711fcfbe348d190f64c0644938351bf44bb02b04ffe98ccf50a57d"
+    }
+    hash "77ad126d6e81de01487c2429eda360ee7178d54a41df95af6e0c349401cd567b"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8010, Apr. 25, 1983, eff. Aug. 1, 1983, related to form and length of briefs, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "634a0b1e1232c5028f5e4899036d5e0f4623c52df78f63515bc648ba67aeb22b"
+  }
+  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8007 and F.R.App.P. 11. It applies to an appeal taken directly to a court of appeals under 28 U.S.C. § 158(d)(2), as well as to an appeal to a district court or BAP."
+    p "Subdivision (a) generally retains the procedure of former Rule 8007(a) regarding the reporter’s duty to prepare and file a transcript if a party requests one. It clarifies that the person or service that transcribes the recording of a proceeding is considered the reporter under this rule if the proceeding is recorded without a reporter being present in the courtroom. It also makes clear that the reporter must file with the bankruptcy court the acknowledgment of the request for a transcript and statement of the expected completion date, the completed transcript, and any request for an extension of time beyond 30 days for completion of the transcript."
+    p "Subdivision (b) requires the bankruptcy clerk to transmit the record to the district, BAP or circuit clerk when the record is complete and, in the case of appeals under 28 U.S.C. § 158(a)(3), leave to appeal has been granted. This transmission will be made electronically, either by sending the record itself or sending notice that the record can be accessed electronically. The court where the appeal is pending may, however, require that a paper copy of some or all of the record be furnished, in which case the clerk of that court will direct the appellant to provide the copies. If the appellant does not do so, the bankruptcy clerk must prepare the copies at the appellant’s expense."
+    p "In a change from former Rule 8007(b), subdivision (b) of this rule no longer directs the clerk of the appellate court to docket the appeal upon receipt of the record from the bankruptcy clerk. Instead, under Rules 8003(d) and 8004(c) and F.R.App.P. 12(a), the district, BAP, or circuit clerk dockets the appeal upon receipt of the notice of appeal or, in the case of appeals under 28 U.S.C. § 158(a)(3), the notice of appeal and the motion for leave to appeal. Accordingly, by the time the district, BAP, or circuit clerk receives the record, the appeal will already be docketed in that court. The clerk of the appellate court must indicate on the docket and give notice to the parties to the appeal when the transmission of the record is received. Under Rule 8018(a) and F.R.App.P. 31, the briefing schedule is generally based on that date."
+    p "Subdivision (c) is derived from former Rule 8007(c) and F.R.App.P. 11(g). It provides for the transmission of parts of the record that the parties designate for consideration by the district court, BAP, or court of appeals in ruling on specified preliminary motions filed prior to the preparation and transmission of the record on appeal."
+    p "Changes Made After Publication and Comment. Subdivision (a)(1) was revised to more accurately reflect the way in which transcription services are selected. A cross-reference to Rule 8009(b) was added to subdivision (a)(2)(A)."
+    hash "b1ebb06c0977277bc24f3ac1d476431b338fd084dd1b7d42faaf5af1870856c2"
+  }
+  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "The amendment of subdivision (c) conforms this rule with the amendment of Rule 62 F.R.Civ.P., which is made applicable in adversary proceedings by Rule 7062. Rule 62 formerly required a party to provide a “supersedeas bond” to obtain a stay of the judgment and proceedings to enforce the judgment. As amended, Rule 62(b) allows a party to obtain a stay by providing a “bond or other security.”"
+    hash "f5fb4a8d2c2a251e77f61c71de143e2443134dfe0282baef47d297eb9c22127e"
+  }
+  note "/us/usc/ptVIII/rule8010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8010 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "4728fd6cbe45601315aa9e39285ddc99de0973b896fc089ed734596a87c49c63"
+  }
+  layers {
+    operative "77ad126d6e81de01487c2429eda360ee7178d54a41df95af6e0c349401cd567b"
+    enacted "eae8fa5cdd80053a4cdc48273f1c907cc2826cd8d043e712b1b43767888fe01c"
+    editorial "a987651c0d32d92de7c440e372f6f86e589b3fc6109cdd03963682e5747570f9"
+  }
+}

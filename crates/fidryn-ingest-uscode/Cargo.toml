@@ -1,0 +1,20 @@
+[package]
+name = "fidryn-ingest-uscode"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Fidryn importer of the United States Code into the provision model"
+
+[dependencies]
+fidryn-provision.workspace = true
+zip.workspace = true
+flate2.workspace = true
+roxmltree.workspace = true
+blake3.workspace = true
+sha2.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true

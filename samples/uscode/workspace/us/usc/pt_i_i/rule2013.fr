@@ -1,0 +1,87 @@
+edition 2
+module "/us/usc/ptII/rule2013" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2013" courtRule {
+    num "2013" "Rule 2013."
+    heading "Keeping a Public Record of Compensation Awarded by the Court to Examiners, Trustees, and Professionals"
+    provision "/us/usc/ptII/rule2013/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      provision "/us/usc/ptII/rule2013/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Required Items. The clerk must keep a public record of fees the court awards to examiners and trustees, and to attorneys, accountants, appraisers, auctioneers, and other professionals that trustees employ. The record must:"
+        provision "/us/usc/ptII/rule2013/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "include the case name and number, the name of the individual or firm receiving the fee, and the amount awarded;"
+          hash "d98778d16dbadb7ea12524030d80a7b6d9641793d8d9c8ba81c1608181af8332"
+        }
+        provision "/us/usc/ptII/rule2013/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "be maintained chronologically; and"
+          hash "b5368186e227a9fb3e6c09b5c805bab3638facd53eb07c7a06d126d4eed0feb1"
+        }
+        provision "/us/usc/ptII/rule2013/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "be kept current and open for public examination without charge."
+          hash "cad70379e9692ed4b89299f00b8dde9252203e0211c89962871d74cd9dfade77"
+        }
+        hash "69b061d3dd7f785a800650c183c90fc37effa40a1fa6de001b1e99af187b47a6"
+      }
+      provision "/us/usc/ptII/rule2013/a/2" paragraph {
+        num "2" "(2)"
+        content "Meaning of “Trustee.” As used in this rule, “trustee” does not include a debtor in possession."
+        hash "04dcfe8d60d3bc16bf7a69d88ace0a3486da6ddad9a47b5350dd1b92c1c042d0"
+      }
+      hash "ce10eb93ef09749f4a0814043a9b4083c32000ec6f3bde0035a6383db39c939a"
+    }
+    provision "/us/usc/ptII/rule2013/b" subsection {
+      num "b" "(b)"
+      heading "Annual Summary of the Record."
+      content "At the end of each year, the clerk must prepare a summary of the public record, by individual or firm name, showing the total fees awarded during the year. The summary must be open for public examination without charge. The clerk must send a copy of the summary to the United States trustee."
+      hash "22024996301f0fb3e54c1b9fb41bd8c4c30e9e24d8f3d78503e0bd60dab1e1d1"
+    }
+    hash "bc5a58391831bc303668df498a41d7255d71af6539a0ce2737e82c887a351117"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Rule 213. The first sentence of that rule is omitted because of the provisions in 28 U.S.C. §§ 586 and [former] 604(f) creating panels of private trustees."
+    p "The rule is not applicable to standing trustees serving in chapter 13 cases. See § 1302 of the Code."
+    p "A basic purpose of the rule is to prevent what Congress has defined as “cronyism.” Appointment or employment, whether in a chapter 7 or 11 case, should not center among a small select group of individuals unless the circumstances are such that it would be warranted. The public record of appointments to be kept by the clerk will provide a means for monitoring the appointment process."
+    p "Subdivision (b) provides a convenient source for public review of fees paid from debtors’ estates in the bankruptcy courts. Thus, public recognition of appointments, fairly distributed and based on professional qualifications and expertise, will be promoted and notions of improper favor dispelled. This rule is in keeping with the findings of the Congressional subcommittees as set forth in the House Report of the Committee on the Judiciary, No. 95–595, 95th Cong., 1st Sess. 89–99 (1977). These findings included the observations that there were frequent appointments of the same person, contacts developed between the bankruptcy bar and the courts, and an unusually close relationship between the bar and the judges developed over the years. A major purpose of the new statute is to dilute these practices and instill greater public confidence in the system. Rule 2013 implements that laudatory purpose."
+    hash "bb7ebc1947ae959f46555eebacc75f627cffba555a9125c9288856aac753a18c"
+  }
+  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "In subdivisions (b) and (c) the word awarded is substituted for the word paid. While clerks do not know if fees are paid, they can determine what fees are awarded by the court."
+    hash "3552587c3e09ef2e0a281b9620707741dc6eed7fa11e48d18dcc7e9d422921b8"
+  }
+  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is deleted. The matter contained in this subdivision is more properly left for regulation by the United States trustee. When appointing trustees and examiners and when monitoring applications for employment of auctioneers, appraisers and other professionals, the United States trustee should be sensitive to disproportionate or excessive fees received by any person."
+    p "Subdivision (b), redesignated as subdivision (a), is amended to reflect the fact that the United States trustee appoints examiners subject to court approval."
+    p "Subdivision (c), redesignated as subdivision (b), is amended to furnish the United States trustee with a copy of the annual summary which may assist that office in the performance of its responsibilities under 28 U.S.C. § 586 and the Code."
+    p "The rule is not applicable to standing trustees serving in chapter 12 cases. See § 1202 of the Code."
+    hash "0c5b795ac343a11d4da731107bc1a2a63833ac290d29591baf8d20565adc243a"
+  }
+  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2013 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "3ca2f52eb9c996b1488acbe19354ae6b04aaea5fdf87f1663a107eecad8a9f50"
+  }
+  layers {
+    operative "bc5a58391831bc303668df498a41d7255d71af6539a0ce2737e82c887a351117"
+    enacted "38d46ca714748f0b9e333546c0c3b7af10c9b5527047f75a45d1158b2f2075cd"
+    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+  }
+}

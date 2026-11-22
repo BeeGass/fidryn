@@ -1,0 +1,44 @@
+edition 2
+module "/us/usc/t45/s723" {
+  within "/us/usc/t45/ch16/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s723" section {
+    num "723" "§ 723."
+    heading "Emergency assistance pending implementation"
+    provision "/us/usc/t45/s723/a" subsection {
+      num "a" "(a)"
+      heading "Emergency assistance"
+      content "The Secretary is authorized, pending the implementation of the final system plan, to pay to the trustees of railroads in reorganization such sums as are necessary for the continued provision of essential transportation services by such railroads. Such payments shall be made by the Secretary upon such reasonable terms and conditions as the Secretary establishes, except that recipients must agree to maintain and provide service at a level no less than that in effect on January 2, 1974. Where the Secretary and the trustees agree that funds provided pursuant to this section are to be used (together with funds provided pursuant to " ["section 725 of this title" -> "/us/usc/t45/s725"] ", if any) to perform program maintenance on designated rail properties until the date rail properties are conveyed under this chapter or to improve such designated properties, such agreement shall contain the conditions set forth in " ["section 725(b) of this title" -> "/us/usc/t45/s725/b"] "."
+      hash "1c5b3f312b627823e530dedbf0646038ddbef783f3a572d574d72b450f2430e8"
+    }
+    provision "/us/usc/t45/s723/b" subsection {
+      num "b" "(b)"
+      heading "Authorization of appropriations"
+      content "There are authorized to be appropriated to the Secretary for carrying out this section such sums as are necessary, not to exceed $282,000,000, to remain available until expended. Of amounts authorized to be appropriated under this subsection, $50,000,000 shall be available solely to pay to the trustees of railroads in reorganization such sums as may be necessary to provide such railroads with amounts equal to revenues attributable to tariff increases proposed by such railroads and suspended by the Interstate Commerce Commission during the calendar year 1975, if the Secretary determines that such payments are necessary to carry out this section."
+      hash "365a49a68690ac2eef37b07a186b496ae7f66591d105bb027664b990832c6b16"
+    }
+    hash "4379b3b7def34d277dbe5e6d4c677750276d2c693b60835644000f82ef53ca32"
+  }
+  credit "(" ["Pub. L. 93–236, title II, § 213" -> "/us/pl/93/236/tII/s213"] ", Jan. 2, 1974, " ["87 Stat. 1003" -> "/us/stat/87/1003"] "; " ["Pub. L. 94–5, § 6" -> "/us/pl/94/5/s6"] ", Feb. 28, 1975, " ["89 Stat. 8" -> "/us/stat/89/8"] ".)"
+  note "/us/usc/t45/s723/note/editorialNotes/pl.94.5/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1975—Subsec. (a). " ["Pub. L. 94–5, § 6(a)" -> "/us/pl/94/5/s6/a"] ", inserted provision that, where Secretary and trustees agree that funds provided pursuant to this section are to be used (together with funds provided pursuant to " ["section 725 of this title" -> "/us/usc/t45/s725"] ", if any) to perform program maintenance on designated rail properties until date rail properties are conveyed under this chapter or to improve such designated properties, such agreement contain conditions set forth in " ["section 725(b) of this title" -> "/us/usc/t45/s725/b"] "."
+    p "Subsec. (b). " ["Pub. L. 94–5, § 6(b)" -> "/us/pl/94/5/s6/b"] ", substituted “$282,000,000” for “$85,000,000” and inserted provision that, of amounts authorized to be appropriated under this subsection $50,000,000 be available solely to pay to trustees of railroads in reorganization sums necessary to provide railroads with amounts equal to revenues attributable to tariff increases proposed by railroads and suspended by Interstate Commerce Commission during calendar year 1975, if Secretary determines that payments are necessary to carry out this section."
+    hash "4be3c3d568e56cdf227f5a552e8b8b89cb5bfd72528f0dd20c53397eb7b76453"
+  }
+  note "/us/usc/t45/s723/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  layers {
+    operative "4379b3b7def34d277dbe5e6d4c677750276d2c693b60835644000f82ef53ca32"
+    enacted "6bc62b9cd939710a357a1f4eb1c360815e13b4cde4b0f79207dbd31298b74a62"
+    editorial "b221d86b97cb96b8311d53392ad1c0c05ed64a158917f62316470ff3adb33c7c"
+  }
+}

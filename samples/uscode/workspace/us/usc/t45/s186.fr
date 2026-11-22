@@ -1,0 +1,24 @@
+edition 2
+module "/us/usc/t45/s186" {
+  within "/us/usc/t45/ch8/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s186" section {
+    num "186" "§ 186."
+    heading "Omitted"
+    status omitted
+    hash "5e4845b7491396b95cb25fee73d01b2c949a5cc0ee94ef08ce415924198601bc"
+  }
+  note "/us/usc/t45/s186/note/editorialNotes/act.1926-05-20.ch347/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Section, " ["act May 20, 1926, ch. 347, § 206" -> "/us/act/1926-05-20/ch347/s206"] ", as added " ["Apr. 10, 1936, ch. 166" -> "/us/act/1936-04-10/ch166"] ", " ["49 Stat. 1191" -> "/us/stat/49/1191"] ", transferred certain pending cases before National Labor Relations Board to Mediation Board."
+    hash "ba86be2795fe5495bf754642111e7001ae613089c520991e7ddaac393e05a24f"
+  }
+  layers {
+    operative "5e4845b7491396b95cb25fee73d01b2c949a5cc0ee94ef08ce415924198601bc"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "456404eaf1ebf934d8c69bbe17343fe2b4d6bdd7b42af69111345a58fef94b5d"
+  }
+}

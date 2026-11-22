@@ -1,0 +1,104 @@
+edition 2
+module "/us/usc/t45/s231m" {
+  within "/us/usc/t45/ch9/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s231m" section {
+    num "231m" "§ 231m."
+    heading "Assignability; exemption from levy"
+    provision "/us/usc/t45/s231m/a" subsection {
+      num "a" "(a)"
+      content "Except as provided in subsection (b) of this section and the Internal Revenue Code of 1986 [" ["26 U.S.C. 1" -> "/us/usc/t26/s1"] " et seq.], notwithstanding any other law of the United States, or of any State, territory, or the District of Columbia, no annuity or supplemental annuity shall be assignable or be subject to any tax or to garnishment, attachment, or other legal process under any circumstances whatsoever, nor shall the payment thereof be anticipated" mark "1" 1
+      hash "877864a3f699a1afa115c8254512175e4c91dfbf89e6fbfef23c41b4ebd2eff2"
+    }
+    provision "/us/usc/t45/s231m/b" subsection {
+      num "b" "(b)"
+      provision "/us/usc/t45/s231m/b/1" paragraph {
+        num "1" "(1)"
+        content "This section shall not operate to exclude the amount of any supplemental annuity paid to an individual under " ["section 231a(b) of this title" -> "/us/usc/t45/s231a/b"] " from income taxable pursuant to the Federal income tax provisions of the Internal Revenue Code of 1986 [" ["26 U.S.C. 1" -> "/us/usc/t26/s1"] " et seq.]."
+        hash "52d498b65bd92d819bbe6dc93015eb232d847d8f3f00fda83125d685062912ac"
+      }
+      provision "/us/usc/t45/s231m/b/2" paragraph {
+        num "2" "(2)"
+        content "This section shall not operate to prohibit the characterization or treatment of that portion of an annuity under this subchapter which is not computed under section 231b(a), 231c(a), or 231c(f) of this title, or any portion of a supplemental annuity under this subchapter, as community property for the purposes of, or property subject to, distribution in accordance with a court decree of divorce, annulment, or legal separation or the terms of any court-approved property settlement incident to any such court decree. The Board shall make payments of such portions in accordance with any such characterization or treatment or any such decree or settlement."
+        hash "f155b712691042f126bbf77f96bcb225c23ca268f03d4eebe168b4243cc6dae1"
+      }
+      provision "/us/usc/t45/s231m/b/3" paragraph {
+        num "3" "(3)"
+        provision "/us/usc/t45/s231m/b/3/A" subparagraph {
+          num "A" "(A)"
+          chapeau "Payments made pursuant to paragraph (2) of this subsection shall not require that the employee be entitled to an annuity under " ["section 231a(a)(1) of this title" -> "/us/usc/t45/s231a/a/1"] ": Provided, however, That where an employee is not entitled to such an annuity, payments made pursuant to paragraph (2) may not begin before the month in which the following three conditions are satisfied:"
+          provision "/us/usc/t45/s231m/b/3/A/i" clause {
+            num "i" "(i)"
+            content "The employee has completed ten years of service in the railroad industry or, five years of service all of which accrues after December 31, 1995."
+            hash "8b7293c18e08bc242ca006cc559c64c9267931eaaa8892bbddef129913fadacd"
+          }
+          provision "/us/usc/t45/s231m/b/3/A/ii" clause {
+            num "ii" "(ii)"
+            content "The spouse or former spouse attains age 62."
+            hash "d2473dddda3870b0892e31c957cdf0a23b856b3d2b1811f08c58662f59b7ad16"
+          }
+          provision "/us/usc/t45/s231m/b/3/A/iii" clause {
+            num "iii" "(iii)"
+            content "The employee attains age 62 (or if deceased, would have attained age 62)."
+            hash "b29bce67fe10e314e226c0a6cb9569c65762950df13dfba38c09c1c8a6f282a2"
+          }
+          hash "cc4d9c972b228bf36287afd3ad7d5f7cc894d8d3bb0526af40b83ff77a399bde"
+        }
+        provision "/us/usc/t45/s231m/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "Payments made pursuant to paragraph (2) of this subsection shall terminate upon the death of the spouse or former spouse, unless the court document provides for termination at an earlier date. Notwithstanding the language in a court order, that portion of payments made pursuant to paragraph (2) which represents payments computed pursuant to " ["section 231b(f)(2) of this title" -> "/us/usc/t45/s231b/f/2"] " shall not be paid after the death of the employee."
+          hash "0c1e38b6d04856bb5b6b8ac558eb152eccd33f19ca30ebb69495f7321d9f1024"
+        }
+        provision "/us/usc/t45/s231m/b/3/C" subparagraph {
+          num "C" "(C)"
+          content "If the employee is not entitled to an annuity under " ["section 231a(a)(1) of this title" -> "/us/usc/t45/s231a/a/1"] ", payments made pursuant to paragraph (2) of this subsection shall be computed as though the employee were entitled to an annuity."
+          hash "e0fb7b9cd4e80326166c6e6cf4e501e08f1d2b0df2c0855fe03e9129534eb60d"
+        }
+        hash "7fcd2ea96d72b35349dd759b4459548e1c01fa4681f475b1a5cb01cd691e1f75"
+      }
+      hash "c6451ddd6ee87c370367699f67e750c7b9abd60ac450f274050b7d4fa6961ab1"
+    }
+    hash "71fc9cf8b848e38104e732f3053b8766fa822c5defe7b216991c5e5f70300800"
+  }
+  credit "(" ["Aug. 29, 1935, ch. 812, § 14" -> "/us/act/1935-08-29/ch812/s14"] ", as restated " ["June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", pt. I, " ["50 Stat. 307" -> "/us/stat/50/307"] ", as restated " ["Pub. L. 93–445, title I, § 101" -> "/us/pl/93/445/tI/s101"] ", Oct. 16, 1974, " ["88 Stat. 1345" -> "/us/stat/88/1345"] "; amended " ["Pub. L. 98–76, title IV, § 419(a)" -> "/us/pl/98/76/tIV/s419/a"] ", Aug. 12, 1983, " ["97 Stat. 438" -> "/us/stat/97/438"] "; " ["Pub. L. 99–514, § 2" -> "/us/pl/99/514/s2"] ", Oct. 22, 1986, " ["100 Stat. 2095" -> "/us/stat/100/2095"] "; " ["Pub. L. 110–458, title I, § 110(a)(1)" -> "/us/pl/110/458/tI/s110/a/1"] ", Dec. 23, 2008, " ["122 Stat. 5112" -> "/us/stat/122/5112"] ".)"
+  note "/us/usc/t45/s231m/note/editorialNotes/pl.110.458/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "2008—Subsec. (b)(3). " ["Pub. L. 110–458" -> "/us/pl/110/458"] " added par. (3)."
+    p "1986—Subsecs. (a), (b)(1). " ["Pub. L. 99–514" -> "/us/pl/99/514"] " substituted “Internal Revenue Code of 1986” for “Internal Revenue Code of 1954”."
+    p "1983—Subsec. (a). " ["Pub. L. 98–76, § 419(a)(1)" -> "/us/pl/98/76/s419/a/1"] ", substituted “(a) Except as provided in subsection (b) of this section and the Internal Revenue Code of 1954, notwithstanding” for “Notwithstanding”."
+    p "Subsec. (b)(1). " ["Pub. L. 98–76, § 419(a)(2)" -> "/us/pl/98/76/s419/a/2"] ", substituted “(b)(1) This” for “: Provided, however, That the provisions of this”."
+    p "Subsec. (b)(2). " ["Pub. L. 98–76, § 419(a)(3)" -> "/us/pl/98/76/s419/a/3"] ", added par. (2)."
+    hash "32e2d11179d49328b8b06f913f5f83f4b98d8de62d46939b3a1f089a3b89900e"
+  }
+  note "/us/usc/t45/s231m/note/statutoryNotes/pl.110.458/effective-date-of-2008-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 2008 Amendment"
+    p ["Pub. L. 110–458, title I, § 110(b)(1)" -> "/us/pl/110/458/tI/s110/b/1"] ", Dec. 23, 2008, " ["122 Stat. 5112" -> "/us/stat/122/5112"] ", provided that:"
+    quoted "/us/pl/110/458/tI/s110/b/1" {
+      p "“The amendment made by subsection (a)(1) [amending this section] shall apply with respect to payments due for months after August 2007. If, prior to the effective date of such amendment, payment pursuant to paragraph (2) of section 14(b) of the Railroad Retirement Act of 1974 (" ["45 U.S.C. 231m(b)" -> "/us/usc/t45/s231m/b"] ") was terminated because of the employee’s death, payment to the former spouse may be reinstated for months after August 2007.”"
+    }
+    hash "f92dfc7df2ea53447ed53eee78de3a908ba17b2bcb373d7e63cf08643b419aff"
+  }
+  note "/us/usc/t45/s231m/note/statutoryNotes/pl.98.76/effective-date-of-1983-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1983 Amendment"
+    p ["Pub. L. 98–76, title IV, § 419(b)" -> "/us/pl/98/76/tIV/s419/b"] ", Aug. 12, 1983, " ["97 Stat. 438" -> "/us/stat/97/438"] ", provided that:"
+    quoted "/us/pl/98/76/tIV/s419/b" {
+      p "“The amendments made by this section [amending this section] shall apply with respect to annuity amounts payable for months beginning after the date of the enactment of this Act [Aug. 12, 1983].”"
+    }
+    hash "c7e2b3124a24731215ed3ad1253c9ff0412fb7f74f54e7acc9b7c74dfcd7a43c"
+  }
+  footnote 1 "1" {
+    p "So in original. Probably should be followed by a period."
+  }
+  layers {
+    operative "71fc9cf8b848e38104e732f3053b8766fa822c5defe7b216991c5e5f70300800"
+    enacted "f8154c15806b821314929e28c758b4be8630999aacdb5940cd2f5498884bf2f5"
+    editorial "f30084ccc0c638a5555821476d38c7e2e7b7d081e8e621a6f99c52796fd39311"
+  }
+}

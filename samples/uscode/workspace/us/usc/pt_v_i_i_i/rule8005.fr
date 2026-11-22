@@ -1,0 +1,77 @@
+edition 2
+module "/us/usc/ptVIII/rule8005" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8005" courtRule {
+    num "8005" "Rule 8005."
+    heading "Election to Have an Appeal Heard in the District Court Instead of the BAP"
+    provision "/us/usc/ptVIII/rule8005/a" subsection {
+      num "a" "(a)"
+      heading "Filing a Statement of Election."
+      content "To elect to have the district court hear an appeal, a party must file a statement of election within the time prescribed by 28 U.S.C. § 158(c)(1). The statement must substantially conform to Form 417A."
+      hash "380174a27f1fc60f03ed8ee7066b0ca20641e137836cc43f2f10ee92d6f6bd3c"
+    }
+    provision "/us/usc/ptVIII/rule8005/b" subsection {
+      num "b" "(b)"
+      heading "Sending Documents Relating to the Appeal."
+      chapeau "Upon receiving an appellant’s timely statement of election, the bankruptcy clerk must send all documents related to the appeal to the district clerk. A BAP clerk who receives a timely statement of election from a party other than the appellant must:"
+      provision "/us/usc/ptVIII/rule8005/b/1" paragraph {
+        num "1" "(1)"
+        content "send those documents to the district clerk; and"
+        hash "915246680aa812a746c68503f95efca8ecf25bd5af770cac7ced0aa94df230a3"
+      }
+      provision "/us/usc/ptVIII/rule8005/b/2" paragraph {
+        num "2" "(2)"
+        content "notify the bankruptcy clerk that they have been sent."
+        hash "935ee26ff7c747f2d908a730e022bbde4aae676fe8e12f7cb439df0e4fe2f62a"
+      }
+      hash "cb197cd1aad64a7cf3f33a58423b9adf4ff17aa7164b103e3c2fc2bb4ed6326a"
+    }
+    provision "/us/usc/ptVIII/rule8005/c" subsection {
+      num "c" "(c)"
+      heading "Determining the Validity of an Election."
+      content "Within 14 days after the statement of election has been filed, a party seeking to determine the election’s validity must file a motion in the court where the appeal is pending."
+      hash "d92b7eac768475ad165b8b39e3ad35d79daa9d63f413391e56c89a4fd77d9a7d"
+    }
+    provision "/us/usc/ptVIII/rule8005/d" subsection {
+      num "d" "(d)"
+      heading "Effect of Filing a Motion for Leave to Appeal Without Filing a Notice of Appeal."
+      content "If an appellant moves for leave to appeal under Rule 8004 but fails to file a notice of appeal with the motion, it must be treated as a notice of appeal in determining whether the statement of election has been timely filed."
+      hash "a462c108b916c2efa113ab96429f53332ba0ebf2eceb343bd7d4078edd24e44f"
+    }
+    hash "e73f7e55a828f0351b984c82aa18e7f9bd07c5017b6428b210d3648dd57afdd2"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8005/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8005, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987, related to stay pending appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "ffd3b11024d57835fde42b2c0b91a0d0c251d7feb19e2b36318b2da2d9b4183d"
+  }
+  note "/us/usc/ptVIII/rule8005/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule, which implements 28 U.S.C. § 158(c)(1), is derived from former Rule 8001(e). It applies only in districts in which an appeal to a BAP is authorized."
+    p "As the former rule required, subdivision (a) provides that an appellant that elects to have a district court, rather than a BAP, hear its appeal must file with the bankruptcy clerk a statement of election when it files its notice of appeal. The statement must conform substantially to the appropriate Official Form. For appellants, that statement is included in the Notice of Appeal Official Form. If a BAP has been established for appeals from the bankruptcy court and the appellant does not file a timely statement of election, any other party that elects to have the district court hear the appeal must file a statement of election with the BAP clerk no later than 30 days after service of the notice of appeal."
+    p "Subdivision (b) requires the bankruptcy clerk to transmit all appeal documents to the district clerk if the appellant files a timely statement of election. If the appellant does not make that election, the bankruptcy clerk must transmit those documents to the BAP clerk. Upon a timely election by any other party, the BAP clerk must promptly transmit the appeal documents to the district clerk and notify the bankruptcy clerk that the appeal has been transferred."
+    p "Subdivision (c) provides a new procedure for the resolution of disputes regarding the validity of an election. A motion seeking the determination of the validity of an election must be filed no later than 14 days after the statement of election is filed. Nothing in this rule prevents a court from determining the validity of an election on its own motion."
+    p "Subdivision (d) provides that, in the case of an appeal by leave, if the appellant files a motion for leave to appeal but fails to file a notice of appeal, the filing and service of the motion will be treated for timing purposes under this rule as the filing and service of the notice of appeal."
+    p "Changes Made After Publication and Comment. In subdivision (b), a requirement was added that the BAP clerk notify the bankruptcy clerk if an appeal is transferred from the BAP to the district court upon the election of an appellee. Conforming and clarifying changes were made to the Committee Note."
+    hash "70471683f0a9c9f8fb671176a16bab73ca95dbfe6686c5cde2d951e899333fd9"
+  }
+  note "/us/usc/ptVIII/rule8005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8005 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "e83177116f3a65a9c75204ecb93753e410f9da8333d09a5806179bd00dce0057"
+  }
+  layers {
+    operative "e73f7e55a828f0351b984c82aa18e7f9bd07c5017b6428b210d3648dd57afdd2"
+    enacted "6ce75ad6cbe374c396c32cd4aa4fe7f54af9f0c2c8cc34431a106a406312bc53"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

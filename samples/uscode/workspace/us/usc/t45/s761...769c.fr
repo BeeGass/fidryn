@@ -1,0 +1,109 @@
+edition 2
+module "/us/usc/t45/s761...769c" {
+  alias "/us/usc/t45/s761"
+  alias "/us/usc/t45/s769c"
+  within "/us/usc/t45/ch16/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s761...769c" section {
+    num "761 to 769c" "§§ 761 to 769c."
+    heading "Repealed. " ["Pub. L. 99–509, title IV, § 4033(a)(1)" -> "/us/pl/99/509/tIV/s4033/a/1"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"]
+    status repealed
+    hash "6efd74a08871016b545d91f1c31a47b25d7ea11023d35b387d5471f6d8a5d143"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 761, " ["Pub. L. 93–236, title IV, § 401" -> "/us/pl/93/236/tIV/s401"] ", as added " ["Pub. L. 97–35, title XI, § 1142" -> "/us/pl/97/35/tXI/s1142"] ", Aug. 13, 1981, " ["95 Stat. 654" -> "/us/stat/95/654"] ", related to sale of interest of United States in common stock of Consolidated Rail Corporation."
+    hash "94fdcfe748b5591a08e6039583fd63383c8b77848f0c6500315021ea5dd452e5"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "A prior section 761, " ["Pub. L. 93–236, title IV, § 401" -> "/us/pl/93/236/tIV/s401"] ", Jan. 2, 1974, " ["87 Stat. 1010" -> "/us/stat/87/1010"] ", related to Congressional findings and purpose in providing for a program of rail service continuation subsidies, prior to repeal by " ["Pub. L. 94–210, title VIII, § 806" -> "/us/pl/94/210/tVIII/s806"] ", Feb. 5, 1976, " ["90 Stat. 143" -> "/us/stat/90/143"] ", eff. Apr. 1, 1978."
+    hash "3edca324ecd17236cf72abf2de7dcb744577675c50d2009df5b670c5462c570c"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 762, " ["Pub. L. 93–236, title IV, § 402" -> "/us/pl/93/236/tIV/s402"] ", as added " ["Pub. L. 97–35, title XI, § 1142" -> "/us/pl/97/35/tXI/s1142"] ", Aug. 13, 1981, " ["95 Stat. 655" -> "/us/stat/95/655"] ", related to debt and preferred stock of Consolidated Rail Corporation."
+    hash "af7c7cf65888c63864e8facae70faf57df3493bd2e44c30092706c0f446ebba3"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "A prior section 762, " ["Pub. L. 93–236, title IV, § 402" -> "/us/pl/93/236/tIV/s402"] ", Jan. 2, 1974, " ["87 Stat. 1010" -> "/us/stat/87/1010"] "; " ["Pub. L. 93–488, § 1(d)" -> "/us/pl/93/488/s1/d"] ", Oct. 26, 1974, " ["88 Stat. 1464" -> "/us/stat/88/1464"] "; " ["Pub. L. 94–210, title VIII, § 805(a)" -> "/us/pl/94/210/tVIII/s805/a"] ", Feb. 5, 1976, " ["90 Stat. 139" -> "/us/stat/90/139"] ", directed Secretary to provide financial assistance to States and local or regional transportation authorities in facilitating and maintaining main line or local rail service, prior to repeal by " ["Pub. L. 94–210, title VIII, § 806" -> "/us/pl/94/210/tVIII/s806"] ", Feb. 5, 1976, " ["90 Stat. 143" -> "/us/stat/90/143"] ", eff. Apr. 1, 1978."
+    hash "9af0aa2c97bfc6bccd6542a16cdd8acf03ced2dbead8728d33f743604c26af1a"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/5" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 763, " ["Pub. L. 93–236, title IV, § 403" -> "/us/pl/93/236/tIV/s403"] ", as added " ["Pub. L. 97–35, title XI, § 1142" -> "/us/pl/97/35/tXI/s1142"] ", Aug. 13, 1981, " ["95 Stat. 655" -> "/us/stat/95/655"] ", related to determinations about profitability of Consolidated Rail Corporation."
+    hash "9bf7a26da707dc96f6ed051a7f40d3c4ede57df2c664b322aaca4b66ac2fd729"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/6" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "A prior section 763, " ["Pub. L. 93–236, title IV, § 403" -> "/us/pl/93/236/tIV/s403"] ", Jan. 2, 1974, " ["87 Stat. 1012" -> "/us/stat/87/1012"] "; " ["Pub. L. 93–488, § 1(e)" -> "/us/pl/93/488/s1/e"] ", Oct 26, 1974, " ["88 Stat. 1465" -> "/us/stat/88/1465"] "; " ["Pub. L. 94–210, title VIII, § 805(b)" -> "/us/pl/94/210/tVIII/s805/b"] ", (c), Feb. 5, 1976, " ["90 Stat. 142" -> "/us/stat/90/142"] ", authorized Association to provide loans for acquisition of rail properties by States or local or regional transportation authorities and for modernization of those acquired properties, prior to repeal by " ["Pub. L. 94–210, title VIII, § 806" -> "/us/pl/94/210/tVIII/s806"] ", Feb. 5, 1976, " ["90 Stat. 143" -> "/us/stat/90/143"] ", eff. Apr. 1, 1978."
+    hash "b616e11b55be4a1e1f770ba045fdfeee183403b6d7ee6676abc9ad8131f0cf3d"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/7" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 764, " ["Pub. L. 93–236, title IV, § 404" -> "/us/pl/93/236/tIV/s404"] ", as added " ["Pub. L. 97–35, title XI, § 1142" -> "/us/pl/97/35/tXI/s1142"] ", Aug. 13, 1981, " ["95 Stat. 656" -> "/us/stat/95/656"] ", related to failure to sell interest of United States in common stock of Consolidated Rail Corporation as an entity."
+    hash "4e58bb98cab745551c6c72aab01850f62c9b99506e7b46ca563a3ac7a35b66ae"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/8" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 765, " ["Pub. L. 93–236, title IV, § 405" -> "/us/pl/93/236/tIV/s405"] ", as added " ["Pub. L. 97–35, title XI, § 1142" -> "/us/pl/97/35/tXI/s1142"] ", Aug. 13, 1981, " ["95 Stat. 657" -> "/us/stat/95/657"] ", related to plans to transfer Consolidated Rail Corporation’s freight rail properties and service responsibilities."
+    hash "af748043e483c1af63f6eb21337d23d082bf8207ca27e07b766400f171afc0ee"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/9" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 766, " ["Pub. L. 93–236, title IV, § 406" -> "/us/pl/93/236/tIV/s406"] ", as added " ["Pub. L. 97–35, title XI, § 1142" -> "/us/pl/97/35/tXI/s1142"] ", Aug. 13, 1981, " ["95 Stat. 658" -> "/us/stat/95/658"] ", related to consolidation and review of freight transfer agreements."
+    hash "b4e3a99b2386a07622c38c01ff126cd5da2362e87aca9a7e975246f0bd780d93"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/10" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 767, " ["Pub. L. 93–236, title IV, § 407" -> "/us/pl/93/236/tIV/s407"] ", as added " ["Pub. L. 97–35, title XI, § 1142" -> "/us/pl/97/35/tXI/s1142"] ", Aug. 13, 1981, " ["95 Stat. 658" -> "/us/stat/95/658"] ", related to public comment and Congressional notification regarding freight transfer agreements."
+    hash "7803911fdaac9db7a8b57e06838308f374560e1a7e960f4a34b70b0d7fd9ccbd"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/11" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 768, " ["Pub. L. 93–236, title IV, § 408" -> "/us/pl/93/236/tIV/s408"] ", as added " ["Pub. L. 97–35, title XI, § 1142" -> "/us/pl/97/35/tXI/s1142"] ", Aug. 13, 1981, " ["95 Stat. 659" -> "/us/stat/95/659"] ", related to performance under freight transfer agreements."
+    hash "c77939cd6ca429c38cfe5671323fd154aa5eb0d9b4c65ffc4ea5236d18bbbaee"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/12" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 769, " ["Pub. L. 93–236, title IV, § 409" -> "/us/pl/93/236/tIV/s409"] ", as added " ["Pub. L. 97–35, title XI, § 1142" -> "/us/pl/97/35/tXI/s1142"] ", Aug. 13, 1981, " ["95 Stat. 659" -> "/us/stat/95/659"] ", provided that conveyance of interest in rail properties under freight transfer agreement is deemed to be an assignment."
+    hash "4488be15fcc112b438f28d3dbd63eae3a9023504d8f7395c82945759587ed03b"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/13" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 769a, " ["Pub. L. 93–236, title IV, § 410" -> "/us/pl/93/236/tIV/s410"] ", as added " ["Pub. L. 97–35, title XI, § 1142" -> "/us/pl/97/35/tXI/s1142"] ", Aug. 13, 1981, " ["95 Stat. 660" -> "/us/stat/95/660"] ", related to identification and sale of unprofitable subsidiaries of Consolidated Rail Corporation."
+    hash "eb732fd93c7e892257b49e6427fd1ba8a97bfc62e6c4a3dbd1dd25d849fb8a9c"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/14" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 769b, " ["Pub. L. 93–236, title IV, § 411" -> "/us/pl/93/236/tIV/s411"] ", as added " ["Pub. L. 97–35, title XI, § 1146(a)" -> "/us/pl/97/35/tXI/s1146/a"] ", Aug. 13, 1981, " ["95 Stat. 672" -> "/us/stat/95/672"] ", related to labor transfer agreements."
+    hash "f10a475a97556122247acb2f7a851724400ab02bef72301982c656a3ae48f758"
+  }
+  note "/us/usc/t45/s761...769c/note/ungrouped/pl.93.236/noheading/15" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 769c, " ["Pub. L. 93–236, title IV, § 412" -> "/us/pl/93/236/tIV/s412"] ", as added " ["Pub. L. 97–35, title XI, § 1146(a)" -> "/us/pl/97/35/tXI/s1146/a"] ", Aug. 13, 1981, " ["95 Stat. 673" -> "/us/stat/95/673"] ", related to labor protection benefits."
+    hash "024d47d4251d72e4a37ab7d41fd93124f24b664430c79af8cfd52c5e072fab21"
+  }
+  layers {
+    operative "6efd74a08871016b545d91f1c31a47b25d7ea11023d35b387d5471f6d8a5d143"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "380a1a746953fa65f98c1968cfb8eb74e8920fa90eee3fdef41f5c20af2c5a6d"
+  }
+}

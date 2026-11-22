@@ -1,0 +1,155 @@
+edition 2
+module "/us/usc/ptII/rule2004" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2004" courtRule {
+    num "2004" "Rule 2004."
+    heading "Examinations"
+    provision "/us/usc/ptII/rule2004/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content "On a party in interest’s motion, the court may order the examination of any entity."
+      hash "4c242857d942d6852f7f230c23ca8b8197cb516b03ec60148151b1afeb62b4ee"
+    }
+    provision "/us/usc/ptII/rule2004/b" subsection {
+      num "b" "(b)"
+      heading "Scope of the Examination."
+      provision "/us/usc/ptII/rule2004/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. The examination of an entity under this Rule 2004, or of a debtor under § 343, may relate only to:"
+        provision "/us/usc/ptII/rule2004/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "the debtor’s acts, conduct, or property;"
+          hash "dd09b04fb547fc90a191b661e27b9652acd4e7d4ce7e8a8df496e1f5d902fb13"
+        }
+        provision "/us/usc/ptII/rule2004/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "the debtor’s liabilities and financial condition;"
+          hash "b5c1b7ed003d9fc272772d3a430f0fa302e64f5f94727438e786f5b7ec3bbf01"
+        }
+        provision "/us/usc/ptII/rule2004/b/1/C" subparagraph {
+          num "C" "(C)"
+          content "any matter that may affect the administration of the debtor’s estate; or"
+          hash "c667ee0a347dd400527e9f675d22f91595065f68e719d4143ae8806ebc4de675"
+        }
+        provision "/us/usc/ptII/rule2004/b/1/D" subparagraph {
+          num "D" "(D)"
+          content "the debtor’s right to a discharge."
+          hash "c51e810dbfc134a2d1d578f40a282e2c75675d909a1929f921d9032e81ec9a0b"
+        }
+        hash "d004bb8f1699738244a65d3547a59ea9f023750f2318d9842903f54a09781cc9"
+      }
+      provision "/us/usc/ptII/rule2004/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Other Topics in Certain Cases. In a Chapter 12 or 13 case, or in a Chapter 11 case that is not a railroad reorganization, the examination may also relate to:"
+        provision "/us/usc/ptII/rule2004/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "the operation of any business and the desirability of its continuing;"
+          hash "f591f09529a4d3d959f772d1cc0f2a5a8627784e8067379663f587f023df5770"
+        }
+        provision "/us/usc/ptII/rule2004/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "the source of any money or property the debtor acquired or will acquire for the purpose of consummating a plan and the consideration given or offered; and"
+          hash "f004c329c6d9c4f641c6064f1b95f64785cac5ff614348a0eac1bfe19ac04a34"
+        }
+        provision "/us/usc/ptII/rule2004/b/2/C" subparagraph {
+          num "C" "(C)"
+          content "any other matter relevant to the case or to formulating a plan."
+          hash "ab23768b5241bbaf606980aed5a6ad77ced5d2ff9254803eb5c8b04d5899b626"
+        }
+        hash "028c4bf96792734ee0deee97902c8034b604076f23bad354fe2a94343a1dda64"
+      }
+      hash "99c3f8262fc095f6c02bc1677bc55d2380615e5ab0e7ab25f8d8bae8d11b9c70"
+    }
+    provision "/us/usc/ptII/rule2004/c" subsection {
+      num "c" "(c)"
+      heading "Compelling Attendance and the Production of Documents or Electronically Stored Information."
+      content "Regardless of the district where the examination will be conducted, an entity may be compelled under Rule 9016 to attend and produce documents or electronically stored information. An attorney may issue and sign a subpoena on behalf of the court where the case is pending if the attorney is admitted to practice in that court."
+      hash "68bd53770ade40eae800a599fa81d3acbbad077a909be6615e9ca82eb90e731e"
+    }
+    provision "/us/usc/ptII/rule2004/d" subsection {
+      num "d" "(d)"
+      heading "Time and Place to Examine the Debtor."
+      content "The court may, for cause and on terms it may impose, order the debtor to be examined under this Rule 2004 at any designated time and place, in or outside the district."
+      hash "a5e022567744691c5d143f7692fa27945e3f61032a37067ab6b87d5289b6a138"
+    }
+    provision "/us/usc/ptII/rule2004/e" subsection {
+      num "e" "(e)"
+      heading "Witness Fees and Mileage."
+      provision "/us/usc/ptII/rule2004/e/1" paragraph {
+        num "1" "(1)"
+        content "For a Nondebtor Witness. An entity, except the debtor, may be required to attend as a witness only if the lawful mileage and witness fee for 1 day’s attendance are first tendered."
+        hash "9974079979fe12839b4f5e7d1f6bcb78529426b78225b6c764dd860cd9926c5e"
+      }
+      provision "/us/usc/ptII/rule2004/e/2" paragraph {
+        num "2" "(2)"
+        chapeau "For a Debtor Witness. A debtor who is required to appear for examination more than 100 miles from the debtor’s residence must be tendered a mileage fee. The fee need cover only the distance exceeding 100 miles from the nearer of where the debtor resides:"
+        provision "/us/usc/ptII/rule2004/e/2/A" subparagraph {
+          num "A" "(A)"
+          content "when the first petition was filed; or"
+          hash "940a62ad642a8c91618efd6b15c5e62272154e4a8e54e4f86525ed63f3ff3ef7"
+        }
+        provision "/us/usc/ptII/rule2004/e/2/B" subparagraph {
+          num "B" "(B)"
+          content "when the examination takes place."
+          hash "f4269652f446eb73d22cebe602715659f29e3be5db406d1043d12c97d3cf4c7e"
+        }
+        hash "456d8162c9331fe813483af2d63e7296b08537970a5380e4546545351834228a"
+      }
+      hash "a658d38a8b099daa9cd842fee7104cd3941208106e6d37838a6943d094cb76b3"
+    }
+    hash "8e601bedfc44e8dde2414524e61d6b05d9c01c86057520deecbe99b41d42e753"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 29, 2002, eff. Dec. 1, 2002; Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a) of this rule is derived from former Bankruptcy Rule 205(a). See generally 2 Collier, Bankruptcy ¶¶ 343.02, 343.08, 343.13 (15th ed. 1981). It specifies the manner of moving for an examination. The motion may be heard ex parte or it may be heard on notice."
+    p "Subdivision (b) is derived from former Bankruptcy Rules 205(d) and 11–26."
+    p "Subdivision (c) specifies the mode of compelling attendance of a witness or party for an examination and for the production of evidence under this rule. The subdivision is substantially declaratory of the practice that had developed under § 21a of the Act. See 2 Collier, supra ¶ 343.11."
+    p "This subdivision will be applicable for the most part to the examination of a person other than the debtor. The debtor is required to appear at the meeting of creditors for examination. The word “person” includes the debtor and this subdivision may be used if necessary to obtain the debtor’s attendance for examination."
+    p "Subdivision (d) is derived from former Bankruptcy Rule 205(f) and is not a limitation on subdivision (c). Any person, including the debtor, served with a subpoena within the range of a subpoena must attend for examination pursuant to subdivision (c). Subdivision (d) applies only to the debtor and a subpoena need not be issued. There are no territorial limits on the service of an order on the debtor. See, e.g., In re Totem Lodge & Country Club, Inc., 134 F. Supp. 158 (S.D.N.Y. 1955)."
+    p "Subdivision (e) is derived from former Bankruptcy Rule 205(g). The lawful mileage and fee for attendance at a United States court as a witness are prescribed by 28 U.S.C. § 1821."
+    p "Definition of debtor. The word “debtor” as used in this rule includes the persons specified in the definition in Rule 9001(5)."
+    p "Spousal privilege. The limitation on the spousal privilege formerly contained in § 21a of the Act is not carried over in the Code. For privileges generally, see Rule 501 of the Federal Rules of Evidence made applicable in cases under the Code by Rule 1101 thereof."
+    hash "5ac82cf507a90b615cea9b323b8925cec7dd38990bb01c77cbab73a487dc05a5"
+  }
+  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to allow the examination in a chapter 12 case to cover the same matters that may be covered in an examination in a chapter 11 or 13 case."
+    hash "379a6e196138beaed137cfe04604386a5aab9b4de9170a2b98c21d422c2b3ce6"
+  }
+  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2002 Amendment"
+    p "Subdivision (c) is amended to clarify that an examination ordered under Rule 2004(a) may be held outside the district in which the case is pending if the subpoena is issued by the court for the district in which the examination is to be held and is served in the manner provided in Rule 45 F. R. Civ. P., made applicable by Rule 9016."
+    p "The subdivision is amended further to clarify that, in addition to the procedures for the issuance of a subpoena set forth in Rule 45 F. R. Civ. P., an attorney may issue and sign a subpoena on behalf of the court for the district in which a Rule 2004 examination is to be held if the attorney is authorized to practice, even if admitted pro hac vice, either in the court in which the case is pending or in the court for the district in which the examination is to be held. This provision supplements the procedures for the issuance of a subpoena set forth in Rule 45(a)(3)(A) and (B) F. R. Civ. P. and is consistent with one of the purposes of the 1991 amendments to Rule 45, to ease the burdens of interdistrict law practice."
+    p "Changes Made After Publication and Comments. The typographical error was corrected, but no other changes were made."
+    hash "47c08134c9c1dbb172eb54ecd598d6a10c71974c41f24dc3bdd739e2af1a12bd"
+  }
+  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2020 Amendment"
+    p "Subdivision (c) is amended in two respects. First, the provision now refers expressly to the production of electronically stored information, in addition to the production of documents. This change is an acknowledgment of the form in which information now commonly exists and the type of production that is frequently sought in connection with an examination under Rule 2004."
+    p "Second, subdivision (c) is amended to bring its subpoena provision into conformity with the current version of F.R.Civ.P. 45, which Rule 9016 makes applicable in bankruptcy cases. Under Rule 45, a subpoena always issues from the court where the action is pending, even for a deposition in another district, and an attorney admitted to practice in the issuing court may issue and sign it. In light of this procedure, a subpoena for a Rule 2004 examination is now properly issued from the court where the bankruptcy case is pending and by an attorney authorized to practice in that court, even if the examination is to occur in another district."
+    hash "d3c84474ac475e40cf098ae89ee35cf0a22d22c0b3154255d5aa4d76f2d39cb6"
+  }
+  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2004 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "6b63df01b52384a3403ea02c4a1db3f7361cad90df8c42c562c5fb44ddaf0413"
+  }
+  layers {
+    operative "8e601bedfc44e8dde2414524e61d6b05d9c01c86057520deecbe99b41d42e753"
+    enacted "bc0e4c4505fd41fb669acdb0db0c4d3baa5ba7fab1ffe16886ad84d8305b6fad"
+    editorial "ab7404fd1323febc64ff0cdfbb8cc657ff9e30282d28a416fd17618beab98c9d"
+  }
+}

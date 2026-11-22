@@ -1,0 +1,1679 @@
+{"invented": "Every model in this file is invented, in the invented corpus /zz/demo; no text in it comes from any law.",
+  "provisions": [
+    {
+      "name": "a provision with text only",
+      "provision": {
+        "address": "/zz/demo/t1/s1",
+        "kind": "section",
+        "num": {
+          "value": "1",
+          "shown": {
+            "runs": [
+              {
+                "words": "§ 1."
+              }
+            ]
+          }
+        },
+        "heading": {
+          "runs": [
+            {
+              "words": "Short title"
+            }
+          ]
+        },
+        "status": null,
+        "items": [
+          {
+            "part": {
+              "role": "content",
+              "blocks": [
+                {
+                  "para": {
+                    "runs": [
+                      {
+                        "words": "This invented chapter may be cited as the Demo Widget Act."
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "hash": "2a00e15f286dffda8f0eb0a62487253feb1f91a8de543eed949f9cd8b9766d41"
+    },
+    {
+      "name": "a provision with a link, a superscript, a subscript, footnote markers, a number that holds a marker, a subheading, an image and a table with spanning cells and an empty cell",
+      "provision": {
+        "address": "/zz/demo/t1/s2",
+        "kind": "section",
+        "num": {
+          "value": "2",
+          "shown": {
+            "runs": [
+              {
+                "words": "§ 2."
+              },
+              {
+                "mark": {
+                  "shown": "1",
+                  "footnote": 1
+                }
+              }
+            ]
+          }
+        },
+        "heading": {
+          "runs": [
+            {
+              "words": "Definition of “gadget”"
+            }
+          ]
+        },
+        "status": null,
+        "items": [
+          {
+            "part": {
+              "role": "chapeau",
+              "blocks": [
+                {
+                  "para": {
+                    "runs": [
+                      {
+                        "words": "For this invented chapter, the term “gadget” has the meaning given in "
+                      },
+                      {
+                        "ref": {
+                          "words": "section 1 of this title",
+                          "target": "/zz/demo/t1/s1"
+                        }
+                      },
+                      {
+                        "words": ", weighs at most 10"
+                      },
+                      {
+                        "sup": "3"
+                      },
+                      {
+                        "words": " grams of H"
+                      },
+                      {
+                        "sub": "2"
+                      },
+                      {
+                        "words": "O"
+                      },
+                      {
+                        "mark": {
+                          "shown": "2",
+                          "footnote": 2
+                        }
+                      },
+                      {
+                        "words": ", and is shown below:"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "part": {
+              "role": "content",
+              "blocks": [
+                {
+                  "image": {
+                    "source": "demo-figure-1.png"
+                  }
+                },
+                {
+                  "subheading": {
+                    "runs": [
+                      {
+                        "words": "Weights of gadgets"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "table": {
+                    "rows": [
+                      {
+                        "group": "head",
+                        "cells": [
+                          {
+                            "header": true,
+                            "colspan": 1,
+                            "rowspan": 1,
+                            "blocks": [
+                              {
+                                "para": {
+                                  "runs": [
+                                    {
+                                      "words": "Kind"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "header": true,
+                            "colspan": 1,
+                            "rowspan": 1,
+                            "blocks": [
+                              {
+                                "para": {
+                                  "runs": [
+                                    {
+                                      "words": "Weight"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "body",
+                        "cells": [
+                          {
+                            "header": false,
+                            "colspan": 2,
+                            "rowspan": 1,
+                            "blocks": [
+                              {
+                                "para": {
+                                  "runs": [
+                                    {
+                                      "words": "Gadgets of every kind"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "body",
+                        "cells": [
+                          {
+                            "header": true,
+                            "colspan": 1,
+                            "rowspan": 2,
+                            "blocks": [
+                              {
+                                "para": {
+                                  "runs": [
+                                    {
+                                      "words": "Small"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "header": false,
+                            "colspan": 1,
+                            "rowspan": 1,
+                            "blocks": [
+                              {
+                                "para": {
+                                  "runs": [
+                                    {
+                                      "words": "1 gram"
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "para": {
+                                  "runs": [
+                                    {
+                                      "words": "or less"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "body",
+                        "cells": [
+                          {
+                            "header": false,
+                            "colspan": 1,
+                            "rowspan": 1,
+                            "blocks": []
+                          }
+                        ]
+                      },
+                      {
+                        "group": "foot",
+                        "cells": [
+                          {
+                            "header": false,
+                            "colspan": 2,
+                            "rowspan": 1,
+                            "blocks": [
+                              {
+                                "para": {
+                                  "runs": [
+                                    {
+                                      "words": "Invented figures."
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "hash": "c48c79751d7d4494e79f8e6383e4272824d7f1595d8924f3056fe00dcc2694f9"
+    },
+    {
+      "name": "a three-level tree with a chapeau, a continuation, a proviso and a status",
+      "provision": {
+        "address": "/zz/demo/t1/s3",
+        "kind": "section",
+        "num": {
+          "value": "3",
+          "shown": {
+            "runs": [
+              {
+                "words": "§ 3."
+              }
+            ]
+          }
+        },
+        "heading": {
+          "runs": [
+            {
+              "words": "Duties of makers"
+            }
+          ]
+        },
+        "status": null,
+        "items": [
+          {
+            "part": {
+              "role": "chapeau",
+              "blocks": [
+                {
+                  "para": {
+                    "runs": [
+                      {
+                        "words": "Each invented maker of widgets shall—"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "child": {
+              "address": "/zz/demo/t1/s3/a",
+              "kind": "paragraph",
+              "num": {
+                "value": "a",
+                "shown": {
+                  "runs": [
+                    {
+                      "words": "(a)"
+                    }
+                  ]
+                }
+              },
+              "heading": null,
+              "status": null,
+              "items": [
+                {
+                  "part": {
+                    "role": "chapeau",
+                    "blocks": [
+                      {
+                        "para": {
+                          "runs": [
+                            {
+                              "words": "keep a record of—"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "child": {
+                    "address": "/zz/demo/t1/s3/a/1",
+                    "kind": "clause",
+                    "num": {
+                      "value": "1",
+                      "shown": {
+                        "runs": [
+                          {
+                            "words": "(1)"
+                          }
+                        ]
+                      }
+                    },
+                    "heading": null,
+                    "status": null,
+                    "items": [
+                      {
+                        "part": {
+                          "role": "content",
+                          "blocks": [
+                            {
+                              "para": {
+                                "runs": [
+                                  {
+                                    "words": "each widget made; and"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "child": {
+                    "address": "/zz/demo/t1/s3/a/2",
+                    "kind": "clause",
+                    "num": {
+                      "value": "2",
+                      "shown": {
+                        "runs": [
+                          {
+                            "words": "(2)"
+                          }
+                        ]
+                      }
+                    },
+                    "heading": null,
+                    "status": null,
+                    "items": [
+                      {
+                        "part": {
+                          "role": "content",
+                          "blocks": [
+                            {
+                              "para": {
+                                "runs": [
+                                  {
+                                    "words": "each widget sold,"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "part": {
+                    "role": "continuation",
+                    "blocks": [
+                      {
+                        "para": {
+                          "runs": [
+                            {
+                              "words": "for three years; and"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "child": {
+              "address": "/zz/demo/t1/s3/b",
+              "kind": "paragraph",
+              "num": {
+                "value": "b",
+                "shown": {
+                  "runs": [
+                    {
+                      "words": "(b)"
+                    }
+                  ]
+                }
+              },
+              "heading": {
+                "runs": [
+                  {
+                    "words": "Repealed"
+                  }
+                ]
+              },
+              "status": "repealed",
+              "items": [
+                {
+                  "part": {
+                    "role": "content",
+                    "blocks": [
+                      {
+                        "para": {
+                          "runs": [
+                            {
+                              "words": "[Repealed.]"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "part": {
+              "role": "proviso",
+              "blocks": [
+                {
+                  "para": {
+                    "runs": [
+                      {
+                        "words": "Provided, That no record need be kept of a gadget."
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "hash": "60449a72a076d22d4f5ba7f252224f20620e8a1a5a7a7e66bf6af6734d9c8964"
+    },
+    {
+      "name": "a provision with neither a number nor a heading, and a status",
+      "provision": {
+        "address": "/zz/demo/t1/s5",
+        "kind": "section",
+        "num": null,
+        "heading": null,
+        "status": "repealed",
+        "items": [
+          {
+            "part": {
+              "role": "content",
+              "blocks": [
+                {
+                  "para": {
+                    "runs": [
+                      {
+                        "words": "Repealed."
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "hash": "2877c2b3d846930669bd28c98fcf3dc33b72b7dca991ceafcb0aca1d59dd074d"
+    }
+  ],
+  "notes": [
+    {
+      "name": "an enacted note with quoted content, levels, a part and a subheading",
+      "note": {
+        "address": "/zz/demo/t1/s2/note/demoNotes/nolaw/amendments",
+        "layer": "enacted",
+        "group": "demoNotes",
+        "topics": [
+          "amendments",
+          "effectiveDate"
+        ],
+        "heading": {
+          "runs": [
+            {
+              "words": "Amendments"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "para": {
+              "runs": [
+                {
+                  "words": "An invented act amended "
+                },
+                {
+                  "ref": {
+                    "words": "this section",
+                    "target": "/zz/demo/t1/s2"
+                  }
+                },
+                {
+                  "words": " to read as follows:"
+                }
+              ]
+            }
+          },
+          {
+            "quoted": {
+              "origin": "/zz/demo/act/2001-01-01",
+              "items": [
+                {
+                  "level": {
+                    "kind": "section",
+                    "num": {
+                      "value": "2",
+                      "shown": {
+                        "runs": [
+                          {
+                            "words": "§ 2."
+                          }
+                        ]
+                      }
+                    },
+                    "heading": {
+                      "runs": [
+                        {
+                          "words": "Gadgets"
+                        }
+                      ]
+                    },
+                    "items": [
+                      {
+                        "part": {
+                          "role": "content",
+                          "blocks": [
+                            {
+                              "para": {
+                                "runs": [
+                                  {
+                                    "words": "A gadget is any small device."
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "level": {
+                          "kind": "subsection",
+                          "num": {
+                            "value": "a",
+                            "shown": {
+                              "runs": [
+                                {
+                                  "words": "(a)"
+                                }
+                              ]
+                            }
+                          },
+                          "heading": null,
+                          "items": [
+                            {
+                              "block": {
+                                "para": {
+                                  "runs": [
+                                    {
+                                      "words": "Exception.—A widget is no gadget."
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "block": {
+                    "subheading": {
+                      "runs": [
+                        {
+                          "words": "An invented note inside the quotation"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "part": {
+                    "role": "continuation",
+                    "blocks": [
+                      {
+                        "para": {
+                          "runs": [
+                            {
+                              "words": "This text follows the quoted section."
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "quoted": {
+              "origin": null,
+              "items": [
+                {
+                  "block": {
+                    "para": {
+                      "runs": [
+                        {
+                          "words": "A quotation without an origin."
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "subheading": {
+              "runs": [
+                {
+                  "words": "Effective Date"
+                }
+              ]
+            }
+          },
+          {
+            "para": {
+              "runs": [
+                {
+                  "words": "The amendment takes effect on an invented date."
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "hash": "5d7310c895d94f9c008e3ab9d0278a3c043fb10050edd2dc8b5e55ca31888f69"
+    },
+    {
+      "name": "an editorial note with neither a heading nor a topic",
+      "note": {
+        "address": "/zz/demo/t1/s2/note/ungrouped/nolaw/h.0123456789abcdef",
+        "layer": "editorial",
+        "group": "ungrouped",
+        "topics": [],
+        "heading": null,
+        "blocks": [
+          {
+            "para": {
+              "runs": [
+                {
+                  "words": "An invented editorial remark."
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "hash": "32d87310471903a9d798569f1b4b46a03901c370861bfd6a0284597f37bbc1d5"
+    }
+  ],
+  "units": [
+    {
+      "name": "a unit with two enacted notes, one editorial note, a credit, a footnote and three markers, two of them in notes listed out of address order",
+      "unit": {
+        "address": "/zz/demo/t1/s4",
+        "aliases": [
+          "/zz/demo/t1/s4a"
+        ],
+        "within": "/zz/demo/t1/ch1",
+        "source": "demo01.xml",
+        "positive_law": true,
+        "root": {
+          "address": "/zz/demo/t1/s4",
+          "kind": "section",
+          "num": {
+            "value": "4",
+            "shown": {
+              "runs": [
+                {
+                  "words": "§ 4."
+                }
+              ]
+            }
+          },
+          "heading": {
+            "runs": [
+              {
+                "words": "Records"
+              }
+            ]
+          },
+          "status": null,
+          "items": [
+            {
+              "part": {
+                "role": "chapeau",
+                "blocks": [
+                  {
+                    "para": {
+                      "runs": [
+                        {
+                          "words": "An invented maker shall keep—"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "child": {
+                "address": "/zz/demo/t1/s4/a",
+                "kind": "paragraph",
+                "num": {
+                  "value": "a",
+                  "shown": {
+                    "runs": [
+                      {
+                        "words": "(a)"
+                      }
+                    ]
+                  }
+                },
+                "heading": null,
+                "status": null,
+                "items": [
+                  {
+                    "part": {
+                      "role": "content",
+                      "blocks": [
+                        {
+                          "para": {
+                            "runs": [
+                              {
+                                "words": "a record of each widget"
+                              },
+                              {
+                                "mark": {
+                                  "shown": "1",
+                                  "footnote": 1
+                                }
+                              },
+                              {
+                                "words": "; and"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "child": {
+                "address": "/zz/demo/t1/s4/b",
+                "kind": "paragraph",
+                "num": {
+                  "value": "b",
+                  "shown": {
+                    "runs": [
+                      {
+                        "words": "(b)"
+                      }
+                    ]
+                  }
+                },
+                "heading": null,
+                "status": null,
+                "items": [
+                  {
+                    "part": {
+                      "role": "content",
+                      "blocks": [
+                        {
+                          "para": {
+                            "runs": [
+                              {
+                                "words": "a record of each gadget."
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "credit": {
+          "runs": [
+            {
+              "words": "(Added by an invented act, "
+            },
+            {
+              "ref": {
+                "words": "§ 4",
+                "target": "/zz/demo/act/1/s4"
+              }
+            },
+            {
+              "words": ".)"
+            }
+          ]
+        },
+        "notes": [
+          {
+            "address": "/zz/demo/t1/s4/note/demoNotes/nolaw/short-title",
+            "layer": "enacted",
+            "group": "demoNotes",
+            "topics": [
+              "shortTitle"
+            ],
+            "heading": {
+              "runs": [
+                {
+                  "words": "Short Title"
+                }
+              ]
+            },
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "This invented section may be cited as the Record Act."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "address": "/zz/demo/t1/s4/note/ungrouped/nolaw/codification",
+            "layer": "editorial",
+            "group": "ungrouped",
+            "topics": [
+              "codification"
+            ],
+            "heading": {
+              "runs": [
+                {
+                  "words": "Codification"
+                }
+              ]
+            },
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "This invented section was enacted as part of another invented act"
+                    },
+                    {
+                      "mark": {
+                        "shown": "1",
+                        "footnote": 1
+                      }
+                    },
+                    {
+                      "words": "."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "address": "/zz/demo/t1/s4/note/demoNotes/nolaw/effective-date",
+            "layer": "enacted",
+            "group": "demoNotes",
+            "topics": [
+              "effectiveDate"
+            ],
+            "heading": {
+              "runs": [
+                {
+                  "words": "Effective Date"
+                }
+              ]
+            },
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "This invented section takes effect on enactment."
+                    },
+                    {
+                      "mark": {
+                        "shown": "1",
+                        "footnote": 1
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "footnotes": [
+          {
+            "ordinal": 1,
+            "shown": "1",
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "So in the invented original."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "definitions": [
+          {
+            "at": "/zz/demo/t1/s4/a",
+            "terms": [
+              "record"
+            ],
+            "kind": "means",
+            "words": null,
+            "region": null,
+            "basis": "enacted",
+            "borrowed_from": null,
+            "see_note": null
+          }
+        ]
+      },
+      "layers": {
+        "operative": "9359e6a1ed0e44d60b0094a4a910d52dceede29587081c0992f46586074e8af8",
+        "enacted": "f46c25b9cbdb3d16d640bfa08136ba896c80e594eabd74b05d1411d421c6da20",
+        "editorial": "9d7328ad269d9f7d3c18e114b700e694e284822d95de88928fa8a5a9ead2c4e4"
+      }
+    },
+    {
+      "name": "a unit with no credit, no note and no footnote",
+      "unit": {
+        "address": "/zz/demo/t1/s5",
+        "aliases": [],
+        "within": null,
+        "source": "demo01.xml",
+        "positive_law": null,
+        "root": {
+          "address": "/zz/demo/t1/s5",
+          "kind": "section",
+          "num": null,
+          "heading": null,
+          "status": "repealed",
+          "items": [
+            {
+              "part": {
+                "role": "content",
+                "blocks": [
+                  {
+                    "para": {
+                      "runs": [
+                        {
+                          "words": "Repealed."
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "credit": null,
+        "notes": [],
+        "footnotes": [],
+        "definitions": []
+      },
+      "layers": {
+        "operative": "2877c2b3d846930669bd28c98fcf3dc33b72b7dca991ceafcb0aca1d59dd074d",
+        "enacted": "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff",
+        "editorial": "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+      }
+    },
+    {
+      "name": "a unit with footnote markers in a provision's number, a provision's heading, a table cell, the headings of two notes listed out of address order, quoted content inside a note and a block of a footnote",
+      "unit": {
+        "address": "/zz/demo/t1/s6",
+        "aliases": [],
+        "within": "/zz/demo/t1/ch1",
+        "source": "demo01.xml",
+        "positive_law": false,
+        "root": {
+          "address": "/zz/demo/t1/s6",
+          "kind": "section",
+          "num": {
+            "value": "6",
+            "shown": {
+              "runs": [
+                {
+                  "words": "§ 6."
+                },
+                {
+                  "mark": {
+                    "shown": "1",
+                    "footnote": 1
+                  }
+                }
+              ]
+            }
+          },
+          "heading": {
+            "runs": [
+              {
+                "words": "Gauges of widgets"
+              },
+              {
+                "mark": {
+                  "shown": "2",
+                  "footnote": 2
+                }
+              }
+            ]
+          },
+          "status": null,
+          "items": [
+            {
+              "part": {
+                "role": "chapeau",
+                "blocks": [
+                  {
+                    "para": {
+                      "runs": [
+                        {
+                          "words": "An invented maker shall mark the gauge of each widget—"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "child": {
+                "address": "/zz/demo/t1/s6/a",
+                "kind": "paragraph",
+                "num": {
+                  "value": "a",
+                  "shown": {
+                    "runs": [
+                      {
+                        "words": "(a)"
+                      }
+                    ]
+                  }
+                },
+                "heading": null,
+                "status": null,
+                "items": [
+                  {
+                    "part": {
+                      "role": "content",
+                      "blocks": [
+                        {
+                          "para": {
+                            "runs": [
+                              {
+                                "words": "on its packaging, as the following table shows; and"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "table": {
+                            "rows": [
+                              {
+                                "group": "head",
+                                "cells": [
+                                  {
+                                    "header": true,
+                                    "colspan": 1,
+                                    "rowspan": 1,
+                                    "blocks": [
+                                      {
+                                        "para": {
+                                          "runs": [
+                                            {
+                                              "words": "Widget"
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "header": true,
+                                    "colspan": 1,
+                                    "rowspan": 1,
+                                    "blocks": [
+                                      {
+                                        "para": {
+                                          "runs": [
+                                            {
+                                              "words": "Gauge"
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "group": "body",
+                                "cells": [
+                                  {
+                                    "header": false,
+                                    "colspan": 1,
+                                    "rowspan": 1,
+                                    "blocks": [
+                                      {
+                                        "para": {
+                                          "runs": [
+                                            {
+                                              "words": "Small widget"
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "header": false,
+                                    "colspan": 1,
+                                    "rowspan": 1,
+                                    "blocks": [
+                                      {
+                                        "para": {
+                                          "runs": [
+                                            {
+                                              "words": "Gauge 3"
+                                            },
+                                            {
+                                              "mark": {
+                                                "shown": "3",
+                                                "footnote": 3
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "child": {
+                "address": "/zz/demo/t1/s6/b",
+                "kind": "paragraph",
+                "num": {
+                  "value": "b",
+                  "shown": {
+                    "runs": [
+                      {
+                        "words": "(b)"
+                      }
+                    ]
+                  }
+                },
+                "heading": null,
+                "status": null,
+                "items": [
+                  {
+                    "part": {
+                      "role": "content",
+                      "blocks": [
+                        {
+                          "para": {
+                            "runs": [
+                              {
+                                "words": "on the widget itself."
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "credit": {
+          "runs": [
+            {
+              "words": "(Added by an invented act.)"
+            }
+          ]
+        },
+        "notes": [
+          {
+            "address": "/zz/demo/t1/s6/note/ungrouped/nolaw/codification",
+            "layer": "editorial",
+            "group": "ungrouped",
+            "topics": [
+              "codification"
+            ],
+            "heading": {
+              "runs": [
+                {
+                  "words": "Codification"
+                },
+                {
+                  "mark": {
+                    "shown": "3",
+                    "footnote": 3
+                  }
+                }
+              ]
+            },
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "This invented section was enacted as part of an invented gauge act."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "address": "/zz/demo/t1/s6/note/demoNotes/nolaw/amendments",
+            "layer": "enacted",
+            "group": "demoNotes",
+            "topics": [
+              "amendments"
+            ],
+            "heading": {
+              "runs": [
+                {
+                  "words": "Amendments"
+                },
+                {
+                  "mark": {
+                    "shown": "1",
+                    "footnote": 1
+                  }
+                }
+              ]
+            },
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "An invented act amended subsection (a) to read as follows:"
+                    }
+                  ]
+                }
+              },
+              {
+                "quoted": {
+                  "origin": "/zz/demo/act/2002-02-02",
+                  "items": [
+                    {
+                      "level": {
+                        "kind": "paragraph",
+                        "num": {
+                          "value": "a",
+                          "shown": {
+                            "runs": [
+                              {
+                                "words": "(a)"
+                              }
+                            ]
+                          }
+                        },
+                        "heading": null,
+                        "items": [
+                          {
+                            "part": {
+                              "role": "content",
+                              "blocks": [
+                                {
+                                  "para": {
+                                    "runs": [
+                                      {
+                                        "words": "on its packaging, as the gauge table of the invented act shows"
+                                      },
+                                      {
+                                        "mark": {
+                                          "shown": "2",
+                                          "footnote": 2
+                                        }
+                                      },
+                                      {
+                                        "words": "; and"
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "footnotes": [
+          {
+            "ordinal": 1,
+            "shown": "1",
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "So in the invented original"
+                    },
+                    {
+                      "mark": {
+                        "shown": "2",
+                        "footnote": 2
+                      }
+                    },
+                    {
+                      "words": "."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ordinal": 2,
+            "shown": "2",
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "An invented remark on a heading."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "ordinal": 3,
+            "shown": "3",
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "An invented remark on a gauge."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "definitions": []
+      },
+      "layers": {
+        "operative": "8a3394f95af3c809738c34890778e72b4dfd789bb3c138f2cb59f644bf27210c",
+        "enacted": "6c38d9d436df0d3e96ae1fc140bf2540e2d971fb04e0291f4a396d037e4703a3",
+        "editorial": "260ed4b6df40d2f3e9948074a2a34b2f507ae9763cfdd376a5c790d707d230f5"
+      }
+    }
+  ],
+  "containers": [
+    {
+      "name": "a container with a credit, an enacted note, an editorial note, a footnote and four markers, two of them in notes listed out of address order",
+      "container": {
+        "address": "/zz/demo/t1/ch1",
+        "aliases": [],
+        "within": "/zz/demo/t1",
+        "source": "demo01.xml",
+        "positive_law": true,
+        "kind": "chapter",
+        "num": {
+          "value": "1",
+          "shown": {
+            "runs": [
+              {
+                "words": "CHAPTER 1"
+              },
+              {
+                "mark": {
+                  "shown": "*",
+                  "footnote": 1
+                }
+              }
+            ]
+          }
+        },
+        "heading": {
+          "runs": [
+            {
+              "words": "Invented Widgets"
+            }
+          ]
+        },
+        "status": null,
+        "members": [
+          "/zz/demo/t1/s1",
+          "/zz/demo/t1/s2",
+          "/zz/demo/t1/s3",
+          "/zz/demo/t1/s4"
+        ],
+        "credit": {
+          "runs": [
+            {
+              "words": "(Invented act of 2001, "
+            },
+            {
+              "ref": {
+                "words": "ch. 1",
+                "target": "/zz/demo/act/2001/ch1"
+              }
+            },
+            {
+              "words": ".)"
+            },
+            {
+              "mark": {
+                "shown": "*",
+                "footnote": 1
+              }
+            }
+          ]
+        },
+        "notes": [
+          {
+            "address": "/zz/demo/t1/ch1/note/ungrouped/nolaw/prior-provisions",
+            "layer": "editorial",
+            "group": "ungrouped",
+            "topics": [
+              "priorProvisions"
+            ],
+            "heading": {
+              "runs": [
+                {
+                  "words": "Prior Provisions"
+                }
+              ]
+            },
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "An invented chapter 1 stood here before."
+                    },
+                    {
+                      "mark": {
+                        "shown": "*",
+                        "footnote": 1
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "address": "/zz/demo/t1/ch1/note/demoNotes/nolaw/purpose",
+            "layer": "enacted",
+            "group": "demoNotes",
+            "topics": [
+              "purpose"
+            ],
+            "heading": {
+              "runs": [
+                {
+                  "words": "Purpose"
+                }
+              ]
+            },
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "The purpose of this invented chapter is order"
+                    },
+                    {
+                      "mark": {
+                        "shown": "*",
+                        "footnote": 1
+                      }
+                    },
+                    {
+                      "words": "."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "footnotes": [
+          {
+            "ordinal": 1,
+            "shown": "*",
+            "blocks": [
+              {
+                "para": {
+                  "runs": [
+                    {
+                      "words": "So in the invented original; probably should be “Chapter”."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "hash": "d6580e9b1992904abeb4cbb9df383fefe88bf06b8fc928c02e2094facded00d6",
+      "layers": {
+        "operative": "d6580e9b1992904abeb4cbb9df383fefe88bf06b8fc928c02e2094facded00d6",
+        "enacted": "e1e7c6c09f4aa0da50eb99aa2314a0e67817fc38e01234827ebe4d903860716e",
+        "editorial": "b7fc8a35eaa6d0d71ffe6b4869dd0875e4fdda69e36076b3321652d7e808c012"
+      }
+    },
+    {
+      "name": "a container with members only",
+      "container": {
+        "address": "/zz/demo/t1",
+        "aliases": [],
+        "within": null,
+        "source": "demo01.xml",
+        "positive_law": null,
+        "kind": "title",
+        "num": {
+          "value": "1",
+          "shown": {
+            "runs": [
+              {
+                "words": "Title 1—"
+              }
+            ]
+          }
+        },
+        "heading": {
+          "runs": [
+            {
+              "words": "Invented Title"
+            }
+          ]
+        },
+        "status": null,
+        "members": [
+          "/zz/demo/t1/ch1",
+          "/zz/demo/t1/s5"
+        ],
+        "credit": null,
+        "notes": [],
+        "footnotes": []
+      },
+      "hash": "78022ac0fb772e4d28b1bbda653029190b98df908a44bccd5116b047fbc4a05f",
+      "layers": {
+        "operative": "78022ac0fb772e4d28b1bbda653029190b98df908a44bccd5116b047fbc4a05f",
+        "enacted": "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff",
+        "editorial": "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+      }
+    }
+  ]
+}

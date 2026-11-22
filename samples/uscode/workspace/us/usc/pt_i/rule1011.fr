@@ -1,0 +1,122 @@
+edition 2
+module "/us/usc/ptI/rule1011" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1011" courtRule {
+    num "1011" "Rule 1011."
+    heading "Responsive Pleading in an Involuntary Case; Effect of a Motion"
+    provision "/us/usc/ptI/rule1011/a" subsection {
+      num "a" "(a)"
+      heading "Who May Contest a Petition."
+      content "A debtor may contest an involuntary petition filed against it. In a partnership case under Rule 1004, a nonpetitioning general partner—or a person who is alleged to be a general partner but denies the allegation—may contest the petition."
+      hash "63c39596c5f7d6c952b85831c376ccb975ab7ae06ac4af6b7aedc57335f58555"
+    }
+    provision "/us/usc/ptI/rule1011/b" subsection {
+      num "b" "(b)"
+      heading "Defenses and Objections; Time to File."
+      content "A defense or objection to the petition must be presented as prescribed by Fed. R. Civ. P. 12. It must be filed and served within 21 days after the summons is served. But if service is made by publication on a party or partner who does not reside in—or cannot be found in—the state where the court sits, the court must set the time to file and serve the answer."
+      hash "1b69395d16b3e61eecc3ef2766bfe2fc68968dd9ba699efd3b134f1049cf28f2"
+    }
+    provision "/us/usc/ptI/rule1011/c" subsection {
+      num "c" "(c)"
+      heading "Effect of a Motion."
+      content "Serving a motion under Fed. R. Civ. P. 12(b) extends the time to file and serve an answer as Fed. R. Civ. P. 12(a) permits."
+      hash "83a6c032817935843c168475b424ed786edaae4a50905847d67d051b9e0aed8e"
+    }
+    provision "/us/usc/ptI/rule1011/d" subsection {
+      num "d" "(d)"
+      heading "Limitation on Asserting a Debtor’s Claim Against a Petitioning Creditor."
+      content "A debtor’s answer must not assert a claim against a petitioning creditor except to defeat the petition."
+      hash "51cedfef6e10b7b2a4ed6cc976870876410f2618f6352d5f3222d17cc5a5e426"
+    }
+    provision "/us/usc/ptI/rule1011/e" subsection {
+      num "e" "(e)"
+      heading "Limit on Pleadings."
+      content "No pleading other than an answer to the petition is allowed, but the court may order a reply to an answer and set the time for filing and service."
+      hash "12c1b434f04e718cedb125d51a68ac31b7d5227f19081f7679842e5ea0350eab"
+    }
+    provision "/us/usc/ptI/rule1011/f" subsection {
+      num "f" "(f)"
+      heading "Corporate-Ownership Statement."
+      content "A corporation that responds to the petition must file a corporate-ownership statement containing the information described in Rule 7007.1. The corporation must do so with its first appearance, pleading, motion, or response, or other first request to the court."
+      hash "3989154674a5ce0719f06e1657a9765bffd9249cd76bc6fa4f846348fe80c471"
+    }
+    hash "2caf9f8c9e726f0f0cd1921deb740797bc1d314935c1ce2ff5d063bd5f49b592"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 26, 2004, eff. Dec. 1, 2004; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from former Bankruptcy Rule 112. A petition filed by fewer than all the general partners under Rule 1004(b) to have an order for relief entered with respect to the partnership is referred to as a petition against the partnership because of the adversary character of the proceeding it commences. Cf. § 303(b)(3) of the Code; 2 Collier Bankruptcy ¶ 303.05[5][a] (15th ed. 1981); 2 id. ¶¶ 18.33[2], 18.46 (14th ed. 1966). One who denies an allegation of membership in the firm is nevertheless recognized as a party entitled to contest a petition filed against a partnership under subdivision (b) of Rule 1004 in view of the possible consequences to him of an order for relief against the entity alleged to include him as a member. See § 723 of the Code; Francis v. McNeal, 228 U.S. 695 (1913); Manson v. Williams, 213 U.S. 453 (1909); Carter v. Whisler, 275 Fed. 743, 746–747 (8th Cir. 1921). The rule preserves the features of the former Act and Rule 112 and the Code permitting no response by creditors to an involuntary petition or petition against a partnership under Rule 1004(b)."
+    p "Subdivision (b): Rule 12 F.R.Civ.P. has been looked to by the courts as prescribing the mode of making a defense or objection to a petition in bankruptcy. See Fada of New York, Inc. v. Organization Service Co., Inc., 125 F.2d 120. (2d Cir. 1942); In the Matter of McDougald, 17 F.R.D. 2, 5 (W.D. Ark. 1955); In the Matter of Miller, 6 Fed. Rules Serv. 12f.26, Case No. 1 (N.D. Ohio 1942); Tatum v. Acadian Production Corp. of La., 35 F. Supp. 40, 50 (E.D. La. 1940); 2 Collier, supra ¶ 303.07 (15th ed. 1981); 2 id. at 134–40 (14th ed. 1966). As pointed out in the Note accompanying former Bankruptcy Rule 915 an objection that a debtor is neither entitled to the benefits of the Code nor amenable to an involuntary petition goes to jurisdiction of the subject matter and may be made at any time consistent with Rule 12(h)(3) F.R.Civ.P. Nothing in this rule recognizes standing in a creditor or any other person not authorized to contest a petition to raise an objection that a person eligible to file a voluntary petition cannot be the subject of an order for relief on an involuntary petition. See Seligson & King, Jurisdiction and Venue in Bankruptcy, 36 Ref.J. 36, 38–40 (1962)."
+    p "As Collier has pointed out with respect to the Bankruptcy Act, “the mechanics of the provisions in § 18a and b relating to time for appearance and pleading are unnecessarily confusing. . . . It would seem, though, to be more straightforward to provide, as does Federal Rule 12(a), that the time to respond runs from the date of service rather than the date of issuance of process.” 2 Collier, supra at 119. The time normally allowed for the service and filing of an answer or motion under Rule 1011 runs from the date of the issuance of the summons. Compare Rule 7012. Service of the summons and petition will ordinarily be made by mail under Rule 1010 and must be made within 10 days of the issuance of the summons under Rule 7004(e), which governs the time of service. When service is made by publication, the court should fix the time for service and filing of the response in the light of all the circumstances so as to afford a fair opportunity to the debtor to enter a defense or objection without unduly delaying the hearing on the petition. Cf. Rule 12(a) F.R.Civ.P."
+    p "Subdivision (c): Under subdivision (c), the timely service of a motion permitted by Rule 12(b), (e), (f), or (h) F.R.Civ.P. alters the time within which an answer must be filed. If the court denies a motion or postpones its disposition until trial on the merits, the answer must be served within 10 days after notice of the court’s action. If the court grants a motion for a more definite statement, the answer may be served any time within 10 days after the service of the more definite statement."
+    p "Many of the rules governing adversary proceedings apply to proceedings on a contested petition unless the court otherwise directs as provided in Rule 1018. The specific provisions of this Rule 1011 or 7005, however, govern the filing of an answer or motion responsive to a petition. The rules of Part VII are adaptations of the corresponding Federal Rules of Civil Procedure, and the effect of Rule 1018 is thus to make the provisions of Civil Rules 5, 8, 9, 15, and 56, inter alia, generally applicable to the making of defenses and objections to the petition. Rule 1018 follows prior law and practice in this respect. See 2 Collier, Bankruptcy ¶¶ 18.39–18.41 (14th ed. 1966)."
+    p "Subdivision (d). This subdivision adopts the position taken in many cases that an affirmative judgment against a petitioning creditor cannot be sought by a counterclaim filed in an answer to an involuntary petition. See, e.g., Georgia Jewelers, Inc. v. Bulova Watch Co., 302 F.2d 362, 369–70 (5th Cir. 1962); Associated Electronic Supply Co. of Omaha v. C.B.S. Electronic Sales Corp., 288 F.2d 683, 684–85 (8th Cir. 1961). The subdivision follows Harris v. Capehart-Farnsworth Corp., 225 F.2d 268 (8th Cir. 1955), in permitting the debtor to challenge the standing of a petitioner by filing a counterclaim against him. It does not foreclose the court from rejecting a counterclaim that cannot be determined without unduly delaying the decision upon the petition. See In the Matter of Bichel Optical Laboratories, Inc., 299 F. Supp. 545 (D. Minn. 1969)."
+    p "Subdivision (e). This subdivision makes it clear that no reply needs to be made to an answer, including one asserting a counterclaim, unless the court orders otherwise."
+    hash "fc41fe2223fc8071cd95dde2f531854e82413a16e859b81af219728719c8f6a1"
+  }
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The rule has been broadened to make applicable in ancillary cases the provisions concerning responsive pleadings to involuntary petitions."
+    hash "08142f9830cb2845196e7f8744acc771bb98e5bef4aef61ecc6808fbbb2f4c92"
+  }
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2004-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2004 Amendment"
+    p "The amendment to Rule 1004 that became effective on December 1, 2002, deleted former subdivision (a) of that rule leaving only the provisions relating to involuntary petitions against partnerships. The rule no longer includes subdivisions. Therefore, this technical amendment changes the reference to Rule 1004(b) to Rule 1004."
+    hash "9cdad1caaacac70620619d8ca7c50e33bd2e2f35ccf6a7579fcdf68ef6a96e47"
+  }
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The rule is amended to reflect the 2005 amendments to the Code, which repealed § 304 and added chapter 15. Section 304 covered cases ancillary to foreign proceedings, while chapter 15 governs ancillary and other cross-border cases and introduces the concept of a petition for recognition of a foreign proceeding."
+    p "The rule is also amended in tandem with the amendment to Rule 1010 to require the parties responding to an involuntary petition and a petition for recognition of a foreign proceeding to file corporate ownership statements to assist the court in determining whether recusal is necessary."
+    hash "c0ce33b2c7c95f6796c35ba0090f2a6cc66eba95f9a9259b5c1a967e3d22250f"
+  }
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "f8eb45e81f249c959fc1e6dc20edf7c1add6f287f9ba0ff09b6c2c011b4c5b5b"
+  }
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2016 Amendment"
+    p "This rule is amended to remove provisions regarding chapter 15 proceedings. The requirements for responses to a petition for recognition of a foreign proceeding are found in Rule 1012."
+    hash "c69822ca69d3b9de236e9c1b3d99ffd2dc9e804a5892b16a200fef3211450dab"
+  }
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1011 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "30f001d2d660518627f84dd72f84a9347f6edab28b5e93215f4e08e75fd0ec69"
+  }
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subds. (b) and (c), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "5f9b6de7cbc846213c38ecb731166532f9bd7bc63f5aad80b1074f55dffff7d1"
+  }
+  layers {
+    operative "2caf9f8c9e726f0f0cd1921deb740797bc1d314935c1ce2ff5d063bd5f49b592"
+    enacted "1331f6bc41bc148e2affa7db5a2f6dd7778a429adfbf9e30a75a67842b538883"
+    editorial "bdadffd63de97b20c34aa27a5b2678e58b79ffe7e1a86349185479c0a978352d"
+  }
+}

@@ -1,0 +1,50 @@
+edition 2
+module "/us/usc/ptII/rule2011" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2011" courtRule {
+    num "2011" "Rule 2011."
+    heading "Evidence That a Debtor Is a Debtor in Possession or That a Trustee Has Qualified"
+    provision "/us/usc/ptII/rule2011/a" subsection {
+      num "a" "(a)"
+      heading "The Clerk’s Certification."
+      content "Whenever evidence is required to prove that a debtor is a debtor in possession or that a trustee has qualified, the clerk may so certify. The certification constitutes conclusive evidence of that fact."
+      hash "e0c5f798ba9c88569121b85759aae5ad9d45d7cfa69d02d3262030dcd45ff548"
+    }
+    provision "/us/usc/ptII/rule2011/b" subsection {
+      num "b" "(b)"
+      heading "Trustee’s Failure to Qualify."
+      content "If a person elected or appointed as trustee does not qualify within the time prescribed by § 322(a), the clerk must so notify the court and the United States trustee."
+      hash "5c79585a421fc2ce3ea8fbcff18bf38806b094c7f831f63e9d6af9d3225bcfda"
+    }
+    hash "0d7ef9fc9b46c2e34f0d1cba3508f18991b530d258486f5d020f6769f6bc28ac"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule prescribes the evidentiary effect of a certificate issued by the clerk that the debtor is a debtor in possession. See Official Form No. 26. Only chapter 11 of the Code provides for a debtor in possession. See § 1107(a) of the Code. If, however, a trustee is appointed in the chapter 11 case, there will not be a debtor in possession. See §§ 1101(1), 1105 of the Code."
+    hash "dc24b576c2601ca1c4f64d3686abcf77e5ad8c60c26b6b0d0f7d1d608273f8ea"
+  }
+  note "/us/usc/ptII/rule2011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to provide a procedure for proving that a trustee has qualified in accordance with § 322 of the Code. Subdivision (b) is added so that the court and the United States trustee will be informed if the person selected as trustee pursuant to §§ 701, 702, 1104, 1202, 1302, or 1163 fails to qualify within the time prescribed in § 322(a)."
+    hash "30f94877b9cba349098560809513caa9a570abec7635f62d4e378834c6de43fc"
+  }
+  note "/us/usc/ptII/rule2011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2011 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "73284aee823b782e147980f392db4d97f3e4c3a31aeb98a052278214c598a864"
+  }
+  layers {
+    operative "0d7ef9fc9b46c2e34f0d1cba3508f18991b530d258486f5d020f6769f6bc28ac"
+    enacted "46e16d3ad1454386433f026b4f7a0738dd2749ae396d58eff2ff84f63e069d19"
+    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+  }
+}

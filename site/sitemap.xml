@@ -26,6 +26,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://fidryn.onlygass.dev/docs/law-modules</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://fidryn.onlygass.dev/docs/cli</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -42,6 +47,11 @@
   </url>
   <url>
     <loc>https://fidryn.onlygass.dev/docs/examples</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fidryn.onlygass.dev/docs/coverage</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

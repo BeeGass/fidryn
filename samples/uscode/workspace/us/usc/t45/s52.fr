@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s52" {
+  within "/us/usc/t45/ch2"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s52" section {
+    num "52" "§ 52."
+    heading "Carriers in Territories or other possessions of United States"
+    content "Every common carrier by railroad in the Territories, the District of Columbia, the Panama Canal Zone, or other possessions of the United States shall be liable in damages to any person suffering injury while he is employed by such carrier in any of said jurisdictions, or, in case of the death of such employee, to his or her personal representative, for the benefit of the surviving widow or husband and children of such employee; and, if none, then of such employee’s parents; and, if none, then of the next of kin dependent upon such employee, for such injury or death resulting in whole or in part from the negligence of any of the officers, agents, or employees of such carrier, or by reason of any defect or insufficiency, due to its negligence, in its cars, engines, appliances, machinery, track, roadbed, works, boats, wharves, or other equipment."
+    hash "8c7cff9050058f3149293ab99c2b5fb2cba287cd33319a331b69dd34474539f1"
+  }
+  credit "(" ["Apr. 22, 1908, ch. 149, § 2" -> "/us/act/1908-04-22/ch149/s2"] ", " ["35 Stat. 65" -> "/us/stat/35/65"] ".)"
+  layers {
+    operative "8c7cff9050058f3149293ab99c2b5fb2cba287cd33319a331b69dd34474539f1"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d9cad8c5c89158a21ac27b199f893514fa939d69b90b1003931d91624fd97908"
+  }
+}

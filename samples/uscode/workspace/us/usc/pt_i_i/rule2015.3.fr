@@ -1,0 +1,104 @@
+edition 2
+module "/us/usc/ptII/rule2015.3" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2015.3" courtRule {
+    num "2015.3" "Rule 2015.3."
+    heading "Reporting Financial Information About Entities in Which a Chapter 11 Estate Holds a Substantial or Controlling Interest"
+    provision "/us/usc/ptII/rule2015.3/a" subsection {
+      num "a" "(a)"
+      heading "Reporting Requirement; Content of the Report."
+      content "In a Chapter 11 case, the trustee or debtor in possession must file periodic financial reports of the value, operations, and profitability of each entity in which the estate holds a substantial or controlling interest—unless the entity is a publicly traded corporation or a debtor in a bankruptcy case. The reports must be prepared as prescribed by Form 426 and be based on the most recent information reasonably available to the filer."
+      hash "7b57aaff39bc0882a6f72544e173abc1a0787ee2e3fb474f9ba0d0731a0f5e30"
+    }
+    provision "/us/usc/ptII/rule2015.3/b" subsection {
+      num "b" "(b)"
+      heading "Time to File; Service."
+      content {
+        p "The first report must be filed at least 7 days before the first date set for the meeting of creditors under § 341. Later reports must be filed at least every 6 months, until the date a plan becomes effective or the case is converted or dismissed. A copy of each report must be served on:"
+        p "• the United States trustee;"
+        p "• any committee appointed under § 1102; and"
+        p "• any other party in interest that has filed a request for it."
+      }
+      hash "73e4e1fe3804be1cf87da6b5604ad3bd8e958363ceadccf38c0bfefaa06c25fe"
+    }
+    provision "/us/usc/ptII/rule2015.3/c" subsection {
+      num "c" "(c)"
+      heading "Presumption of a Substantial or Controlling Interest."
+      provision "/us/usc/ptII/rule2015.3/c/1" paragraph {
+        num "1" "(1)"
+        content "When a Presumption Applies. Under this Rule 2015.3, the estate is presumed to have a substantial or controlling interest in an entity of which it controls or owns at least a 20% interest. Otherwise, the estate is presumed not to have a substantial or controlling interest."
+        hash "749cf1dca21504c05e03c3ba1963bdf65f79df24fba4bfa10a117c963becdb67"
+      }
+      provision "/us/usc/ptII/rule2015.3/c/2" paragraph {
+        num "2" "(2)"
+        content "Rebutting the Presumption. The entity, any holder of an interest in it, the United States trustee, or any other party in interest may move to rebut either presumption. After notice and a hearing, the court must determine whether the estate’s interest in the entity is substantial or controlling."
+        hash "1e58c516c443025310255ae3df482c8360e44ae84783c1ab8f16443475c0f755"
+      }
+      hash "3b606831adcf79fb9db1d58bae157056af1a6da8086597d98a77538c766e9e78"
+    }
+    provision "/us/usc/ptII/rule2015.3/d" subsection {
+      num "d" "(d)"
+      heading "Modifying the Reporting Requirement."
+      chapeau "After notice and a hearing, the court may vary the reporting requirements of (a) for cause, including that:"
+      provision "/us/usc/ptII/rule2015.3/d/1" paragraph {
+        num "1" "(1)"
+        content "the trustee or debtor in possession is not able, after a good-faith effort, to comply with them; or"
+        hash "65a91b7feefcc378a2547cae9b57dbf5e9e6c1cdbb48f25bb465a2a82afb34b1"
+      }
+      provision "/us/usc/ptII/rule2015.3/d/2" paragraph {
+        num "2" "(2)"
+        content "the required information is publicly available."
+        hash "de84d8f093a7bb90d5079280a66f86299b7c16466acec7495cf62894e49ddf64"
+      }
+      hash "5913e031738428e1a83a5c1d872b7a86f394ebd008661866e9e623d9e1231bf5"
+    }
+    provision "/us/usc/ptII/rule2015.3/e" subsection {
+      num "e" "(e)"
+      heading "Notice to Entities in Which the Estate has a Substantial or Controlling Interest; Protective Order."
+      content "At least 14 days before filing the first report under (a), the trustee or debtor in possession must send notice to every entity in which the estate has a substantial or controlling interest—and all known holders of an interest in the entity—that the trustee or debtor in possession expects to file and serve financial information about the entity in accordance with this Rule 2015.3. Any such entity, or person holding an interest in it, may request that the information be protected under § 107."
+      hash "c912a51d3ca5918b910de6ea8ad3966e8d65611b0df9977fe91d7e631df7194b"
+    }
+    provision "/us/usc/ptII/rule2015.3/f" subsection {
+      num "f" "(f)"
+      heading "Effect of a Request."
+      content "Unless the court orders otherwise, a pending request under (c), (d), or (e) does not alter or stay the requirements of (a)."
+      hash "2f0932d7fc6d0b403def64ae31bfcecb9c0e79fce9130155b8856874f32168cf"
+    }
+    hash "8e9ce4e6b4e114dcf33d577f48d1b0fafc6fe888d0e5a5a75bc8083a6025adc1"
+  }
+  credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2015.3/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008"
+    p "This rule implements § 419 of the Bankruptcy Abuse Prevention and Consumer Protection Act of 2005 (“BAPCPA”). Reports are to be made on the appropriate Official Form. While § 419 of BAPCPA places the obligation to report upon the “debtor,” this rule extends the obligation to include cases in which a trustee has been appointed. The court can order that the reports not be filed in appropriate circumstances, such as when the information that would be included in these reports is already available to interested parties."
+    p "Changes After Publication. In subdivision (e), the 20 day period was changed to 14 days. This better reconciles the timing of the notice and the scheduling of the § 341 meeting of creditors, and it is also consistent with the upcoming time computation amendments."
+    hash "9f123076286bb63fba6dfee42842b604354876b43640ed062487162940c2ce26"
+  }
+  note "/us/usc/ptII/rule2015.3/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptII/rule2015.3/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2015.3 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "e9665414b612f28bf115ebfd30a6292aad31b79864ece575666cb222bcdcc189"
+  }
+  layers {
+    operative "8e9ce4e6b4e114dcf33d577f48d1b0fafc6fe888d0e5a5a75bc8083a6025adc1"
+    enacted "fc6072e297aef9f204504d80abccac37bfe619a9fcd0fbc5374a09798e9d4069"
+    editorial "a7a87ea82ce26b6544cc3c69e822448f599834e4961f55d5c8be47261511261c"
+  }
+}

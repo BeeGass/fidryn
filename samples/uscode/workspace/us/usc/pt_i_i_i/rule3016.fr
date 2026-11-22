@@ -1,0 +1,123 @@
+edition 2
+module "/us/usc/ptIII/rule3016" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3016" courtRule {
+    num "3016" "Rule 3016."
+    heading "Chapter 9 or 11—Plan and Disclosure Statement"
+    provision "/us/usc/ptIII/rule3016/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content "In a Chapter 9 or 11 case, every proposed plan or modification must be dated. In a Chapter 11 case, the plan or modification must also name the entity or entities proposing or filing it."
+      hash "03d2552bc8beb7a3e67fe143c0ed9f61c7f8fadf5d4bea025612f30aabbf57b6"
+    }
+    provision "/us/usc/ptIII/rule3016/b" subsection {
+      num "b" "(b)"
+      heading "Filing a Disclosure Statement."
+      provision "/us/usc/ptIII/rule3016/b/1" paragraph {
+        num "1" "(1)"
+        content "In General. In a Chapter 9 or 11 case, unless (2) applies, the disclosure statement, if required by § 1125—or evidence showing compliance with § 1126(b)—must be filed with the plan or at another time set by the court."
+        hash "5cf1c2d6a7d3f6688e4169fa19e3df2bb7c259e0cc7bd6fa9c158936947df08a"
+      }
+      provision "/us/usc/ptIII/rule3016/b/2" paragraph {
+        num "2" "(2)"
+        content "Providing Information Under § 1125(f)(1). A plan intended to provide adequate information under § 1125(f)(1) must be so designated. Rule 3017.1 then applies as if the plan were a disclosure statement."
+        hash "ddaf37058e4d100c1e1b20dac6dd9476d538db33ef17c391850bbcdb118492b4"
+      }
+      hash "d1a01ab3d8e4bc1858247d9cd52b28bcc8e2c3f0fa9d8678b757688e2888eb6f"
+    }
+    provision "/us/usc/ptIII/rule3016/c" subsection {
+      num "c" "(c)"
+      heading "Injunction in a Plan."
+      chapeau "If the plan provides for an injunction against conduct not otherwise enjoined by the Code, the plan and disclosure statement must:"
+      provision "/us/usc/ptIII/rule3016/c/1" paragraph {
+        num "1" "(1)"
+        content "describe in specific and conspicuous language (bold, italic, or underlined text) all acts to be enjoined; and"
+        hash "47cb9857355ae8c0f150947c9d3cd1568c35753bd80f14a98ffc60d211b3739d"
+      }
+      provision "/us/usc/ptIII/rule3016/c/2" paragraph {
+        num "2" "(2)"
+        content "identify the entities that would be subject to the injunction."
+        hash "5ed8689ec83ab69effc9646ba8711625157aa10b6f11b2c3bfa154777e035d12"
+      }
+      hash "b161c4e1f5f747afa2cbbece13f7b75fd8b9641d8512b8b7c0451ae009ecfeda"
+    }
+    provision "/us/usc/ptIII/rule3016/d" subsection {
+      num "d" "(d)"
+      heading "Form of a Disclosure Statement and Plan in a Small Business Case or a Case Under Subchapter V of Chapter 11."
+      content "In a small business case or a case under Subchapter V of Chapter 11, the court may approve a disclosure statement that substantially conforms to Form 425B and confirm a plan that substantially conforms to Form 425A—or, in either instance, to a standard form approved by the court."
+      hash "871b4da8dba3d45b839f3c13f5480afd96fc0f4afff236ff0300bdeb35616af5"
+    }
+    hash "431dc7a0ee9f7e4bf6955174d5c7e25a76eb409faf372929b8bed66d412ef679"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 23, 2001, eff. Dec. 1, 2001; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule implements the Code provisions concerning the filing of plans in chapters 9 and 11."
+    p "Chapter 9 Cases. Section 941 provides that the debtor may file a plan with the petition or thereafter but within a time fixed by the court. A rule, therefore, is unnecessary to specify the time for filing chapter 9 plans."
+    p "Chapter 11 Nonrailroad Cases. Section 1121 contains detailed provisions with respect to who may file a chapter 11 plan and, in part, the time period. Section 1121(a) permits a debtor to file a plan with the petition or at any time during the case. Section 1121(b) and (c) grants exclusive periods of 120 days and 180 days for the debtor to file and obtain acceptance of a plan. Failure to take advantage of these periods or the appointment of a trustee would permit other parties in interest to file a plan. These statutory provisions are not repeated in the rules."
+    p "Chapter 11 Railroad Cases. Pursuant to subchapter IV of chapter 11, § 1121 of the Code is applicable in railroad cases; see §§ 1161, 103(g) [now 103(h)]. A trustee, however, is to be appointed in every case; thus, pursuant to § 1121(c), any party in interest may file a plan. See discussion of subdivision (a) of this rule, infra."
+    p "Subdivision (a). Section 1121(c), while permitting parties in interest a limited right to file plans, does not provide any time limitation. This subdivision sets as the deadline, the conclusion of the hearing on the disclosure statement. The court may, however, grant additional time. It is derived from former Chapter X Rule 10–301(c)(2) which used, as the cut-off time, the conclusion of the hearing on approval of a plan. As indicated, supra, § 1121(a) permits a debtor to file a plan at any time during the chapter 11 case. Under § 1121(c), parties other than a debtor may file a plan only after a trustee is appointed or the debtor’s exclusive time expires."
+    p "Subdivision (b) requires plans to be properly identified."
+    p "Subdivision (c). This provision is new. In chapter 9 and 11 cases (including railroad reorganization cases) postpetition solicitation of votes on a plan requires transmittal of a disclosure statement, the contents of which have been approved by the court. See § 1125 of the Code. A prepetition solicitation must either have been in conformity with applicable nonbankruptcy law or, if none, the disclosure must have been of adequate information as set forth in § 1125 of the Code. See § 1126(b). Subdivision (c) of this rule provides the time for filing the disclosure statement or evidence of compliance with § 1126(b) which ordinarily will be with the plan but the court may allow a later time or the court may, pursuant to the last sentence, fix a time certain. Rule 3017 deals with the hearing on the disclosure statement. The disclosure statement, pursuant to § 1125 is to contain adequate information. “Adequate information” is defined in § 1125(a) as information that would permit a reasonable creditor or equity security holder to make an informed judgment on the plan."
+    hash "cc65b6c0c3b340e16b6bb9edce48e045d4f4a1d840c1f0ddf84127377e23e1f5"
+  }
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is amended to enlarge the time for filing competing plans. A party in interest may not file a plan without leave of court only if an order approving a disclosure statement relating to another plan has been entered and a decision on confirmation of the plan has not been entered. This subdivision does not fix a deadline beyond which a debtor may not file a plan."
+    hash "cdccc5df4decc46db0c3ed8808ffdd71ccf54945e7c5108ec0a9c08e1cf9bcb9"
+  }
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1996 Amendment"
+    p "Section 1121(c) gives a party in interest the right to file a chapter 11 plan after expiration of the period when only the debtor may file a plan. Under § 1121(d), the exclusive period in which only the debtor may file a plan may be extended, but only if a party in interest so requests and the court, after notice and a hearing, finds cause for an extension. Subdivision (a) is abrogated because it could have the effect of extending the debtor’s exclusive period for filing a plan without satisfying the requirements of § 1121(d). The abrogation of subdivision (a) does not affect the court’s discretion with respect to the scheduling of hearings on the approval of disclosure statements when more than one plan has been filed."
+    p "The amendment to subdivision (c), redesignated as subdivision (b), is stylistic."
+    p "GAP Report on Rule 3016. No changes since publication, except for a stylistic change."
+    hash "882184219159af424a40518a10bb7129c2716d1c6720878939b1b702709324b4"
+  }
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2001 Amendment"
+    p "Subdivision (c) is added to assure that entities whose conduct would be enjoined under a plan, rather than by operation of the Code, are given adequate notice of the proposed injunction. The validity and effect of any injunction are substantive law matters that are beyond the scope of these rules."
+    p "Specific and conspicuous language is not necessary if the injunction contained in the plan is substantially the same as an injunction provided under the Code. For example, if a plan contains an injunction against acts to collect a discharged debt from the debtor, Rule 3016(c) would not apply because that conduct would be enjoined nonetheless under § 524(a)(2). But if a plan provides that creditors will be permanently enjoined from asserting claims against persons who are not debtors in the case, the plan and disclosure statement must highlight the injunctive language and comply with the requirements of Rule 3016(c). See § 524(e)."
+    p "The requirement in this rule that the plan and disclosure statement identify the entities that would be subject to the injunction requires reasonable identification under the circumstances. If the entities that would be subject to the injunction cannot be identified by name, the plan and disclosure statement may describe them by class or category. For example, it may be sufficient to identify the subjects of the injunction as “all creditors of the debtor.”"
+    p "Changes Made After Publication and Comments. The word “highlighted” in the parenthesis was replaced with “underlined” because highlighted documents are difficult to scan electronically for inclusion in the clerks’ files. The Committee Note was revised to put in a more prominent position the statement that the validity and effect of any injunction provided for in a plan are substantive matters beyond the scope of the rules. Other stylistic changes were made to the Committee Note."
+    hash "412d82edfc4ab6f231742db0586b41b93b419f36baf6884a7056856b47ac35e8"
+  }
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subdivision (b) is amended to recognize that, in 2005, § 1125(f)(1) was added to the Code to provide that the plan proponent in a small business case need not file a disclosure statement if the plan itself includes adequate information and the court finds that a separate disclosure statement is unnecessary. If the plan is intended to provide adequate information in a small business case, it may be conditionally approved as a disclosure statement under Rule 3017.1 and is subject to all other rules applicable to disclosure statements in small business cases."
+    p "Subdivision (d) is added to the rule to implement § 433 of the Bankruptcy Abuse Prevention and Consumer Protection Act of 2005 which requires the promulgation of Official Forms for plans and disclosure statements in small business cases. Section 1125(f)(2) of the Code provides that the court may approve a disclosure statement submitted on the appropriate Official Form or on a standard form approved by the court. The rule takes no position on whether a court may require a local standard form disclosure statement or plan of reorganization in lieu of the Official Forms."
+    p "Other amendments are stylistic."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "70b554da9b05049fff82423f4744ba2407bf898b311a3e2c150487e29cdd8127"
+  }
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022 Amendment"
+    p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. Subdivision (b) of the rule is amended to reflect that under § 1181(b) of the Code, § 1125 does not apply to subchapter V cases (and thus a disclosure statement is not required) unless the court for cause orders otherwise. Subdivision (d) is amended to include subchapter V cases as ones in which Official Forms are available for a reorganization plan and, when required, a disclosure statement."
+    hash "6acf7bc48d76607ed83f9ebf161f78c212efa217b6ec2b353050358ad9cd0833"
+  }
+  note "/us/usc/ptIII/rule3016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3016 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "1ec99190b5f1aa67306280f1cbe2f5f06011fa4f26387fb987c9792440a298f2"
+  }
+  layers {
+    operative "431dc7a0ee9f7e4bf6955174d5c7e25a76eb409faf372929b8bed66d412ef679"
+    enacted "bcdc4829ce7cf9e3aba9573e9a48b76f33a64a4c627329abfbc7c395f687aee2"
+    editorial "56654b0320c01d35068c45387dd908a1110c989f8bee51987babc6af2f53326a"
+  }
+}

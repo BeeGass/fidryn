@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s650d" {
+  alias "/us/usc/t45/s650e"
+  within "/us/usc/t45/ch14/schVIII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s650d" section {
+    num "650d, 650e" "§§ 650d, 650e."
+    heading "Repealed. " ["Pub. L. 103–429, § 8(6)" -> "/us/pl/103/429/s8/6"] ", Oct. 31, 1994, " ["108 Stat. 4390" -> "/us/stat/108/4390"]
+    status repealed
+    hash "ddb9eba7f35cf2a9cf327ed36fa0f6a00ed786c52e35ef5f6f89d9af7d65420b"
+  }
+  note "/us/usc/t45/s650d/note/ungrouped/pl.91.518/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 650d, " ["Pub. L. 91–518, title VIII, § 814" -> "/us/pl/91/518/tVIII/s814"] ", as added " ["Pub. L. 102–533, § 11" -> "/us/pl/102/533/s11"] ", Oct. 27, 1992, " ["106 Stat. 3520" -> "/us/stat/106/3520"] ", related to formation of task force to consider recommendations on emergency training and response and to report to Congress not later than June 1, 1993."
+    hash "5899cf81b492386b747a91f8939d18ae42ac2f3c7b73670b072455bc904e5541"
+  }
+  note "/us/usc/t45/s650d/note/ungrouped/pl.91.518/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 650e, " ["Pub. L. 91–518, title VIII, § 815" -> "/us/pl/91/518/tVIII/s815"] ", as added " ["Pub. L. 102–533, § 13" -> "/us/pl/102/533/s13"] ", Oct. 27, 1992, " ["106 Stat. 3522" -> "/us/stat/106/3522"] ", directed National Railroad Passenger Corporation to develop comprehensive plan for New York City station facilities."
+    hash "c5958c847ec4a297e10a75b37995af6a9cd534dc2f1cec89f46446c0a09a97a2"
+  }
+  layers {
+    operative "ddb9eba7f35cf2a9cf327ed36fa0f6a00ed786c52e35ef5f6f89d9af7d65420b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2e9d7019123242db896ecd5892f66c10108cbf31514a3277fbe337e9952b129b"
+  }
+}

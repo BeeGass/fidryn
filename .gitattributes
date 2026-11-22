@@ -1,3 +1,5 @@
 * text=auto eol=lf
 *.woff2 binary
+*.zip binary
 LICENSES/** -text whitespace=-blank-at-eol
+samples/uscode/workspace/** linguist-generated=true

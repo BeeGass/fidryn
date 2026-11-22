@@ -1,0 +1,27 @@
+edition 2
+module "/us/usc/t45/ch2" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch2" chapter {
+    num "2" "CHAPTER 2—"
+    heading "LIABILITY FOR INJURIES TO EMPLOYEES"
+    member "/us/usc/t45/s51"
+    member "/us/usc/t45/s52"
+    member "/us/usc/t45/s53"
+    member "/us/usc/t45/s54"
+    member "/us/usc/t45/s54a"
+    member "/us/usc/t45/s55"
+    member "/us/usc/t45/s56"
+    member "/us/usc/t45/s57"
+    member "/us/usc/t45/s58"
+    member "/us/usc/t45/s59"
+    member "/us/usc/t45/s60"
+    hash "7f02daf543cadb8fc6ee0ca335c0ba2d21517b2bf492464e315134ed56684ad6"
+  }
+  layers {
+    operative "7f02daf543cadb8fc6ee0ca335c0ba2d21517b2bf492464e315134ed56684ad6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

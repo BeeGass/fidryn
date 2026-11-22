@@ -1,0 +1,25 @@
+edition 2
+module "/us/usc/t45/s162" {
+  within "/us/usc/t45/ch8/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s162" section {
+    num "162" "§ 162."
+    heading "Authorization of appropriations"
+    content "There is authorized to be appropriated such sums as may be necessary for expenditure by the Mediation Board in carrying out the provisions of this chapter."
+    hash "1f2c91c6bc5ebaddf015e4871d71b8ee4a49e72b33bfa313925806ccaed8bc50"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 12" -> "/us/act/1926-05-20/ch347/s12"] ", " ["44 Stat. 587" -> "/us/stat/44/587"] "; " ["June 21, 1934, ch. 691, § 7" -> "/us/act/1934-06-21/ch691/s7"] ", " ["48 Stat. 1197" -> "/us/stat/48/1197"] ".)"
+  note "/us/usc/t45/s162/note/editorialNotes/nolaw/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1934—Act June 21, 1934, substituted “Mediation Board” for “Board of Mediation”."
+    hash "23f8d8655be888fb8d8db4d67af94ab0efff4cf5f65b692926e1c3c89f686acf"
+  }
+  layers {
+    operative "1f2c91c6bc5ebaddf015e4871d71b8ee4a49e72b33bfa313925806ccaed8bc50"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b389c131d1a6370a067e89a351160da93c5b351375d06df0492f1673ddaab213"
+  }
+}

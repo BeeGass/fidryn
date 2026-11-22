@@ -1,0 +1,37 @@
+edition 2
+module "/us/usc/t45/s65" {
+  alias "/us/usc/t45/s66"
+  within "/us/usc/t45/ch3"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s65" section {
+    num "65, 66" "§§ 65, 66."
+    heading "Repealed. " ["Pub. L. 104–287, § 10(b)" -> "/us/pl/104/287/s10/b"] ", Oct. 11, 1996, " ["110 Stat. 3401" -> "/us/stat/110/3401"]
+    status repealed
+    hash "87e3880be56a0f5810783bc27bd8ba6fe38deff5dd7c70d83c6b95949f3e253e"
+  }
+  note "/us/usc/t45/s65/note/ungrouped/nolaw/h.5dd42de00627f63f" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 65, act Sept. 3, 5, 1916, ch. 436, § 1, " ["39 Stat. 721" -> "/us/stat/39/721"] ", established eight hour work day for employees of railroads. See " ["section 28301 of Title 49" -> "/us/usc/t49/s28301"] ", Transportation."
+    hash "5dd42de00627f63f5682c638182149f0788fb1d5bb712a377692df952766d3c9"
+  }
+  note "/us/usc/t45/s65/note/ungrouped/nolaw/h.17f5da6073b415dc" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 66, act Sept. 3, 5, 1916, ch. 436, § 4, " ["39 Stat. 722" -> "/us/stat/39/722"] ", provided penalty for violation of " ["section 65 of this title" -> "/us/usc/t45/s65"] ". See " ["section 28302 of Title 49" -> "/us/usc/t49/s28302"] ", Transportation."
+    hash "17f5da6073b415dcc06baf7a27c1964089f71ce25cab1685319987b3732be430"
+  }
+  note "/us/usc/t45/s65/note/statutoryNotes/nolaw/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p "Act Sept. 3, 5, 1916, ch. 436, " ["39 Stat. 721" -> "/us/stat/39/721"] ", which enacted sections 65 and 66 of this title, was popularly known as the “Adamson Law”."
+    hash "8a4aa1e16f921929c4bcfcd0695840dca07c7e62b053c06bf6727a1cd1bbd858"
+  }
+  layers {
+    operative "87e3880be56a0f5810783bc27bd8ba6fe38deff5dd7c70d83c6b95949f3e253e"
+    enacted "f1c1203cdbf2f4727382692f3186debc5868bad8b8bedf847cb50f4aaf860b5c"
+    editorial "c3bb8b2f44c11c093c902f44c5be80e91d9ffc6ab1187364ecc4cba5742b7543"
+  }
+}

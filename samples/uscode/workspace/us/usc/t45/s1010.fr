@@ -1,0 +1,26 @@
+edition 2
+module "/us/usc/t45/s1010" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1010" section {
+    num "1010" "§ 1010."
+    heading "Applicability of National Environmental Policy Act and " ["section 6362(b) of title 42" -> "/us/usc/t42/s6362/b"]
+    content "The provisions of the National Environmental Policy Act [" ["42 U.S.C. 4321" -> "/us/usc/t42/s4321"] " et seq.] and " ["section 6362(b) of title 42" -> "/us/usc/t42/s6362/b"] " shall not apply to transactions carried out pursuant to this chapter."
+    hash "db0dced381f00a39f3aa526ef9206280a33126d92be075e5796917c05f125c62"
+  }
+  credit "(" ["Pub. L. 96–254, title I, § 113" -> "/us/pl/96/254/tI/s113"] ", May 30, 1980, " ["94 Stat. 405" -> "/us/stat/94/405"] ".)"
+  note "/us/usc/t45/s1010/note/editorialNotes/pl.91.190/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The National Environmental Policy Act, referred to in text, probably means the National Environmental Policy Act of 1969, " ["Pub. L. 91–190" -> "/us/pl/91/190"] ", Jan. 1, 1970, " ["83 Stat. 852" -> "/us/stat/83/852"] ", which is classified generally to chapter 55 (§ 4321 et seq.) of Title 42, The Public Health and Welfare. For complete classification of this Act to the Code, see Short Title note set out under " ["section 4321 of Title 42" -> "/us/usc/t42/s4321"] " and Tables."
+    p "This chapter, referred to in text, was in the original “this title”, meaning title I (§ 101 et seq.) of " ["Pub. L. 96–254" -> "/us/pl/96/254"] ", May 30, 1980, " ["94 Stat. 399" -> "/us/stat/94/399"] ", known as the Rock Island Railroad Transition and Employee Assistance Act, which is classified principally to this chapter. For complete classification of title I to the Code, see Short Title note set out under " ["section 1001 of this title" -> "/us/usc/t45/s1001"] " and Tables."
+    hash "b19a1ff0325a486aef06c69ecc7d4a35bb2c6a214a21945bea011cc53132bcc4"
+  }
+  layers {
+    operative "db0dced381f00a39f3aa526ef9206280a33126d92be075e5796917c05f125c62"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "324b515f2add4b9212a5d809690a1727594f9936dd3df79332216c53e8444f9b"
+  }
+}

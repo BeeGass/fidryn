@@ -1,0 +1,85 @@
+edition 2
+module "/us/usc/t45/s911" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s911" section {
+    num "911" "§ 911."
+    heading "New career training assistance"
+    provision "/us/usc/t45/s911/a" subsection {
+      num "a" "(a)"
+      heading "Eligible employees"
+      content "Any employee who elects to receive a separation allowance from the Milwaukee Railroad under an employee protection agreement entered into under " ["section 908 of this title" -> "/us/usc/t45/s908"] " shall be entitled to receive from the Board expenses for training in qualified institutions for new career opportunities."
+      hash "6c18ffde7f26df7deefd502cce02cfd1fd58b1e22cc837d9b346723ff18aa41e"
+    }
+    provision "/us/usc/t45/s911/b" subsection {
+      num "b" "(b)"
+      heading "Commencement of training as condition"
+      content "To be entitled for assistance under this section, an employee must begin his course of training within two years following the date of his separation from employment with the Milwaukee Railroad."
+      hash "773fc4f09b63ad272fa291c8556e35f10a4e64d735ec3dddcf94762a4c1418ba"
+    }
+    provision "/us/usc/t45/s911/c" subsection {
+      num "c" "(c)"
+      heading "Filing of application; Board determination"
+      content "Entitlement to expenses for assistance under this section shall be determined by the Board on the basis of an application therefor filed by an employee with the Board."
+      hash "a1d0406ca984bf054ca83632e976a076bde553f7bcef686a955b5adcd23d4417"
+    }
+    provision "/us/usc/t45/s911/d" subsection {
+      num "d" "(d)"
+      heading "Assistance prohibited after April 1, 1984"
+      content "No assistance may be provided under this section after April 1, 1984."
+      hash "4bdd5e92011e297a849b9f7a6e445cba870a2502dbd0cc2fb4b7f27868b10af6"
+    }
+    provision "/us/usc/t45/s911/e" subsection {
+      num "e" "(e)"
+      heading "Definitions"
+      chapeau "As used in this section—"
+      provision "/us/usc/t45/s911/e/1" paragraph {
+        num "1" "(1)"
+        content "the term “expenses” means actual expenses paid for room, board, tuition, fees, or educational material in an amount not to exceed $3,000; and"
+        hash "5ea52b6d834bfc753a4ae9287ffe4013acce15afe81180269253afdf4c595b43"
+      }
+      provision "/us/usc/t45/s911/e/2" paragraph {
+        num "2" "(2)"
+        content "the term “qualified institution” means an educational institution accredited for payment by the Veterans’ Administration under chapter 36 of title 38, or a State-accredited institution which has been in existence for not less than two years."
+        hash "86941757d30315ea300d0d63106e9f7f310b4a2a1a599966ea74a258532cc1a9"
+      }
+      hash "75489d59f431b2f2b72df982eade9d09fcda0425f1793da1299c3d25f0183961"
+    }
+    hash "489651fb76d6e101bb153cf9a74fe55bd68c98830a327375187d0ae76bb8e98c"
+  }
+  credit "(" ["Pub. L. 96–101, § 12" -> "/us/pl/96/101/s12"] ", Nov. 4, 1979, " ["93 Stat. 743" -> "/us/stat/93/743"] "; " ["Pub. L. 96–254, title I, § 119(f)" -> "/us/pl/96/254/tI/s119/f"] ", May 30, 1980, " ["94 Stat. 408" -> "/us/stat/94/408"] ".)"
+  note "/us/usc/t45/s911/note/editorialNotes/pl.96.254/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1980—Subsec. (e)(2). " ["Pub. L. 96–254" -> "/us/pl/96/254"] " inserted reference to State-accredited institutions which have been in existence for not less than two years."
+    hash "c62524a6071b8b6e350dbbb8dc2af2b80b0ac04727923e0a6ad2addc08da071d"
+  }
+  note "/us/usc/t45/s911/note/statutoryNotes/pl.100.527/change-of-name" enacted {
+    group statutoryNotes
+    topic "changeOfName"
+    heading "Change of Name"
+    p "Reference to Veterans’ Administration deemed to refer to Department of Veterans Affairs pursuant to " ["section 10 of Pub. L. 100–527" -> "/us/pl/100/527/s10"] ", set out as a Department of Veterans Affairs Act note under " ["section 301 of Title 38" -> "/us/usc/t38/s301"] ", Veterans’ Benefits."
+    hash "8f287ec28c9989546a9525b68875f8240e914d3ae3ee85c8342c78666023494b"
+  }
+  definition "/us/usc/t45/s911/e/1" {
+    term "expenses"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t45/s911"
+    basis restated
+  }
+  definition "/us/usc/t45/s911/e/2" {
+    term "qualified institution"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t45/s911"
+    basis restated
+  }
+  layers {
+    operative "489651fb76d6e101bb153cf9a74fe55bd68c98830a327375187d0ae76bb8e98c"
+    enacted "601d6757465e1854d93dc1de2c724a5bdba026722ba65d9f57315fdebebd4c6a"
+    editorial "d79e262ea6aa123011a49f36037a2007baab599eaef18160f73805ffb0fad5bf"
+  }
+}

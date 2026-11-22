@@ -1,0 +1,72 @@
+edition 2
+module "/us/usc/t45/s1346" {
+  within "/us/usc/t45/ch22/schII/ptC"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1346" section {
+    num "1346" "§ 1346."
+    heading "Resolution of certain issues"
+    provision "/us/usc/t45/s1346/a" subsection {
+      num "a" "(a)"
+      heading "Employee issues"
+      chapeau "Section 4024 completely and finally—"
+      provision "/us/usc/t45/s1346/a/1" paragraph {
+        num "1" "(1)"
+        content "extinguishes all employee rights, and any obligation of the United States, under section 761(e)" mark "1" 1 " of this title as in effect immediately before October 21, 1986;"
+        hash "1c46d5bb69aa7f6e778677634a7ac579bcbec9145e9c6d3efee1e0a34fc020e9"
+      }
+      provision "/us/usc/t45/s1346/a/2" paragraph {
+        num "2" "(2)"
+        content "resolves any and all claims against the Corporation or any other person arising under the Definitive Agreement referred to in section 4024(d)(1) or any other agreement containing similar terms and conditions;"
+        hash "83bf9b3fc2cfc2d30e1f276567d33c01f0ae72168f5a104d401de668b8de74c5"
+      }
+      provision "/us/usc/t45/s1346/a/3" paragraph {
+        num "3" "(3)"
+        content "resolves all claims to pay entitlements arising out of the pay increase deferrals by present and former employees of the Corporation under the Agreement of May 5, 1981, between Conrail and Certain Labor Organizations for Labor Contributions to Self-Sufficiency for Conrail;"
+        hash "4236602366b1805265e0f65ceeb0ee615f5921d6a868789024f4ac19fbe7d3d7"
+      }
+      provision "/us/usc/t45/s1346/a/4" paragraph {
+        num "4" "(4)"
+        content "resolves all issues raised by notices served by representatives of such employees under " ["section 156 of this title" -> "/us/usc/t45/s156"] " proposing repayment of or compensation for such deferrals; and"
+        hash "3164edeeb02eb193c727a10ce8a505b2359f10997e82f8b25003751938a93921"
+      }
+      provision "/us/usc/t45/s1346/a/5" paragraph {
+        num "5" "(5)"
+        content "resolves all claims against the Railway Labor Executives’ Association or the Corporation by any adviser, consultant, or other person who has provided services to such association in connection with any matter referred to in this subchapter."
+        hash "994829f0f056d8192a482d03b70da69d4147d5fe6724b09c93e37180af5a297b"
+      }
+      hash "e13fbd1a6d63fae71a17ebd3e17c31460058c34aea0d10b1c907377fcc53562d"
+    }
+    provision "/us/usc/t45/s1346/b" subsection {
+      num "b" "(b)"
+      heading "Corporation actions"
+      content "The Corporation shall not be considered to be in breach, default, or violation of any agreement to which it is a party, notwithstanding any provision of such agreement, because of any provision of this subchapter or any action the Corporation is required to take under this subchapter."
+      hash "a682094a7e0e57e320488844032321592b034ac1f1dea4f315ebdac21f13f4d1"
+    }
+    provision "/us/usc/t45/s1346/c" subsection {
+      num "c" "(c)"
+      heading "Right to sue withdrawn"
+      content "The United States hereby withdraws any stated or implied consent for the United States, or any agent or officer of the United States, to be sued by any person for any legal, equitable, or other relief with respect to any claim arising out of, or resulting from, acts or omissions under this subchapter, except actions brought to require the Secretary of Transportation to perform duties or acts required under part A of this subchapter."
+      hash "afcd66a8b3792f5884669010a022c980dcf901250a94a75dc044ff60d88955fb"
+    }
+    hash "b98fd40fef9aba9d2fee67db27ef3cc6bdd667a7d1bfa695c8a8e034ceb17acb"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4038" -> "/us/pl/99/509/tIV/s4038"] ", Oct. 21, 1986, " ["100 Stat. 1909" -> "/us/stat/100/1909"] ".)"
+  note "/us/usc/t45/s1346/note/editorialNotes/pl.99.509/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Section 4024, referred to in subsec. (a), is " ["section 4024 of Pub. L. 99–509" -> "/us/pl/99/509/s4024"] ", which amended " ["section 797 of this title" -> "/us/usc/t45/s797"] ", provided for repeal of " ["section 797 of this title" -> "/us/usc/t45/s797"] " effective on the sale date of the Consolidated Rail Corporation, and enacted provisions set out as a note under " ["section 797 of this title" -> "/us/usc/t45/s797"] ". Section 4024(d)(1) is set out as a note under " ["section 797 of this title" -> "/us/usc/t45/s797"] "."
+    p ["Section 761 of this title" -> "/us/usc/t45/s761"] ", referred to in subsec. (a)(1), was repealed by " ["Pub. L. 99–509, title IV, § 4033(a)(1)" -> "/us/pl/99/509/tIV/s4033/a/1"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] "."
+    p "Part A of this subchapter, referred to in subsec. (c), was in the original “subpart A” meaning subpart A (§§ 4011–4013) of part 2 of subtitle A of title IV of " ["Pub. L. 99–509" -> "/us/pl/99/509"] ", Oct. 21, 1986, " ["100 Stat. 1895" -> "/us/stat/100/1895"] ", which enacted part A of this subchapter and amended " ["section 726 of this title" -> "/us/usc/t45/s726"] ". For complete classification of this Act to the Code, see Tables."
+    hash "c6e4b6efaf2ed21243632f4a776bc6887bc9f26f137ca4e762c709808c1800a4"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "b98fd40fef9aba9d2fee67db27ef3cc6bdd667a7d1bfa695c8a8e034ceb17acb"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "be0f26295b891fb93cc470da93c1879768ebbbca1011bea7d9743018245ea24f"
+  }
+}

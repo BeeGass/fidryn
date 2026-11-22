@@ -1,0 +1,89 @@
+edition 2
+module "/us/usc/ptIX/rule9009" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9009" courtRule {
+    num "9009" "Rule 9009."
+    heading "Using Official Forms; Director’s Forms"
+    provision "/us/usc/ptIX/rule9009/a" subsection {
+      num "a" "(a)"
+      heading "Official Forms."
+      chapeau "The Official Forms prescribed by the Judicial Conference of the United States must be used without alteration—unless alteration is authorized by these rules, the form itself, or the national instructions for a particular form. A form may be modified to permit minor changes not affecting wording or the order of presentation, including a change that:"
+      provision "/us/usc/ptIX/rule9009/a/1" paragraph {
+        num "1" "(1)"
+        content "expands the prescribed response area to permit a complete response;"
+        hash "9b68bf91b7284d1646eb80301c1ce03dd494a26dc4e88fc5e96560a65a8b3730"
+      }
+      provision "/us/usc/ptIX/rule9009/a/2" paragraph {
+        num "2" "(2)"
+        content "deletes space not needed for a response; or"
+        hash "215ff3ce4dfd2d0a28a78e9dbba515fc5ff90bb49063398441da6107c00242b9"
+      }
+      provision "/us/usc/ptIX/rule9009/a/3" paragraph {
+        num "3" "(3)"
+        content "deletes items requiring detail in a question or category if the filer indicates—either by checking “no” or “none,” or by stating in words—that there is nothing to report on that item."
+        hash "a55bd172e6e471065fe529f592f5ee30091d628ed2d80fd87d5d133f8ed6743d"
+      }
+      hash "60c354d18bb6baebda9699536dcaaafd2c6b8ab946ba73da6a4d29551bd75a44"
+    }
+    provision "/us/usc/ptIX/rule9009/b" subsection {
+      num "b" "(b)"
+      heading "Director’s Forms."
+      content "The Director of the Administrative Office of the United States Courts may issue additional forms."
+      hash "f9362892ff5ebd058951c0ad709450ceef241137656e53ca784efa68b7608822"
+    }
+    provision "/us/usc/ptIX/rule9009/c" subsection {
+      num "c" "(c)"
+      heading "Construing Forms."
+      content "The forms must be construed to be consistent with these rules and the Code."
+      hash "25652484e7550918c2888f6a1719a929f7633f1beab1daeab563585d8419328d"
+    }
+    hash "498f544a1ace5378bb5c20d0000652af2c4a8ca8c50d4c1d3c39ddabd18006ed"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "The rule continues the obligatory character of the Official Forms in the interest of facilitating the processing of the paperwork of bankruptcy administration, but provides that Official Forms will be prescribed by the Judicial Conference of the United States. The Supreme Court and the Congress will thus be relieved of the burden of considering the large number of complex forms used in bankruptcy practice. The use of the Official Forms has generally been held subject to a “rule of substantial compliance” and some of these rules, for example Rule 1002, specifically state that the filed document need only “conform substantially” to the Official Form. See also Rule 9005. The second sentence recognizes the propriety of combining and rearranging Official Forms to take advantage of technological developments and resulting economies."
+    p "The Director of the Administrative Office is authorized to issue additional forms for the guidance of the bar."
+    hash "01023601a33543b1dc409677462994563936060efa07e2d88b2de01575b06f5c"
+  }
+  note "/us/usc/ptIX/rule9009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Rule 9029 [9009] is amended to clarify that local court rules may not prohibit or limit the use of the Official Forms."
+    hash "94b8a4e3b791282f696770a2c04833c50137ce2ca6f5d0e7723ea97e68ec4eaa"
+  }
+  note "/us/usc/ptIX/rule9009/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The rule is amended to provide that a plan proponent in a small business chapter 11 case need not use an Official Form of a plan of reorganization and disclosure statement. The use of those forms is optional, and under Rule 3016(d) the proponent may submit a plan and disclosure statement in those cases that does not conform to the Official Forms."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "375b8919f4e1a2bb54bf3cc6380eae4627c730b98184036b10fcd0d05bf86973"
+  }
+  note "/us/usc/ptIX/rule9009/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017 Amendment"
+    p "This rule is amended and reorganized into separate subdivisions."
+    p "Subdivision (a) addresses permissible modifications to Official Forms. It requires that an Official Form be used without alteration, except when another rule, the Official Form itself, or the national instructions applicable to an Official Form permit alteration. The former language generally permitting alterations has been deleted, but the rule preserves the ability to make minor modifications to an Official Form that do not affect the wording or the order in which information is presented on a form. Permissible changes include those that merely expand or delete the space for responses as appropriate or delete inapplicable items so long as the filer indicates that no response is intended. For example, when more space will be necessary to completely answer a question on an Official Form without an attachment, the answer space may be expanded. Similarly, varying the width or orientation of columnar data on a form for clarity of presentation would be a permissible minor change. On the other hand, many Official Forms indicate on their face that certain changes are not appropriate. Any changes that contravene the directions on an Official Form would be prohibited by this rule."
+    p "The creation of subdivision (b) and subdivision (c) is stylistic."
+    hash "b407a55a8f078abee91e67f64b6ea70b9e68f704c6a0baff2e679b087195633f"
+  }
+  note "/us/usc/ptIX/rule9009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9009 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "b866e0ba5afd103e01020cda3bbd3128cc18e9428f468eac2fe90d89882416b3"
+  }
+  layers {
+    operative "498f544a1ace5378bb5c20d0000652af2c4a8ca8c50d4c1d3c39ddabd18006ed"
+    enacted "43ec85b027386fd365c8d90ed8cb2ef5cd53f5eaf16de6b4391c3249ee56e221"
+    editorial "bae0ded5e601bbe99cbe3397695bd5824a04541bccfadffdc2e4a3699e239b9e"
+  }
+}

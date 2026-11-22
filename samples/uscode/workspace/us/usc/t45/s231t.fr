@@ -1,0 +1,58 @@
+edition 2
+module "/us/usc/t45/s231t" {
+  within "/us/usc/t45/ch9/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s231t" section {
+    num "231t" "§ 231t."
+    heading "Short title"
+    content "This subchapter may be cited as the “Railroad Retirement Act of 1974”."
+    hash "1ab8a32f0507a9e5206c2ee23c79670a96dcd26a9b0b6802b13e86b2d48dd62a"
+  }
+  credit "(" ["Aug. 29, 1935, ch. 812, § 21" -> "/us/act/1935-08-29/ch812/s21"] ", as restated " ["June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", pt. I, " ["50 Stat. 307" -> "/us/stat/50/307"] ", as restated " ["Pub. L. 93–445, title I, § 101" -> "/us/pl/93/445/tI/s101"] ", Oct. 16, 1974, " ["88 Stat. 1351" -> "/us/stat/88/1351"] ".)"
+  note "/us/usc/t45/s231t/note/statutoryNotes/pl.109.478/short-title-of-2007-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 2007 Amendment"
+    p ["Pub. L. 109–478, § 1" -> "/us/pl/109/478/s1"] ", Jan. 12, 2007, " ["120 Stat. 3573" -> "/us/stat/120/3573"] ", provided that:"
+    quoted "/us/pl/109/478/s1" {
+      p "“This Act [amending " ["section 231a of this title" -> "/us/usc/t45/s231a"] " and enacting provisions set out as a note under " ["section 231a of this title" -> "/us/usc/t45/s231a"] "] may be cited as the ‘Railroad Retirement Disability Earnings Act’.”"
+    }
+    hash "a872db5ef2c1fe94c25d76476e71ae6f22d22f5aa222bac6f43343ff92b74959"
+  }
+  note "/us/usc/t45/s231t/note/statutoryNotes/pl.109.305/short-title-of-2006-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 2006 Amendment"
+    p ["Pub. L. 109–305, § 1" -> "/us/pl/109/305/s1"] ", Oct. 6, 2006, " ["120 Stat. 1719" -> "/us/stat/120/1719"] ", provided that:"
+    quoted "/us/pl/109/305/s1" {
+      p "“This Act [amending " ["section 231f of this title" -> "/us/usc/t45/s231f"] "] may be cited as the ‘Railroad Retirement Technical Improvement Act of 2006’.”"
+    }
+    hash "dca8f68024f1c0d8a23879b0a8a4c5a241d8b7ecfe8a17740865835176a9b21d"
+  }
+  note "/us/usc/t45/s231t/note/statutoryNotes/pl.107.90/short-title-of-2001-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 2001 Amendment"
+    p ["Pub. L. 107–90, § 1(a)" -> "/us/pl/107/90/s1/a"] ", Dec. 21, 2001, " ["115 Stat. 878" -> "/us/stat/115/878"] ", provided that:"
+    quoted "/us/pl/107/90/s1/a" {
+      p "“This Act [enacting " ["section 231v of this title" -> "/us/usc/t45/s231v"] " and subchapter E of chapter 22 of Title 26, Internal Revenue Code, amending sections 231a to 231f, 231n, 231n–1, 231q, 231r, and 231u of this title, sections 24, 72, 501, 3201, 3211, 3221, and 3231 of Title 26, and " ["section 405 of Title 42" -> "/us/usc/t42/s405"] ", The Public Health and Welfare, and enacting provisions set out as notes under sections 231b, 231c, and 231n of this title, sections 24 and 3211 of Title 26, and " ["section 405 of Title 42" -> "/us/usc/t42/s405"] "] may be cited as the ‘Railroad Retirement and Survivors’ Improvement Act of 2001’.”"
+    }
+    hash "075d92fc9ed45459b9d265698e921d49b310a2c44c595af184266168b0826aac"
+  }
+  note "/us/usc/t45/s231t/note/statutoryNotes/pl.98.76/short-title-of-1983-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 1983 Amendment"
+    p ["Pub. L. 98–76, § 1" -> "/us/pl/98/76/s1"] ", Aug. 12, 1983, " ["97 Stat. 411" -> "/us/stat/97/411"] ", provided:"
+    quoted "/us/pl/98/76/s1" {
+      p "“That this Act [enacting sections 231f–1, 231n–1 and 231v of this title and sections 3321 to 3323 and 6050G of Title 26, Internal Revenue Code, amending sections 231 to 231f, 231m, 231n, 231u, 351 to 354, 358, and 360 of this title, sections 72, 86, 105, 3201, 3202, 3211, 3221, 3231, 6157, 6201, 6317, 6513, and 6601 of Title 26, and " ["section 430 of Title 42" -> "/us/usc/t42/s430"] ", The Public Health and Welfare, and enacting provisions set out as notes under sections 231 to 231d, 231f, 231m, 231n, 231n–1, 351, 352, and 362 of this title and sections 1, 72, 105, 3201, 3321, and 6302 of Title 26] may be cited as the ‘Railroad Retirement Solvency Act of 1983’.”"
+    }
+    hash "6319afa32409b417b2243e24bc2575a6840a11a098295fe88169958c84c3e3d8"
+  }
+  layers {
+    operative "1ab8a32f0507a9e5206c2ee23c79670a96dcd26a9b0b6802b13e86b2d48dd62a"
+    enacted "1b67203e57458ff4844dc2d388e80de9d59a3d79f1c037e24481b844d68380b2"
+    editorial "acf445609daa9970f312059c86bcdadfc84c0de332046b0019fda8d8127f26c7"
+  }
+}

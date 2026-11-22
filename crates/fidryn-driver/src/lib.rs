@@ -10,6 +10,8 @@
 //! Fuel exhaustion is not retained as a stable memo. Pasted mill source uses
 //! `source_root = None` and never follows artifact paths or `packages/`.
 
+pub mod workspace;
+
 use fidryn_check::check_with_sources;
 use fidryn_core::{
     CaseRecord, CoreModule, Diagnostic, DiagnosticCode, EngineError, EvaluationReport,

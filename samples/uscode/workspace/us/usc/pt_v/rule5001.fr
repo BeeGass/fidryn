@@ -1,0 +1,71 @@
+edition 2
+module "/us/usc/ptV/rule5001" {
+  within "/us/usc/ptV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptV/rule5001" courtRule {
+    num "5001" "Rule 5001."
+    heading "Court Operations; Clerks’ Offices"
+    provision "/us/usc/ptV/rule5001/a" subsection {
+      num "a" "(a)"
+      heading "Courts Always Open."
+      content "Bankruptcy courts are considered always open for filing a pleading, motion, or other paper; issuing and returning process; making rules; or entering an order."
+      hash "1189eb124970ccec1ec4589cd1bb6cbd21ce365975f394f75d1160339562e5a8"
+    }
+    provision "/us/usc/ptV/rule5001/b" subsection {
+      num "b" "(b)"
+      heading "Location for Trials and Hearings; Proceedings in Chambers."
+      content "Every trial or hearing must be held in open court—in a regular courtroom if convenient. Except as provided in 28 U.S.C. § 152(c), any other act may be performed—or a proceeding held—in chambers anywhere within or outside the district. But unless it is ex parte, a hearing may be held outside the district only if all affected parties consent."
+      hash "5aa1b87efe4af69fdcd03c05db98397839d55f6cfb7b39f7cb5bbbf59b29b11e"
+    }
+    provision "/us/usc/ptV/rule5001/c" subsection {
+      num "c" "(c)"
+      heading "Clerk’s Office Hours."
+      content "A clerk’s office—with the clerk or a deputy in attendance—must be open during business hours on all days except Saturdays, Sundays, and the legal holidays listed in Rule 9006(a)(6)."
+      hash "454aba04e06749d6881c9a2876f4fc1ad46c92a0823f428370ca06a26ee1bbd1"
+    }
+    hash "89d672e98e3837ab51769650aa9d052d72f466d79b7173b8c13685eed34da631"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from subdivisions (a), (b) and (c) of Rule 77 F.R.Civ.P."
+    hash "5646d4188d6637b913cb92e165938e495793569069cfa723a2593af4d7b3dfea"
+  }
+  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Rule 9001, as amended, defines court to mean the bankruptcy judge or district judge before whom a case or proceeding is pending. Clerk means the bankruptcy clerk, if one has been appointed for the district; if a bankruptcy clerk has not been appointed, clerk means clerk of the district court."
+    hash "ea8170f99db51809debd2baa2974488c8f839bf50d4ad164cdb42fc5c7d6906d"
+  }
+  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (c) is amended to refer to Rule 9006(a) for a list of legal holidays. Reference to F.R.Civ.P. is not necessary for this purpose."
+    hash "7af508bbccab4b9bf9e42c8b127b9e1773df3d3bd880c975d10f1010d2a69522"
+  }
+  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The rule is amended to permit bankruptcy judges to hold hearings outside of the district in which the case is pending to the extent that the circumstances lead to the authorization of the court to take such action under the 2005 amendment to 28 U.S.C. § 152(c). Under that provision, bankruptcy judges may hold court outside of their districts in emergency situations and when the business of the court otherwise so requires. This amendment to the rule is intended to implement the legislation."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "bf8cfae6e07d55a2a2c0b1d0f3628b19c2dceeb5f19f3124347d8d29aa8582b8"
+  }
+  note "/us/usc/ptV/rule5001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 5001 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "a5de5bd6296901eef2ddfb036641e874749a2999b5dff2bdbc37932363cdd2d3"
+  }
+  layers {
+    operative "89d672e98e3837ab51769650aa9d052d72f466d79b7173b8c13685eed34da631"
+    enacted "20826b9bb2731d257f8e347597d0742415f8257df07d2db5a65ce3f8c1ccf318"
+    editorial "bca4e64bfe5e2de0ae5940691907691d6f1d9028b168e3e52a6429af2c6cd4e2"
+  }
+}

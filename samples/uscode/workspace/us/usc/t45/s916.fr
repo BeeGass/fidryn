@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s916" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s916" section {
+    num "916" "§ 916."
+    heading "Repealed. " ["Pub. L. 104–88, title III, § 328" -> "/us/pl/104/88/tIII/s328"] ", Dec. 29, 1995, " ["109 Stat. 952" -> "/us/stat/109/952"]
+    status repealed
+    hash "3f97255749ea23f3110f7123f25484ce644af11a41eb568c2e4aeeb9293cc33c"
+  }
+  note "/us/usc/t45/s916/note/ungrouped/pl.96.101/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 96–101, § 18" -> "/us/pl/96/101/s18"] ", Nov. 4, 1979, " ["93 Stat. 746" -> "/us/stat/93/746"] "; " ["Pub. L. 96–254, title I, § 116" -> "/us/pl/96/254/tI/s116"] ", May 30, 1980, " ["94 Stat. 405" -> "/us/stat/94/405"] ", provided that this chapter be in lieu of directed service on any line of the Milwaukee Railroad with certain exceptions."
+    hash "786c4fc77b5f6a39656a7c0bb455c82133dbe6948a8a0eb0da9381ca7c427363"
+  }
+  note "/us/usc/t45/s916/note/statutoryNotes/pl.104.88/effective-date-of-repeal" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date of Repeal"
+    p "Repeal effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
+    hash "d8ef95426396a7f32d49c22c8d65882cc5b6581d01ce04dd7734346980221ab3"
+  }
+  layers {
+    operative "3f97255749ea23f3110f7123f25484ce644af11a41eb568c2e4aeeb9293cc33c"
+    enacted "75b4e6c58bf7f61e4d7786ffb1f131118dfe319fdf5282fc4296206ed3ad210f"
+    editorial "79c3be03d6ea214216ed091da36b0af8f7f9c430b738be80fb6d8b3e7447b3e0"
+  }
+}

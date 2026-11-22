@@ -1,0 +1,20 @@
+<!-- Invented for tests: this document is not the text of any law. -->
+<uscDoc xmlns="http://xml.house.gov/schemas/uslm/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.house.gov/schemas/uslm/1.0 USLM-1.0.15.xsd">
+<meta>
+<docPublicationName>Online@999-1</docPublicationName>
+<property role="is-positive-law">yes</property>
+</meta>
+<main>
+<title identifier="/us/usc/t99"><num value="99">Title 99</num><heading>Invented</heading>
+<section identifier="/us/usc/t99/s1"><num value="1">§ 1.</num><heading>First of two</heading><content>The first section 1.</content></section>
+<section identifier="/us/usc/t99/s1"><num value="1">§ 1.</num><heading>Second of two</heading>
+<subsection identifier="/us/usc/t99/s1/a"><num value="a">(a)</num><content>Inside the second.</content></subsection>
+</section>
+<section identifier="/us/usc/t99/s2"><num value="2">§ 2.</num><heading>Repeated paragraphs</heading>
+<chapeau>Under <ref href="/us/usc/t99/s1">section 1</ref>:</chapeau>
+<paragraph identifier="/us/usc/t99/s2/3"><num value="3">(3)</num><content>The first paragraph 3.</content></paragraph>
+<paragraph identifier="/us/usc/t99/s2/3"><num value="3">(3)</num><content>The second paragraph 3.</content></paragraph>
+</section>
+</title>
+</main>
+</uscDoc>

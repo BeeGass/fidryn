@@ -1,0 +1,109 @@
+edition 2
+module "/us/usc/ptIII/rule3015.1" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3015.1" courtRule {
+    num "3015.1" "Rule 3015.1." mark "1" 1
+    heading "Requirements for a Local Form for a Chapter 13 Plan"
+    chapeau "As an exception to Rule 9029(a)(1), a district may require that a single local form be used for a Chapter 13 plan instead of Form 113 if it:"
+    provision "/us/usc/ptIII/rule3015.1/a" subsection {
+      num "a" "(a)"
+      content "is adopted for the district after public notice and an opportunity for comment;"
+      hash "023dee6e28551630dc35273d7b65fa633dac393270a650b0e669d48c7cf48048"
+    }
+    provision "/us/usc/ptIII/rule3015.1/b" subsection {
+      num "b" "(b)"
+      content "numbers and labels each paragraph in boldface type with a heading that states its general subject matter;"
+      hash "f61e45d54327b9a30386807ac5b170e01908c8e6992b7e88f8de559c680a3fd6"
+    }
+    provision "/us/usc/ptIII/rule3015.1/c" subsection {
+      num "c" "(c)"
+      chapeau "includes an opening paragraph for the debtor to indicate that the plan does or does not:"
+      provision "/us/usc/ptIII/rule3015.1/c/1" paragraph {
+        num "1" "(1)"
+        content "contain a nonstandard provision;"
+        hash "e54cded1f4240d76f8d6571e6c90a44a10ada406242c441a9ea467850ef30883"
+      }
+      provision "/us/usc/ptIII/rule3015.1/c/2" paragraph {
+        num "2" "(2)"
+        content "limit the amount of a secured claim based on a valuation of the collateral; or"
+        hash "b61f045c429255024d9b3b0900577c14a69820319ddc0bded8edda36cee2e9c6"
+      }
+      provision "/us/usc/ptIII/rule3015.1/c/3" paragraph {
+        num "3" "(3)"
+        content "avoid a security interest or lien;"
+        hash "31da4a0578d096a78b0a9cce9ade87c9841992b47fb401d108b55cf649101de7"
+      }
+      hash "cdb4b02bce2210115961ea5a31e36f475666a4cf5dff0c39b7b597bce24ad367"
+    }
+    provision "/us/usc/ptIII/rule3015.1/d" subsection {
+      num "d" "(d)"
+      chapeau "contains separate paragraphs relating to:"
+      provision "/us/usc/ptIII/rule3015.1/d/1" paragraph {
+        num "1" "(1)"
+        content "curing any default and maintaining payments on a claim secured by the debtor’s principal residence;"
+        hash "4d77db36e0464fe44f81f6a6b27626f4b0aff019037646a4dbad3979851091fa"
+      }
+      provision "/us/usc/ptIII/rule3015.1/d/2" paragraph {
+        num "2" "(2)"
+        content "paying a domestic support obligation;"
+        hash "ec837b4b061c57b1855f427478cd8433d9fc2f58d4714920fa483d07f0509fa2"
+      }
+      provision "/us/usc/ptIII/rule3015.1/d/3" paragraph {
+        num "3" "(3)"
+        content "paying a claim described in the final paragraph of § 1325(a); and"
+        hash "13982b568b14766fe914ec1225647e269a1538ea3664388976e3c5e29fcb0a60"
+      }
+      provision "/us/usc/ptIII/rule3015.1/d/4" paragraph {
+        num "4" "(4)"
+        content "surrendering property that secures a claim and requesting that the stay under § 362(a) or 1301(a) related to the property be terminated; and"
+        hash "e8064762e98d0379b2dd762a6b5c055d21b779d672ea859737c0372b33b46564"
+      }
+      hash "338bf1a329d8f218bd315ee0667891911883be0d3af72a3c3ca95417f2fb2363"
+    }
+    provision "/us/usc/ptIII/rule3015.1/e" subsection {
+      num "e" "(e)"
+      chapeau "contains a final paragraph providing a place for:"
+      provision "/us/usc/ptIII/rule3015.1/e/1" paragraph {
+        num "1" "(1)"
+        content "nonstandard provisions as defined in Rule 3015(c), with a warning that any nonstandard provision placed elsewhere is void; and"
+        hash "deee5de03ac54e9e20461fd0ccb1fee75d4ed3b692cff7e4b33e264b18219ecf"
+      }
+      provision "/us/usc/ptIII/rule3015.1/e/2" paragraph {
+        num "2" "(2)"
+        content "a certification by the debtor’s attorney, or by an unrepresented debtor, that the plan does not contain any nonstandard provision except as set out in the final paragraph."
+        hash "b07db4692b931172985c59a18c26281a0ab25eb8aa0daeab2af2f778cedbe48d"
+      }
+      hash "5b48aa81d60d4c36b20e2982a4801df4388f1595da9ffd5570b8c074224cc280"
+    }
+    hash "b1650bbe387853031e90f6102c713c391248a7eaecafb8a5bd3108868291e0ca"
+  }
+  credit "(Added Apr. 27, 2017, eff. Dec. 1, 2017; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3015.1/note/ungrouped/nolaw/committee-notes-on-rules-2017" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017"
+    p "This rule is new. It sets out features required for all Local Forms for plans in chapter 13 cases. If a Local Form does not comply with this rule, it may not be used in lieu of the Official Chapter 13 Plan Form. See Rule 3015(c)."
+    p "Under the rule only one Local Form may be adopted in a district. The rule does not specify the method of adoption, but it does require that adoption of a Local Form be preceded by a public notice and comment period."
+    p "To promote consistency among Local Forms and clarity of content of chapter 13 plans, the rule prescribes several formatting and disclosure requirements. Paragraphs in such a form must be numbered and labeled in bold type, and the form must contain separate paragraphs for the cure and maintenance of home mortgages, payment of domestic support obligations, treatment of secured claims covered by the “hanging paragraph” of § 1325(a), and surrender of property securing a claim. Whether those portions of the Local Form are used in a given chapter 13 case will depend on the debtor’s individual circumstances."
+    p "The rule requires that a Local Form begin with a paragraph for the debtor to call attention to the fact that the plan contains a nonstandard provision; limits the amount of a secured claim based on a valuation of the collateral, as authorized by Rule 3012(b); or avoids a lien, as authorized by Rule 4003(d)."
+    p "The last paragraph of a Local Form must be for the inclusion of any nonstandard provisions, as defined by Rule 3015(c), and must include a statement that nonstandard provisions placed elsewhere in the plan are void. This part gives the debtor the opportunity to propose provisions that are not otherwise in, or that deviate from, the Local Form. The form must also require a certification by the debtor’s attorney or unrepresented debtor that there are no nonstandard provisions other than those placed in the final paragraph."
+    hash "b09526f2b71192c29c449595a02a0dada1a3d4779dc44db2c5ec15d684c4834a"
+  }
+  note "/us/usc/ptIII/rule3015.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3015.1 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "39de27c3949f33b6e316e164e93eef947b5e8b0bb09b6e064418e7de3baa1462"
+  }
+  footnote 1 "1" {
+    p "Second period editorially added."
+  }
+  layers {
+    operative "b1650bbe387853031e90f6102c713c391248a7eaecafb8a5bd3108868291e0ca"
+    enacted "03433f97df90f5d22d883790d06ffd5575bb332d77970b71f6b239132fc1e41b"
+    editorial "1b4ce7a07bb3db3ab513040488d10219f715e2bccae3f7056c1004f27d4cec8c"
+  }
+}

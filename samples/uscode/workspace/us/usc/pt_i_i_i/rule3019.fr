@@ -1,0 +1,124 @@
+edition 2
+module "/us/usc/ptIII/rule3019" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3019" courtRule {
+    num "3019" "Rule 3019."
+    heading "Chapter 9 or 11—Modifying a Plan"
+    provision "/us/usc/ptIII/rule3019/a" subsection {
+      num "a" "(a)"
+      heading "Modifying a Plan Before Confirmation."
+      content {
+        p "In a Chapter 9 or 11 case, after a plan has been accepted and before confirmation, the plan proponent may file a modification. The modification is considered accepted by any creditor or equity security holder who has accepted it in writing. For others who have not accepted it in writing but have accepted the plan, the modification is considered accepted if, after notice and a hearing, the court finds that it does not adversely change the treatment of their claims or interests. The notice must be served on:"
+        p "• the trustee;"
+        p "• any appointed committee; and"
+        p "• any other entity the court designates."
+      }
+      hash "b00a558e976dcc476653a45377576216c0685bf6f17036343abed96d1dc360d9"
+    }
+    provision "/us/usc/ptIII/rule3019/b" subsection {
+      num "b" "(b)"
+      heading "Modifying a Plan After Confirmation in an Individual Debtor’s Chapter 11 Case."
+      provision "/us/usc/ptIII/rule3019/b/1" paragraph {
+        num "1" "(1)"
+        content "In General. When a plan in an individual debtor’s Chapter 11 case has been confirmed, a request to modify it under § 1127(e) is governed by Rule 9014. The request must identify the proponent, and the proposed modification must be filed with it."
+        hash "e2e5e45773e6286712ee8f83bfedb81a7918ff364edd042cf4e49ec3cf1f96d3"
+      }
+      provision "/us/usc/ptIII/rule3019/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Time to File an Objection; Service."
+        provision "/us/usc/ptIII/rule3019/b/2/A" subparagraph {
+          num "A" "(A)"
+          chapeau "Time. Unless the court orders otherwise for creditors who are not affected by the proposed modification, the clerk—or the court’s designee—must give the debtor, trustee, and creditors at least 21 days’ notice, by mail, of:"
+          provision "/us/usc/ptIII/rule3019/b/2/A/i" clause {
+            num "i" "(i)"
+            content "the time to file an objection; and"
+            hash "03abaf6d135e3ccbbf3cb22fbcf914b1c6c924d1d5f0b168358711c58747e52c"
+          }
+          provision "/us/usc/ptIII/rule3019/b/2/A/ii" clause {
+            num "ii" "(ii)"
+            content "if an objection is filed, the date of a hearing to consider the proposed modification."
+            hash "a46ec8f4908898d9ab9bb91d70a0a4f7d383b96311cd7b8247d75ff1dd84f8fb"
+          }
+          hash "b4b9c582fbd016c43973a1f6a800cd76682b60f9a617193d9bbca158945c4d67"
+        }
+        provision "/us/usc/ptIII/rule3019/b/2/B" subparagraph {
+          num "B" "(B)"
+          content {
+            p "Service. Any objection must be served on:"
+            p "• the debtor;"
+            p "• the entity proposing the modification;"
+            p "• the trustee; and"
+            p "• any other entity the court designates."
+          }
+          continuation "A copy of the notice, modification, and objection must also be sent to the United States trustee."
+          hash "14fd5dda2159185432d1445c960ef4f1c0d5fc45fb89df23a8473ecb3a97453c"
+        }
+        hash "1d347f141dc8b09f42bdcff59d53827867c6154ece975f47dfaec1a749e2c06f"
+      }
+      hash "c86458246b8842e818e7f9645e3f4eb681e7fbf802449c296fc36bf7b695f26d"
+    }
+    provision "/us/usc/ptIII/rule3019/c" subsection {
+      num "c" "(c)"
+      heading "Modifying a Plan After Confirmation in a Case Under Subchapter V of Chapter 11."
+      content "In a case under Subchapter V of Chapter 11, Rule 9014 governs a request to modify the plan under § 1193(b) or (c), and (b) of this rule applies."
+      hash "10ab227a4a95b19ad623f7234945ec0b42508a32a7eb0872044ac9cac17a3e73"
+    }
+    hash "77a08ad4db06df8c8dba81d3d7f7461b98e1322258543749c62b5a989795b7bb"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule implements §§ 942, 1127 and 1323 of the Code. For example, § 1127 provides for modification before and after confirmation but does not deal with the minor modifications that do not adversely change any rights. The rule makes clear that a modification may be made, after acceptance of the plan without submission to creditors and equity security holders if their interests are not affected. To come within this rule, the modification should be one that does not change the rights of a creditor or equity security holder as fixed in the plan before modification."
+    hash "a394e342600001a381bec8400124ae86fddb56ccb5ee13d658580094ca32cacc"
+  }
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "This rule is amended to limit its application to chapter 9 and chapter 11 cases. Modification of plans after confirmation in chapter 12 and chapter 13 cases is governed by Rule 3015. The addition of the comma in the second sentence is stylistic and makes no substantive change."
+    hash "50e94619b2e7b778809f225eca295d9bab0bd34cb93382c01e9917f53c47683f"
+  }
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The 2005 amendments to § 1127 of the Code provide for modification of a confirmed plan in an individual debtor chapter 11 case. Therefore, the rule is amended to establish the procedure for filing and objecting to a proposed modification of a confirmed plan."
+    p "Changes Made After Publication. The last sentence of the published rule provided that an objection to modification of a plan is governed by Rule 9014. The sentence is deleted and the reference to Rule 9014 is moved to the first sentence of subdivision (b) of the rule. The Committee Note was revised to make the reference to the 2005 amendments to the Bankruptcy Code consistent with their identification in other Committee Notes."
+    hash "59b023aed70a7ab5bea927e1d8c2acef116b846727e6d8cfc4292d92aebd43ec"
+  }
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022 Amendment"
+    p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. Subdivision (c) is added to the rule to govern requests to modify a plan after confirmation in such cases under § 1193(b) or (c) of the Code."
+    hash "be17e5b45f3747eb6781602e13549894ff2d4bc9988fc53022bde10134f5cd5e"
+  }
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3019 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "556fdb69959d14875f82d6c89f6c98a06d7e0447ad892a57709c02df5cc7e868"
+  }
+  layers {
+    operative "77a08ad4db06df8c8dba81d3d7f7461b98e1322258543749c62b5a989795b7bb"
+    enacted "254f802aae7c957f030aba8ede4db08ba89a2e781f3589311498d49d4e323a8f"
+    editorial "481a29cece4762f6be8757dd125c94d33aea502eb0895d8309f12f773f0b280f"
+  }
+}

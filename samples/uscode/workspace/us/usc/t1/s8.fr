@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/t1/s8" {
+  within "/us/usc/t1/ch1"
+  source "usc01.xml"
+  positive_law true
+  provision "/us/usc/t1/s8" section {
+    num "8" "§ 8."
+    heading "“Person”, “human being”, “child”, and “individual” as including born-alive infant"
+    provision "/us/usc/t1/s8/a" subsection {
+      num "a" "(a)"
+      content "In determining the meaning of any Act of Congress, or of any ruling, regulation, or interpretation of the various administrative bureaus and agencies of the United States, the words “person”, “human being”, “child”, and “individual”, shall include every infant member of the species homo sapiens who is born alive at any stage of development."
+      hash "cd555cfdcc00b2d958d765467d22471c264146edb6ffb1869943946a6cc552d0"
+    }
+    provision "/us/usc/t1/s8/b" subsection {
+      num "b" "(b)"
+      content "As used in this section, the term “born alive”, with respect to a member of the species homo sapiens, means the complete expulsion or extraction from his or her mother of that member, at any stage of development, who after such expulsion or extraction breathes or has a beating heart, pulsation of the umbilical cord, or definite movement of voluntary muscles, regardless of whether the umbilical cord has been cut, and regardless of whether the expulsion or extraction occurs as a result of natural or induced labor, cesarean section, or induced abortion."
+      hash "b2d5a9b8293a28294946661245e40d7b5bba32df1aaca9cc71f5ff88f9588480"
+    }
+    provision "/us/usc/t1/s8/c" subsection {
+      num "c" "(c)"
+      content "Nothing in this section shall be construed to affirm, deny, expand, or contract any legal status or legal right applicable to any member of the species homo sapiens at any point prior to being “born alive” as defined in this section."
+      hash "97560508280899ba98bdaef063fd81e424bc5e66c3c6a610505a9f7dc47e3995"
+    }
+    hash "b53c0b82252690d813cc476167264de47d5cb7e03fe8c65987e5d270c425dd39"
+  }
+  credit "(Added " ["Pub. L. 107–207, § 2(a)" -> "/us/pl/107/207/s2/a"] ", Aug. 5, 2002, " ["116 Stat. 926" -> "/us/stat/116/926"] ".)"
+  definition "/us/usc/t1/s8/b" {
+    term "born alive"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t1/s8"
+    basis enacted
+  }
+  layers {
+    operative "b53c0b82252690d813cc476167264de47d5cb7e03fe8c65987e5d270c425dd39"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "71eb68f2cbbb4c3071db2b2793be27090d5d613806e091fb71aa6978849916ac"
+  }
+}

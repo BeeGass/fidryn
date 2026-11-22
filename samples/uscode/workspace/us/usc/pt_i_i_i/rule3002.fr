@@ -1,0 +1,168 @@
+edition 2
+module "/us/usc/ptIII/rule3002" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3002" courtRule {
+    num "3002" "Rule 3002."
+    heading "Filing a Proof of Claim or Interest"
+    provision "/us/usc/ptIII/rule3002/a" subsection {
+      num "a" "(a)"
+      heading "Need to File."
+      content "Unless Rule 1019(c), 3003, 3004, or 3005 provides otherwise, every creditor must file a proof of claim—and an equity security holder must file a proof of interest—for the claim or interest to be allowed. A lien that secures a claim is not void solely because an entity failed to file a proof of claim."
+      hash "fa7ca3673e17a06cf990edd4ba234e49597edd9d217ce0327a6b9f15f83bf173"
+    }
+    provision "/us/usc/ptIII/rule3002/b" subsection {
+      num "b" "(b)"
+      heading "Where to File."
+      content "The proof of claim or interest must be filed in the district where the case is pending and in accordance with Rule 5005."
+      hash "a16965f14cfa572780007a74904b647b6062149081e6dd9e485136309e6b34f8"
+    }
+    provision "/us/usc/ptIII/rule3002/c" subsection {
+      num "c" "(c)"
+      heading "Time to File."
+      chapeau "In a voluntary Chapter 7 case or in a Chapter 12 or 13 case, the proof of claim is timely if filed within 70 days after the order for relief or entry of an order converting the case to Chapter 12 or 13. In an involuntary Chapter 7 case, a proof of claim is timely if filed within 90 days after the order for relief is entered. These exceptions apply in all cases:"
+      provision "/us/usc/ptIII/rule3002/c/1" paragraph {
+        num "1" "(1)"
+        content "Governmental Unit. A governmental unit’s proof of claim is timely if filed within 180 days after the order for relief. But a proof of claim resulting from a tax return filed under § 1308 is timely if filed within 180 days after the order for relief or within 60 days after the tax return is filed. On motion filed by a governmental unit before the time expires and for cause, the court may extend the time to file a proof of claim."
+        hash "97d42153f62a08ce9a949f3fb4e7e008867de91196722cd2bd6e503f9d59bd6d"
+      }
+      provision "/us/usc/ptIII/rule3002/c/2" paragraph {
+        num "2" "(2)"
+        content "Infant or Incompetent Person. In the interests of justice, the court may extend the time for an infant or incompetent person—or a representative of either—to file a proof of claim, but only if the extension will not unduly delay case administration."
+        hash "11ec45668bab9a03cb2a58d10c446a571cfa6095bb624e73a627b05b8a528790"
+      }
+      provision "/us/usc/ptIII/rule3002/c/3" paragraph {
+        num "3" "(3)"
+        content "Unsecured Claim That Arises from a Judgment. This paragraph (3) applies if an unsecured claim arises in favor of an entity or becomes allowable because of a judgment to recover money or property from that entity or a judgment that denies or avoids the entity’s interest in property. The claim may be filed within 30 days after the judgment becomes final. But the claim must not be allowed if the judgment imposes a liability that is not satisfied—or a duty that is not performed—within the 30 days or any additional time set by the court."
+        hash "883ab22d8601bcc390f662a066e6a4faee8f9d3d5f625acee130003ae8e9c5cb"
+      }
+      provision "/us/usc/ptIII/rule3002/c/4" paragraph {
+        num "4" "(4)"
+        content "Claim Arising from a Rejected Executory Contract or Unexpired Lease. A proof of claim for a claim that arises from a rejected executory contract or an unexpired lease may be filed within the time set by the court."
+        hash "09333ab2822ad6b591190f4e85e69ad41c6609b199550a249c7004ba6d9ce33a"
+      }
+      provision "/us/usc/ptIII/rule3002/c/5" paragraph {
+        num "5" "(5)"
+        chapeau "Notice That Assets May Be Available to Pay a Dividend. The clerk must, by mail, give at least 90 days’ notice to creditors that a dividend payment appears possible and that proofs of claim must be filed by the date set forth in the notice if:"
+        provision "/us/usc/ptIII/rule3002/c/5/A" subparagraph {
+          num "A" "(A)"
+          content "a notice of insufficient assets to pay a dividend had been given under Rule 2002(e); and"
+          hash "a799505bfaab215ecb4c021871fa0a0dbeee6b21beac497cd44649b7aeb93087"
+        }
+        provision "/us/usc/ptIII/rule3002/c/5/B" subparagraph {
+          num "B" "(B)"
+          content "the trustee later notifies the court that a dividend appears possible."
+          hash "7f59bd50d68854f0c9e7de9b48807f55608cdb3dd8693ca96ad1ab1e5cb3993a"
+        }
+        hash "485cb1d09be1feac0ae676f7d5e73245dde0312ebf0cb826387f1d76362beb92"
+      }
+      provision "/us/usc/ptIII/rule3002/c/6" paragraph {
+        num "6" "(6)"
+        chapeau "Claim Secured by a Security Interest in the Debtor’s Principal Residence. A proof of a claim secured by a security interest in the debtor’s principal residence is timely filed if:"
+        provision "/us/usc/ptIII/rule3002/c/6/A" subparagraph {
+          num "A" "(A)"
+          content "the proof of claim and attachments required by Rule 3001(c)(2)(C) are filed within 70 days after the order for relief; and"
+          hash "4b0e9c58368af4fc3db3d373ae64d7101d80960fcf49de8bbc8aaaeefafd1fc4"
+        }
+        provision "/us/usc/ptIII/rule3002/c/6/B" subparagraph {
+          num "B" "(B)"
+          content "the attachments required by Rule 3001(c)(1) and (d) are filed as a supplement to the holder’s claim within 120 days after the order for relief."
+          hash "1cec5ff3318f80912d6a96c17d8cb71ae1ee3ed16a33d3e5fb2f0991834e7f81"
+        }
+        hash "27b02586a3f6782c84d2b210b1d42f79ec506c72b2740ce24cd05fe7050ba2ad"
+      }
+      provision "/us/usc/ptIII/rule3002/c/7" paragraph {
+        num "7" "(7)"
+        content "Extending the Time to File. On a creditor’s motion filed before or after the time to file a proof of claim has expired, the court may extend the time to file by no more than 60 days from the date of its order. The motion may be granted if the court finds that the notice was insufficient to give the creditor a reasonable time to file."
+        hash "d1e459c5951bc571eaf55824005bad5aa391f6d1a14988efdf56b072b12dc561"
+      }
+      hash "de1d2f676795976ffdb6c6746b80ff31bb57edb55454c8d59866bfcbb76762ca"
+    }
+    hash "8cdecef16e2a8da4a8bce38fa5fe5f02b18ff6140d7027586bc97d6a4c8faa11"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a) of this rule is substantially a restatement of the general requirement that claims be proved and filed. The exceptions refer to Rule 3003 providing for the filing of claims in chapter 9 and 11 cases, and to Rules 3004 and 3005 authorizing claims to be filed by the debtor or trustee and the filing of a claim by a contingent creditor of the debtor."
+    p "A secured claim need not be filed or allowed under § 502 or § 506(d) unless a party in interest has requested a determination and allowance or disallowance under § 502."
+    p "Subdivision (c) is adapted from former Bankruptcy Rule 302(e) but changes the time limits on the filing of claims in chapter 7 and 13 cases from six months to 90 days after the first date set for the meeting of creditors. The special rule for early filing by a secured creditor in a chapter 13 case, in former Rule 13–302(e)(1) is not continued."
+    p "Although the claim of a secured creditor may have arisen before the petition, a judgment avoiding the security interest may not have been entered until after the time for filing claims has expired. Under Rule 3002(c)(3) the creditor who did not file a secured claim may nevertheless file an unsecured claim within the time prescribed. A judgment does not become final for the purpose of starting the 30 day period provided for by paragraph (3) until the time for appeal has expired or, if an appeal is taken, until the appeal has been disposed of. In re Tapp, 61 F. Supp. 594 (W.D. Ky. 1945)."
+    p "Paragraph (1) is derived from former Bankruptcy Rule 302(e). The governmental unit may move for an extension of the 90 day period. Pursuant to § 501(c) of the Code, if the government does not file its claim within the proper time period, the debtor or trustee may file on its behalf. An extension is not needed by the debtor or trustee because the right to file does not arise until the government’s time has expired."
+    p "Paragraph (4) is derived from former chapter rules. (See, e.g., Rule 11–33(a)(2)(B). In light of the reduced time it is necessary that a party with a claim arising from the rejection of an executory contract have sufficient time to file that claim. This clause allows the court to fix an appropriate time."
+    p "Paragraph (5) of subdivision (c) is correlated with the provision in Rule 2002(e) authorizing notification to creditors of estates from which no dividends are anticipated. The clause permits creditors who have refrained from filing claims after receiving notification to be given an opportunity to file when subsequent developments indicate the possibility of a dividend. The notice required by this clause must be given in the manner provided in Rule 2002. The information relating to the discovery of assets will usually be obtained by the clerk from the trustee’s interim reports or special notification by the trustee."
+    p "Provision is made in Rule 2002(a) and (h) for notifying all creditors of the fixing of a time for filing claims against a surplus under paragraph (6). This paragraph does not deal with the distribution of the surplus. Reference must also be made to § 726(a)(2)(C) and (3) which permits distribution on late filed claims."
+    p "Paragraph (6) is only operative in a chapter 7 case. In chapter 13 cases, the plan itself provides the distribution to creditors which is not necessarily dependent on the size of the estate."
+    hash "8ed3c32d01c8819655b04a5397f5fdf6ec02f2663ea43031050351ffe498d89d"
+  }
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (a) is amended by adding a reference to Rule 1019(4). Rule 1019(4) provides that claims actually filed by a creditor in a chapter 11 or 13 case shall be treated as filed in a superseding chapter 7 case. Claims deemed filed in a chapter 11 case pursuant to § 1111(a) of the Code are not considered as filed in a superseding chapter 7 case. The creditor must file a claim in the superseding chapter 7 case."
+    hash "5d7dc3285623dfd6e3c9ea5eb3491b85948106fff5875bb53b819184c8bdd3f2"
+  }
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is amended to conform to the renumbering of subdivisions of Rule 1019. Subdivision (c) is amended to include chapter 12 cases. Subdivision (c)(4) is amended to clarify that it includes a claim arising from the rejection of an unexpired lease."
+    hash "5b1871af4a48e12eea7ccf7eaadbd546b9cd7135f3a537f84a8d098f77d55351"
+  }
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1996 Amendment"
+    p "The amendments are designed to conform to §§ 502(b)(9) and 726(a) of the Code as amended by the Bankruptcy Reform Act of 1994."
+    p "The Reform Act amended § 726(a)(1) and added § 502(b)(9) to the Code to govern the effects of a tardily filed claim. Under § 502(b)(9), a tardily filed claim must be disallowed if an objection to the proof of claim is filed, except to the extent that a holder of a tardily filed claim is entitled to distribution under § 726(a)(1), (2), or (3)."
+    p "The phrase “in accordance with this rule” is deleted from Rule 3002(a) to clarify that the effect of filing a proof of claim after the expiration of the time prescribed in Rule 3002(c) is governed by § 502(b)(9) of the Code, rather than by this rule."
+    p "Section 502(b)(9) of the Code provides that a claim of a governmental unit shall be timely filed if it is filed “before 180 days after the date of the order for relief” or such later time as the Bankruptcy Rules provide. To avoid any confusion as to whether a governmental unit’s proof of claim is timely filed under § 502(b)(9) if it is filed on the 180th day after the order for relief, paragraph (1) of subdivision (c) provides that a governmental unit’s claim is timely if it is filed not later than 180 days after the order for relief."
+    p "References to “the United States, a state, or subdivision thereof” in paragraph (1) of subdivision (c) are changed to “governmental unit” to avoid different treatment among foreign and domestic governments."
+    p "GAP Report on Rule 3002. After publication of the proposed amendments, the Bankruptcy Reform Act of 1994 amended sections 726 and 502(b) of the Code to clarify the rights of creditors who tardily file a proof of claim. In view of the Reform Act, proposed new subdivision (d) of Rule 3002 has been deleted from the proposed amendments because it is no longer necessary. In addition, subdivisions (a) and (c) have been changed after publication to clarify that the effect of tardily filing a proof of claim is governed by § 502(b)(9) of the Code, rather than by this rule."
+    p "The amendments to § 502(b) also provide that a governmental unit’s proof of claim is timely filed if it is filed before 180 days after the order for relief. Proposed amendments to Rule 3002(c)(1) were added to the published amendments to conform to this statutory change and to avoid any confusion as to whether a claim by a governmental unit is timely if it is filed on the 180th day."
+    p "The committee note has been re-written to explain the rule changes designed to conform to the Reform Act."
+    hash "1f19dfe61729aa5ff06a4e28565db8d72d5eccd332f96d859e17dc49f83afe86"
+  }
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subdivision (c)(1) is amended to reflect the addition of § 1308 to the Bankruptcy Code in 2005. This provision requires that chapter 13 debtors file tax returns during the pendency of the case, and imposes bankruptcy-related consequences if debtors fail to do so. Subdivision (c)(1) provides additional time for governmental units to file a proof of claim for tax obligations with respect to tax returns filed during the pendency of a chapter 13 case. The amendment also allows the governmental unit to move for additional time to file a proof of claim prior to expiration of the applicable filing period."
+    p "Subdivision (c)(5) of the rule is amended to set a new period for providing notice to creditors that they may file a proof of claim in a case in which they were previously informed that there was no need to file a claim. Under Rule 2002(e), if it appears that there will be no distribution to creditors, the creditors are notified of this fact and are informed that if assets are later discovered and a distribution is likely that a new notice will be given to the creditors. This second notice is prescribed by Rule 3002(c)(5). The rule is amended to direct the clerk to give at least 90 days’ notice of the time within which creditors may file a proof of claim. Setting the deadline in this manner allows the notices being sent to creditors to be more accurate regarding the deadline than was possible under the prior rule. The rule previously began the 90 day notice period from the time of the mailing of the notice, a date that could vary and generally would not even be known to the creditor. Under the amended rule, the notice will identify a specific bar date for filing proofs of claim thereby being more helpful to the creditors."
+    p "Subdivision (c)(6) is added to give the court discretion to extend the time for filing a proof of claim for a creditor who received notice of the time to file the claim at a foreign address, if the court finds that the notice was not sufficient, under the particular circumstances, to give the foreign creditor a reasonable time to file a proof of claim. This amendment is designed to comply with § 1514(d), added to the Code by the 2005 amendments, and requires that the rules and orders of the court provide such additional time as is reasonable under the circumstances for foreign creditors to file claims in cases under all chapters of the Code."
+    p "Other changes are stylistic."
+    p "Changes Made After Publication. Subdivision (c)(1) was amended to allow governmental units to move for an enlargement of the time to file a proof of claim. The Committee Note was amended to describe this addition to the rule."
+    hash "67f3bf5cf897c3cc8334a87ac6c749b13919216f33647b1024a3bc9aefb32a25"
+  }
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017 Amendment"
+    p "Subdivision (a) is amended to clarify that a creditor, including a secured creditor, must file a proof of claim in order to have an allowed claim. The amendment also clarifies, in accordance with § 506(d), that the failure of a secured creditor to file a proof of claim does not render the creditor’s lien void. The inclusion of language from § 506(d) is not intended to effect any change of law with respect to claims subject to setoff under § 553. The amendment preserves the existing exceptions to this rule under Rules 1019(3), 3003, 3004, and 3005. Under Rule 1019(3), a creditor does not need to file another proof of claim after conversion of a case to chapter 7. Rule 3003 governs the filing of a proof of claim in chapter 9 and chapter 11 cases. Rules 3004 and 3005 govern the filing of a proof of claim by the debtor, trustee, or another entity if a creditor does not do so in a timely manner."
+    p "Subdivision (c) is amended to alter the calculation of the bar date for proofs of claim in chapter 7, chapter 12, and chapter 13 cases. The amendment changes the time for filing a proof of claim in a voluntary chapter 7 case, a chapter 12 case, or a chapter 13 case from 90 days after the § 341 meeting of creditors to 70 days after the petition date. If a case is converted to chapter 12 or chapter 13, the 70-day time for filing runs from the order of conversion. If a case is converted to chapter 7, Rule 1019(2) provides that a new time period for filing a claim commences under Rule 3002. In an involuntary chapter 7 case, a 90-day time for filing applies and runs from the entry of the order for relief."
+    p "Subdivision (c)(6) is amended to expand the exception to the bar date for cases in which a creditor received insufficient notice of the time to file a proof of claim. The amendment provides that the court may extend the time to file a proof of claim if the debtor fails to file a timely list of names and addresses of creditors as required by Rule 1007(a). The amendment also clarifies that if a court grants a creditor’s motion under this rule to extend the time to file a proof of claim, the extension runs from the date of the court’s decision on the motion."
+    p "Subdivision (c)(7) is added to provide a two-stage deadline for filing mortgage proofs of claim secured by an interest in the debtor’s principal residence. Those proofs of claim must be filed with the appropriate Official Form mortgage attachment within 70 days of the order for relief. The claim will be timely if any additional documents evidencing the claim, as required by Rule 3001(c)(1) and (d), are filed within 120 days of the order for relief. The order for relief is the commencement of the case upon filing a petition, except in an involuntary case. See § 301 and § 303(h). The confirmation of a plan within the 120-day period set forth in subdivision (c)(7)(B) does not prohibit an objection to any proof of claim."
+    hash "f9b81e2d4b38692bb52b2e9624b4fb9f02a5a00fe63831581e6666b97530b83a"
+  }
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022 Amendment"
+    p "Rule 3002(c)(6) is amended to provide a single standard for granting motions for an extension of time to file a proof of claim, whether the creditor has a domestic address or a foreign address. If the notice to such creditor was “insufficient under the circumstances to give the creditor a reasonable time to file a proof of claim,” the court may grant an extension."
+    hash "52dc534d8e1fc3418997e30b34be29c694e6a7595999ef2db570fa89a12c79d0"
+  }
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3002 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "6ea17d254fb36cc763011d5118609213a2bee4c5a802957801bbae20f3f01044"
+  }
+  layers {
+    operative "8cdecef16e2a8da4a8bce38fa5fe5f02b18ff6140d7027586bc97d6a4c8faa11"
+    enacted "29ac46f1470a89fc28db84bce49221d466e5b665ba5e9b9074076914615ead57"
+    editorial "e39787713ea9394266f438f7aab29cf1517c5e90de22493e158bb43f49416d4b"
+  }
+}

@@ -1,0 +1,143 @@
+edition 2
+module "/us/usc/t45/s748" {
+  within "/us/usc/t45/ch16/schIII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s748" section {
+    num "748" "§ 748."
+    heading "Abandonments"
+    provision "/us/usc/t45/s748/a" subsection {
+      num "a" "(a)"
+      heading "General"
+      content "The Corporation may, in accordance with this section, file with the Commission an application for a certificate of abandonment for any line which is part of the system of the Corporation. Any such application shall be governed by this section and shall not, except as specifically provided in this section, be subject to the provisions of chapter 109 of title 49."
+      hash "4344bf094fdef52527e8fafd8b09ddc5d528b28bf71ec5f5f1f2bc3fe6fb7f80"
+    }
+    provision "/us/usc/t45/s748/b" subsection {
+      num "b" "(b)"
+      heading "Applications for abandonment"
+      content "Any application for abandonment that is filed by the Corporation under this section before December 1, 1981, shall be granted by the Commission within 90 days after the date such application is filed unless, within such 90-day period, an offer of financial assistance is made in accordance with subsection (d) of this section with respect to the line to be abandoned."
+      hash "a5a4953a7b750e147eecc57c1611528800788501228a697695299bad3e440ba4"
+    }
+    provision "/us/usc/t45/s748/c" subsection {
+      num "c" "(c)"
+      heading "Notice of insufficient revenues"
+      provision "/us/usc/t45/s748/c/1" paragraph {
+        num "1" "(1)"
+        content "The Corporation may, prior to November 1, 1985, file with the Commission a notice of insufficient revenues for any line which is part of the system of the Corporation."
+        hash "32e50535857a47b5528893aa09f2144239447bbdccb394c0c6e93f396915e250"
+      }
+      provision "/us/usc/t45/s748/c/2" paragraph {
+        num "2" "(2)"
+        content "At any time after the 90-day period beginning with the filing of a notice of insufficient revenues for a line, the Corporation may file an application for abandonment for such line. An application for abandonment that is filed by the Corporation under this subsection for a line for which a notice of insufficient revenues was filed under paragraph (1) shall be granted by the Commission within 90 days after the date such application is filed unless, within such 90-day period, an offer of financial assistance is made in accordance with subsection (d) of this section with respect to such line."
+        hash "e83d99b954fb1e846b68eae9441e75a5dd6323af07d04f0e21e15ed6170c3049"
+      }
+      hash "e5d53a42404f9f6e20b255ec7d20787be583e8e3c90b9caea810aa1a4b92b884"
+    }
+    provision "/us/usc/t45/s748/d" subsection {
+      num "d" "(d)"
+      heading "Offers of financial assistance"
+      provision "/us/usc/t45/s748/d/1" paragraph {
+        num "1" "(1)"
+        content "The provisions of " ["section 10904 of title 49" -> "/us/usc/t49/s10904"] " (including the timing requirements of subsection (d) thereof) shall apply to any offer of financial assistance under subsection (b) or (c) of this section."
+        hash "4e87b678ac5a6640bca62b00b83c73f0072fd1fb1750355c55d964a99752e175"
+      }
+      provision "/us/usc/t45/s748/d/2" paragraph {
+        num "2" "(2)"
+        content "The Corporation shall provide any person that intends to make an offer of financial assistance under subsection (b) or (c) of this section with such information as the Commission may require."
+        hash "0853f58dccbfb6aeb9121d5a4bdd5a7a697b2ab6bc42b3d3a876acce358379a9"
+      }
+      hash "be8096aca2292e3023e12d34a981b309e8b4565a48d7300efc876aeb3a26348d"
+    }
+    provision "/us/usc/t45/s748/e" subsection {
+      num "e" "(e)"
+      heading "Liquidation"
+      provision "/us/usc/t45/s748/e/1" paragraph {
+        num "1" "(1)"
+        content "If any application for abandonment is granted under subsection (b) of this section, the Commission shall, as soon as practicable, appraise the net liquidation value of the line to be abandoned, and shall publish notice of such appraisal in the Federal Register."
+        hash "ff54f7786b9bce23db518c4403ae8397dab4dce938dbb2596867dae4800bef8d"
+      }
+      provision "/us/usc/t45/s748/e/2" paragraph {
+        num "2" "(2)"
+        content "Appraisals made under paragraph (1) shall not be appealable."
+        hash "84f99bec8d70cc236151aeedb725158725bd2cb1a9d81b6a1f49f639fa6b0ff1"
+      }
+      provision "/us/usc/t45/s748/e/3" paragraph {
+        num "3" "(3)"
+        provision "/us/usc/t45/s748/e/3/A" subparagraph {
+          num "A" "(A)"
+          content "If, within 120 days after the date on which an appraisal is published in the Federal Register under paragraph (1), the Corporation receives a bona fide offer for the sale, for 75 percent of the amount at which the liquidation value of such line was appraised by the Commission, of the line to be abandoned, the Corporation shall sell such line and the Commission shall, unless the parties otherwise agree, establish an equitable division of joint rates for through routes over such lines."
+          hash "b3fcb2dc98abe53c4d5f78fac9b0e77ebb09835696b7c996413b646782ac171a"
+        }
+        provision "/us/usc/t45/s748/e/3/B" subparagraph {
+          num "B" "(B)"
+          content "If the Corporation receives no bona fide offer under subparagraph (A), within such 120-day period, the Corporation may abandon or dispose of the line as it chooses, except that the Corporation may not dismantle bridges, or other structures (not including rail, signals, and other rail facilities) for 120 days thereafter. The Secretary may require that bridges or other structures (not including rail, signals, and other rail facilities), not be dismantled for an additional 8 months if he assumes all liability of any sort related to such property."
+          hash "014c65701213f5ea8c23dda751f8f632f5738f3a9cc3298b2597c53c5ed6f2a6"
+        }
+        hash "4ba93aca1a2fa94c808c426fc8cb052d919f9bbc46363fcf83e6a933fa7df17e"
+      }
+      provision "/us/usc/t45/s748/e/4" paragraph {
+        num "4" "(4)"
+        content "If the purchaser under paragraph (3)(A) of this subsection of any line of the Corporation abandons such line within five years after such purchase, the proceeds of any track liquidations shall be paid into the general fund of the Treasury of the United States."
+        hash "1ed245867c4dcd148ecc94e1549eac302e6fd28e5327767b05e36058d31456a7"
+      }
+      hash "73bb7be40b53601a58386538db54857a4bb7979b53869e2849de13d83bc067a0"
+    }
+    provision "/us/usc/t45/s748/f" subsection {
+      num "f" "(f)"
+      heading "Employee protection"
+      content "The provisions of section 10903(b)(3)" mark "1" 1 " of title 49 shall not apply to any abandonment granted under this section. Any employee who was protected by the compensatory provisions of subchapter V" mark "2" 2 " of this chapter immediately prior to August 13, 1981, who is deprived of employment by such an abandonment shall be eligible for employee protection under section 797" mark "2" 2 " of this title."
+      hash "51d063f176799596d1ec81f6a5e3a74928c69645a2becead4e2466ad87ab4cd0"
+    }
+    hash "5e5bf4ac468ffd499203db18851d56c2baf486146e16876f1338f3e5ceb60a82"
+  }
+  credit "(" ["Pub. L. 93–236, title III, § 308" -> "/us/pl/93/236/tIII/s308"] ", as added " ["Pub. L. 97–35, title XI, § 1156(a)" -> "/us/pl/97/35/tXI/s1156/a"] ", Aug. 13, 1981, " ["95 Stat. 679" -> "/us/stat/95/679"] "; amended " ["Pub. L. 98–181, title II, § 2003(c)(2)" -> "/us/pl/98/181/tII/s2003/c/2"] ", Nov. 30, 1983, " ["97 Stat. 1298" -> "/us/stat/97/1298"] "; " ["Pub. L. 104–88, title III, § 327(4)" -> "/us/pl/104/88/tIII/s327/4"] ", Dec. 29, 1995, " ["109 Stat. 952" -> "/us/stat/109/952"] ".)"
+  note "/us/usc/t45/s748/note/editorialNotes/pl.97.35/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Subchapter V of this chapter, referred to in subsec. (f), was repealed by " ["Pub. L. 97–35, title XI, § 1144(a)(1)" -> "/us/pl/97/35/tXI/s1144/a/1"] ", Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"] "."
+    p ["Section 797 of this title" -> "/us/usc/t45/s797"] ", referred to in subsec. (f), was repealed by " ["Pub. L. 99–509, title IV, § 4024(c)" -> "/us/pl/99/509/tIV/s4024/c"] ", Oct. 21, 1986, " ["100 Stat. 1904" -> "/us/stat/100/1904"] ", effective on the sale date (Apr. 2, 1987)."
+    hash "41940b05420ba0ca9c4002296a414d315ea798cf508e02fc7277e95aa341a296"
+  }
+  note "/us/usc/t45/s748/note/editorialNotes/pl.104.88/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1995—Subsec. (d)(1). " ["Pub. L. 104–88, § 327(4)(A)" -> "/us/pl/104/88/s327/4/A"] ", substituted “section 10904” for “section 10905(d)–(f)”."
+    p "Subsec. (f). " ["Pub. L. 104–88, § 327(4)(B)" -> "/us/pl/104/88/s327/4/B"] ", substituted “section 10903(b)(3)” for “section 10903(b)(2)”."
+    p "1983—Subsec. (c)(1). " ["Pub. L. 98–181" -> "/us/pl/98/181"] " substituted “1985” for “1983”."
+    hash "c370a11abf7bce8e5f092ca649c984e2a91798b0ba51da36a995697f13748bdb"
+  }
+  note "/us/usc/t45/s748/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1995 Amendment"
+    p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
+    hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
+  }
+  note "/us/usc/t45/s748/note/statutoryNotes/pl.97.35/effective-date" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date"
+    p "Section effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as a note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
+    hash "c0941333df7fda0a7e45f1a15726e04b8f5639248b2b6fb747963faa50869950"
+  }
+  note "/us/usc/t45/s748/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  footnote 1 "1" {
+    p "So in original. " ["Section 10903(b) of Title 49" -> "/us/usc/t49/s10903/b"] ", Transportation, does not contain a par. (3)."
+  }
+  footnote 2 "2" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "5e5bf4ac468ffd499203db18851d56c2baf486146e16876f1338f3e5ceb60a82"
+    enacted "5c5e00f33de728f4f85e18dbb8abe168fa9b8bf5edce85ea3fce4af9e14e144e"
+    editorial "5350984874a68fce9d4519428896eb04b68f090d1241215d24093a692dd4f524"
+  }
+}

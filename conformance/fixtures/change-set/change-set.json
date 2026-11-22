@@ -1,0 +1,153 @@
+{
+  "schema": "fidryn.change-set/v0.1",
+  "prefix": "/zz/demo",
+  "old": {
+    "release": "v1",
+    "lock_digest": "5e6a8d1f0764e8180215208bf2d3a1514d34f37b038bb7f934ac80dcf7eca7cb"
+  },
+  "new": {
+    "release": "v2",
+    "lock_digest": "5d8c07a67e39b851a5e623d72fca78b721f8bf03f059811cd02d31ec762240d7"
+  },
+  "operative": {
+    "added": [
+      "/zz/demo/t1/s12/b",
+      "/zz/demo/t1/s20",
+      "/zz/demo/t1/s21",
+      "/zz/demo/t1/s30",
+      "/zz/demo/t1/s31"
+    ],
+    "removed": [
+      "/zz/demo/t1/s10",
+      "/zz/demo/t1/s11",
+      "/zz/demo/t1/s18",
+      "/zz/demo/t1/s19"
+    ],
+    "amended_text": [
+      "/zz/demo/t1/s12/a",
+      "/zz/demo/t1/s13"
+    ],
+    "amended_structure": [
+      "/zz/demo/t1/s12",
+      "/zz/demo/t1/s14",
+      "/zz/demo/t1/s15"
+    ],
+    "moved": [
+      {
+        "from": "/zz/demo/t1/s16",
+        "to": "/zz/demo/t1/s26"
+      },
+      {
+        "from": "/zz/demo/t1/s17",
+        "to": "/zz/demo/t1/s27"
+      }
+    ]
+  },
+  "enacted_notes": {
+    "added": [
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/e7",
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/e8"
+    ],
+    "removed": [
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/e1",
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/e2"
+    ],
+    "amended": [
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/e3",
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/e4"
+    ],
+    "moved": [
+      {
+        "from": "/zz/demo/t1/s1/note/demoNotes/nolaw/e5",
+        "to": "/zz/demo/t1/s1/note/demoNotes/pl.42.8/e5"
+      },
+      {
+        "from": "/zz/demo/t1/s1/note/demoNotes/nolaw/e6",
+        "to": "/zz/demo/t1/s1/note/demoNotes/pl.42.8/e6"
+      }
+    ]
+  },
+  "editorial": {
+    "added": [
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/d7",
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/d8"
+    ],
+    "removed": [
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/d1",
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/d2"
+    ],
+    "amended": [
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/d3",
+      "/zz/demo/t1/s1/note/demoNotes/nolaw/d4"
+    ],
+    "moved": [
+      {
+        "from": "/zz/demo/t1/s1/note/demoNotes/nolaw/d5",
+        "to": "/zz/demo/t1/s1/note/demoNotes/pl.42.8/d5"
+      },
+      {
+        "from": "/zz/demo/t1/s1/note/demoNotes/nolaw/d6",
+        "to": "/zz/demo/t1/s1/note/demoNotes/pl.42.8/d6"
+      }
+    ],
+    "credits_changed": [
+      "/zz/demo/t1/s1",
+      "/zz/demo/t1/s2"
+    ],
+    "footnotes_changed": [
+      "/zz/demo/t1/s3",
+      "/zz/demo/t1/s8"
+    ]
+  },
+  "containers": {
+    "added": [
+      "/zz/demo/t1/ch3",
+      "/zz/demo/t1/ch4"
+    ],
+    "removed": [
+      "/zz/demo/t1/ch2",
+      "/zz/demo/t1/ch5"
+    ],
+    "changed": [
+      "/zz/demo/t1",
+      "/zz/demo/t1/ch1"
+    ]
+  },
+  "stale_bindings": [
+    {
+      "workspace": "atlas",
+      "module": "/zz/atlas/b",
+      "binding": "fourteen",
+      "address": "/zz/demo/t1/s14",
+      "reason": "provision text changed"
+    },
+    {
+      "workspace": "atlas",
+      "module": "/zz/atlas/b",
+      "binding": "twelve_a",
+      "address": "/zz/demo/t1/s12/a",
+      "reason": "provision text changed"
+    },
+    {
+      "workspace": "notes",
+      "module": "/zz/notes/a",
+      "binding": "one",
+      "address": "/zz/demo/t1/s1",
+      "reason": "enacted notes of the unit changed"
+    },
+    {
+      "workspace": "notes",
+      "module": "/zz/notes/a",
+      "binding": "ten",
+      "address": "/zz/demo/t1/s10",
+      "reason": "provision removed or moved"
+    },
+    {
+      "workspace": "notes",
+      "module": "/zz/notes/a",
+      "binding": "thirteen",
+      "address": "/zz/demo/t1/s13",
+      "reason": "provision text changed"
+    }
+  ]
+}

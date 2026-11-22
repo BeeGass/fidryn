@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/coverage-v0.1.json",
+  "title": "fidryn.coverage/v0.1",
+  "description": "The coverage ledger of a generated workspace of law modules, the file coverage.json at its top, which `fidryn coverage DIR` prints: the units, containers and provisions imported; the notes, footnotes and images; the references of each layer by outcome; the definitions extracted, by basis and by kind; the lock's counts of the addresses the importer gave and of what it counted and did not import; and the units, provisions and definitions of each source file. Every count comes from the interfaces of the modules, the index of their addresses, the manifest and the lock.",
+  "type": "object",
+  "required": ["schema", "prefix", "release", "totals", "by_source"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "fidryn.coverage/v0.1" },
+    "prefix": { "$ref": "#/$defs/address" },
+    "release": { "type": "string" },
+    "totals": {
+      "type": "object",
+      "required": [
+        "units",
+        "containers",
+        "provisions",
+        "units_by_kind",
+        "units_by_status",
+        "containers_by_kind",
+        "addresses",
+        "notes",
+        "notes_by_group",
+        "footnotes",
+        "with_images",
+        "references",
+        "outside_by_body",
+        "definitions",
+        "definitions_by_kind",
+        "not_imported"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "units": { "$ref": "#/$defs/count" },
+        "containers": { "$ref": "#/$defs/count" },
+        "provisions": {
+          "$comment": "Every provision of every unit, the unit's own top provision included.",
+          "$ref": "#/$defs/count"
+        },
+        "units_by_kind": { "$ref": "#/$defs/by_word" },
+        "units_by_status": {
+          "$comment": "The publisher's status words, and in-force for a unit with none.",
+          "$ref": "#/$defs/by_word"
+        },
+        "containers_by_kind": { "$ref": "#/$defs/by_word" },
+        "addresses": {
+          "$comment": "The lock's counts, copied.",
+          "type": "object",
+          "required": ["aliases", "disambiguated", "assigned"],
+          "additionalProperties": false,
+          "properties": {
+            "aliases": { "$ref": "#/$defs/count" },
+            "disambiguated": { "$ref": "#/$defs/count" },
+            "assigned": { "$ref": "#/$defs/count" }
+          }
+        },
+        "notes": {
+          "type": "object",
+          "required": ["enacted", "editorial"],
+          "additionalProperties": false,
+          "properties": {
+            "enacted": { "$ref": "#/$defs/count" },
+            "editorial": { "$ref": "#/$defs/count" }
+          }
+        },
+        "notes_by_group": { "$ref": "#/$defs/by_word" },
+        "footnotes": { "$ref": "#/$defs/count" },
+        "with_images": {
+          "$comment": "The provisions and notes that hold an image, whose picture is not in the pinned archive.",
+          "$ref": "#/$defs/count"
+        },
+        "references": {
+          "type": "object",
+          "required": ["operative", "enacted", "editorial"],
+          "additionalProperties": false,
+          "properties": {
+            "operative": { "$ref": "#/$defs/outcomes" },
+            "enacted": { "$ref": "#/$defs/outcomes" },
+            "editorial": { "$ref": "#/$defs/outcomes" }
+          }
+        },
+        "outside_by_body": {
+          "$comment": "A body of law is the first two segments of a target, or the target when it has one segment; only a body with a reference is listed.",
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/body" },
+          "additionalProperties": { "$ref": "#/$defs/positive" }
+        },
+        "definitions": {
+          "$comment": "The definitions extracted, by basis.",
+          "type": "object",
+          "required": ["enacted", "restated", "unresolved"],
+          "additionalProperties": false,
+          "properties": {
+            "enacted": { "$ref": "#/$defs/count" },
+            "restated": { "$ref": "#/$defs/count" },
+            "unresolved": { "$ref": "#/$defs/count" }
+          }
+        },
+        "definitions_by_kind": {
+          "type": "object",
+          "propertyNames": { "enum": ["means", "includes", "does_not_include", "borrowed"] },
+          "additionalProperties": { "$ref": "#/$defs/positive" }
+        },
+        "not_imported": {
+          "$comment": "The lock's counts, copied.",
+          "type": "object",
+          "required": [
+            "tables_of_contents",
+            "footnotes_in_tables_of_contents",
+            "links_in_tables_of_contents",
+            "release_notes",
+            "links_without_words",
+            "note_group_headings"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "tables_of_contents": { "$ref": "#/$defs/count" },
+            "footnotes_in_tables_of_contents": { "$ref": "#/$defs/count" },
+            "links_in_tables_of_contents": { "$ref": "#/$defs/count" },
+            "release_notes": { "$ref": "#/$defs/count" },
+            "links_without_words": { "$ref": "#/$defs/count" },
+            "note_group_headings": { "$ref": "#/$defs/count" }
+          }
+        }
+      }
+    },
+    "by_source": {
+      "$comment": "One row for each source file of a unit or a container, sorted by the bytes of source.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/source" }
+    }
+  },
+  "$defs": {
+    "address": {
+      "$comment": "A slash followed by segments separated by slashes; a segment is ASCII letters, digits, '-', '.', '~' and the en dash, and is never '.' or '..'.",
+      "type": "string",
+      "pattern": "^(/(?!\\.\\.?(/|$))[A-Za-z0-9.~–-]+)+$"
+    },
+    "body": {
+      "$comment": "An address of one or two segments.",
+      "type": "string",
+      "pattern": "^(/(?!\\.\\.?(/|$))[A-Za-z0-9.~–-]+){1,2}$"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "positive": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "by_word": {
+      "$comment": "Counts by a word: a kind, a status or a group; only a word with something counted is listed.",
+      "type": "object",
+      "propertyNames": { "minLength": 1 },
+      "additionalProperties": { "$ref": "#/$defs/positive" }
+    },
+    "outcomes": {
+      "type": "object",
+      "required": ["exact", "target-status", "ambiguous", "unit-only", "range-form", "no-unit", "outside", "malformed"],
+      "additionalProperties": false,
+      "properties": {
+        "exact": { "$ref": "#/$defs/count" },
+        "target-status": { "$ref": "#/$defs/count" },
+        "ambiguous": { "$ref": "#/$defs/count" },
+        "unit-only": { "$ref": "#/$defs/count" },
+        "range-form": { "$ref": "#/$defs/count" },
+        "no-unit": { "$ref": "#/$defs/count" },
+        "outside": { "$ref": "#/$defs/count" },
+        "malformed": { "$ref": "#/$defs/count" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["source", "positive_law", "units", "provisions", "definitions"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string" },
+        "positive_law": {
+          "$comment": "The source file's positive-law flag, or null when it has none.",
+          "type": ["boolean", "null"]
+        },
+        "units": { "$ref": "#/$defs/count" },
+        "provisions": { "$ref": "#/$defs/count" },
+        "definitions": { "$ref": "#/$defs/count" }
+      }
+    }
+  }
+}

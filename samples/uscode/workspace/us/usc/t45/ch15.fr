@@ -1,0 +1,25 @@
+edition 2
+module "/us/usc/t45/ch15" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch15" chapter {
+    num "15" "CHAPTER 15—"
+    heading "EMERGENCY RAIL SERVICES"
+    member "/us/usc/t45/s661"
+    member "/us/usc/t45/s662"
+    member "/us/usc/t45/s663"
+    member "/us/usc/t45/s664"
+    member "/us/usc/t45/s665"
+    member "/us/usc/t45/s666"
+    member "/us/usc/t45/s667"
+    member "/us/usc/t45/s668"
+    member "/us/usc/t45/s669"
+    hash "80e2bd141c0edf6b55288b7aa0e9043355e1bbf8ad50105824c1a933c4d64857"
+  }
+  layers {
+    operative "80e2bd141c0edf6b55288b7aa0e9043355e1bbf8ad50105824c1a933c4d64857"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

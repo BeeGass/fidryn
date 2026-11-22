@@ -1,0 +1,19 @@
+edition 2
+module "/us/usc/t45/ch17" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch17" chapter {
+    num "17" "CHAPTER 17—"
+    heading "RAILROAD REVITALIZATION AND REGULATORY REFORM"
+    member "/us/usc/t45/ch17/schI"
+    member "/us/usc/t45/ch17/schII"
+    member "/us/usc/t45/ch17/schIII"
+    hash "4d12764fba8ea503fa50291a68bce4ec7f245a34d55a9f9caff66066a207b679"
+  }
+  layers {
+    operative "4d12764fba8ea503fa50291a68bce4ec7f245a34d55a9f9caff66066a207b679"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

@@ -1,0 +1,101 @@
+edition 2
+module "/us/usc/ptVIII/rule8022" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8022" courtRule {
+    num "8022" "Rule 8022."
+    heading "Motion for Rehearing"
+    provision "/us/usc/ptVIII/rule8022/a" subsection {
+      num "a" "(a)"
+      heading "Time to File; Content; Response; Action by the District Court or BAP If Granted."
+      provision "/us/usc/ptVIII/rule8022/a/1" paragraph {
+        num "1" "(1)"
+        content "Time. Unless the time is shortened or extended by order or local rule, any motion for rehearing by the district court or BAP must be filed within 14 days after a judgment on appeal is entered."
+        hash "262011b872a34cb9623574a079d2bc25c147208342ce93cc0d2aa68d9d0f7716"
+      }
+      provision "/us/usc/ptVIII/rule8022/a/2" paragraph {
+        num "2" "(2)"
+        content "Content. The motion must state with particularity each point of law or fact that the movant believes the district court or BAP has overlooked or misapprehended and must argue in support of the motion."
+        hash "5bf87c8f20c78ca5924044ef7f26e67febd501da5f411f99f2ace23e11e16484"
+      }
+      provision "/us/usc/ptVIII/rule8022/a/3" paragraph {
+        num "3" "(3)"
+        content "Response. Unless the district court or BAP requests, no response to a motion for rehearing is permitted. But ordinarily, rehearing will not be granted without such a request."
+        hash "0ad0ea7654599ab8bc43b0ecfb9a4d95c47b0b3701388d9306f685a4e07315f9"
+      }
+      provision "/us/usc/ptVIII/rule8022/a/4" paragraph {
+        num "4" "(4)"
+        content "No Oral Argument. Oral argument is not permitted."
+        hash "3f01a95dd123f3b1814d63d9d558dee81d65fb9771f11463ace5c923ffcbabcf"
+      }
+      provision "/us/usc/ptVIII/rule8022/a/5" paragraph {
+        num "5" "(5)"
+        chapeau "Action by the District Court or BAP. If a motion for rehearing is granted, the district court or BAP may do any of the following:"
+        provision "/us/usc/ptVIII/rule8022/a/5/A" subparagraph {
+          num "A" "(A)"
+          content "make a final disposition of the appeal without reargument;"
+          hash "4041c83863105d95c4b120d8fae2b7c7242b031055cf205821bd078c3f8d4897"
+        }
+        provision "/us/usc/ptVIII/rule8022/a/5/B" subparagraph {
+          num "B" "(B)"
+          content "restore the case to the calendar for reargument or resubmission; or"
+          hash "112c4308a9785328b8a5dbf84b1b742c6cc6bf07b4c73d424e622def5faa4c1f"
+        }
+        provision "/us/usc/ptVIII/rule8022/a/5/C" subparagraph {
+          num "C" "(C)"
+          content "issue any other appropriate order."
+          hash "5660557c10c313cc5c09d1d1d144e629cb67dbd95e4497313cf253957c2e2cd9"
+        }
+        hash "416c30d974892389a954fe1b67f1e28607b1214a226a52b6e4aa0f1f11c026aa"
+      }
+      hash "01d254b5974ad9f60fa27e282aa23051829bc9a5be9abf813414a07fbdfa03fd"
+    }
+    provision "/us/usc/ptVIII/rule8022/b" subsection {
+      num "b" "(b)"
+      heading "Form; Length."
+      chapeau "A motion for rehearing must comply in form with Rule 8013(f)(1) and (2). Copies must be served and filed as Rule 8011 provides. Except by the district court’s or BAP’s permission:"
+      provision "/us/usc/ptVIII/rule8022/b/1" paragraph {
+        num "1" "(1)"
+        content "a motion produced using a computer must include a certificate under Rule 8015(h) and not exceed 3,900 words; and"
+        hash "8f9c34fb371e9e7a4c62ba35430dbdd54e949a4108afd96e448d85cd1aaaef5f"
+      }
+      provision "/us/usc/ptVIII/rule8022/b/2" paragraph {
+        num "2" "(2)"
+        content "a handwritten or typewritten motion must not exceed 15 pages."
+        hash "9e053797e73983c0230f097e5d51bbb0917f11e34dd59b2d555ba2d07997c565"
+      }
+      hash "21ec4d793d1b6b45b8cc7aba62ef3505e6093f3e37a618be3c40cdb211c1e6c7"
+    }
+    hash "915b5195dd5fd94a999a6f0d9e767f7b8611fd6e0a92981ca8866df8680a8dd0"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8022/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8015 and F.R.App.P. 40. It deletes the provision of former Rule 8015 regarding the time for appeal to the court of appeals because the matter is addressed by F.R.App.P. 6(b)(2)(A)."
+    p "Changes Made After Publication and Comment. In subdivision (b), the reference to local rule was deleted as unnecessary."
+    hash "e0dd96c31f58e23242c62cc39f660135a7e02709be3cf86a6fcf9892dec0d6a8"
+  }
+  note "/us/usc/ptVIII/rule8022/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "Subdivision (b) is amended to conform to the recent amendment to F.R.App.P. 40(b), which was one of several appellate rules in which word limits were substituted for page limits for documents prepared by computer. The word limits were derived from the previous page limits using the assumption that one page is equivalent to 260 words. Documents produced using a computer must include the certificate of compliance required by Rule 8015(h); completion of Official Form 417C suffices to meet that requirement."
+    p "Page limits are retained for papers prepared without the aid of a computer (i.e., handwritten or typewritten papers). For both the word limit and the page limit, the calculation excludes any items listed in Rule 8015(g)."
+    hash "d96c076c8a3398eeb4b8b5890e5f23d3ace6f63c10b876b3dcdfce342ec0817f"
+  }
+  note "/us/usc/ptVIII/rule8022/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8022 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "a24933852abb0ba02abcc312dc657227e33950b1f53badf6cdd6f313170476cf"
+  }
+  layers {
+    operative "915b5195dd5fd94a999a6f0d9e767f7b8611fd6e0a92981ca8866df8680a8dd0"
+    enacted "9dcdf6ca2120246d64949aa538111b5a871c8ac96967d40db43296300fdeb0aa"
+    editorial "a987651c0d32d92de7c440e372f6f86e589b3fc6109cdd03963682e5747570f9"
+  }
+}

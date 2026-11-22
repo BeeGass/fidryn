@@ -1,0 +1,40 @@
+edition 2
+module "/us/usc/ptVII/rule7056" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7056" courtRule {
+    num "7056" "Rule 7056."
+    heading "Summary Judgment"
+    content "Fed. R. Civ. P. 56 applies in an adversary proceeding. But a motion for summary judgment must be filed at least 30 days before the first date set for an evidentiary hearing on any issue that the motion addresses, unless a local rule sets a different time or the court orders otherwise."
+    hash "19ea29eda1020c95dce8caeb13cdd42e7bdfbeda71e7c3bd33bbe82cf5f3b9b1"
+  }
+  credit "(As amended Apr. 23, 2012, eff. Dec. 1, 2012; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7056/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2012 Amendment"
+    p "The only exception to complete adoption of Rule 56 F.R.Civ.P. involves the default deadline for filing a summary judgment motion. Rule 56(c)(1)(A) makes the default deadline 30 days after the close of all discovery. Because in bankruptcy cases hearings can occur shortly after the close of discovery, a default deadline based on the scheduled hearing date, rather than the close of discovery, is adopted. As with Rule 56(c)(1), the deadline can be altered either by local rule or court order."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "6dd16962aabd901fa2f185adeba64fa743b67bdd690ecaadaff8120cffa2a740"
+  }
+  note "/us/usc/ptVII/rule7056/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7056 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "66d668058c59d7b356be015883e33948ec0851f040d8fd99546f30cf007584a7"
+  }
+  note "/us/usc/ptVII/rule7056/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "19ea29eda1020c95dce8caeb13cdd42e7bdfbeda71e7c3bd33bbe82cf5f3b9b1"
+    enacted "4deb24512c6720f87e5931a421bd42ea31494bdf37072e2b495aa84aada16f4d"
+    editorial "5be242be7b620317f2aa0351c9e8661f3e5eb60069dd915f61b8a2ada11e9335"
+  }
+}

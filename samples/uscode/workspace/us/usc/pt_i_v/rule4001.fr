@@ -1,0 +1,426 @@
+edition 2
+module "/us/usc/ptIV/rule4001" {
+  within "/us/usc/ptIV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIV/rule4001" courtRule {
+    num "4001" "Rule 4001."
+    heading "Relief from the Automatic Stay; Prohibiting or Conditioning the Use, Sale, or Lease of Property; Using Cash Collateral; Obtaining Credit; Various Agreements"
+    provision "/us/usc/ptIV/rule4001/a" subsection {
+      num "a" "(a)"
+      heading "Relief from the Automatic Stay; Prohibiting or Conditioning the Use, Sale, or Lease of Property."
+      provision "/us/usc/ptIV/rule4001/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Motion. A motion under § 362(d) for relief from the automatic stay—or a motion under § 363(e) to prohibit or condition the use, sale, or lease of property—must comply with Rule 9014. The motion must be served on:"
+        provision "/us/usc/ptIV/rule4001/a/1/A" subparagraph {
+          num "A" "(A)"
+          content {
+            p "the following, as applicable:"
+            p "• a committee elected under § 705 or appointed under § 1102;"
+            p "• the committee’s authorized agent; or"
+            p "• the creditors included on the list filed under Rule 1007(d) if the case is a Chapter 9 or Chapter 11 case and no committee of unsecured creditors has been appointed under § 1102; and"
+          }
+          hash "1b6d0c0c6aa672e75de160f3af3b85da97ee025ebcc0f9b94ce0bee645227f38"
+        }
+        provision "/us/usc/ptIV/rule4001/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "any other entity the court designates."
+          hash "79245ee3fb544dbc9aed13604fc3700e544dee7d02671037021843ce16ecdb6b"
+        }
+        hash "959b13257605817b8b71bace9ebc506f1540e353861d3a78427849805b967335"
+      }
+      provision "/us/usc/ptIV/rule4001/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Relief Without Notice. Relief from a stay under § 362(a)—or a request under § 363(e) to prohibit or condition the use, sale, or lease of property—may be granted without prior notice only if:"
+        provision "/us/usc/ptIV/rule4001/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "specific facts—shown by either an affidavit or a verified motion—clearly demonstrate that the movant will suffer immediate and irreparable injury, loss, or damage before the adverse party or its attorney can be heard in opposition; and"
+          hash "2de51cc0790a98b66cffebabcd76c7d2b7318c818c980fb03a8e0cba8d29ebf3"
+        }
+        provision "/us/usc/ptIV/rule4001/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "the movant’s attorney certifies to the court in writing what efforts, if any, have been made to give notice and why it should not be required."
+          hash "ba8a95e33f0b33115d1fab32e6d77edd23dc31bfbd29a3d772541df02c181afb"
+        }
+        hash "ca83d9c9f9a62c1fec5299963d0543273fd458f12b23a078f4574ab713b81182"
+      }
+      provision "/us/usc/ptIV/rule4001/a/3" paragraph {
+        num "3" "(3)"
+        chapeau "Notice of Relief; Motion for Reinstatement or Reconsideration."
+        provision "/us/usc/ptIV/rule4001/a/3/A" subparagraph {
+          num "A" "(A)"
+          chapeau "Notice of Relief. A party who obtains relief under (2) and under § 362(f) or § 363(e) must:"
+          provision "/us/usc/ptIV/rule4001/a/3/A/i" clause {
+            num "i" "(i)"
+            content "immediately give oral notice both to the debtor and to the trustee or the debtor in possession; and"
+            hash "1e9eaae562568876b9727aa8a213e3c233509d165e972b8c25d152200032d05f"
+          }
+          provision "/us/usc/ptIV/rule4001/a/3/A/ii" clause {
+            num "ii" "(ii)"
+            content "promptly send them a copy of the order granting relief."
+            hash "734db0117037b1f79b5b9e13352d927f876fecbd13c46397ab61ec9687450034"
+          }
+          hash "0421a904c0ea1cb1a8add217f3cd01d1196548ec21ba2685428a56c41131e332"
+        }
+        provision "/us/usc/ptIV/rule4001/a/3/B" subparagraph {
+          num "B" "(B)"
+          content "Motion for Reinstatement or Reconsideration. On 2 days’ notice to the party who obtained relief under (2)—or on shorter notice as the court may order—the adverse party may move to reinstate the stay or reconsider the order prohibiting or conditioning the use, sale, or lease of property. The court must proceed expeditiously to hear and decide the motion."
+          hash "5f05c6342cc49602e8b9ad35f089c3b8ce6d1d45e39e54771f7b0fbebf07be33"
+        }
+        hash "9f464820b006196ab87db99e6b9a851d260922f2876b8e8d0ec84c1857ec1b7f"
+      }
+      provision "/us/usc/ptIV/rule4001/a/4" paragraph {
+        num "4" "(4)"
+        content "Stay of an Order Granting Relief from the Automatic Stay. Unless the court orders otherwise, an order granting a motion for relief from the automatic stay under (1) is stayed for 14 days after it is entered."
+        hash "36c3e63ffe13204c20d4a281098fe910d370f09c5842c6432dd1ed7ebd956992"
+      }
+      hash "d06c06c8534a01cc438941a98d614ef8ed2e375792ebc45a031a3000e7a6761d"
+    }
+    provision "/us/usc/ptIV/rule4001/b" subsection {
+      num "b" "(b)"
+      heading "Using Cash Collateral."
+      provision "/us/usc/ptIV/rule4001/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "Motion; Content; Service."
+        provision "/us/usc/ptIV/rule4001/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "Motion. A motion for authorization to use cash collateral must comply with Rule 9014 and must be accompanied by a proposed form of order."
+          hash "cbe438eedf0170524889063659cf1fa910abcfcc872ffda785fa0b3aefb7d627"
+        }
+        provision "/us/usc/ptIV/rule4001/b/1/B" subparagraph {
+          num "B" "(B)"
+          content {
+            p "Content. The motion must consist of—or if the motion exceeds five pages, begin with—a concise statement of the relief requested, no longer than five pages. The statement must list or summarize all material provisions (citing their locations in the relevant documents), including:"
+            p "• the name of each entity with an interest in the cash collateral;"
+            p "• how it will be used;"
+            p "• the material terms of its use, including duration; and"
+            p "• all liens, cash payments, or other adequate protection that will be provided to each entity with an interest in the cash collateral—or if no such protection is proposed, an explanation of how each entity’s interest is adequately protected."
+          }
+          hash "fc58e93a793f1e39c2c6d22f024c7f64bdb8eaac325114408b6477f075cf1104"
+        }
+        provision "/us/usc/ptIV/rule4001/b/1/C" subparagraph {
+          num "C" "(C)"
+          content {
+            p "Service. The motion must be served on:"
+            p "• each entity with an interest in the cash collateral;"
+            p "• all those who must be served under (a)(1)(A); and"
+            p "• any other entity the court designates."
+          }
+          hash "0b90aa9b6e708671617fc8330e979e824ea31ae50406c99a54dbb72221f3d88f"
+        }
+        hash "6f00cda1973d65425590c97f58e9ba3ea9428385017f62aecfb72e4369ed3295"
+      }
+      provision "/us/usc/ptIV/rule4001/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Hearings; Notice."
+        provision "/us/usc/ptIV/rule4001/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "Preliminary and Final Hearings. The court may begin a final hearing on the motion no earlier than 14 days after it has been served. If the motion so requests, the court may conduct a preliminary hearing before that 14-day period ends. After a preliminary hearing, the court may authorize using only the cash collateral necessary to avoid immediate and irreparable harm to the estate pending a final hearing."
+          hash "359e007f3a200106c40211c85fcf14c22ad55f4d174284e764713296bf43e3a3"
+        }
+        provision "/us/usc/ptIV/rule4001/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "Notice. Notice of a hearing must be given to the parties who must be served with the motion under (1)(C) and to any other entity the court designates."
+          hash "d01eddc5796b7f058bf87d999b17942caafdbcdd1b5c53aa61424434623b76b1"
+        }
+        hash "dafe259e4f11c2fd7731f0da67935d611ac5509f3f510916b16ed3b072b131a7"
+      }
+      hash "cff021b15c704cab86803bac61b44c6081f7869d900a96265956c07282ea343d"
+    }
+    provision "/us/usc/ptIV/rule4001/c" subsection {
+      num "c" "(c)"
+      heading "Obtaining Credit."
+      provision "/us/usc/ptIV/rule4001/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "Motion; Content; Service."
+        provision "/us/usc/ptIV/rule4001/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "Motion. A motion for authorization to obtain credit must comply with Rule 9014 and must be accompanied by a copy of the credit agreement and a proposed form of order."
+          hash "9e4aaa609f64bf9aac39837182366348aee1e8b2eeedb2812855f6589f61df68"
+        }
+        provision "/us/usc/ptIV/rule4001/c/1/B" subparagraph {
+          num "B" "(B)"
+          chapeau "Content. The motion must consist of—or if the motion exceeds five pages, begin with—a concise statement of the relief requested, no longer than five pages. The statement must list or summarize all material provisions of the credit agreement and form of order (citing their locations in the relevant documents), including interest rates, maturity dates, default provisions, liens, and borrowing limits and conditions. If the credit agreement or form of order includes any of the provisions listed below in (i)–(xi), the concise statement must also list or summarize each one, describe its nature and extent, cite its location in the proposed agreement and form of order, and identify any that would remain effective if interim approval were to be granted but final relief denied under (2). The provisions are:"
+          provision "/us/usc/ptIV/rule4001/c/1/B/i" clause {
+            num "i" "(i)"
+            content "a grant of priority or a lien on property of the estate under § 364(c) or (d);"
+            hash "12bc17f6be5b9cbf9ba36fa72dc083861d2dabc95200e79458cde7b0a0a9d37e"
+          }
+          provision "/us/usc/ptIV/rule4001/c/1/B/ii" clause {
+            num "ii" "(ii)"
+            content "the providing of adequate protection or priority for a claim that arose before the case commenced—including a lien on property of the estate, or its use, or of credit obtained under § 364 to make cash payments on the claim;"
+            hash "fbe4464ef8f4a947ae1d81f56a00c10be5f7b0c323f11a166c9e26c1cbd4f7f8"
+          }
+          provision "/us/usc/ptIV/rule4001/c/1/B/iii" clause {
+            num "iii" "(iii)"
+            content "a determination of the validity, enforceability, priority, or amount of a claim that arose before the case commenced, or of any lien securing the claim;"
+            hash "25c24019a36d1961e7e82cf1e56b6978431a96e1d9d00e236a369f0dd34c854e"
+          }
+          provision "/us/usc/ptIV/rule4001/c/1/B/iv" clause {
+            num "iv" "(iv)"
+            content "a waiver or modification of Code provisions or applicable rules regarding the automatic stay;"
+            hash "7973cee487c52622fecd797e85d62b99cdf40a5a0b4ebd368733b2b6a8eaff89"
+          }
+          provision "/us/usc/ptIV/rule4001/c/1/B/v" clause {
+            num "v" "(v)"
+            content "a waiver or modification of an entity’s right to file a plan, seek to extend the time in which the debtor has the exclusive right to file a plan, request the use of cash collateral under § 363(c), or request authorization to obtain credit under § 364;"
+            hash "798f10cb9c3038eeffdaf2e4af510ad7d7e9f038e1ee31f6ef274ee5f57c3c98"
+          }
+          provision "/us/usc/ptIV/rule4001/c/1/B/vi" clause {
+            num "vi" "(vi)"
+            content "the establishment of deadlines for filing a plan of reorganization, approving a disclosure statement, holding a hearing on confirmation, or entering a confirmation order;"
+            hash "c7d52474e1bf05a843e980250a50250ae14524fcab0cbe6a3fa050399accbaf1"
+          }
+          provision "/us/usc/ptIV/rule4001/c/1/B/vii" clause {
+            num "vii" "(vii)"
+            content "a waiver or modification of applicable nonbankruptcy law regarding perfecting or enforcing a lien on property of the estate;"
+            hash "308416c5b40c51a815382135ce946d0838d7926e89819b64553f090007b226a7"
+          }
+          provision "/us/usc/ptIV/rule4001/c/1/B/viii" clause {
+            num "viii" "(viii)"
+            content "a release, waiver, or limitation on a claim or other cause of action belonging to the estate or the trustee, including any modification of the statute of limitations or other deadline to commence an action;"
+            hash "19536bbc187e861af710478485d9f0f7647dde845835df6fbec8ef15563cf215"
+          }
+          provision "/us/usc/ptIV/rule4001/c/1/B/ix" clause {
+            num "ix" "(ix)"
+            content "the indemnification of any entity;"
+            hash "e62f23ac07b59ee6fe292895c292e48f5fe6a8575a2b9c857236d3ed85555131"
+          }
+          provision "/us/usc/ptIV/rule4001/c/1/B/x" clause {
+            num "x" "(x)"
+            content "a release, waiver, or limitation of any right under § 506(c); or"
+            hash "45ee3e4db3f8489058ec2cc61649d133bcefbcb50feb6268aa403730e2425d79"
+          }
+          provision "/us/usc/ptIV/rule4001/c/1/B/xi" clause {
+            num "xi" "(xi)"
+            content "the granting of a lien on a claim or cause of action arising under § 544, 545, 547, 548, 549, 553(b), 723(a), or 724(a)."
+            hash "912edfe1e9ad020395aeb890dd9c4c791480999d2639b302b6baa0b058333564"
+          }
+          hash "42b00b75a373e7e48140fdc37cbbcf7a406a0a62eba2b83e6a865948af6ca8a6"
+        }
+        provision "/us/usc/ptIV/rule4001/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "Service. The motion must be served on all those who must be served under (a)(1)(A) and any other entity the court designates."
+          hash "0f84fbbdceafdec32db0f3d0bc81923eca20ea1a49727c815560572e8301f9ae"
+        }
+        hash "38013c438925b950b4bc0b7ce8b26cd41af37275e7c52101c51b5e1d362ab2c4"
+      }
+      provision "/us/usc/ptIV/rule4001/c/2" paragraph {
+        num "2" "(2)"
+        chapeau "Hearings; Notice."
+        provision "/us/usc/ptIV/rule4001/c/2/A" subparagraph {
+          num "A" "(A)"
+          content "Preliminary and Final Hearings. The court may begin a final hearing on the motion no earlier than 14 days after it has been served. If the motion so requests, the court may conduct a preliminary hearing before that 14-day period ends. After a preliminary hearing, the court may authorize obtaining credit only to the extent necessary to avoid immediate and irreparable harm to the estate pending a final hearing."
+          hash "c45b93c6aa7d2646070709d2e9afcdc63f3a2d3ab7cdf78c57eaab2af3a29e1a"
+        }
+        provision "/us/usc/ptIV/rule4001/c/2/B" subparagraph {
+          num "B" "(B)"
+          content "Notice. Notice of a hearing must be given to the parties who must be served with the motion under (1)(C) and to any other entity the court designates."
+          hash "d01eddc5796b7f058bf87d999b17942caafdbcdd1b5c53aa61424434623b76b1"
+        }
+        hash "438163cf86b34da648c8f64a6c95646a36f56ed4d3d6f3f8809a2971a3c8fcc2"
+      }
+      provision "/us/usc/ptIV/rule4001/c/3" paragraph {
+        num "3" "(3)"
+        content "Inapplicability in a Chapter 13 Case. This subdivision (c) does not apply in a Chapter 13 case."
+        hash "46b55fee20763c6be037c0616f3b7f9ce710f9252a0b71e5b090d7cfe01758b7"
+      }
+      hash "e8ef10d35f0dfc8b0e7f9e13e6971b8f9ba57a0906254e837fe4db6fd0b74c44"
+    }
+    provision "/us/usc/ptIV/rule4001/d" subsection {
+      num "d" "(d)"
+      heading "Various Agreements: Relief from the Automatic Stay; Prohibiting or Conditioning the Use, Sale, or Lease of Property; Providing Adequate Protection; Using Cash Collateral; or Obtaining Credit."
+      provision "/us/usc/ptIV/rule4001/d/1" paragraph {
+        num "1" "(1)"
+        chapeau "Motion; Content; Service."
+        provision "/us/usc/ptIV/rule4001/d/1/A" subparagraph {
+          num "A" "(A)"
+          chapeau "Motion. A motion to approve any of the following must be accompanied by a copy of the agreement and a proposed form of order:"
+          provision "/us/usc/ptIV/rule4001/d/1/A/i" clause {
+            num "i" "(i)"
+            content "an agreement to provide adequate protection;"
+            hash "b77de63c787f81f81271de5cf7c7af08220370959c4636bb96285d60a0561154"
+          }
+          provision "/us/usc/ptIV/rule4001/d/1/A/ii" clause {
+            num "ii" "(ii)"
+            content "an agreement to prohibit or condition the use, sale, or lease of property;"
+            hash "0ff0ac700385eeaf27820731afb2ac7c0f514f72b76f01916b52e65f5d2fbf49"
+          }
+          provision "/us/usc/ptIV/rule4001/d/1/A/iii" clause {
+            num "iii" "(iii)"
+            content "an agreement to modify or terminate the stay provided for in § 362;"
+            hash "c15310cea0ba3d989ae6afafbb2115e2989e335e545d0e0b6db110b4cac289b6"
+          }
+          provision "/us/usc/ptIV/rule4001/d/1/A/iv" clause {
+            num "iv" "(iv)"
+            content "an agreement to use cash collateral; or"
+            hash "7fbf70a1e735c421bf24d5f7aec1ee20fb85949e91127325c16c3936dc015823"
+          }
+          provision "/us/usc/ptIV/rule4001/d/1/A/v" clause {
+            num "v" "(v)"
+            content "an agreement between the debtor and an entity that has a lien or interest in property of the estate under which the entity consents to creating a lien that is senior or equal to the entity’s lien or interest."
+            hash "5237c4f8415ef57b03c615e45295641193b1dc92d97df01f9390cb7310854e39"
+          }
+          hash "d983cc3cbe70e54dad06d35b69ee6c5d409ddde5e6e7bee3ee0556dd2f60d679"
+        }
+        provision "/us/usc/ptIV/rule4001/d/1/B" subparagraph {
+          num "B" "(B)"
+          chapeau "Content. The motion must consist of—or if the motion exceeds five pages, begin with—a concise statement of the relief requested, no longer than five pages. The statement must:"
+          provision "/us/usc/ptIV/rule4001/d/1/B/i" clause {
+            num "i" "(i)"
+            content "list or summarize all the agreement’s material provisions (citing their locations in the relevant documents); and"
+            hash "07d432f9a8fdb8758e6f01e3fcbb1794ec6ac0e6eb9c08820c198ead6ed8b8b5"
+          }
+          provision "/us/usc/ptIV/rule4001/d/1/B/ii" clause {
+            num "ii" "(ii)"
+            content "briefly list or summarize, cite the location of, and describe the nature and extent of each provision in the proposed form of order, agreement, or other document of the type listed in (c)(1)(B)."
+            hash "9cfedc41d636322a1d726f35c1605803a85573e60a6a605b9c15f5194a897f4d"
+          }
+          hash "50cabfa300c5513e95f2c415102a92afb11b7971bc06867626d0fbd26094dd3d"
+        }
+        provision "/us/usc/ptIV/rule4001/d/1/C" subparagraph {
+          num "C" "(C)"
+          content "Service. The motion must be served on all those who must be served under (a)(1)(A) and any other entity the court designates."
+          hash "0f84fbbdceafdec32db0f3d0bc81923eca20ea1a49727c815560572e8301f9ae"
+        }
+        hash "98b90216f993a6c92755e962028c96512eaff9833845583047d5df5c5213d0fa"
+      }
+      provision "/us/usc/ptIV/rule4001/d/2" paragraph {
+        num "2" "(2)"
+        content "Objection. Notice of the motion must be mailed to the parties on whom service of the motion is required and any other entity the court designates. The notice must include the time within which objections may be filed and served on the debtor in possession or trustee. Unless the court sets a different time, any objections must be filed within 14 days after the notice is mailed."
+        hash "5adff63a80026614b8065ee1071617d3c59b3653097933f704ef11317b82d319"
+      }
+      provision "/us/usc/ptIV/rule4001/d/3" paragraph {
+        num "3" "(3)"
+        content "Disposition Without a Hearing. If no objection is filed, the court may enter an order approving or disapproving the agreement without holding a hearing."
+        hash "db0a29ab8e674611ab14dfa368c1df00b692e83fbdddf286487955c661599c5d"
+      }
+      provision "/us/usc/ptIV/rule4001/d/4" paragraph {
+        num "4" "(4)"
+        content {
+          p "Hearing. If an objection is filed or if the court decides that a hearing is appropriate, the court must hold one after giving at least 7 days’ notice to:"
+          p "• the objector;"
+          p "• the movant;"
+          p "• the parties who must be served with the motion under (1)(C); and"
+          p "• any other entity the court designates."
+        }
+        hash "d5d1e60c8739c9b7538419df4b2deef7761c7981b4b3515ab75ec81770671e23"
+      }
+      provision "/us/usc/ptIV/rule4001/d/5" paragraph {
+        num "5" "(5)"
+        content "Agreement to Settle a Motion. The court may decide that a motion made under (a), (b), or (c) was sufficient to give reasonable notice of the agreement’s material provisions and an opportunity for a hearing. If so, the court may order that the procedures prescribed in (1)–(4) do not apply and may approve the agreement without further notice."
+        hash "3baa0dc40a357379c91a7f0419284e835a0b8b84d118fae43f16fd90c29e1fda"
+      }
+      hash "1cf7e8bf2be2dee43da0df5d13d0db82274e0d53f99d7309dbb437f5960c8acc"
+    }
+    hash "3a94ce9ae406bf65ec7dcd352f8b2cba69b499fdd8e38c8bc619edd30fd18f78"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 30, 2007, eff. Dec. 1, 2007; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 25, 2019, eff. Dec. 1, 2019; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule implements § 362 of the Code which set forth provisions regarding the automatic stay that arises on the filing of a petition. That section and this rule are applicable in chapters 7, 9, 11 and 13 cases. It also implements § 363(c)(2) concerning use of cash collateral."
+    p "Subdivision (a) transforms with respect to the automatic stay what was an adversary proceeding under the former rules to motion practice. The Code provides automatic stays in several sections, e.g., §§ 362(a), 1301(a), and in § 362(d) provides some grounds for relief from the stay. This rule specifies that the pleading seeking relief is by means of a motion. Thus the time period in Rule 7012 to answer a complaint would not be applicable and shorter periods may be fixed. Section 362(e) requires the preliminary hearing to be concluded within 30 days of it inception, rendering ordinary complaint and answer practice inappropriate."
+    p "This subdivision also makes clear that a motion under Rule 9014 is the proper procedure for a debtor to seek court permission to use cash collateral. See § 363(c)(2). Pursuant to Rule 5005, the motion should be filed in the court in which the case in pending. The court or local rule may specify the persons to be served with the motion for relief from the stay; see Rule 9013."
+    p "Subdivision (b) of the rule fills a procedural void left by § 362. Pursuant to § 362(e), the automatic stay is terminated 30 days after a motion for relief is made unless the court continues the stay as a result of a final hearing or, pending final hearing, after a preliminary hearing. If a preliminary hearing is held, § 362(e) requires the final hearing to be commenced within 30 days after the preliminary hearing. Although the expressed legislative intent is to require expeditious resolution of a secured party’s motion for relief, § 362 is silent as to the time within which the final hearing must be concluded. Subdivision (b) imposes a 30 day deadline on the court to resolve the dispute."
+    p "At the final hearing, the stay is to be terminated, modified, annulled, or conditioned for cause, which includes, inter alia, lack of adequate protection; § 362(d). The burden of proving adequate protection is on the party opposing relief from the stay; § 362(g)(2). Adequate protection is exemplified in § 361."
+    p "Subdivision (c) implements § 362(f) which permits ex parte relief from the stay when there will be irreparable damage. This subdivision sets forth the procedure to be followed when relief is sought under § 362(f). It is derived from former Bankruptcy Rule 601(d)."
+    hash "4b968ac62b49cdbc45cde00d8f480b56bc3ead03deaaf056447d5fa9e9f8f1e6"
+  }
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The scope of this rule is expanded and the former subdivisions (a), (b) and (c) are now combined in subdivision (a). The new subdivision (a)(2) is amended to conform to the 1984 amendments to § 362(e) of the Code."
+    p "Subdivision (b) deals explicitly with the procedures which follow after a motion to use cash collateral is made and served. Filing shall be pursuant to Rule 5005. Service of the motion may be made by any method authorized by Rule 7004 and, if service is by mail, service is complete on mailing. Rule 9006(e). Under subdivision (b)(2), the court may commence a final hearing on the motion within 15 days of service. Rule 9006(f) does not extend this 15 day period when service of the motion is by mail because the party served is not required to act within the 15 day period. In addition to service of the motion, notice of the hearing must be given. Rule 9007 authorizes the court to direct the form and manner of giving notice that is appropriate to the circumstances."
+    p "Section 363(c)(3) authorizes the court to conduct a preliminary hearing and to authorize the use of cash collateral “if there is a reasonable likelihood that the trustee will prevail at a final hearing.” Subdivision (b)(2) of the rule permits a preliminary hearing to be held earlier than 15 days after service. Any order authorizing the use of cash collateral shall be limited to the amount necessary to protect the estate until a final hearing is held."
+    p "The objective of subdivision (b) is to accommodate both the immediate need of the debtor and the interest of the secured creditor in the cash collateral. The time for holding the final hearing may be enlarged beyond the 15 days prescribed when required by the circumstances."
+    p "The motion for authority to use cash collateral shall include (1) the amount of cash collateral sought to be used; (2) the name and address of each entity having an interest in the cash collateral; (3) the name and address of the entity in control or having possession of the cash collateral; (4) the facts demonstrating the need to use the cash collateral; and (5) the nature of the protection to be provided those having an interest in the cash collateral. If a preliminary hearing is requested, the motion shall also include the amount of cash collateral sought to be used pending final hearing and the protection to be provided."
+    p "Notice of the preliminary and final hearings may be combined. This rule does not limit the authority of the court under § 363(c)(2)(B) and § 102(1)."
+    p "Subdivision (c) is new. The service, hearing, and notice requirements are similar to those imposed by subdivision (b). The motion to obtain credit shall include the amount and type of the credit to be extended, the name and address of the lender, the terms of the agreement, the need to obtain the credit, and the efforts made to obtain credit from other sources. If the motion is to obtain credit pursuant to § 364(c) or (d), the motion shall describe the collateral, if any, and the protection for any existing interest in the collateral which may be affected by the proposed agreement."
+    p "Subdivision (d) is new. In the event the 15 day period for filing objections to the approval of an agreement of the parties described in this subdivision is too long, the parties either may move for a reduction of the period under Rule 9006(c)(1) or proceed under subdivision (b) or (c), if applicable. Rule 9006(c)(1) requires that cause be shown for the reduction of the period in which to object. In applying this criterion the court may consider the option of proceeding under subdivision (b) or (c) and grant a preliminary hearing and relief pending final hearing."
+    hash "376373d7d8a9ee05fc2cb51d3b4329f9653f6181791a88b7fc00334d03e1a678"
+  }
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is expanded to include a request to prohibit or condition the use, sale, or lease of property as is necessary to provide adequate protection of a property interest pursuant to § 363(e) of the Code."
+    p "Notice of the motion for relief from the automatic stay or to prohibit or condition the use, sale, or lease of property must be served on the entities entitled to receive notice of a motion to approve an agreement pursuant to subdivision (d). If the movant and the adverse party agree to settle the motion and the terms of the agreement do not materially differ from the terms set forth in the movant’s motion papers, the court may approve the agreement without further notice pursuant to subdivision (d)(4)."
+    p "Subdivision (a)(2) is deleted as unnecessary because of § 362(e) of the Code."
+    p "Subdivisions (b)(1), (c)(1), and (d)(1) are amended to require service on committees that are elected in chapter 7 cases. Service on committees of retired employees appointed under § 1114 of the Code is not required. These subdivisions are amended further to clarify that, in the absence of a creditors’ committee, service on the creditors included on the list filed pursuant to Rule 1007(d) is required only in chapter 9 and chapter 11 cases. The other amendments to subdivision (d)(1) are for consistency of style and are not substantive."
+    p "Subdivision (d)(4) is added to avoid the necessity of further notice and delay for the approval of an agreement in settlement of a motion for relief from an automatic stay, to prohibit or condition the use, sale, or lease of property, for use of cash collateral, or for authority to obtain credit if the entities entitled to notice have already received sufficient notice of the scope of the proposed agreement in the motion papers and have had an opportunity to be heard. For example, if a trustee makes a motion to use cash collateral and proposes in the original motion papers to provide adequate protection of the interest of the secured party by granting a lien on certain equipment, and the secured creditor subsequently agrees to terms that are within the scope of those proposed in the motion, the court may enter an order approving the agreement without further notice if the entities that received the original motion papers have had a reasonable opportunity to object to the granting of the motion to use cash collateral."
+    p "If the motion papers served under subdivision (a), (b), or (c) do not afford notice sufficient to inform the recipients of the material provisions of the proposed agreement and opportunity for a hearing, approval of the settlement agreement may not be obtained unless the procedural requirements of subdivision (d)(1), (d)(2), and (d)(3) are satisfied. If the 15 day period for filing objections to the approval of the settlement agreement is too long under the particular circumstances of the case, the court may shorten the time for cause under Rule 9006(c)(1)."
+    hash "d7efe29c2858bf51189e6ada489fa807674a6151f429ed02041834ad810ee9aa"
+  }
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "Paragraph (a)(3) is added to provide sufficient time for a party to request a stay pending appeal of an order granting relief from an automatic stay before the order is enforced or implemented. The stay under paragraph (a)(3) is not applicable to orders granted ex parte in accordance with Rule 4001(a)(2)."
+    p "The stay of the order does not affect the time for filing a notice of appeal in accordance with Rule 8002. While the enforcement and implementation of an order granting relief from the automatic stay is temporarily stayed under paragraph (a)(3), the automatic stay continues to protect the debtor, and the moving party may not foreclose on collateral or take any other steps that would violate the automatic stay."
+    p "The court may, in its discretion, order that Rule 4001(a)(3) is not applicable so that the prevailing party may immediately enforce and implement the order granting relief from the automatic stay. Alternatively, the court may order that the stay under Rule 4001(a)(3) is for a fixed period less than 10 days."
+    p "GAP Report on Rule 4001. No changes since publication."
+    hash "f23f3635960d428b233033d503b56dc2132914ed29c337396395c4fa4144f7eb"
+  }
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2007 Amendment"
+    p "The rule is amended to require that parties seeking authority to use cash collateral, to obtain credit, and to obtain approval of agreements to provide adequate protection, modify or terminate the stay, or to grant a senior or equal lien on property, submit with those requests a proposed order granting the relief, and that they provide more extensive notice to interested parties of a number of specified terms. The motion must either not exceed five pages in length, or, if it is longer, begin with a concise statement of five pages or less, that summarizes or lists the material provisions and which will assist the court and interested parties in understanding the nature of the relief requested. The concise statement must also set out the location within the documents of the summarized or listed provisions. The parties to agreements and lending offers frequently have concise summaries of their transactions that contain a list of the material provisions of the agreements, even if the agreements themselves are very lengthy. A similar summary should allow the court and interested parties to understand the relief requested."
+    p "In addition to the concise statement, the rule requires that motions under subdivisions (c) and (d) state whether the movant is seeking approval of any of the provisions listed in subdivision (c)(1)(B), and where those provisions are located in the documents. The rule is intended to enhance the ability of the court and interested parties to find and evaluate those provisions."
+    p "The rule also provides that any motion for authority to obtain credit must identify any provision listed in subdivision (c)(1)(B)(i)–(xi) that is proposed to remain effective if the court grants the motion on an interim basis under Rule 4001(c)(2), but later denies final relief."
+    p "Other amendments are stylistic."
+    p "Changes Made After Publication."
+    p "1. The introductory language in subdivisions (b)(1)(B), (c)(1)(B), and (d)(1)(B) was revised to clarify that the motions filed under the rule can be either no more than five pages long or begin with a concise statement of that length. This permits the continued use of forms that have been effective in smaller cases. Subdivision (c)(1)(B) also is amended to require that the motion identify any provisionally approved term that would remain in effect even if the court denies the permanent relief requested."
+    p "2. A new subparagraph (c)(1)(B)(vi) was inserted into the rule and the remaining subparagraphs were renumbered accordingly. The new subparagraph requires that the motion identify any provisions setting deadlines for filing and confirming reorganization plans and disclosure statements."
+    p "3. Subdivisions (c)(1)(C) and (d)(1)(C) of the proposed rule were deleted as unnecessary. The court has whatever authority Rule 9024 provides, and making an explicit reference to that rule in these subdivisions brings unnecessary attention to Rule 9024 and could create a different standard of review under that rule than would apply in other instances. The Advisory Committee did not intend either consequence, so the subdivisions were deleted."
+    p "4. Subdivision (d)(1)(A) was restyled to form a vertical list of the motions subject to that provision."
+    hash "9abab99efe4bb29ab90d291180c4137415d584996bd35d51a95c95316ff60ade"
+  }
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010 Amendment"
+    p "Subdivision (d). Subdivision (d) is amended to implement changes in connection with the 2009 amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in subdivision (d)(2) and (d)(3) are amended to substitute deadlines that are multiples of seven days. Throughout the rules, deadlines have been amended in the following manner:"
+    p "• 5 day periods become 7 day periods"
+    p "• 10 day periods become 14 day periods"
+    p "• 15 day periods become 14 day periods"
+    p "• 20 day periods become 21 day periods"
+    p "• 25 day periods become 28 day periods"
+    p "Final approval of the amendments to this rule is sought without publication."
+    hash "c84c231aae3ec9aab56b6ba2e4c6c7fa4f8b7df5fc208d8a22ab31f6f65cd317"
+  }
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2019 Amendment"
+    p "Subdivision (c) of the rule is amended to exclude chapter 13 cases from that subdivision. This amendment does not speak to the underlying substantive issue of whether the Bankruptcy Code requires or permits a chapter 13 debtor not engaged in business to request approval of postpetition credit."
+    hash "e19e74c4118beb6a3ac2ca2fdfd302de5487045e9bd5b0da686615d4d3aac966"
+  }
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 4001 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "478b74ef9e849fcf5fc876a3b0f78d7775d948b8e942f32905bb5ce46d038e1f"
+  }
+  layers {
+    operative "3a94ce9ae406bf65ec7dcd352f8b2cba69b499fdd8e38c8bc619edd30fd18f78"
+    enacted "e6dda626b2fcf7dd17de049cc3ace70f97c397680b31686162367149b923830f"
+    editorial "08f4e013c9b8cae8cc72719207be11960be903ba9c15c68dd174b663890938c7"
+  }
+}

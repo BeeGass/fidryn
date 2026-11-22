@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s126" {
+  within "/us/usc/t45/ch6"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s126" section {
+    num "126" "§ 126."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "f9fef106242f1e92aef8746b14d3bef201cb67b34616f0eedec61b1e81b43390"
+  }
+  note "/us/usc/t45/s126/note/ungrouped/act.1921-12-15.ch1/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["act Dec. 15, 1921, ch. 1, § 1" -> "/us/act/1921-12-15/ch1/s1"] ", " ["42 Stat. 328" -> "/us/stat/42/328"] ", abolished offices of Commissioner and Assistant Commissioner of Mediation and Conciliation."
+    hash "6963c92a89fed1f03cd72f99834c5b4506995ee6eac1cbf461db3a567306342c"
+  }
+  layers {
+    operative "f9fef106242f1e92aef8746b14d3bef201cb67b34616f0eedec61b1e81b43390"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "df346cd613c0dc07c4785bafe3f5ef748ad2c9f46a6ecb5e1fcee0cc396cfb8a"
+  }
+}

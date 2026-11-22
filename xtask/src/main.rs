@@ -12,6 +12,7 @@ mod site;
 mod test;
 #[cfg(test)]
 mod test_support;
+mod uscode_sample;
 mod workspace;
 
 use anyhow::Result;
@@ -35,7 +36,7 @@ enum Command {
     Test(test::TestArgs),
     /// Run `cargo bench --offline`
     Bench(bench::BenchArgs),
-    /// Workspace CI: tests, clippy -D warnings, conformance probes, Python checks, site check, example status and documentation checks, JS tests, bench build
+    /// Workspace CI: tests, clippy -D warnings, conformance probes, Python checks, the sample of the Code, site check, example status and documentation checks, JS tests, bench build
     Ci(ci::CiArgs),
     /// Check or regenerate the recorded check status of every .fr file
     Examples(examples::ExamplesArgs),
@@ -51,6 +52,8 @@ enum Command {
     ReleaseCheck(release::ReleaseCheckArgs),
     /// Print the changelog entry for the current workspace version
     ReleaseNotes(release::ReleaseNotesArgs),
+    /// Check the sample of the Code: its archives against their retrieval record, its workspace against what the ingester writes from them on one worker and on eight, its check, its profile and its counts of references, and its text against the independent script (--update writes the workspace first)
+    UscodeSample(uscode_sample::UscodeSampleArgs),
 }
 
 fn main() -> Result<()> {
@@ -65,5 +68,6 @@ fn main() -> Result<()> {
         Command::Package(args) => package::run(args),
         Command::ReleaseCheck(args) => release::run_check(args),
         Command::ReleaseNotes(args) => release::run_notes(args),
+        Command::UscodeSample(args) => uscode_sample::run(args),
     }
 }

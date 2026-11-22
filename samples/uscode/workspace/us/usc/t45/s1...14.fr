@@ -1,0 +1,115 @@
+edition 2
+module "/us/usc/t45/s1...14" {
+  alias "/us/usc/t45/s1"
+  alias "/us/usc/t45/s2"
+  alias "/us/usc/t45/s3"
+  alias "/us/usc/t45/s4"
+  alias "/us/usc/t45/s5"
+  alias "/us/usc/t45/s6"
+  alias "/us/usc/t45/s7"
+  alias "/us/usc/t45/s8"
+  alias "/us/usc/t45/s9"
+  alias "/us/usc/t45/s10"
+  alias "/us/usc/t45/s11"
+  alias "/us/usc/t45/s12"
+  alias "/us/usc/t45/s13"
+  alias "/us/usc/t45/s14"
+  within "/us/usc/t45/ch1"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1...14" section {
+    num "1 to 14" "§§ 1 to 14."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "0ab8f8fe689b54aeb9ae0d469ba145a60b4ca9e1484524c8787428718de1d3e6"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1893-03-02.ch196/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 1, acts " ["Mar. 2, 1893, ch. 196, § 1" -> "/us/act/1893-03-02/ch196/s1"] ", " ["27 Stat. 531" -> "/us/stat/27/531"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(1)(A)" -> "/us/pl/100/342/s13/1/A"] ", " ["102 Stat. 630" -> "/us/stat/102/630"] ", related to use of power driving-wheel brakes and appliances for operating train-brake systems. See " ["section 20302 of Title 49" -> "/us/usc/t49/s20302"] ", Transportation."
+    hash "f1e1c842aa0fac15732cf6777ce637cc67260dc188a1416c7323c036a65d75c2"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1893-03-02.ch196/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 2, acts " ["Mar. 2, 1893, ch. 196, § 2" -> "/us/act/1893-03-02/ch196/s2"] ", " ["27 Stat. 531" -> "/us/stat/27/531"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(1)(B)" -> "/us/pl/100/342/s13/1/B"] ", " ["102 Stat. 630" -> "/us/stat/102/630"] ", related to use of cars not equipped with automatic couplers. See " ["section 20302 of Title 49" -> "/us/usc/t49/s20302"] "."
+    hash "1349a91bee236750c29bb5a4a9f1da35f134760d2a36d423045231331daed360"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1893-03-02.ch196/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 3, acts " ["Mar. 2, 1893, ch. 196, § 3" -> "/us/act/1893-03-02/ch196/s3"] ", " ["27 Stat. 531" -> "/us/stat/27/531"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(1)(C)" -> "/us/pl/100/342/s13/1/C"] ", " ["102 Stat. 630" -> "/us/stat/102/630"] ", related to refusal to receive insufficiently equipped cars from connecting lines. See " ["section 20302 of Title 49" -> "/us/usc/t49/s20302"] "."
+    hash "63dd52fb4ef836eff2389fd022a2638245d90d790ad49f63cb38d838d2a8d0be"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1893-03-02.ch196/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 4, acts " ["Mar. 2, 1893, ch. 196, § 4" -> "/us/act/1893-03-02/ch196/s4"] ", " ["27 Stat. 531" -> "/us/stat/27/531"] "; Oct. 15, 1966, " ["Pub. L. 89–670, § 6(e)(1)(A)" -> "/us/pl/89/670/s6/e/1/A"] ", " ["80 Stat. 939" -> "/us/stat/80/939"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(1)(D)" -> "/us/pl/100/342/s13/1/D"] ", " ["102 Stat. 630" -> "/us/stat/102/630"] ", related to grab irons or handholds for security in coupling and uncoupling cars. See " ["section 20302 of Title 49" -> "/us/usc/t49/s20302"] "."
+    hash "fba5aaab63d77a477fa39390949c338154dbf9e4276308d7ce5b6e14c0c6cef1"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1893-03-02.ch196/noheading/5" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 5, acts " ["Mar. 2, 1893, ch. 196, § 5" -> "/us/act/1893-03-02/ch196/s5"] ", " ["27 Stat. 531" -> "/us/stat/27/531"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(1)(E)" -> "/us/pl/100/342/s13/1/E"] ", " ["102 Stat. 630" -> "/us/stat/102/630"] ", related to exclusion from traffic of freight cars not complying with prescribed standard for height of drawbars."
+    hash "73182067d3df7aa700dcd737041b4fa300eb7847aebb105935e90a84aac26b6e"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1893-03-02.ch196/noheading/6" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 6, acts " ["Mar. 2, 1893, ch. 196, § 6" -> "/us/act/1893-03-02/ch196/s6"] ", " ["27 Stat. 532" -> "/us/stat/27/532"] "; " ["Apr. 1, 1896, ch. 87" -> "/us/act/1896-04-01/ch87"] ", " ["29 Stat. 85" -> "/us/stat/29/85"] "; " ["June 25, 1948, ch. 646, § 1" -> "/us/act/1948-06-25/ch646/s1"] ", " ["62 Stat. 909" -> "/us/stat/62/909"] "; Aug. 14, 1957, " ["Pub. L. 85–135, § 1(1)" -> "/us/pl/85/135/s1/1"] ", " ["71 Stat. 352" -> "/us/stat/71/352"] "; Oct. 15, 1966, " ["Pub. L. 89–670, § 6(e)(1)(A)" -> "/us/pl/89/670/s6/e/1/A"] ", " ["80 Stat. 939" -> "/us/stat/80/939"] "; July 8, 1976, " ["Pub. L. 94–348, § 3(a)" -> "/us/pl/94/348/s3/a"] ", " ["90 Stat. 818" -> "/us/stat/90/818"] "; Nov. 2, 1978, " ["Pub. L. 95–574, § 7(a)" -> "/us/pl/95/574/s7/a"] ", " ["92 Stat. 2461" -> "/us/stat/92/2461"] "; Oct. 10, 1980, " ["Pub. L. 96–423, § 8(b)" -> "/us/pl/96/423/s8/b"] ", " ["94 Stat. 1814" -> "/us/stat/94/1814"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(1)(F)" -> "/us/pl/100/342/s13/1/F"] ", " ["102 Stat. 630" -> "/us/stat/102/630"] "; Sept. 3, 1992, " ["Pub. L. 102–365" -> "/us/pl/102/365"] ", §§ 4(a)(1), (c)(3), 9(a)(3), " ["106 Stat. 973" -> "/us/stat/106/973"] ", 974, 977, related to use of cars in violation of sections 1 to 7 of this title and enforcement duties of United States attorneys and Secretary of Transportation. See sections 20301, 21302, and 21304 of Title 49, Transportation."
+    hash "61f88e211e974a51dedd384e5e030f1a25107df373eca9181bf7a73e0b3d4c69"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1893-03-02.ch196/noheading/7" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 7, acts " ["Mar. 2, 1893, ch. 196, § 8" -> "/us/act/1893-03-02/ch196/s8"] ", " ["27 Stat. 532" -> "/us/stat/27/532"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(1)(H)" -> "/us/pl/100/342/s13/1/H"] ", " ["102 Stat. 631" -> "/us/stat/102/631"] ", related to assumption of risk by railroad employees. See " ["section 20304 of Title 49" -> "/us/usc/t49/s20304"] "."
+    hash "fb4406e49a35fbcaa67a8f29297a1400aa543888381e7073fc9d1bdf6dfe8701"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1903-03-02.ch976/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 8, acts " ["Mar. 2, 1903, ch. 976, § 1" -> "/us/act/1903-03-02/ch976/s1"] ", " ["32 Stat. 943" -> "/us/stat/32/943"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(2)(A)" -> "/us/pl/100/342/s13/2/A"] ", " ["102 Stat. 631" -> "/us/stat/102/631"] ", extended provisions of sections 1 to 7 of this title to include railroads in the Territories and the District of Columbia and to apply in other cases. See sections 20301, 20302, 20304, and 21302 of Title 49."
+    hash "d7942e4d1406522e028a3a8cded802e7b7d426ab29b263548fb4152c600d0928"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1903-03-02.ch976/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 9, acts " ["Mar. 2, 1903, ch. 976, § 2" -> "/us/act/1903-03-02/ch976/s2"] ", " ["32 Stat. 943" -> "/us/stat/32/943"] "; Apr. 11, 1958, " ["Pub. L. 85–375" -> "/us/pl/85/375"] ", " ["72 Stat. 86" -> "/us/stat/72/86"] "; Oct. 15, 1966, " ["Pub. L. 89–670, § 6(e)(1)(B)" -> "/us/pl/89/670/s6/e/1/B"] ", " ["80 Stat. 939" -> "/us/stat/80/939"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(2)(B)" -> "/us/pl/100/342/s13/2/B"] ", " ["102 Stat. 631" -> "/us/stat/102/631"] ", provided that locomotive engineers were to operate power and train brakes on not less than 50 percent of cars of trains operated with power or train brakes, and retained rules, standards, and instructions of Association of American Railroads for installation, inspection, maintenance, and repair of such brakes. See sections 20301, 20302, and 21302 of Title 49."
+    hash "30fa3bfdb083ad15ec3b126e90caebccca69c70e44b0e94c33092980c57412cb"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1903-03-02.ch976/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 10, acts " ["Mar. 2, 1903, ch. 976, § 3" -> "/us/act/1903-03-02/ch976/s3"] ", " ["32 Stat. 943" -> "/us/stat/32/943"] "; " ["June 25, 1948, ch. 646, § 1" -> "/us/act/1948-06-25/ch646/s1"] ", " ["62 Stat. 909" -> "/us/stat/62/909"] "; Oct. 15, 1966, " ["Pub. L. 89–670, § 6(e)(1)(B)" -> "/us/pl/89/670/s6/e/1/B"] ", " ["80 Stat. 939" -> "/us/stat/80/939"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(2)(C)" -> "/us/pl/100/342/s13/2/C"] ", " ["102 Stat. 631" -> "/us/stat/102/631"] "; Sept. 3, 1992, " ["Pub. L. 102–365, § 9(a)(4)" -> "/us/pl/102/365/s9/a/4"] ", " ["106 Stat. 977" -> "/us/stat/106/977"] ", related to continuation of duties, requirements, and liabilities specified under sections 1 to 7 of this title unless specifically amended by sections 8 to 10 of this title. See " ["section 21302 of Title 49" -> "/us/usc/t49/s21302"] "."
+    hash "404091e03cba8782666fb49584c4f452ae37feba493f0c8328112636fb88ece8"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1910-04-14.ch160/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 11, acts " ["Apr. 14, 1910, ch. 160, § 2" -> "/us/act/1910-04-14/ch160/s2"] ", " ["36 Stat. 298" -> "/us/stat/36/298"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(3)(A)" -> "/us/pl/100/342/s13/3/A"] ", " ["102 Stat. 631" -> "/us/stat/102/631"] ", related to use of cars not equipped as required by sections 11 to 16 of this title. See " ["section 20302 of Title 49" -> "/us/usc/t49/s20302"] "."
+    hash "4c0a443d7c341bdbec550a9d328558773fe29855279001b5354c2456a59fa85f"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1910-04-14.ch160/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 12, acts " ["Apr. 14, 1910, ch. 160, § 3" -> "/us/act/1910-04-14/ch160/s3"] ", " ["36 Stat. 298" -> "/us/stat/36/298"] "; Oct. 15, 1966, " ["Pub. L. 89–670, § 6(e)(1)(C)" -> "/us/pl/89/670/s6/e/1/C"] ", " ["80 Stat. 939" -> "/us/stat/80/939"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(3)(B)" -> "/us/pl/100/342/s13/3/B"] ", " ["102 Stat. 631" -> "/us/stat/102/631"] ", continued to maintain designations of safety appliances by Secretary of Transportation as standards of equipment for railroad cars, unless changed by order of Secretary, and authorized Secretary to modify standard height of drawbars. See sections 20302 and 21302 of Title 49."
+    hash "659c65502bb73f6c904e27ba6d4e8d85d80c1a1c0c338180fb1254608632c1ad"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1910-04-14.ch160/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 13, acts " ["Apr. 14, 1910, ch. 160, § 4" -> "/us/act/1910-04-14/ch160/s4"] ", " ["36 Stat. 299" -> "/us/stat/36/299"] "; Aug. 14, 1957, " ["Pub. L. 85–135, § 1(2)" -> "/us/pl/85/135/s1/2"] ", " ["71 Stat. 352" -> "/us/stat/71/352"] "; July 8, 1976, " ["Pub. L. 94–348, § 3(b)" -> "/us/pl/94/348/s3/b"] ", " ["90 Stat. 818" -> "/us/stat/90/818"] "; Nov. 2, 1978, " ["Pub. L. 95–574, § 7(b)" -> "/us/pl/95/574/s7/b"] ", " ["92 Stat. 2461" -> "/us/stat/92/2461"] "; Jan. 14, 1983, " ["Pub. L. 97–468, title VII, § 704" -> "/us/pl/97/468/tVII/s704"] ", " ["96 Stat. 2580" -> "/us/stat/96/2580"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(3)(C)" -> "/us/pl/100/342/s13/3/C"] ", " ["102 Stat. 632" -> "/us/stat/102/632"] "; Sept. 3, 1992, " ["Pub. L. 102–365" -> "/us/pl/102/365"] ", §§ 4(a)(1), (c)(4), 9(a)(5), " ["106 Stat. 973" -> "/us/stat/106/973"] ", 974, 978, related to penalty for using cars not equipped as provided by sections 1 to 16 of this title, with provisos for hauling cars for repairs when equipment becomes defective, liability for death or injury to employees in connection with such hauling, and use of chains instead of drawbars in conducting such hauling. See sections 20303, 21302, and 21304 of Title 49."
+    hash "7d6f67923e21ded2ca13b331623ce24f8a7c067aa04043cc43978eb6666d9553"
+  }
+  note "/us/usc/t45/s1...14/note/ungrouped/act.1910-04-14.ch160/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 14, acts " ["Apr. 14, 1910, ch. 160, § 5" -> "/us/act/1910-04-14/ch160/s5"] ", " ["36 Stat. 299" -> "/us/stat/36/299"] "; Oct. 15, 1966, " ["Pub. L. 89–670, § 6(e)(1)(C)" -> "/us/pl/89/670/s6/e/1/C"] ", " ["80 Stat. 939" -> "/us/stat/80/939"] "; June 22, 1988, " ["Pub. L. 100–342, § 13(3)(D)" -> "/us/pl/100/342/s13/3/D"] ", " ["102 Stat. 632" -> "/us/stat/102/632"] ", related to liability for using cars with defective or insecure equipment. See " ["section 21302 of Title 49" -> "/us/usc/t49/s21302"] "."
+    hash "263c5bb0dc524c9a1bfc9e3ceb4c358b51b48697c8cac2acc143e4f71fd67ace"
+  }
+  layers {
+    operative "0ab8f8fe689b54aeb9ae0d469ba145a60b4ca9e1484524c8787428718de1d3e6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "13f3f448d3d8396b6b462c407bc3baa97f9a2e46054b8ad63783f02ec304c3ac"
+  }
+}

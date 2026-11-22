@@ -1,4 +1,4 @@
-# Fidryn 0.2 architecture
+# Fidryn 0.3 architecture
 
 Fidryn is a reference interpreter for legal instruments. It is a compiler
 plus a partial evaluator: parse a `.fr` module, authenticate a source
@@ -33,18 +33,18 @@ bytes
   -> Outcome<T> + proof-relevant trace
 ```
 
-Fidryn 0.2 is a reference interpreter, not a native-code compiler. There is no
+Fidryn 0.3 is a reference interpreter, not a native-code compiler. There is no
 LLVM backend. `calc` functions are total, effect-free, and terminating;
 they run in the evaluator, not as machine code.
 
 ## Improvements over the essay's gaps
 
 The essay left a grammar sketch, deferred conflict oracles, and noted that
-no-false-determinacy is only as honest as the admitted model. Fidryn 0.2
+no-false-determinacy is only as honest as the admitted model. Fidryn 0.3
 retains the following contracts:
 
 1. `grammar.ebnf` is closed. It has no catch-all `Ident Expr` statement.
-   The 0.2 parser enforces closed field sets only in `source` blocks,
+   The 0.3 parser enforces closed field sets only in `source` blocks,
    rule bodies and judgment request blocks; in most other declarations an
    unknown field is skipped without a diagnostic (see
    [implementation status](implementation-status.md)).
@@ -96,21 +96,46 @@ retains the following contracts:
 fidryn-syntax          parser, formatter, Rowan CST (not every Pratt node)
 fidryn-core            IR, types, Outcome, LegalState, diagnostics
 fidryn-hir             names, imports, elaboration  (syntax + core)
-fidryn-check           types, effects, authority, time, strata (hir + core)
+fidryn-check           types, effects, authority, time, strata (hir + core); edition 2 lowering and one-module check (syntax + provision)
 fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)
 fidryn-kernel          covering-check boundary (accept/reject; no proof gen)
-fidryn-driver          incremental check/run memo
+fidryn-driver          incremental check/run memo; workspace check, writer and change sets (provision)
 fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates
 fidryn-adapt           filing adapters
 fidryn-solve           bounded DPLL (eager product today; lazy yield remaining)
-fidryn-cli             fidryn binary and mill UI
+fidryn-provision       law-module model and the rules over it (no workspace crate)
+fidryn-ingest-uscode   official XML release point into law modules (provision)
+fidryn-cli             fidryn binary and mill UI; ingest, text, coverage and changes commands (driver + provision + ingest-uscode)
 ```
 
 Do not add reverse dependencies. Do not put evaluator logic in `syntax`.
-Do not put parser logic in `core`.
+Do not put parser logic in `core`. `fidryn-provision` depends on no other
+crate of the workspace. Of the workspace crates, `fidryn-ingest-uscode`
+depends on `fidryn-provision` only, and `fidryn-cli` alone depends on
+`fidryn-ingest-uscode`, for its `ingest` command; neither `fidryn-driver`
+nor `fidryn-provision` may. `fidryn-check` depends on `fidryn-provision` for
+the model into which it lowers modules of edition 2. `fidryn-driver`
+depends on `fidryn-provision` for the files of a workspace and the
+interfaces of its modules: it holds the check of a workspace of edition 2
+modules, in two phases on several threads with a cache of the first, the
+writer of a generated one, and the change set between two generated ones.
+`fidryn-provision`
+holds the model of law modules and the rules over it, among them
+addresses, text normalization, file paths, hashes, text records, the
+coverage ledger of a generated workspace, the
+canonical text of a module, the interface of a module, the index of
+addresses that gives each reference its outcome, and the comparison of two
+versions of a module. `fidryn-ingest-uscode`
+reads the archives of the official XML release point published by the
+Office of the Law Revision Counsel, each checked against its retrieval
+record, and the documents in them into the units and containers of that
+model. It is the one crate of the workspace that knows the Code's titles
+and the publisher's elements. `fidryn-cli` names the Code only in
+`fidryn ingest uscode`, which writes what the ingester reads with the
+writer of `fidryn-driver`.
 
 ## Public APIs
 
@@ -163,6 +188,11 @@ pub fn elaborate(parse: &fidryn_syntax::Parse, manifest: &SourceManifest)
 ```rust
 pub fn check(hir: &HirModule, manifest: &SourceManifest)
     -> Result<CoreModule, Vec<Diagnostic>>
+
+// fidryn_check::e2, for law modules of edition 2 (see law-modules.md):
+pub fn lower(parse: &fidryn_syntax::e2::Parse) -> Result<Lowered, Vec<Diagnostic>>
+pub fn check_module(lowered: &Lowered) -> Vec<Diagnostic>
+pub fn check_source(source: &str) -> Result<Lowered, Vec<Diagnostic>>
 ```
 
 ### fidryn-eval
@@ -223,7 +253,8 @@ Conservative precedence (first match wins):
 
 ```text
 fidryn fmt PATH
-fidryn check PATH
+fidryn check PATH [--jobs N] [--cache-dir DIR | --no-cache]
+    [--report FILE] [--unresolved FILE]
 fidryn inputs PATH --query NAME
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME
     [--arg KEY=VALUE] [--scenario] [--budget N]
@@ -237,6 +268,11 @@ fidryn review PATH --query NAME --case RECORD.json --valid-at TIME --known-at TI
     [--scenario] [--budget N] [--template TEMPLATE]
 fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint URL]
 fidryn ui [--port N] [--no-open]
+fidryn ingest uscode ARCHIVE_DIR --out DIR [--title T]... [--jobs N] [--verify]
+fidryn text DIR [ADDRESS] [--json | --hashes]
+fidryn coverage DIR
+fidryn changes OLD_DIR NEW_DIR [--bindings DIR]... [--json] [--jobs N]
+    [--cache-dir DIR | --no-cache]
 ```
 
 Every subcommand also takes `--source-root PATH`. `run` never chooses a
@@ -269,6 +305,53 @@ parse
 A guard that is `Open` or `Conflict` stages no partial mutation. Name-dispatch
 on a query name is not evaluation of Core.
 
+## Law modules of edition 2
+
+A file whose first two words are `edition 2` is a law module, which holds
+provisions of law as data and is never evaluated
+([Law modules](law-modules.md)). It takes a pipeline of its own:
+
+```
+bytes
+  -> edition_of                     (fidryn-syntax)
+  -> e2::parse                      (fidryn-syntax)
+  -> e2::lower into the model       (fidryn-check, the model of fidryn-provision)
+  -> e2::check_module               (fidryn-check)
+  -> interface_of                   (fidryn-provision)
+```
+
+Two crates hold what no other crate does. `fidryn-provision` holds the
+model of law modules and every rule over it, and depends on no other crate
+of the workspace. `fidryn-ingest-uscode` reads the publisher's XML of the
+United States Code into that model; it depends, of the workspace crates, on
+`fidryn-provision` only, and only `fidryn-cli` depends on it. The direction
+runs one way: the ingester knows the model, and the model, the parser and
+lowering of edition 2 and the check of a workspace know no corpus. The test
+`corpus_neutral_code_names_no_corpus` in `xtask/tests/corpus_neutrality.rs`
+holds `fidryn-provision`, the edition-2 parts of `fidryn-syntax` and
+`fidryn-check` and the workspace code of `fidryn-driver` to that.
+
+`fidryn_driver::workspace::check_workspace` checks a workspace in two
+phases:
+
+1. **Phase one**, for each module file by itself, of the workspace and of
+   each dependency, on worker threads: the BLAKE3 of its bytes, its edition,
+   the grammar, lowering, the checks of one module and the module's
+   interface. What it gives of a file depends on the file's bytes alone, so
+   it is kept in a cache keyed by those bytes, the toolchain's version and
+   the identity of the executable.
+2. **Phase two**, with the result of every module in memory: the files
+   against the lock, where each module stands, the check of each
+   dependency, and then, from the manifest and the interfaces alone
+   (`check_interfaces`), the toolchain, `within` and members, imports and
+   names, the staleness of bindings, addresses declared twice, and the
+   outcome of every reference and citation. Phase two reads no module
+   again.
+
+The change set between two generated workspaces
+(`fidryn_driver::workspace::changes`) reads each of them as that check
+does, and then compares their interfaces.
+
 ## Diagnostic codes
 
 ```
@@ -290,7 +373,20 @@ E530 NegativeRecursion
 E540 MissingLegalSource
 W610 OpenUniverse
 W620 BoundedVerification
+E700 InvalidAddress
+E710 IntegrityMismatch
+E720 UnresolvedModule
+E730 WorkspaceViolation
+E740 PinMismatch
+W750 StaleBinding
+W760 ToolchainMismatch
 ```
+
+`E700`, `E710`, `E720`, `E730`, `E740`, `W750` and `W760` are defined in
+`fidryn-core`. The checks of one module of edition 2 raise `E700` and
+`E710`, besides `E100` and `E200`; the check of a workspace raises `E720`,
+`E730`, `E740`, `W750` and `W760` besides. `W750` and `W760` are
+warnings.
 
 Compiler diagnostics are not legal outcomes. A valid program may evaluate
 to `Suspended`, `Contingent`, or `NormConflict`.

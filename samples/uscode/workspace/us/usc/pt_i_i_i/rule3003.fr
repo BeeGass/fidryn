@@ -1,0 +1,109 @@
+edition 2
+module "/us/usc/ptIII/rule3003" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3003" courtRule {
+    num "3003" "Rule 3003."
+    heading "Chapter 9 or 11—Filing a Proof of Claim or Equity Interest"
+    provision "/us/usc/ptIII/rule3003/a" subsection {
+      num "a" "(a)"
+      heading "Scope."
+      content "This rule applies only in a Chapter 9 or 11 case."
+      hash "048c8ea4eaf831837fad05f6601196bca9e0d3b3715f17b9b6973b8bbaec12f7"
+    }
+    provision "/us/usc/ptIII/rule3003/b" subsection {
+      num "b" "(b)"
+      heading "Scheduled Liabilities and Listed Equity Security Holders as Prima Facie Evidence of Validity and Amount."
+      provision "/us/usc/ptIII/rule3003/b/1" paragraph {
+        num "1" "(1)"
+        content "Creditor’s Claim. An entry on the schedule of liabilities filed under § 521(a)(1)(B)(i) is prima facie evidence of the validity and the amount of a creditor’s claim—except for a claim scheduled as disputed, contingent, or unliquidated. Filing a proof of claim is unnecessary except as provided in (c)(2)."
+        hash "2b389936b25678d26e3b71c60738c3eeea2fb8940c28cff73283cabfc512d443"
+      }
+      provision "/us/usc/ptIII/rule3003/b/2" paragraph {
+        num "2" "(2)"
+        content "Interest of an Equity Security Holder. An entry on the list of equity security holders filed under Rule 1007(a)(3) is prima facie evidence of the validity and the amount of the equity interest. Filing a proof of the interest is unnecessary except as provided in (c)(2)."
+        hash "9679986f0d3d8f59392fcb2b99a94ed750886ef48ae9f2c80ff1e399be55825c"
+      }
+      hash "d258154ef90a54d620b1fdf1e016d48fb5303731b06fd53f9238d2e24c14635f"
+    }
+    provision "/us/usc/ptIII/rule3003/c" subsection {
+      num "c" "(c)"
+      heading "Filing a Proof of Claim."
+      provision "/us/usc/ptIII/rule3003/c/1" paragraph {
+        num "1" "(1)"
+        content "Who May File a Proof of Claim. A creditor or indenture trustee may file a proof of claim."
+        hash "c687f42ee10720087ba5e686f693b00bbce33fb8925818ef62c3e90e7664186b"
+      }
+      provision "/us/usc/ptIII/rule3003/c/2" paragraph {
+        num "2" "(2)"
+        content "Who Must File a Proof of Claim or Interest. A creditor or equity security holder whose claim or interest is not scheduled—or is scheduled as disputed, contingent, or unliquidated—must file a proof of claim or interest. A creditor who fails to do so will not be treated as a creditor for that claim for voting and distribution."
+        hash "05f31872d03cad575536d1c6e6245816c7888ad2d5274a2e84444a720625bc48"
+      }
+      provision "/us/usc/ptIII/rule3003/c/3" paragraph {
+        num "3" "(3)"
+        content "Time to File. The court must set the time to file a proof of claim or interest and may, for cause, extend the time. If the time has expired, the proof of claim or interest may be filed to the extent and under the conditions stated in Rule 3002(c)(2), (3), (4), and (7)."
+        hash "4ea228b35c1ca03078ecf783a2aa0a4f2685260ec284f9fde8610b3fda584952"
+      }
+      provision "/us/usc/ptIII/rule3003/c/4" paragraph {
+        num "4" "(4)"
+        content "Proof of Claim by an Indenture Trustee. An indenture trustee may file a proof of claim on behalf of all known or unknown holders of securities issued under the trust instrument under which it is trustee."
+        hash "72ff9c87cfb899a545e67b3d9e7c04dc24bbf317edf6c43f7df0f69290bf796f"
+      }
+      provision "/us/usc/ptIII/rule3003/c/5" paragraph {
+        num "5" "(5)"
+        content "Effect of Filing a Proof of Claim or Interest. A proof of claim or interest signed and filed under (c) supersedes any scheduling of the claim or interest under § 521(a)(1)."
+        hash "eaa708d57c8bab5318cb3d8a0b9a6b7d48df283e677684802f37c30054fad2a6"
+      }
+      hash "5359983ced6986c48fca553e0371fe4c6752b0e47e833ac889a211fe6dfd155c"
+    }
+    provision "/us/usc/ptIII/rule3003/d" subsection {
+      num "d" "(d)"
+      heading "Treating a Nonrecord Holder of a Security as the Record Holder."
+      content "For the purpose of Rules 3017, 3018, and 3021 and receiving notices, an entity that is not a record holder of a security may file a statement setting forth facts that entitle the entity to be treated as the record holder. A party in interest may file an objection to the statement."
+      hash "df5d1c7fd52b1c29b9bd44a6ede383d0c2e1595c45de5eae46df1dfe00027959"
+    }
+    hash "f069407a449bbb8d80c5dc4cae7e7c668afa7c6782b32618d12193f8e6f9c863"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a). This rule applies only in chapter 9 and chapter 11 cases. It is adapted from former Chapter X Rule 10–401 and provides an exception to the requirement for filing proofs of claim and interest as expressed in §§ 925 and 1111(a) of the Code."
+    p "Subdivision (b). This general statement implements §§ 925 and 1111(a) of the Code."
+    p "Subdivision (c). This subdivision permits, in paragraph (1), the filing of a proof of claim but does not make it mandatory. Paragraph (2) requires, as does the Code, filing when a claim is scheduled as disputed, contingent, or unliquidated as to amount. It is the creditor’s responsibility to determine if the claim is accurately listed. Notice of the provision of this rule is provided for in Official Form No. 16, the order for the meeting of creditors. In an appropriate case the court may order creditors whose claims are scheduled as disputed, contingent, or unliquidated be notified of that fact but the procedure is left to the discretion of the court."
+    p "Subdivision (d) is derived from former Chapter X Rule 10–401(f)."
+    p "Except with respect to the need and time for filing claims, the other aspects concerning claims covered by Rules 3001 and 3002 are applicable in chapter 9 and 11 cases."
+    p "Holders of equity security interests need not file proofs of interest. Voting and distribution participation is dependent on ownership as disclosed by the appropriate records of a transfer agent or the corporate or other business records at the time prescribed in Rules 3017 and 3021."
+    hash "70e425ca2aafd6322238af138429b1f877903f5dbf8465ba8e3ecb2e487e6de4"
+  }
+  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Paragraph (3) of subdivision (c) is amended to permit the late filing of claims by infants or incompetent persons under the same circumstances that permit late filings in cases under chapter 7, 12, or 13. The amendment also provides sufficient time in which to file a claim that arises from a postpetition judgment against the claimant for the recovery of money or property or the avoidance of a lien. It also provides for purposes of clarification that upon rejection of an executory contract or unexpired lease, the court shall set a time for filing a claim arising therefrom despite prior expiration of the time set for filing proofs of claim."
+    p "The caption of paragraph (4) of subdivision (c) is amended to indicate that it applies to a proof of claim."
+    hash "fb95593a72f6d7ecfe20ff0b43f54909c8d821a757e247303febe97a6489fb88"
+  }
+  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subdivision (c)(3) is amended to implement § 1514(d) of the Code, which was added by the 2005 amendments. It makes the new Rule 3002(c)(6) applicable in chapter 9 and chapter 11 cases. This change was necessary so that creditors with foreign addresses be provided such additional time as is reasonable under the circumstances to file proofs of claims."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "98552cda62f8da578d8e64936623adc938a97971513add0465594f3256d4f4a1"
+  }
+  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3003 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "6651f120549e16aa084789f6d7eed3b92e30ceb5fe4d21fffc391405f9db4b38"
+  }
+  layers {
+    operative "f069407a449bbb8d80c5dc4cae7e7c668afa7c6782b32618d12193f8e6f9c863"
+    enacted "83e741013148c140cd3a509f5f50d792206a6874dbd97b868a78b1489dcf88d7"
+    editorial "bca4e64bfe5e2de0ae5940691907691d6f1d9028b168e3e52a6429af2c6cd4e2"
+  }
+}

@@ -1,0 +1,17 @@
+edition 2
+module "/us/usc/t45/ch14/schVII" {
+  within "/us/usc/t45/ch14"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch14/schVII" subchapter {
+    num "VII" "SUBCHAPTER VII—"
+    heading "EMERGENCY FINANCIAL ASSISTANCE"
+    member "/us/usc/t45/s621"
+    hash "d9383b76af223085808e0d31cf315852d9ce3cbf26051e2167d7f272aa4ed049"
+  }
+  layers {
+    operative "d9383b76af223085808e0d31cf315852d9ce3cbf26051e2167d7f272aa4ed049"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

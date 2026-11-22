@@ -33,10 +33,12 @@ Requires Rust 1.98+. Local mill: `fidryn ui --no-open` (loopback only, default `
 - [Getting started](https://fidryn.onlygass.dev/docs/getting-started) · [getting-started.md](https://fidryn.onlygass.dev/docs/getting-started.md)
 - [Language](https://fidryn.onlygass.dev/docs/language) · [language.md](https://fidryn.onlygass.dev/docs/language.md)
 - [Cases and time](https://fidryn.onlygass.dev/docs/cases-and-time) · [cases-and-time.md](https://fidryn.onlygass.dev/docs/cases-and-time.md)
+- [Law modules](https://fidryn.onlygass.dev/docs/law-modules) · [law-modules.md](https://fidryn.onlygass.dev/docs/law-modules.md)
 - [CLI](https://fidryn.onlygass.dev/docs/cli) · [cli.md](https://fidryn.onlygass.dev/docs/cli.md)
 - [Mill](https://fidryn.onlygass.dev/docs/mill) · [mill.md](https://fidryn.onlygass.dev/docs/mill.md)
 - [Outcomes](https://fidryn.onlygass.dev/docs/outcomes) · [outcomes.md](https://fidryn.onlygass.dev/docs/outcomes.md)
 - [Examples](https://fidryn.onlygass.dev/docs/examples) · [examples.md](https://fidryn.onlygass.dev/docs/examples.md)
+- [Coverage](https://fidryn.onlygass.dev/docs/coverage) · [coverage.md](https://fidryn.onlygass.dev/docs/coverage.md)
 - [Contributing](https://fidryn.onlygass.dev/docs/contributing) · [contributing.md](https://fidryn.onlygass.dev/docs/contributing.md)
 
 ## Agent maps

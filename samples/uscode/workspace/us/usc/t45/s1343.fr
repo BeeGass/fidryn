@@ -1,0 +1,21 @@
+edition 2
+module "/us/usc/t45/s1343" {
+  within "/us/usc/t45/ch22/schII/ptC"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1343" section {
+    num "1343" "§ 1343."
+    heading "Charter amendment"
+    content {
+      p "Within 60 days after October 21, 1986, the Corporation shall amend its Articles of Incorporation to contain the following provision, which provision shall not be subject to amendment or repeal:"
+      p "“It shall be a fundamental purpose of the Corporation to maintain continued rail service in its service area.”."
+    }
+    hash "478e6ded9a6db26182b9fe3de3537b61003a137ccd8bd663218a9b7ad5e6fc86"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4035" -> "/us/pl/99/509/tIV/s4035"] ", Oct. 21, 1986, " ["100 Stat. 1909" -> "/us/stat/100/1909"] ".)"
+  layers {
+    operative "478e6ded9a6db26182b9fe3de3537b61003a137ccd8bd663218a9b7ad5e6fc86"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "cad35b9dcb1feb21b94c7597e570f6bf60f0f7084ef805da1cbe330cad4d9077"
+  }
+}

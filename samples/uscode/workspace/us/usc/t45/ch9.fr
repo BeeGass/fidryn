@@ -1,0 +1,20 @@
+edition 2
+module "/us/usc/t45/ch9" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch9" chapter {
+    num "9" "CHAPTER 9—"
+    heading "RETIREMENT OF RAILROAD EMPLOYEES"
+    member "/us/usc/t45/ch9/schI"
+    member "/us/usc/t45/ch9/schII"
+    member "/us/usc/t45/ch9/schIII"
+    member "/us/usc/t45/ch9/schIV"
+    hash "11eafe0fc38de20b44b38feebea9fad908b6de8a08b78efa78e3475ea21ec212"
+  }
+  layers {
+    operative "11eafe0fc38de20b44b38feebea9fad908b6de8a08b78efa78e3475ea21ec212"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

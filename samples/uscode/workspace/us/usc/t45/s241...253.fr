@@ -1,0 +1,108 @@
+edition 2
+module "/us/usc/t45/s241...253" {
+  alias "/us/usc/t45/s241"
+  alias "/us/usc/t45/s242"
+  alias "/us/usc/t45/s243"
+  alias "/us/usc/t45/s244"
+  alias "/us/usc/t45/s245"
+  alias "/us/usc/t45/s246"
+  alias "/us/usc/t45/s247"
+  alias "/us/usc/t45/s248"
+  alias "/us/usc/t45/s249"
+  alias "/us/usc/t45/s250"
+  alias "/us/usc/t45/s251"
+  alias "/us/usc/t45/s252"
+  alias "/us/usc/t45/s253"
+  within "/us/usc/t45/ch10"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s241...253" section {
+    num "241 to 253" "§§ 241 to 253."
+    heading "Repealed. " ["June 29, 1937, ch. 405, § 11" -> "/us/act/1937-06-29/ch405/s11"] ", " ["50 Stat. 440" -> "/us/stat/50/440"]
+    status repealed
+    hash "a56ca5acbefa4d1c782934ee84487758fdb6bf0eba0e3e3ceb16a05906aed588"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 241, " ["act Aug. 29, 1935, ch. 813, § 1" -> "/us/act/1935-08-29/ch813/s1"] ", " ["49 Stat. 974" -> "/us/stat/49/974"] ", defined terms for purposes of this subchapter."
+    hash "88429895785c65639fa393add40d58b096cbccb71a7c054fd19172b685f04165"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 242, " ["act Aug. 29, 1935, ch. 813, § 2" -> "/us/act/1935-08-29/ch813/s2"] ", " ["49 Stat. 975" -> "/us/stat/49/975"] ", related to income tax on employees."
+    hash "4b5d5773b2691998e5df3c1508244b91067b395731aae0a098d26d595cac4999"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 243, " ["act Aug. 29, 1935, ch. 813, § 3" -> "/us/act/1935-08-29/ch813/s3"] ", " ["49 Stat. 975" -> "/us/stat/49/975"] ", related to deduction of tax from wages."
+    hash "6662573ae6ce97819ce46008ab6d7165439e719eccf2e2a5947c33881bd963cc"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 244, " ["act Aug. 29, 1935, ch. 813, § 4" -> "/us/act/1935-08-29/ch813/s4"] ", " ["49 Stat. 975" -> "/us/stat/49/975"] ", related to excise tax on carriers."
+    hash "1c9b70aa7c8039a444b2bb1c5933981b022cf82dbf21daa8d2a4b710f5713f0e"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/5" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 245, " ["act Aug. 29, 1935, ch. 813, § 5" -> "/us/act/1935-08-29/ch813/s5"] ", " ["49 Stat. 975" -> "/us/stat/49/975"] ", related to adjustment of tax."
+    hash "fecf59326ddc74826b5838669a7b6b03feb33d9c93767ff9b72cba966cd54947"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/6" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 246, " ["act Aug. 29, 1935, ch. 813, § 6" -> "/us/act/1935-08-29/ch813/s6"] ", " ["49 Stat. 975" -> "/us/stat/49/975"] ", related to refunds and deficiencies."
+    hash "62c4dfbefdce3483da3e062cae33d8132206934450d9f112b2467d3541a2787b"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/7" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 247, " ["act Aug. 29, 1935, ch. 813, § 7" -> "/us/act/1935-08-29/ch813/s7"] ", " ["49 Stat. 975" -> "/us/stat/49/975"] ", related to income tax on employees’ representatives."
+    hash "a62c1cad6a66c58c6b45de893a2711fc0ae991bbbed1c6ef603c04d05866b174"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/8" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 248, " ["act Aug. 29, 1935, ch. 813, § 8" -> "/us/act/1935-08-29/ch813/s8"] ", " ["49 Stat. 976" -> "/us/stat/49/976"] ", related to collection and payment of taxes."
+    hash "ba8a4134139073bb79db122d0e8c5a7e156caf69b3929b7cccbf97c323f84ce6"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/9" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 249, " ["act Aug. 29, 1935, ch. 813, § 9" -> "/us/act/1935-08-29/ch813/s9"] ", " ["49 Stat. 976" -> "/us/stat/49/976"] ", related to court jurisdiction."
+    hash "5d466913018c7bf84635f98a7dbfa400d28200e24680c6eeaec5c88876d49615"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/10" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 250, " ["act Aug. 29, 1935, ch. 813, § 10" -> "/us/act/1935-08-29/ch813/s10"] ", " ["49 Stat. 976" -> "/us/stat/49/976"] ", related to penalties under this subchapter."
+    hash "dfd2b50a69f4d18670760d9c95792768d036c7abee1ce4ac563e9fba096a0f56"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/11" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 251, " ["act Aug. 29, 1935, ch. 813, § 11" -> "/us/act/1935-08-29/ch813/s11"] ", " ["49 Stat. 976" -> "/us/stat/49/976"] ", related to meaning of “employment”."
+    hash "6436ea48c017a6e32493f44a77fd68df25146aaec46a19e393375820c32c980a"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/12" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 252, acts " ["Aug. 29, 1935, ch. 813, § 12" -> "/us/act/1935-08-29/ch813/s12"] ", " ["49 Stat. 976" -> "/us/stat/49/976"] "; " ["Feb. 27, 1937, ch. 19" -> "/us/act/1937-02-27/ch19"] ", " ["50 Stat. 23" -> "/us/stat/50/23"] ", related to termination of taxes."
+    hash "b564e2da5669ee6f59c51841e15ae6438386c3ffddb5f9aa328fdf23986bbb4c"
+  }
+  note "/us/usc/t45/s241...253/note/ungrouped/act.1935-08-29.ch813/noheading/13" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 253, " ["act Aug. 29, 1935, ch. 813, § 13" -> "/us/act/1935-08-29/ch813/s13"] ", " ["49 Stat. 977" -> "/us/stat/49/977"] ", related to separability of provisions."
+    hash "78a94397ecd0329083a77ec7f373194e5e933e52e7944e1db01aa23a58fa6fcc"
+  }
+  layers {
+    operative "a56ca5acbefa4d1c782934ee84487758fdb6bf0eba0e3e3ceb16a05906aed588"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2cca987105a71750af11cca2c06b760396ea172e3e95c70bb78e0eef7c2ad584"
+  }
+}

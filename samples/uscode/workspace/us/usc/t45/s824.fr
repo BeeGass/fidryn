@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/s824" {
+  alias "/us/usc/t45/s825"
+  within "/us/usc/t45/ch17/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s824" section {
+    num "824, 825" "§§ 824, 825."
+    heading "Repealed. " ["Pub. L. 105–178, title VII, § 7203(a)(1)" -> "/us/pl/105/178/tVII/s7203/a/1"] ", (2), June 9, 1998, " ["112 Stat. 471" -> "/us/stat/112/471"] ", 477"
+    status repealed
+    hash "da639084b10cc84af5293e10ea49552d11c7caf46bf164912a34a2b42e450a71"
+  }
+  note "/us/usc/t45/s824/note/ungrouped/pl.94.210/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 824, " ["Pub. L. 94–210, title V, § 504" -> "/us/pl/94/210/tV/s504"] ", Feb. 5, 1976, " ["90 Stat. 70" -> "/us/stat/90/70"] "; " ["Pub. L. 94–555, title II" -> "/us/pl/94/555/tII"] ", §§ 216(c), 220(d), Oct. 19, 1976, " ["90 Stat. 2627" -> "/us/stat/90/2627"] ", 2629, related to capital needs study to be submitted to Secretary."
+    hash "63cbf105aed3bad1f7ef768350375bffb547c1e042898d9a4aed0f0ad96d6cd2"
+  }
+  note "/us/usc/t45/s824/note/ungrouped/pl.94.210/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 825, " ["Pub. L. 94–210, title V, § 505" -> "/us/pl/94/210/tV/s505"] ", Feb. 5, 1976, " ["90 Stat. 71" -> "/us/stat/90/71"] "; " ["Pub. L. 94–555, title II" -> "/us/pl/94/555/tII"] ", §§ 212, 216(a), Oct. 19, 1976, " ["90 Stat. 2624" -> "/us/stat/90/2624"] ", 2626; " ["Pub. L. 95–565, § 5" -> "/us/pl/95/565/s5"] ", Nov. 1, 1978, " ["92 Stat. 2400" -> "/us/stat/92/2400"] "; " ["Pub. L. 95–607, title III" -> "/us/pl/95/607/tIII"] ", §§ 301(a), 302, Nov. 8, 1978, " ["92 Stat. 3066" -> "/us/stat/92/3066"] "; " ["Pub. L. 95–620, title VIII, § 803(c)(5)" -> "/us/pl/95/620/tVIII/s803/c/5"] ", (6), Nov. 9, 1978, " ["92 Stat. 3347" -> "/us/stat/92/3347"] ", 3348; " ["Pub. L. 96–73, title IV, § 401" -> "/us/pl/96/73/tIV/s401"] ", Sept. 29, 1979, " ["93 Stat. 557" -> "/us/stat/93/557"] "; " ["Pub. L. 96–101" -> "/us/pl/96/101"] ", §§ 16, 24(a), Nov. 4, 1979, " ["93 Stat. 744" -> "/us/stat/93/744"] ", 747; " ["Pub. L. 96–254, title I, § 112" -> "/us/pl/96/254/tI/s112"] ", May 30, 1980, " ["94 Stat. 404" -> "/us/stat/94/404"] "; " ["Pub. L. 96–448, title IV" -> "/us/pl/96/448/tIV"] ", §§ 404, 405(a)(1), (c)(1), (2), (4), (5), 406, title VII, § 701(d), Oct. 14, 1980, " ["94 Stat. 1945–1947" -> "/us/stat/94/1945-1947"] ", 1961; " ["Pub. L. 97–35, title XI, § 1162(a)" -> "/us/pl/97/35/tXI/s1162/a"] ", (c), (d), Aug. 13, 1981, " ["95 Stat. 683" -> "/us/stat/95/683"] ", 684; " ["Pub. L. 97–468, title IV" -> "/us/pl/97/468/tIV"] ", §§ 401, 403(b), Jan. 14, 1983, " ["96 Stat. 2550" -> "/us/stat/96/2550"] ", 2551; " ["Pub. L. 99–509, title IV, § 4033(c)(3)" -> "/us/pl/99/509/tIV/s4033/c/3"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] "; " ["Pub. L. 104–88, title III, § 330(2)" -> "/us/pl/104/88/tIII/s330/2"] ", Dec. 29, 1995, " ["109 Stat. 953" -> "/us/stat/109/953"] ", related to rehabilitation and improvement financing."
+    hash "cf1c4b9944a99daf3ad3a1b07eeb915de0591634e8ce33bbddaf0c314b7faaa9"
+  }
+  layers {
+    operative "da639084b10cc84af5293e10ea49552d11c7caf46bf164912a34a2b42e450a71"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b8f816ab20d8dab84eeeeacc25f1ed01c6c6c7aeeb3665cebec0e823727c1cb0"
+  }
+}

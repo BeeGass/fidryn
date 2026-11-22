@@ -1,0 +1,189 @@
+edition 2
+module "/us/usc/ptV/rule5003" {
+  within "/us/usc/ptV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptV/rule5003" courtRule {
+    num "5003" "Rule 5003."
+    heading "Records to Be Kept by the Clerk"
+    provision "/us/usc/ptV/rule5003/a" subsection {
+      num "a" "(a)"
+      heading "Bankruptcy Docket."
+      chapeau "The clerk must keep a docket in each case and must:"
+      provision "/us/usc/ptV/rule5003/a/1" paragraph {
+        num "1" "(1)"
+        content "enter on the docket each judgment, order, and activity, as prescribed by the Director of the Administrative Office of the United States Courts; and"
+        hash "672659e7130a1b9edb3a22fd129b5e23f2baaf85e1d1311ac6fe0579508271c2"
+      }
+      provision "/us/usc/ptV/rule5003/a/2" paragraph {
+        num "2" "(2)"
+        content "show the date of entry for each judgment or order."
+        hash "5285164d7ad16d77c9c1114a19f302bfd5fe17bc5ff04cd3110867129528c983"
+      }
+      hash "2eb8dd7eb9580575b0fdd43d0c2b10d733404bc0b01e375e4a04171cd639bec1"
+    }
+    provision "/us/usc/ptV/rule5003/b" subsection {
+      num "b" "(b)"
+      heading "Claims Register."
+      content "When it appears that there will be a distribution to unsecured creditors, the clerk must keep in a claims register a list of the claims filed in the case."
+      hash "0f299e1a82e31994efea3a5c6ef5692b5bbd7baaadc300e1acea7e1d61228ac2"
+    }
+    provision "/us/usc/ptV/rule5003/c" subsection {
+      num "c" "(c)"
+      heading "Judgments and Orders."
+      provision "/us/usc/ptV/rule5003/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. In the form and manner prescribed by the Director of the Administrative Office of the United States Courts, the clerk must keep a copy of:"
+        provision "/us/usc/ptV/rule5003/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "every final judgment or order affecting title to, or a lien on, real property;"
+          hash "9b9066ad50eef488e940d4776ab10f5af07b4255fd6befb9b817e502794f338a"
+        }
+        provision "/us/usc/ptV/rule5003/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "every final judgment or order for the recovery of money or property; and"
+          hash "4a5170fd230605870a4e59e9696ef37123ccaf95d6897361bb1e7368bdfb949e"
+        }
+        provision "/us/usc/ptV/rule5003/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "any other order the court designates."
+          hash "2fabcc992de31655ec0c52e32a7234a75bb553159812abb5ac1be4db282a646b"
+        }
+        hash "4af1f75fe8349471a1acf42c50198d8b9f738c4e436446356d9c606ebac110b6"
+      }
+      provision "/us/usc/ptV/rule5003/c/2" paragraph {
+        num "2" "(2)"
+        chapeau "Indexing with the District Court. On a prevailing party’s request, a copy of the following must be kept and indexed with the district court’s civil judgments:"
+        provision "/us/usc/ptV/rule5003/c/2/A" subparagraph {
+          num "A" "(A)"
+          content "every final judgment or order affecting title to, or a lien on, real or personal property; and"
+          hash "627c247036fa4a659c7a00fabf427376145e0541bd12a73be0064e766b936ea1"
+        }
+        provision "/us/usc/ptV/rule5003/c/2/B" subparagraph {
+          num "B" "(B)"
+          content "every final judgment or order for the recovery of money or property."
+          hash "8afb1bee3640d5d9aa70733cb4ebe969fa0e8eb7203d8d1a4404466a22020b3f"
+        }
+        hash "d5806989804ab07884c03ddfabf449d0cc801aa27b84f600ec6e6aa279d5f7fe"
+      }
+      hash "30dc4ad4ee5be6f9cea8f141ab708bac16e3a4adf638bab004cc39b518b1a5bb"
+    }
+    provision "/us/usc/ptV/rule5003/d" subsection {
+      num "d" "(d)"
+      heading "Index of Cases; Certificate of Search."
+      provision "/us/usc/ptV/rule5003/d/1" paragraph {
+        num "1" "(1)"
+        content "Index of Cases. The clerk must keep an index of cases and adversary proceedings in the form and manner prescribed by the Director of the Administrative Office of the United States Courts."
+        hash "5761601e4c42ea6e31c0a446f44e01897cdf2d1951d51ea9afb6ff53ed187378"
+      }
+      provision "/us/usc/ptV/rule5003/d/2" paragraph {
+        num "2" "(2)"
+        chapeau "Searching the Index; Certificate of Search. On request, the clerk must search the index and papers in the clerk’s custody and certify whether:"
+        provision "/us/usc/ptV/rule5003/d/2/A" subparagraph {
+          num "A" "(A)"
+          content "a case or proceeding has been filed in or transferred to the court; or"
+          hash "e7502caf73875e7bcb990bd9e783bfa545b4679caddb268ad20c7f0099c6d337"
+        }
+        provision "/us/usc/ptV/rule5003/d/2/B" subparagraph {
+          num "B" "(B)"
+          content "a discharge has been entered."
+          hash "41a9cd5c927ef7a935b2fb84b62364d4963a924b0dffe95f8bb7689014963bea"
+        }
+        hash "d13e2ab9d08ac7074bbc59364d6394747819c0d74ed45fbc6ef5a8dba91f6ec3"
+      }
+      hash "639ebd1de751ce409f592b8caa96e6036667f836ccdb4cada2b3afb821cf9183"
+    }
+    provision "/us/usc/ptV/rule5003/e" subsection {
+      num "e" "(e)"
+      heading "Register of Mailing Addresses of Federal and State Governmental Units and Certain Taxing Authorities."
+      provision "/us/usc/ptV/rule5003/e/1" paragraph {
+        num "1" "(1)"
+        content "In General. The United States—or a state or a territory where the court is located—may file a statement designating its mailing address. A taxing authority (including a local taxing authority) may also file a statement designating an address for serving requests under § 505(b). The authority’s designation must describe where to find further information about additional requirements for serving a request."
+        hash "32cef917577fb1e3da6bb00675766fcffebac7dc353fd8e5466679fe97985c35"
+      }
+      provision "/us/usc/ptV/rule5003/e/2" paragraph {
+        num "2" "(2)"
+        chapeau "Register of Mailing Address."
+        provision "/us/usc/ptV/rule5003/e/2/A" subparagraph {
+          num "A" "(A)"
+          content "In General. In the form and manner prescribed by the Director of the Administrative Office of the United States Courts, the clerk must keep a register of the mailing addresses of the governmental units listed in the first sentence of (1) and a separate register containing the addresses of taxing authorities for serving requests under § 505(b)."
+          hash "495a788b0758fd8c22eb2edb7765df45eb85edbf93dc77ee84e0346a4e0eca12"
+        }
+        provision "/us/usc/ptV/rule5003/e/2/B" subparagraph {
+          num "B" "(B)"
+          content "Number of Entries. The clerk need not include in any register more than one mailing address for each department, agency, or instrumentality of the United States or the state or territory. But if more than one mailing address is included, the clerk must also include information that would enable a user to determine when each address applies. Mailing to only one applicable address provides effective notice."
+          hash "76637cc9d8738e586ac3fca80ed4aa0617fb5b52ec6e5fb47a8c8f36d631d827"
+        }
+        provision "/us/usc/ptV/rule5003/e/2/C" subparagraph {
+          num "C" "(C)"
+          content "Keeping the Register Current. The clerk must update the register annually, as of January 2 of each year."
+          hash "880b793f2274f5e542a1cf2427f3e7c6eddcf79a3000197e36cf4f48b19e175a"
+        }
+        provision "/us/usc/ptV/rule5003/e/2/D" subparagraph {
+          num "D" "(D)"
+          content "Mailing Address Presumed to Be Proper. A mailing address in the register is conclusively presumed to be proper. But a failure to use that address does not invalidate a notice that is otherwise effective under applicable law."
+          hash "a429d9c43046805b41ca1180160c18544357a3882a59b0d10b8ee7307f0fb9c2"
+        }
+        hash "13dd282c28cd0fc39d6810237f9cfd74f8eab50fb2be8f98ecdf4ba03e899d95"
+      }
+      hash "905c93b5fcb620e2cad953ba170e0e844f45d2e152f5bcfcd40bd5f1250bd55b"
+    }
+    provision "/us/usc/ptV/rule5003/f" subsection {
+      num "f" "(f)"
+      heading "Other Books and Records."
+      content "The clerk must keep any other books and records required by the Director of the Administrative Office of the United States Courts."
+      hash "1bbacc2a94b05f1bb842966e4ab660189cd9fb67d703b9b940d7d0673cc75967"
+    }
+    hash "736e04484b9098fda42e5fb6b6d78fd63d470d016b16aefa6c76ff57fc8d389a"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 17, 2000, eff. Dec. 1, 2000; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule consolidates former Bankruptcy Rules 504 and 507. The record-keeping duties of the referee under former Bankruptcy Rule 504 are transferred to the clerk. Subdivisions (a), (c), (d) and (e) are similar to subdivisions (a)–(d) of Rule 79 F.R.Civ.P."
+    p "Subdivision (b) requires that filed claims be listed on a claims register only when there may be a distribution to unsecured creditors. Compilation of the list for no asset or nominal asset cases would serve no purpose."
+    p "Rule 2013 requires the clerk to maintain a public record of fees paid from the estate and an annual summary thereof."
+    p "Former Bankruptcy Rules 507(d) and 508, which made materials in the clerk’s office and files available to the public, are not necessary because § 107 of the Code guarantees public access to files and dockets of cases under the Code."
+    hash "7291cc2755b0dd227ef421370dce586211354ec38bf754a976c60c28fad5fc40"
+  }
+  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (a) has been made more specific."
+    p "Subdivision (c) is amended to require that on the request of the prevailing party the clerk of the district court shall keep and index bankruptcy judgments and orders affecting title to or lien upon real or personal property or for the recovery of money or property with the civil judgments of the district court. This requirement is derived from former Rule 9021(b). The Director of the Administrative Office will provide guidance to the bankruptcy and district court clerks regarding appropriate paperwork and retention procedures."
+    hash "2361f7981a1f184deb2235343abea3b5d12019256ef2ed8a89f78973ef3e4add"
+  }
+  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2000 Amendment"
+    p "Subdivision (e) is added to provide a source where debtors, their attorneys, and other parties may go to determine whether the United States or the state or territory in which the court is located has filed a statement designating a mailing address for notice purposes. By using the address in the register—which must be available to the public—the sender is assured that the mailing address is proper. But the use of an address that differs from the address included in the register does not invalidate the notice if it is otherwise effective under applicable law."
+    p "The register may include a separate mailing address for each department, agency, or instrumentality of the United States or the state or territory. This rule does not require that addresses of municipalities or other local governmental units be included in the register, but the clerk may include them."
+    p "Although it is important for the register to be kept current, debtors, their attorneys, and other parties should be able to rely on mailing addresses listed in the register without the need to continuously inquire as to new or amended addresses. Therefore, the clerk must update the register, but only once each year."
+    p "To avoid unnecessary cost and burden on the clerk and to keep the register a reasonable length, the clerk is not required to include more than one mailing address for a particular agency, department, or instrumentality of the United States or the state or territory. But if more than one address is included, the clerk is required to include information so that a person using the register could determine when each address should be used. In any event, the inclusion of more than one address for a particular department, agency, or instrumentality does not impose on a person sending a notice the duty to send it to more than one address."
+    p "GAP Report on Rule 5003. No changes since publication."
+    hash "0cea558bccc9ae77478ecb4bb1bf765def4a03537a4cedd12a009ecf0758c9ee"
+  }
+  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The rule is amended to implement § 505(b)(1) of the Code added by the 2005 amendments, which allows a taxing authority to designate an address to use for the service of requests under that subsection. Under the amendment, the clerk is directed to maintain a separate register for mailing addresses of governmental units solely for the service of requests under § 505(b). This register is in addition to the register of addresses of governmental units already maintained by the clerk. The clerk is required to keep only one address for a governmental unit in each register."
+    p "Changes Made After Publication. Subdivision (e) was amended to clarify that the clerk must maintain a separate mailing address register that contains the addresses to which notices pertaining to actions under § 505 of the Code are to be sent."
+    hash "ff57002af38e83a7845e504469d31ab6477c48a79d2b09aae451aa23cc7e42d6"
+  }
+  note "/us/usc/ptV/rule5003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 5003 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "be1d1c7a26bf60c7e36abbe05d0f2be618a3d4fd8b041d79c8e8af09bea55ac1"
+  }
+  layers {
+    operative "736e04484b9098fda42e5fb6b6d78fd63d470d016b16aefa6c76ff57fc8d389a"
+    enacted "cce43c371f0db481fce479b4585887eb1245e43bbf1a67a2bdbe3c6f3bee0f7a"
+    editorial "df252d4000d02f5baa4ab44222fb42235ecefef4fdc920e1a3776b34e5e26e53"
+  }
+}

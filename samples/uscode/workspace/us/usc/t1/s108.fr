@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t1/s108" {
+  within "/us/usc/t1/ch2"
+  source "usc01.xml"
+  positive_law true
+  provision "/us/usc/t1/s108" section {
+    num "108" "§ 108."
+    heading "Repeal of repealing act"
+    content "Whenever an Act is repealed, which repealed a former Act, such former Act shall not thereby be revived, unless it shall be expressly so provided."
+    hash "a4823f90df691143fa1b7202a4d6916b4f79ee850ac929e476b4a8e191d43745"
+  }
+  credit "(" ["July 30, 1947, ch. 388" -> "/us/act/1947-07-30/ch388"] ", " ["61 Stat. 635" -> "/us/stat/61/635"] ".)"
+  layers {
+    operative "a4823f90df691143fa1b7202a4d6916b4f79ee850ac929e476b4a8e191d43745"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "40847cb2f5e2d1231083e24714e4077fb1d00195cc087496ed0fbbdbd356885f"
+  }
+}

@@ -1,0 +1,70 @@
+edition 2
+module "/us/usc/ptIV/rule4008" {
+  within "/us/usc/ptIV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIV/rule4008" courtRule {
+    num "4008" "Rule 4008."
+    heading "Reaffirmation Agreement and Supporting Statement"
+    provision "/us/usc/ptIV/rule4008/a" subsection {
+      num "a" "(a)"
+      heading "Time to File; Cover Sheet."
+      content "A reaffirmation agreement must be filed within 60 days after the first date set for the § 341(a) meeting of creditors. The agreement must have a cover sheet prepared as prescribed by Form 427. At any time, the court may extend the time to file an agreement."
+      hash "155d5b2e5f780db105b6cbc1582e6f07b6b5aa052d133ad3404fa2a655b33b22"
+    }
+    provision "/us/usc/ptIV/rule4008/b" subsection {
+      num "b" "(b)"
+      heading "Supporting Statement."
+      content "The debtor’s supporting statement required by § 524(k)(6)(A) must be accompanied by a statement of the total income and expenses as shown on Schedules I and J. If the income and expenses shown on the supporting statement differ from those shown on the schedules, the supporting statement must explain the difference."
+      hash "2c1bae424c21ca4e109aa92e85de6ba1e415a6d5feab2019ecff7d01999383a8"
+    }
+    hash "10b2585cdd0cac788bfc89b403c5118a09199fb621907fe03fb09818765ec3ea"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Section 524(d) of the Code requires the court to hold a hearing to inform an individual debtor concerning the granting or denial of discharge and the law applicable to reaffirmation agreements."
+    p "The notice of the § 524(d) hearing may be combined with the notice of the meeting of creditors or entered as a separate order."
+    p "The expression “not more than” contained in the first sentence of the rule is for the explicit purpose of requiring the hearing to occur within that time period and cannot be extended."
+    hash "946a3ddb793669e32bbd53060b8954cbfa05d82c2f8fb6c6deae4c6d355d0990"
+  }
+  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is changed to conform to § 524(d) of the Code as amended in 1986. A hearing under § 524(d) is not mandatory unless the debtor desires to enter into a reaffirmation agreement."
+    hash "0e0478ec5f95cc61c759f87f6310d241073d520c0ecf286e86c78febb2178ab4"
+  }
+  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "This rule is amended to establish a deadline for filing reaffirmation agreements. The Code sets out a number of prerequisites to the enforceability of reaffirmation agreements. Among those requirements, § 524(k)(6)(A) provides that each reaffirmation agreement must be accompanied by a statement indicating the debtor’s ability to make the payments called for by the agreement. In the event that this statement reflects an insufficient income to allow payment of the reaffirmed debt, § 524(m) provides that a presumption of undue hardship arises, allowing the court to disapprove the reaffirmation agreement, but only after a hearing conducted prior to the entry of discharge. Rule 4004(c)(1)(K) accommodates this provision by delaying the entry of discharge where a presumption of undue hardship arises. However, in order for that rule to be effective, the reaffirmation agreement itself must be filed before the entry of discharge. Under Rule 4004(c)(1) discharge is to be entered promptly after the expiration of the time for filing a complaint objecting to discharge, which, under Rule 4004(a), is 60 days after the first date set for the meeting of creditors under § 341(a). Accordingly, that date is set as the deadline for filing a reaffirmation agreement."
+    p "Any party may file the agreement with the court. Thus, whichever party has a greater incentive to enforce the agreement usually will file it. In the event that the parties are unable to file a reaffirmation agreement in a timely fashion, the rule grants the court broad discretion to permit a late filing. A corresponding change to Rule 4004(c)(1)(J) accommodates such an extension by providing for a delay in the entry of discharge during the pendency of a motion to extend the time for filing a reaffirmation agreement."
+    p "Rule 4008 is also amended by deleting provisions regarding the timing of any reaffirmation and discharge hearing. As noted above, § 524(m) itself requires that hearings on undue hardship be conducted prior to the entry of discharge. In other respects, including hearings to approve reaffirmation agreements of unrepresented debtors under § 524(c)(6), the rule leaves discretion to the court to set the hearing at a time appropriate for the particular circumstances presented in the case and consistent with the scheduling needs of the parties."
+    p "Changes Made After Publication. The only change was stylistic. The phrase “of the Code” was added to subdivision (b)."
+    hash "ef640ecd5f9844320d2dc8c8a0d9b4c7efe19717664ced43aa6b354cadbd25ea"
+  }
+  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "Subdivision (a) of the rule is amended to require that the entity filing the reaffirmation agreement with the court also include Official Form 27, the Reaffirmation Agreement Cover Sheet. The form includes information necessary for the court to determine whether the proposed reaffirmation agreement is presumed to be an undue hardship for the debtor under § 524(m) of the Code."
+    p "Changes Made After Publication. No changes since publication."
+    hash "50c420497de70420e6b1e26d98e7c36844e7e57340ac6fd167574508d6211356"
+  }
+  note "/us/usc/ptIV/rule4008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 4008 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "f644eb0fada97feeffbd87e2b496a3e7c9c2a1586feb59b99b3a00887ae6bfd5"
+  }
+  layers {
+    operative "10b2585cdd0cac788bfc89b403c5118a09199fb621907fe03fb09818765ec3ea"
+    enacted "8c6ae402e136c5d759d1df018aedb410600a0840f81b92eaab957829fc2eb179"
+    editorial "635ae2a7c7ea6f5973d29b79a81a0c42648f47762359e7aa384dff00b6c608bf"
+  }
+}

@@ -24,6 +24,16 @@ other legal materials. Each is labeled as a fixture or as not an official
 edition. Where a fixture quotes official legal text, the project claims no
 rights in that text.
 
+## United States Code sample
+
+The archives under `samples/uscode/archives/` were published by the Office
+of the Law Revision Counsel of the United States House of Representatives
+and are kept unchanged. The files under `samples/uscode/workspace/` are
+generated from them. Their text is a work of the United States Government,
+for which copyright protection is not available under 17 U.S.C. § 105(a).
+The MIT License does not apply to that text. It applies to the programs
+that read and generate these files.
+
 ## Contributions
 
 Contributions are accepted under the MIT License, the same license as the

@@ -1,0 +1,42 @@
+edition 2
+module "/us/usc/t45/s797k" {
+  within "/us/usc/t45/ch16/schVII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s797k" section {
+    num "797k" "§ 797k."
+    heading "Factfinding panel"
+    provision "/us/usc/t45/s797k/a" subsection {
+      num "a" "(a)"
+      heading "Purpose"
+      content "The Corporation shall enter into collective bargaining agreements with its employees which provide for the establishment of one or more advisory factfinding panels, chaired by a neutral expert in industrial relations, for purposes of recommending changes in operating practices and procedures which result in greater productivity to the maximum extent practicable."
+      hash "c3fe714d85b68148561af81a7446682a6d57f772720514bffcf44c6766ddcbd7"
+    }
+    provision "/us/usc/t45/s797k/b" subsection {
+      num "b" "(b)"
+      heading "National Mediation Board"
+      content "The National Mediation Board shall appoint public members to any panel established by an agreement entered into under this subparagraph, and shall perform such functions contained in the agreement as are consistent with the duties of such Board under the Railway Labor Act [" ["45 U.S.C. 151" -> "/us/usc/t45/s151"] " et seq.]."
+      hash "0e11eb238e3fdb21300cae4b3f7a433a2cb6dae0e0a594ccf614df0d19d18bd8"
+    }
+    provision "/us/usc/t45/s797k/c" subsection {
+      num "c" "(c)"
+      heading "Other functions"
+      content "The factfinding panel may, before making its report to the parties, provide mediation, concil­iation, and other assistance to the parties."
+      hash "8968d3fa9c49b62be867d137a73257a0ece00bf08408013f82682fdc083f1c29"
+    }
+    hash "72c4d51afed7410373a24686d9f7b711d1b7b43c5f99c580a31e784977633c1b"
+  }
+  credit "(" ["Pub. L. 93–236, title VII, § 712" -> "/us/pl/93/236/tVII/s712"] ", as added " ["Pub. L. 97–35, title XI, § 1143(a)" -> "/us/pl/97/35/tXI/s1143/a"] ", Aug. 13, 1981, " ["95 Stat. 668" -> "/us/stat/95/668"] ".)"
+  note "/us/usc/t45/s797k/note/editorialNotes/act.1926-05-20.ch347/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Railway Labor Act, referred to in subsec. (b), is " ["act May 20, 1926, ch. 347" -> "/us/act/1926-05-20/ch347"] ", " ["44 Stat. 577" -> "/us/stat/44/577"] ", which is classified principally to chapter 8 (§ 151 et seq.) of this title. For complete classification of this Act to the Code, see " ["section 151 of this title" -> "/us/usc/t45/s151"] " and Tables."
+    hash "95c5dfe7ce45b94ac2e123ce547463706069adc250b24182afdb0b513adf7069"
+  }
+  layers {
+    operative "72c4d51afed7410373a24686d9f7b711d1b7b43c5f99c580a31e784977633c1b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d7edcc3154148a34951e5338285e0b2242070476be56cc70ea14066a3152bb92"
+  }
+}
