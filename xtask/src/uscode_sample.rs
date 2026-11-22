@@ -46,6 +46,7 @@ use crate::workspace::workspace_root;
 use anyhow::{Context, Result, anyhow, bail};
 use clap::Parser as _;
 use fidryn_core::DiagnosticCode;
+use fidryn_core::ids::hex_encode;
 use fidryn_driver::workspace::{CheckOptions, check_workspace};
 use fidryn_provision::layout::module_path;
 use fidryn_provision::workspace::{Lock, Manifest, RetrievalRecord};
@@ -974,7 +975,7 @@ fn archive_problems(dir: &Path) -> Result<Vec<String>> {
                 archive.bytes
             ));
         }
-        let sha256 = format!("{:x}", Sha256::digest(&bytes));
+        let sha256 = hex_encode(&Sha256::digest(&bytes));
         if sha256 != archive.sha256 {
             problems.push(format!(
                 "{name}: sha256 is {sha256}, the record gives {}",
@@ -1072,7 +1073,7 @@ mod tests {
             url: format!("https://example.invalid/releases/42/7/{file}"),
             retrieved_at: "2026-11-16T22:14:03Z".to_owned(),
             bytes: bytes.len() as u64,
-            sha256: format!("{:x}", Sha256::digest(bytes)),
+            sha256: hex_encode(&Sha256::digest(bytes)),
             blake3: Hash32(*blake3::hash(bytes).as_bytes()),
         }
     }

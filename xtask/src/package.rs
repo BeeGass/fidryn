@@ -3,6 +3,7 @@
 use crate::workspace::{cargo_command, load_metadata, workspace_root};
 use anyhow::{Context, Result, bail, ensure};
 use clap::Args;
+use fidryn_core::ids::hex_encode;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
@@ -573,7 +574,7 @@ fn digest_file(path: &Path) -> Result<FileDigest> {
     }
     Ok(FileDigest {
         size,
-        sha256: format!("{:x}", sha256.finalize()),
+        sha256: hex_encode(&sha256.finalize()),
         blake3: blake3.finalize().to_hex().to_string(),
     })
 }
