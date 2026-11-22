@@ -57,13 +57,13 @@ clap = { version = "4.5.48", features = ["derive"] }
 flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 indexmap = { version = "2.11.4", features = ["serde"] }
 la-arena = "0.3.1"
-rowan = "0.16.1"
+rowan = "0.17.0"
 roxmltree = "0.21.2"
 rust_decimal = { version = "1.39.0", features = ["serde"] }
 ryu-js = "1.0.3"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = { version = "1.0.145", features = ["preserve_order"] }
-sha2 = "0.10.9"
+sha2 = "0.11.1"
 thiserror = "2.0.17"
 time = { version = "0.3.44", features = ["formatting", "macros", "parsing", "serde"] }
 salsa = "0.28.5"
