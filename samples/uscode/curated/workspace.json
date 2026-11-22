@@ -3,13 +3,13 @@
   "name": "sample",
   "kind": "curated",
   "prefix": "/zz/sample",
-  "toolchain": "0.3.0",
+  "toolchain": "0.3.1",
   "dependencies": [
     {
       "name": "uscode",
       "path": "../workspace",
       "release": "119-142",
-      "lock_digest": "1d25c29bfbbdbb2680322b0c7db7f8c793eb252593044510d6217e44b85785be"
+      "lock_digest": "f7031248ebc7c26a819e2bbd6220c013b06ee76a587255f4cf3ea84f58ba5c31"
     }
   ]
 }

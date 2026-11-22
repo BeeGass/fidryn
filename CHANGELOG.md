@@ -5,6 +5,131 @@ interchange schema versions are maintained independently of the interpreter.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-11-22
+
+### Changed
+
+- The importer of the United States Code extracts definitions by the
+  second version of the rules: D1 to D14 of "Definitions" in
+  `docs/law-modules.md`, with the record of D15 and what stays out in D16.
+  They also read a condition before the terms, at the end of a reach, in a
+  chapeau, as the aside after the terms, or after the verb form; the
+  source words of a borrowed meaning that no link names, or that
+  regulations, rules or an order under the linked provision make; later
+  sentences of a paragraph, later blocks of a part (with the reach of a
+  reach line that begins the part), and continuation and proviso parts
+  that state their reach; and an exception before a lowercase reach, `In`
+  and a kind word, a reach after the terms, the list form after an
+  article, 55 verb forms (16 before), and 17 lead-ins of a chapeau and the
+  form "The following definitions apply in ...". The text they read leaves
+  out a footnote number marked only as a superscript, with one space.
+  Stray marks of nested quotation are trimmed from terms. A second term
+  counts only within its sentence.
+- On release point 119-142 the importer extracts 39,414 definitions
+  (34,329 before): 31,250 `means`, 3,005 `includes`, 854
+  `does_not_include` and 4,305 `borrowed`; 26,979 `restated`, 8,054
+  `enacted` and 4,381 `unresolved`; 3,106 with `borrowed_from`, 1,199 with
+  `borrowed_words` and 1,056 with a condition. Of the earlier records, 588
+  change or disappear. Of the 5,940 near misses of the first version, the
+  second version extracts a definition from 4,341 paragraphs (4,319 under
+  the near miss's own term), and the drawing tool now finds 1,600 near
+  misses. On all 27 release points of 2026 the importer and the
+  independent script give the same definitions, field for field
+  (1,061,828 in all, 0 that differ).
+- The importer puts a note in the enacted layer only when it sets out the
+  text of a law: when it holds quoted content outside its footnotes,
+  stands under Statutory Notes and Related Subsidiaries or in no group,
+  has none of the topics `historicalAndRevision`, `removalDescription` and
+  `prospectiveAmendment`, and, in no group, is not headed as a note of an
+  advisory committee, an extract of a report or a statement, or a
+  historical and revision note. Every other note is editorial. Of the
+  170,451 notes of release point 119-142, 31,336 are enacted (87,335
+  before); 55,999 move from enacted to editorial, none the other way.
+  `conformance/uslm_common.py` applies the same rule, and the two readings
+  agree on every note.
+- Against an import made with this version, every binding of a provision
+  of the 25,649 units whose enacted notes the rule moves is stale once,
+  though no law changed; a change set from an earlier import lists each
+  moved note in `enacted_notes.removed` and in `editorial.added`; and the
+  layer hashes of 370 containers change.
+- `see_note` of 17 definitions in 4 units (43 U.S.C. 1477 and 390g–9,
+  47 U.S.C. 1307 and 1308) now names an ungrouped "References in Text"
+  note that the rule makes editorial. The same 17 change on every release
+  point of 2026.
+- `fidryn check` (`E710`) verifies that a condition stands in its
+  provision's text or in an ancestor's chapeau, that `borrowed_words`
+  stand in the provision's text, and that a `borrowed` definition has
+  exactly one of `borrowed_from` and `borrowed_words` and a definition of
+  another kind has neither. The message "has no `borrowed_from`" becomes
+  "has neither `borrowed_from` nor `borrowed_words`". Before, a
+  non-borrowed definition with `borrowed_from` passed; it is refused now.
+  An empty `condition` or `borrowed_words` is refused. Every "stands in"
+  test of a definition reads the text without footnote markers and
+  without superscript runs of digits only, with the one space of each.
+- The public struct `fidryn_syntax::e2::ast::Definition` has two new
+  fields, `condition: Option<Str>` and `borrowed_words: Option<Str>`, and
+  `fidryn_provision::Definition` two, `condition: Option<String>` after
+  `words` and `borrowed_words: Option<String>` after `borrowed_from`.
+  Neither struct is `#[non_exhaustive]`, so an expression that builds
+  either, and a pattern of either without `..`, must name them. The JSON
+  of `fidryn_provision::Definition` has both keys, `null` when absent, and
+  JSON without them still reads. `fidryn_syntax::e2::parse` has a new
+  `E100` message, for a block with both borrowed fields, and
+  `fidryn_provision::render::render` writes `condition` and
+  `borrowed_words` when present, in the order of the grammar.
+- `fidryn_check::e2` (`lower`, `check_module`, `check_source`) applies the
+  new `E710` rules and messages; no public item changed.
+  `fidryn_ingest_uscode::definitions::extract` has the same signature and
+  follows the second version of the rules, and in `fidryn_ingest_uscode`
+  the layer of a note follows the new rule; no signature changed. In
+  `conformance/fixtures/hash/vectors.json` the definitions carry the two
+  keys, and two unit vectors hold one each; no digest changed.
+- The sample is generated again: 190 definitions (144 before); 196
+  enacted and 1,895 editorial notes (1,498 and 593 before). The curated
+  binding of 45 U.S.C. 151 records the new hash of the unit's enacted
+  notes.
+- The coverage ledger keeps its schema (`fidryn.coverage/v0.1`). Its
+  counts of definitions change in value only, and a definition with a
+  condition or source words is counted as any other.
+- `conformance/usc_definitions.py`, the independent second implementation,
+  implements the second version. Its records carry all ten fields in
+  order, `null` when absent. `--against` reads and compares `condition`
+  and `borrowed_words`, and refuses a block with both borrowed fields or a
+  `condition` out of its order.
+- The reference states the rules of definitions, the rule of layers, what
+  the editorial layer holds, and the limits of both.
+  `conformance/usc-counting-rules.md` gives the profile of release point
+  119-142 again.
+- The locked dependencies `flate2`, `clap` and `zip` are updated to
+  1.1.11, 4.6.8 and 9.7.3 (from 1.1.10, 4.6.7 and 9.6.1), and with `clap`
+  its `clap_derive` to 4.6.8 and `syn` to 3.0.10 (from 3.0.6).
+
+### Added
+
+- The definition block of a module takes two optional fields:
+  `condition`, after `words`, and `borrowed_words`, in the place of
+  `borrowed_from`. A block that gives both `borrowed_from` and
+  `borrowed_words` is refused (`E100`). Each is written only when present,
+  so a module whose definitions do not change keeps its bytes.
+- `fidryn_provision::Text::read_text`, the text the rules of definitions
+  read and the places of its links, with `fidryn_provision::ReadText` and
+  `fidryn_provision::LinkPlace`, which are also in
+  `fidryn_provision::model`.
+- The 238 test vectors of the rules of definitions are committed as
+  `conformance/fixtures/definitions/vectors.jsonl`, and the expected
+  records of the invented fixture `definitions-second.xml` as
+  `second-expected.jsonl`. Both implementations are held to both.
+- `tools/draw_definition_samples.py` reads and prints `condition` and
+  `borrowed_words`.
+
+### Fixed
+
+- `tools/draw_definition_samples.py` places each definition on the
+  paragraph it was extracted from by applying the rules of
+  `conformance/usc_definitions.py`, every step, to the unit as the text
+  records give it. Before, it used only the pattern at each sentence,
+  which could take a paragraph that a later rule refuses.
+
 ## [0.3.0] - 2026-11-22
 
 ### Changed
