@@ -130,14 +130,14 @@ module "/us/usc/ptVIII/rule8014" {
     hash "063dfc9093eb32fe5324704b3e9b96edf2c20cf28fce3c146cb60feac88ce6f8"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8014/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8014/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8014, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987, related to costs, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "a40fd0516035e2ac6c719260361baa30d902bed811508f56ab7acc359ba32ede"
   }
-  note "/us/usc/ptVIII/rule8014/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8014/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -151,7 +151,7 @@ module "/us/usc/ptVIII/rule8014" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "3057223e57f36fa80c628b60b7cf61f7e676793ee9c48c89b8ce589516c35a36"
   }
-  note "/us/usc/ptVIII/rule8014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -160,7 +160,7 @@ module "/us/usc/ptVIII/rule8014" {
   }
   layers {
     operative "063dfc9093eb32fe5324704b3e9b96edf2c20cf28fce3c146cb60feac88ce6f8"
-    enacted "bc0b7bcdc2ce1577d6061c5b7256ae235cb194d437a4d0a2b3d78b7250d63caa"
-    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "aecd31258bbd0bd4ee65bb12fdc116b670ae134937cc5f8a45cff8d3e8c336ab"
   }
 }

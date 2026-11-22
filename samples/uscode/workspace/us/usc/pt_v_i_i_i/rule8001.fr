@@ -37,14 +37,14 @@ module "/us/usc/ptVIII/rule8001" {
     hash "4c57ce78cddc2c8957bad5546c4e61042176d08b7cfd5789036c4f549c63026e"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8001/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8001/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8001, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009, related to manner of taking appeal, voluntary dismissal, and certification to court of appeals, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "12a5324fdbe9f981d7ba497a712b10dcfb7ffc6d0340897f27b081e1af8956fa"
   }
-  note "/us/usc/ptVIII/rule8001/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8001/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -54,7 +54,7 @@ module "/us/usc/ptVIII/rule8001" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "928807ac4a9be1b44fd92a08c66d5f8561401a4558d063af45c29714ad1351a9"
   }
-  note "/us/usc/ptVIII/rule8001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -63,7 +63,7 @@ module "/us/usc/ptVIII/rule8001" {
   }
   layers {
     operative "4c57ce78cddc2c8957bad5546c4e61042176d08b7cfd5789036c4f549c63026e"
-    enacted "d8c1ac0d36d5dbe785a1bb00983193dccb61272c26dd839bf288dec3c3d269fe"
-    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e36ab441d0d04c57f9512e088d1d1116f30a8b98fef7545d2ac33c8071446ded"
   }
 }

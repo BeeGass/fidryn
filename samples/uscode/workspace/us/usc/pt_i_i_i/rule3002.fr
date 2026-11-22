@@ -82,7 +82,7 @@ module "/us/usc/ptIII/rule3002" {
     hash "8cdecef16e2a8da4a8bce38fa5fe5f02b18ff6140d7027586bc97d6a4c8faa11"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -97,21 +97,21 @@ module "/us/usc/ptIII/rule3002" {
     p "Paragraph (6) is only operative in a chapter 7 case. In chapter 13 cases, the plan itself provides the distribution to creditors which is not necessarily dependent on the size of the estate."
     hash "8ed3c32d01c8819655b04a5397f5fdf6ec02f2663ea43031050351ffe498d89d"
   }
-  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Subdivision (a) is amended by adding a reference to Rule 1019(4). Rule 1019(4) provides that claims actually filed by a creditor in a chapter 11 or 13 case shall be treated as filed in a superseding chapter 7 case. Claims deemed filed in a chapter 11 case pursuant to § 1111(a) of the Code are not considered as filed in a superseding chapter 7 case. The creditor must file a claim in the superseding chapter 7 case."
     hash "5d7dc3285623dfd6e3c9ea5eb3491b85948106fff5875bb53b819184c8bdd3f2"
   }
-  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Subdivision (a) is amended to conform to the renumbering of subdivisions of Rule 1019. Subdivision (c) is amended to include chapter 12 cases. Subdivision (c)(4) is amended to clarify that it includes a claim arising from the rejection of an unexpired lease."
     hash "5b1871af4a48e12eea7ccf7eaadbd546b9cd7135f3a537f84a8d098f77d55351"
   }
-  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1996 Amendment"
@@ -125,7 +125,7 @@ module "/us/usc/ptIII/rule3002" {
     p "The committee note has been re-written to explain the rule changes designed to conform to the Reform Act."
     hash "1f19dfe61729aa5ff06a4e28565db8d72d5eccd332f96d859e17dc49f83afe86"
   }
-  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -136,7 +136,7 @@ module "/us/usc/ptIII/rule3002" {
     p "Changes Made After Publication. Subdivision (c)(1) was amended to allow governmental units to move for an enlargement of the time to file a proof of claim. The Committee Note was amended to describe this addition to the rule."
     hash "67f3bf5cf897c3cc8334a87ac6c749b13919216f33647b1024a3bc9aefb32a25"
   }
-  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2017 Amendment"
@@ -146,14 +146,14 @@ module "/us/usc/ptIII/rule3002" {
     p "Subdivision (c)(7) is added to provide a two-stage deadline for filing mortgage proofs of claim secured by an interest in the debtor’s principal residence. Those proofs of claim must be filed with the appropriate Official Form mortgage attachment within 70 days of the order for relief. The claim will be timely if any additional documents evidencing the claim, as required by Rule 3001(c)(1) and (d), are filed within 120 days of the order for relief. The order for relief is the commencement of the case upon filing a petition, except in an involuntary case. See § 301 and § 303(h). The confirmation of a plan within the 120-day period set forth in subdivision (c)(7)(B) does not prohibit an objection to any proof of claim."
     hash "f9b81e2d4b38692bb52b2e9624b4fb9f02a5a00fe63831581e6666b97530b83a"
   }
-  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "Rule 3002(c)(6) is amended to provide a single standard for granting motions for an extension of time to file a proof of claim, whether the creditor has a domestic address or a foreign address. If the notice to such creditor was “insufficient under the circumstances to give the creditor a reasonable time to file a proof of claim,” the court may grant an extension."
     hash "52dc534d8e1fc3418997e30b34be29c694e6a7595999ef2db570fa89a12c79d0"
   }
-  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -162,7 +162,7 @@ module "/us/usc/ptIII/rule3002" {
   }
   layers {
     operative "8cdecef16e2a8da4a8bce38fa5fe5f02b18ff6140d7027586bc97d6a4c8faa11"
-    enacted "29ac46f1470a89fc28db84bce49221d466e5b665ba5e9b9074076914615ead57"
-    editorial "e39787713ea9394266f438f7aab29cf1517c5e90de22493e158bb43f49416d4b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "45e68a77dcf687f17b84e850bcd362388935db2e64a7acb77577efdcf553a53c"
   }
 }

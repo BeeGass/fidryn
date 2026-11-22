@@ -43,14 +43,14 @@ module "/us/usc/t45/s154" {
     p "1934—Act June 21, 1934, amended section generally."
     hash "ab6e61a12b1173ffad16f50754ecce449fc22ed6df48202b045c581c0958da18"
   }
-  note "/us/usc/t45/s154/note/statutoryNotes/act.1949-10-28.ch782/repeals" enacted {
+  note "/us/usc/t45/s154/note/statutoryNotes/act.1949-10-28.ch782/repeals" editorial {
     group statutoryNotes
     topic "repeals"
     heading "Repeals"
     p ["Act Oct. 28, 1949, ch. 782" -> "/us/act/1949-10-28/ch782"] ", cited as a credit to this section, was repealed (subject to a savings clause) by " ["Pub. L. 89–554" -> "/us/pl/89/554"] ", Sept. 6, 1966, § 8, " ["80 Stat. 632" -> "/us/stat/80/632"] ", 655."
     hash "bec09d440c79f2a2cd3d381b27eeda06c3e6b5573e7861caa156bd2ab880bceb"
   }
-  note "/us/usc/t45/s154/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" enacted {
+  note "/us/usc/t45/s154/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Termination of Reporting Requirements"
@@ -59,7 +59,7 @@ module "/us/usc/t45/s154" {
   }
   layers {
     operative "f014a5bb4f90fa2d3b5973f401c0cef17e6fa3ff01296b3fece9706d150eec6c"
-    enacted "bfe74ca2bb7135667cb08d6f006acccaa2dc9cbaf7e3c90c4ac0283bbce6b6d6"
-    editorial "296e32e43ffd35a8b5523adb3747cf87d4eb2494d372479ebba4747256b93304"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "4d4b50a9771209d6dfb2b1d0e0104a041881c968e30d9976fe15788c2365a42b"
   }
 }

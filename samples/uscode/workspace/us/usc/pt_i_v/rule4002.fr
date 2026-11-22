@@ -120,21 +120,21 @@ module "/us/usc/ptIV/rule4002" {
     hash "c761f3d0458ec472c9fd059a324b39134975573e9485c65ad631a7f8d9452cf5"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule should be read together with §§ 343 and 521 of the Code and Rule 1007, all of which impose duties on the debtor. Clause (3) of this rule implements the provisions of Rule 2015(a)."
     hash "428beb7e7f07204447b5b8b434b00e0798ac9b0bd2b02df6cef674b69ed7cbc6"
   }
-  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "New clause (5) of the rule imposes on the debtor the duty to advise the clerk of any change of the debtor’s address."
     hash "659e47f5dc5461f4e96e3dd129555d2720674ae7f3043cf09967efc5d2f3a942"
   }
-  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -145,7 +145,7 @@ module "/us/usc/ptIV/rule4002" {
     p "Changes Made After Publication. The second paragraph of the Committee Note was amended to clarify that the debtor’s duty to provide copies of tax returns or tax transcripts are governed by a different standard than the debtor’s duty to provide other financial information."
     hash "09ec53384eeb9c140d85274e17bd4f594760f0de8cc5923f6321484c5c1c820a"
   }
-  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -157,7 +157,7 @@ module "/us/usc/ptIV/rule4002" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIV/rule4002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -166,7 +166,7 @@ module "/us/usc/ptIV/rule4002" {
   }
   layers {
     operative "c761f3d0458ec472c9fd059a324b39134975573e9485c65ad631a7f8d9452cf5"
-    enacted "7f9ce899d89209bb654bb155010d794b9e1c574c880c3b86e75a3594a50aae96"
-    editorial "c1b087086bbd7659831b9dfee63f846ac5714e63b2a5305f898d3cc6dce69b8d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "9c8406d1c400fa611ac265d412213e66d3d8fb1f7ed9c4adda50918fd1e0004e"
   }
 }

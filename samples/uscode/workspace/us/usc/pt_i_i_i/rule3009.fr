@@ -20,7 +20,7 @@ module "/us/usc/ptIII/rule3009" {
     hash "22352bb7e25a75332275280b0e22b85b23cecec9395231fc0c0b55bd4483569a"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -29,14 +29,14 @@ module "/us/usc/ptIII/rule3009" {
     p "The rule does not permit variance at local option. This represents a marked change from former Bankruptcy Rule 308."
     hash "62da2d7115567f22d98f705c9743f8d9a78c4ee2793db5a9e235894b300b4639"
   }
-  note "/us/usc/ptIII/rule3009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptIII/rule3009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "This rule is amended to delete the requirement that the court approve the amounts and times of distributions in chapter 7 cases. This change recognizes the role of the United States trustee in supervising trustees. Other amendments are stylistic and make no substantive change."
     hash "67602496cfeda7aa7157d70f382a947e0b658262dc9666dba31e4a740a1f858f"
   }
-  note "/us/usc/ptIII/rule3009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -45,7 +45,7 @@ module "/us/usc/ptIII/rule3009" {
   }
   layers {
     operative "22352bb7e25a75332275280b0e22b85b23cecec9395231fc0c0b55bd4483569a"
-    enacted "9bbbf1f448de051186f02a2ca00c5a68b763567c7093bb465115fd68f6b11fac"
-    editorial "c734d1ab7ce48a94b19d6058bb8b3b3122f6f8f94e75380cea8c8c2354529f4c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "72830057734d151368d2dfeb4b82f2b84839c873bcc8de20ea366f0fa5ccca3a"
   }
 }

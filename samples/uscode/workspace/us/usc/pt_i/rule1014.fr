@@ -79,7 +79,7 @@ module "/us/usc/ptI/rule1014" {
     hash "16deaf34c64a69d5f19451ab4015fd546e335d3847b2cbb8ebfe5c313f77ef64"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 30, 2007, eff. Dec. 1, 2007; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1014/note/ungrouped/pl.95.598/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1014/note/ungrouped/pl.95.598/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -90,7 +90,7 @@ module "/us/usc/ptI/rule1014" {
     p "Transfers of adversary proceedings in cases under title 11 are governed by Rule 7087 and [former] 28 U.S.C. § 1475."
     hash "652abbe5a9be395b26ea398ef94b1085875a2214eb62eea2d8ee6d28e120b78a"
   }
-  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -98,7 +98,7 @@ module "/us/usc/ptI/rule1014" {
     p "The last sentence of the rule has been deleted as unnecessary."
     hash "d0491f554355101c41794a65d987786f9a5dd225f20593ef621d318aa06522c4"
   }
-  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -106,7 +106,7 @@ module "/us/usc/ptI/rule1014" {
     p "The other amendments to this rule are consistent with the responsibilities of the United States trustee in the supervision and administration of cases pursuant to 28 U.S.C. § 586(a)(3). The United States trustee may appear and be heard on issues relating to the transfer of the case or dismissal due to improper venue. See § 307 of the Code."
     hash "22cc338569f643c116d8166fbd2e9ac508aa9538e4449eb1da6bea9632b43e0d"
   }
-  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" enacted {
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2007 Amendment"
@@ -115,7 +115,7 @@ module "/us/usc/ptI/rule1014" {
     p "Changes Made After Publication. No changes since publication."
     hash "20e3bb39c55d3e119ffd41b7120ffb3b2c40ceedc922d5b6ce8ec77f487bf917"
   }
-  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010 Amendment"
@@ -124,7 +124,7 @@ module "/us/usc/ptI/rule1014" {
     p "Changes Made After Publication. No changes since publication."
     hash "cbfa8bdfd7906c387e5331fdba8c1546d9c4b17cbe20f894caaa0e01090e8238"
   }
-  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" enacted {
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014 Amendment"
@@ -134,7 +134,7 @@ module "/us/usc/ptI/rule1014" {
     p "Changes Made After Publication and Comment. The only change made after publication and comment was stylistic."
     hash "cb8a8f14327509c9503e06aeb3a4fdcfa0d34119a6dbec3000d7da51b44eccfe"
   }
-  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -143,7 +143,7 @@ module "/us/usc/ptI/rule1014" {
   }
   layers {
     operative "16deaf34c64a69d5f19451ab4015fd546e335d3847b2cbb8ebfe5c313f77ef64"
-    enacted "ddbd7f583aa9b3dc2e98c984f1e72a1f2438829c89599b852dab03ac4439eb55"
-    editorial "9011cb5f341662642195a53edebb70fafc05bcc46d698a7e545d46600a7c67a8"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e8da351e09089098140322c102004be017df8651dde10e252d76dc9de03b0f64"
   }
 }

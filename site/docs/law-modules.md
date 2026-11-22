@@ -303,8 +303,13 @@ The text of a module falls into three layers:
 | Layer | Holds |
 | --- | --- |
 | operative | the provisions of a unit; the kind, number, heading, status and members of a container |
-| enacted | the enacted notes |
-| editorial | the source credit, the editorial notes, the footnotes and the footnote markers |
+| enacted | the enacted notes: the notes that set out the text of a law |
+| editorial | the source credit, the editorial notes, the footnotes and the footnote markers; the editorial notes are all the other notes |
+
+Of the Code, [Notes and their layers](#notes-and-their-layers) gives the
+rule, and says what the editorial notes are. One layer holds notes of
+different kinds, and each note shows its group and its topics beside its
+layer, which tell them apart.
 
 ### In JSON
 
@@ -2480,7 +2485,9 @@ module "/zz/notes/a" {
   number, heading, status and text and of the tree hash of each child, so
   that a change to any word of it or below it changes it.
 - `notes_hash` is the hash of the [enacted layer](#layers) of the unit the
-  provision lies in, which holds its enacted notes.
+  provision lies in, which holds its enacted notes: of the Code, the notes
+  that set out the text of a law
+  ([Notes and their layers](#notes-and-their-layers)).
 
 Both hashes are 64 lower-case hexadecimal digits, which the check of one
 module requires (`E710`). The check of a workspace compares them, in
@@ -2500,7 +2507,10 @@ stale. Nothing else makes a binding stale:
 
 - Editorial matter, the source credit, the editorial notes and the
   footnotes and their markers, is in neither hash, so a change to it makes
-  nothing stale.
+  nothing stale. Of the Code, the editorial notes include the editors'
+  pointers to provisions set out elsewhere and their paraphrases of them,
+  executive documents and the notes of advisory committees: a change to
+  any of them makes no binding stale.
 - A note set out under a container enters the enacted layer of no unit.
 - The release a binding records is compared with nothing. It is shown in
   the warning beside the release of the dependency, so that a reader sees
@@ -2966,13 +2976,69 @@ U+0020 and no other character, with the empty members dropped: an empty
 attribute, or one of spaces, gives no topic, and two spaces between two
 words give two topics. Its group is the topic of the nearest cross
 heading before it in its `notes` element, and `ungrouped` when there is
-none or the note stands directly in a level:
+none or the note stands directly in a level. What a cross heading holds
+after its label is a note of the group the cross heading opens, with no
+heading and no topics.
 
-| Group | Layer |
-| --- | --- |
-| `editorialNotes` | editorial |
-| `ungrouped`, with one of the topics `removalDescription` and `historicalAndRevision` | editorial |
-| any other: `statutoryNotes`, `execDoc`, `courtRules`, any other `ungrouped` note, and any group word a release introduces | enacted |
+A note is **enacted** when it sets out the text of a law, as the
+publisher's markup shows it, and **editorial** otherwise. It is enacted if
+and only if all four of these hold:
+
+1. **It quotes.** The `note` element holds a `quotedContent` element, at
+   any depth, outside its footnotes. Quoted content in a table cell of the
+   note counts, and so does an empty `quotedContent`; quoted content that
+   stands only in a footnote of the note does not. Of what a cross heading
+   holds after its label, quoted content after the label counts.
+2. **Its group.** Its group is `statutoryNotes`, or it is `ungrouped`. A
+   note of `editorialNotes`, `execDoc` or `courtRules`, or of any group
+   word a release introduces, is editorial.
+3. **Its topics.** None of its topics is `historicalAndRevision`,
+   `removalDescription` or `prospectiveAmendment`.
+4. **Its heading, when it is ungrouped.** Its heading matches none of the
+   three patterns below. A note with no heading passes, and so does every
+   note of `statutoryNotes`, whatever its heading.
+
+The heading that the patterns are tried on is the text of the note's
+heading as the model holds it: the words of its runs, footnote markers
+left out, which [normalization](#normalization) leaves with no white space
+at either end and with each run of white space, of the characters of the
+Unicode property `White_Space`, written as one U+0020. The letters `A` to
+`Z` in it are put in lower case, and no other character is changed. Each
+pattern is a regular expression that is searched for anywhere in that
+text. In it `^` stands for the start of the heading and `$` for its end;
+`\b` for a place with an ASCII letter, an ASCII digit or `_` on one side
+and, on the other, a character that is none of these or the start or the
+end of the heading; and `\d` for one of the ASCII digits `0` to `9`. A
+letter outside ASCII, such as `ë`, is no letter of `\b`, and a digit
+outside ASCII, such as the full-width `２`, is no digit of `\d`. `?` makes
+what stands before it optional, `|` separates alternatives, and
+parentheses group them.
+
+1. The notes of advisory committees on rules:
+   `^(notes? (of|on) (the )?advisory committee|advisory committee notes?$|committee notes? on rules)`
+2. The extracts of reports and statements of the Congress, and the
+   revisers' notes:
+   `\breport no\b|\b(senate|house|conference) reports?\b|legislative statements?|explanatory statement|statement of (the )?managers|notes of (the )?committee on the judiciary|notes of conference committee|revision amendment|reviser|\bfloor statements?\b`
+3. The historical and revision notes:
+   `historical and revision|^\d{4} acts?$`
+
+So, of the invented fixtures, `Notes of Advisory Committee on Rules`,
+`Senate Report No. 99–1`, `2099 Act` and `Report Noël`, whose `ë` ends the
+word `no`, head editorial notes, and so does a heading that differs from
+one of them only in case and in its white space; `Report Nos. 99–1 and
+99–2`, `2099 Acts Amended` and `２０９９ Act` match none of the patterns.
+
+The editorial layer therefore holds everything in notes that is not the
+set-out text of a law: the editors' own writing, such as the notes of
+amendments, of codification and of history and revision; their pointers to
+provisions set out elsewhere, such as most notes of effective dates, of
+transfers of functions and of changes of name, and their paraphrases of
+provisions; and the documents they set out that are not Acts of Congress:
+executive documents, notes of advisory committees and extracts of reports.
+Each note shows its group and its topics, which tell these apart: an
+executive order is an editorial note of the group `execDoc`, and a note
+that points to the provision giving an effective date is an editorial
+note of the group `statutoryNotes`.
 
 Its address is the address of its anchor followed by
 `/note/<group>/<law>/<heading>`:
@@ -3377,6 +3443,53 @@ more.
   move, and it compares neither the prefix, the two releases nor
   `stale_bindings`. The tests of `fidryn-driver` hold each list on its
   own.
+
+### The layers of notes
+
+- The enacted layer holds the whole note: the editors' lead-in before the
+  quoted law, such as a credit that ends "provided that:", and any words
+  after it, such as words in brackets, as well as the quoted law itself.
+  The model does not separate them. Of the 31,336 enacted notes of the
+  release `119-142`, 3,396 have a block after their last quoted content.
+- The layer follows the publisher's grouping and its quotation markup
+  ([Notes and their layers](#notes-and-their-layers)). It is not a finding
+  about legal effect. The publisher's guide says that a provision of a
+  Federal statute is the law whether it appears in the Code as the text of
+  a section or as a statutory note, and even when it does not appear in the
+  Code at all. The Code establishes the laws prima facie, and the text of a
+  title enacted as positive law is legal evidence of them (1 U.S.C.
+  204(a)); the Statutes at Large are legal evidence of laws (1 U.S.C. 112).
+- The editors' pointers to provisions set out elsewhere and their
+  paraphrases of provisions, which the publisher files under the heading
+  Statutory Notes and Related Subsidiaries, are editorial. A change to a
+  provision that a note paraphrases shows only as a change to an editorial
+  note, and makes no binding stale.
+- A note that sets out an instrument without quotation markup is
+  editorial, as about 40 notes of the release `119-142` are, among them the
+  constitution of UNESCO under 22 U.S.C. 287m and the orders under 2 U.S.C.
+  4532 and 4571. A note that holds only a heading, a cross heading that the
+  publisher wrote as a plain note among them, holds no quoted content and
+  is editorial too.
+- 27 notes of the release `119-142` that have the form of a statutory
+  note, a credit followed by quoted law, stand under the heading Editorial
+  Notes, and follow the heading: they are editorial. 31 enacted notes of
+  that release hold quoted content whose source the markup does not name,
+  among them notes of amendments of court rules that quote the words
+  inserted.
+- The notes of advisory committees are the explanatory notes of the body
+  that recommends a rule (28 U.S.C. 2073(d)), not the text of the rule, and
+  they are editorial.
+- A workspace imported under the earlier rule of layers, which put every
+  note of a group other than `editorialNotes` in the enacted layer, unless
+  it was ungrouped and a description of what was removed or a historical
+  and revision note, differs from one imported now in the layer of 55,999
+  of the 170,451 notes of the release `119-142`, each enacted then and
+  editorial now, in 25,649 units and 370 containers. Against the newer
+  import every binding of a provision of those units is stale once, though
+  no law changed, and the change set between the two lists each such note
+  in `enacted_notes.removed` and in `editorial.added`, at one address and
+  with one note hash, since notes are paired only within one layer
+  ([Moved provisions and notes](#moved-provisions-and-notes)).
 
 ### The ingester and the independent reading
 

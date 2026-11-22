@@ -214,7 +214,7 @@ module "/us/usc/ptIII/rule3001" {
     hash "af074ecee23495966375743cd971f39adab7d0ffc5c5dbf930c5d92dd361ff60"
   }
   credit "(As amended " ["Pub. L. 98–353, title III, § 354" -> "/us/pl/98/353/tIII/s354"] ", July 10, 1984, " ["98 Stat. 361" -> "/us/stat/98/361"] "; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 23, 2012, eff. Dec. 1, 2012; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -227,14 +227,14 @@ module "/us/usc/ptIII/rule3001" {
     p "Paragraph (5) describes the procedure to be followed when an objection is made by the transferor to the transferee’s filed evidence of transfer."
     hash "9217801951050d8df78ce348ccf9ef9bc35f90b6781cecd1fdb4dc0cc840375e"
   }
-  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987" enacted {
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987"
     p "Subdivision (g) was added by § 354 of the 1984 amendments."
     hash "d0da011a2de075356c8319eebaaa50c1ec37ebc019794e7bb8980ab9b1d2d18b"
   }
-  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -243,7 +243,7 @@ module "/us/usc/ptIII/rule3001" {
     p "The words “with the clerk” in subdivision (e)(2) and (e)(4) are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "f26f449467d31216bd8bec4e2b82e3ef272bbc3c5b26674b711acfa9461edc82"
   }
-  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -255,7 +255,7 @@ module "/us/usc/ptIII/rule3001" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" enacted {
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2011 Amendment"
@@ -274,7 +274,7 @@ module "/us/usc/ptIII/rule3001" {
     p "Other changes. Stylistic changes were made to the rule and the Committee Note."
     hash "caade8a1662c10db62f2d14b762a80f1ca793e63708187578b609d5e9ba7aab3"
   }
-  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" enacted {
+  note "/us/usc/ptIII/rule3001/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2012 Amendment"
@@ -289,28 +289,28 @@ module "/us/usc/ptIII/rule3001" {
     p "Other changes. Stylistic changes were also made to the rule."
     hash "702e7a54fb9d7bb745f726ae9f6bd60376644aa5380acde12f335d7b13b519e4"
   }
-  note "/us/usc/ptIII/rule3001/note/ungrouped/pl.98.353/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3001/note/ungrouped/pl.98.353/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of most provisions in Rule 3001 have been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only. Rule 3001(g) has not been restyled (except to add a title) because it was enacted by Congress, " ["P.L. 98–353" -> "/us/pl/98/353"] ", " ["98 Stat. 361" -> "/us/stat/98/361"] ", Sec. 354 (1984). The Bankruptcy Rules Enabling Act, 28 U.S.C. § 2075, provides no authority to modify statutory language."
     hash "7318d9c7155c25f2198eecf74fc06214fb07f62704104db97d474d125121ebb1"
   }
-  note "/us/usc/ptIII/rule3001/note/ungrouped/act.1916-08-11.ch313/references-in-text" enacted {
+  note "/us/usc/ptIII/rule3001/note/ungrouped/act.1916-08-11.ch313/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
     p "The United States Warehouse Act, referred to in subd. (g), is Part C of " ["act Aug. 11, 1916, ch. 313" -> "/us/act/1916-08-11/ch313"] ", " ["39 Stat. 486" -> "/us/stat/39/486"] ", which is classified generally to chapter 10 (§ 241 et seq.) of Title 7, Agriculture. For complete classification of this Act to the Code, see Short Title note set out under " ["section 241 of Title 7" -> "/us/usc/t7/s241"] " and Tables."
     hash "32d5d4d35c91f0553aeff37d17e69c74120337422220db09f99ad0be574978a8"
   }
-  note "/us/usc/ptIII/rule3001/note/ungrouped/pl.98.353/amendment-by-public-law" enacted {
+  note "/us/usc/ptIII/rule3001/note/ungrouped/pl.98.353/amendment-by-public-law" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Amendment by Public Law"
     p "1984—Subd. (g). " ["Pub. L. 98–353" -> "/us/pl/98/353"] " added subd. (g)."
     hash "4579fb17c5e28566afeb15682bbab340ae2fa71474b3c655036a8d3b908912dd"
   }
-  note "/us/usc/ptIII/rule3001/note/ungrouped/pl.98.353/effective-date-of-1984-amendment" enacted {
+  note "/us/usc/ptIII/rule3001/note/ungrouped/pl.98.353/effective-date-of-1984-amendment" editorial {
     group ungrouped
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1984 Amendment"
@@ -319,7 +319,7 @@ module "/us/usc/ptIII/rule3001" {
   }
   layers {
     operative "af074ecee23495966375743cd971f39adab7d0ffc5c5dbf930c5d92dd361ff60"
-    enacted "1189075e247eb3daac3aaf9f5aae5622c20cdc84ad23dd1275ebfefdef7b98f1"
-    editorial "d9c747670fca0c58efddd888560d46adc5b1df7c156d1a42387c437ec5a69404"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "54836f3ea920cdb0cc412bc15d98e0e023baa6d7fbbc3aa58b4c70cf6bbb4e35"
   }
 }

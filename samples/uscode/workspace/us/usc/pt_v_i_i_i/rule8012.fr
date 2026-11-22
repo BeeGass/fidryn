@@ -62,14 +62,14 @@ module "/us/usc/ptVIII/rule8012" {
     hash "feb839f81cb5763af288a98431fd5e784e3e303abe73315a1b42b86d9394217c"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8012, Apr. 25, 1983, eff. Aug. 1, 1983, related to oral argument, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "2b7740b21a3f65bbb1e15412d977003d294ad575cd951ecf60e99ba2582f8f48"
   }
-  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -78,7 +78,7 @@ module "/us/usc/ptVIII/rule8012" {
     p "Changes Made After Publication and Comment. A sentence was added to the Committee Note to draw attention to the broad definition of “corporation” under § 101(9) of the Bankruptcy Code."
     hash "36bf2cb23db08e40f1286a3d41295077c46838e72e2287ce586931ea936ec469"
   }
-  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" enacted {
+  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2020 Amendment"
@@ -87,7 +87,7 @@ module "/us/usc/ptVIII/rule8012" {
     p "Subdivision (c), previously subdivision (b), now applies to all the disclosure requirements in Rule 8012."
     hash "ecd70482d9c070aeaaf30353db9093bcf80e6f1b1d6cab59107ce803de830495"
   }
-  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -96,7 +96,7 @@ module "/us/usc/ptVIII/rule8012" {
   }
   layers {
     operative "feb839f81cb5763af288a98431fd5e784e3e303abe73315a1b42b86d9394217c"
-    enacted "14bdfa0e419b6888e6874211640820c31fcd80e34108bd693e373fb050306afd"
-    editorial "5b89c3ff0a1b95395f7a91f2e56edff335ed43df3b85d0636398e312746369a1"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "8f7d059554aca177bd59606e8e049435439deacc0438e0f645ad8aa16a4e5324"
   }
 }

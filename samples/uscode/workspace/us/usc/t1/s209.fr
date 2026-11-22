@@ -17,7 +17,7 @@ module "/us/usc/t1/s209" {
     p "1954—Act Sept. 3, 1954, substituted “Administrator of General Services” for “Secretary of State”."
     hash "e8afde2c529a5d1b0d1ce1fbbf0ec218e3d16727e6cc91acb96540b133d78198"
   }
-  note "/us/usc/t1/s209/note/statutoryNotes/pl.113.235/change-of-name" enacted {
+  note "/us/usc/t1/s209/note/statutoryNotes/pl.113.235/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
@@ -26,7 +26,7 @@ module "/us/usc/t1/s209" {
   }
   layers {
     operative "c7a6a3f894fd753bbd6be11c2b904f262e7e431dc50db66e41fd67abcb2050fc"
-    enacted "e48033c68457c5ab7a95434ac0b1826213c52a4354ee029258393522f665c395"
-    editorial "0d48c745dff893a08ba98bf43284b5cfa7b64367f63ab33b08d8c3b3c5e25067"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b69a84f90647f69368224f2f78a07e627cbd8acc342676a2d728dd48189dc8c6"
   }
 }

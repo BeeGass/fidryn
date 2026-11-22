@@ -12,7 +12,7 @@ module "/zz/sample/citations" {
     binds railway_labor_definitions
     release "119-142"
     provision_hash "180a7eb8dde5870f26e8ef67c1c2808fa942036ee549a94fb84e3dca5c83e924"
-    notes_hash "31a067f1770263653690bbb4d488684076d29965f7997b31d2db56bac12d354c"
+    notes_hash "3b23ae2ee49ffa7a3aec50524d7100f88b1ff459dbd436f79b0a230c065af3bc"
     pending
   }
 }

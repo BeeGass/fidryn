@@ -38,7 +38,7 @@ module "/us/usc/t45/s797i" {
     p "Section 797l of this title, referred to in subsec. (a), was repealed by " ["Pub. L. 99–509, title IV, § 4033(a)(2)" -> "/us/pl/99/509/tIV/s4033/a/2"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] ", and a new section 797l of this title was subsequently added by " ["Pub. L. 104–88, § 327(5)" -> "/us/pl/104/88/s327/5"] "."
     hash "2fed793a999bc1c550113a2075b67ea6f92866194140eae327b8711132b0afe2"
   }
-  note "/us/usc/t45/s797i/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s797i/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -50,7 +50,7 @@ module "/us/usc/t45/s797i" {
   }
   layers {
     operative "682c8a6f850e5ddbead3908be1b6c7f41906fbc1d8532e101419a643f2e28fae"
-    enacted "10581fdc4141e11b6bd92aa6d6c12226ea3c48a5fcf100c51a91f7cd24e92a49"
-    editorial "180152fe474dd99a2869b6b8f1bb1cfd3e1e8e91f4f15553e5b02c69aa5e31c8"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d937279fc16baa49f1333ab84983a302be7f4f7af6a00a0bbdc179b0956a32b5"
   }
 }

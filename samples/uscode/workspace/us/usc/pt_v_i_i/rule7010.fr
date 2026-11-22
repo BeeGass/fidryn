@@ -10,21 +10,21 @@ module "/us/usc/ptVII/rule7010" {
     hash "a6ca8292180400a228820dd901a4bfe0e7433d47c47915eee585fa5287b5a2be"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptVII/rule7010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Reference to the Official Form number is deleted in anticipation of future revision and renumbering of the Official Forms."
     hash "52442a076009196e6a2b2d867281fd4e269c30b1b658ab961039c969e7314a5c"
   }
-  note "/us/usc/ptVII/rule7010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7010 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "1f6f9db65bce13019c4c1b8a09748021085f87813e77fdcee64a6bb57d40480e"
   }
-  note "/us/usc/ptVII/rule7010/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7010/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -33,7 +33,7 @@ module "/us/usc/ptVII/rule7010" {
   }
   layers {
     operative "a6ca8292180400a228820dd901a4bfe0e7433d47c47915eee585fa5287b5a2be"
-    enacted "a9051188b7d1c8ac9aa47181a936d92978a5150df47e9844de1f6beed4e26c23"
-    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "14a696d660a33a5e0392ce41db5d78205cbe7d78518cb8c9517699562fda9c14"
   }
 }

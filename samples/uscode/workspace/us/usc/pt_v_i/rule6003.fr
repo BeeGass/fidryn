@@ -41,14 +41,14 @@ module "/us/usc/ptVI/rule6003" {
     hash "c055335a38ada7c639e6c381379e3359a83a2335b39e7bc666dff7faf15b6673"
   }
   credit "(Added Apr. 30, 2007, eff. Dec. 1, 2007; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991"
     p "This rule [Former Rule 6003—Disbursement of Money of the Estate (Abrogated Apr. 30, 1991, eff. Aug. 1, 1991)] is abrogated in view of the role of the United States trustee in supervising trustees. Use of estate funds by a trustee or debtor in possession is governed by § 363 of the Code."
     hash "c2fdc7c0da1e3f938291d139d5d42cc57992ef9082432693d718d704006d921c"
   }
-  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2007" enacted {
+  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2007" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2007"
@@ -58,7 +58,7 @@ module "/us/usc/ptVI/rule6003" {
     p "Changes After Publication. Subdivision (c) was amended by deleting the reference to the rejection of executory contracts or unexpired leases. The rule, as revised, now limits only the assumption or assignment of executory contracts or unexpired leases in that subdivision."
     hash "c6aa4e24ff699b8bd50a3a71f2095fc0058502bf54ec4d37e18b98420c2812e7"
   }
-  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -70,7 +70,7 @@ module "/us/usc/ptVI/rule6003" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" enacted {
+  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2011 Amendment"
@@ -79,7 +79,7 @@ module "/us/usc/ptVI/rule6003" {
     p "Changes Made After Publication. Minor stylistic changes were made to the Committee Note following publication."
     hash "5f8d5ee7adecc64125746480135d4028329e222c72258fc272281c83e22220f5"
   }
-  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -88,7 +88,7 @@ module "/us/usc/ptVI/rule6003" {
   }
   layers {
     operative "c055335a38ada7c639e6c381379e3359a83a2335b39e7bc666dff7faf15b6673"
-    enacted "a43c4c51b2107266131fdc060203cd9aa97afa68e87bddf1ba42c265665d6a56"
-    editorial "d2af5f188b6f0dbf22a49e9e6fbe8dac8eb7db84b945abe7ac53dba76942a542"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3ff582f254da1e097eb71fc68f0561df0dc5ddb28abcf269912fc24b2be9dfd0"
   }
 }

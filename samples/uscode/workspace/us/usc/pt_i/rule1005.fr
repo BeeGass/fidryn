@@ -46,14 +46,14 @@ module "/us/usc/ptI/rule1005" {
     hash "0ea84a5451b0810759719bf1d824db4110a48cedfd77a6bf1e47cd93e0a4f591"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Mar. 27, 2003, eff. Dec. 1, 2003; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "The title of the case should include all names used by the debtor, such as trade names, former married names and maiden name. See also Official Form No. 1 and the Advisory Committee Note to that Form. Additional names of the debtor are also required to appear in the caption of each notice to creditors. See Rule 2002(m)."
     hash "2153eaff24d24d12f2d3616932c3ccfda6a38e082cfb4480afa4803b8ec3e21d"
   }
-  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" enacted {
+  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2003 Amendment"
@@ -62,7 +62,7 @@ module "/us/usc/ptI/rule1005" {
     p "Changes Made After Publication and Comments. The rule was changed only slightly after publication. The rule was changed to make clear that only the debtor’s social security number is truncated to the final four digits, but other numerical identifiers must be set out in full. The rule also was amended to include a requirement that a debtor list other federal taxpayer identification numbers that may be in use."
     hash "b1845836bac93a18137a39ea3963e0f6f0c4929d400fe88baceed5b4695442ba"
   }
-  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -70,7 +70,7 @@ module "/us/usc/ptI/rule1005" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "77aa723a83a24d9a7da20b1fcd5cb24a5b630a63679435ce5707114732f3780f"
   }
-  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -79,7 +79,7 @@ module "/us/usc/ptI/rule1005" {
   }
   layers {
     operative "0ea84a5451b0810759719bf1d824db4110a48cedfd77a6bf1e47cd93e0a4f591"
-    enacted "61c95ca7f7634d2af809d1dc04a2a596241a7a4d8c1d6e05789dcb408fe34a71"
-    editorial "42fba81e2694ffec0c6a55eb792ba466c1eca64faca1c5da9d613973e8c824c7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "466d9ad28030cb883e9b32664f4b8fe00d78e1d6d26d5ec10cac807ca667e389"
   }
 }

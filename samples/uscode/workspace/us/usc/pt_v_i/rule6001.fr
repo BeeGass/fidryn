@@ -10,14 +10,14 @@ module "/us/usc/ptVI/rule6001" {
     hash "f8409a9c00d89859f8f55c1f2ea419228963e6bf35e0dee422738d671334d025"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVI/rule6001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is derived from former Bankruptcy Rule 603. The Act contained, in § 70d, a provision placing the burden of proof on the same person as did Rule 603. The Code does not contain any directive with respect to the burden of proof. This omission, in all probability, resulted from the intention to leave matters affecting evidence to these rules. See H. Rep. No. 95–595, 95th Cong. 1st Sess. (1977) 293."
     hash "94c0890e6b4b9678248b72460b3b9f1faf7baddf1172481a644946bc95c2cc3a"
   }
-  note "/us/usc/ptVI/rule6001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -26,7 +26,7 @@ module "/us/usc/ptVI/rule6001" {
   }
   layers {
     operative "f8409a9c00d89859f8f55c1f2ea419228963e6bf35e0dee422738d671334d025"
-    enacted "8f938fb2887a3d250b9252049f016212e6f5a83e88f4bccab727b654931a2cd1"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "eef74afe2fff1c5e17195deef01645c57764a78cc1e715e41210466a8773ec20"
   }
 }

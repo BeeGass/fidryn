@@ -179,7 +179,7 @@ module "/us/usc/ptIV/rule4004" {
     hash "724477163eeaa14d0d695c57a65eae5a4fd09eee9b299f36273a5369d1fbcc50"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 17, 2000, eff. Dec. 1, 2000; Apr. 29, 2002, eff. Dec. 1, 2002; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -195,14 +195,14 @@ module "/us/usc/ptIV/rule4004" {
     p "Subdivision (g). Notice of discharge should be mailed promptly after the order becomes final so that creditors may be informed of entry of the order and of its injunctive provisions. Rule 2002 specifies the manner of the notice and persons to whom the notice is to be given."
     hash "ad7e1dc51fb9ec0a84c53b7c922abf60a7ef290253e11ef91298c640286d92ae"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to conform to § 727(c) which gives the United States trustee the right to object to discharge. This amendment is derived from Rule X–1008(a)(1) and is consistent with Rule 2002. The amendment to subdivision (c) is to prevent a timely motion to dismiss a chapter 7 case for substantial abuse from becoming moot merely because a discharge order has been entered. Reference to the Official Form number in subdivision (e) is deleted in anticipation of future revision and renumbering of the Official Forms."
     hash "aa2c51be37c81015a67473e40a253328a6964ab3e01641089533b9e8885f56c1"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1996 Amendment"
@@ -211,7 +211,7 @@ module "/us/usc/ptIV/rule4004" {
     p "GAP Report on Rule 4004. No changes have been made since publication, except for stylistic changes."
     hash "773045fdbe8f10b48089b06cf6f776b81b2ee6c1a6223cb0f7e72ca45c6629cf"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -221,7 +221,7 @@ module "/us/usc/ptIV/rule4004" {
     p "GAP Report on Rule 4004. No changes since publication."
     hash "57d4f28bea50a02176d3d816f60aeefca6fa10c9178080d55a3ab255d48f6885"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2000 Amendment"
@@ -229,7 +229,7 @@ module "/us/usc/ptIV/rule4004" {
     p "GAP Report on Rule 4004(c). No changes since publication except for style revisions."
     hash "db6b017749f14edeef56ea732976fb87d4f5a42cbc387660fe6b4ef85d4befce"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2002 Amendment"
@@ -237,7 +237,7 @@ module "/us/usc/ptIV/rule4004" {
     p "Changes Made After Publication and Comments. No changes were made."
     hash "c8063d7f5d78cc3a587a76f8322c3bb602f1e19ef92662dbe35658031db77cbf"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -252,7 +252,7 @@ module "/us/usc/ptIV/rule4004" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "004e69a27551edf9ef576d3d611c6aa9403245f947b22e924a04b4c5de67b40b"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -264,7 +264,7 @@ module "/us/usc/ptIV/rule4004" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010 Amendment"
@@ -275,7 +275,7 @@ module "/us/usc/ptIV/rule4004" {
     p "Changes Made After Publication. Subdivision (d) was amended to provide that objections to discharge under §§ 727(a)(8), (a)(9), and 1328(f) are commenced by motion rather than by complaint and are governed by Rule 9014. Because of the relocation of this provision from the previously proposed Rule 7001(b), subdivisions (a) and (c)(1) of this rule were revised to change references to “motion under Rule 7001(b)” to “motion under § 727(a)(8) or (a)(9).” Other stylistic changes were made to the rule, and the Committee Note was revised to reflect these changes."
     hash "060d6e867f257ccf688ae32d225bd96c90ed7c9fff842760cc36dd60a1aaa9ec"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2011 Amendment"
@@ -283,7 +283,7 @@ module "/us/usc/ptIV/rule4004" {
     p "Changes Made After Publication. Following publication minor stylistic changes were made to the language of the rule, and a sentence was added to the Committee Note to clarify that the rule applies whenever the debtor commits an act during the gap period that provides a basis for both denial and revocation of the discharge."
     hash "81c4f3ec1133ac5805b963348bf93d5d3a3249f591c8b5f3f80b15951e76431c"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2013 Amendment"
@@ -293,7 +293,7 @@ module "/us/usc/ptIV/rule4004" {
     p "Changes Made After Publication and Comment. Because this amendment is being made to conform to a simultaneous amendment of Rule 1007(b)(7) and is otherwise technical in nature, final approval is sought without publication."
     hash "a1d438a4a2fe7dea018b64c5b5056d2b1cd01b460436d870f0d5f515bd411e19"
   }
-  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -304,7 +304,7 @@ module "/us/usc/ptIV/rule4004" {
   }
   layers {
     operative "724477163eeaa14d0d695c57a65eae5a4fd09eee9b299f36273a5369d1fbcc50"
-    enacted "fe9ce430d4d24ddac0081162db8ac531a7d82d88eccd5cb716ba77715965c655"
-    editorial "ac1dab0495ddb231ad036814458a1734124a527a91027257b4bd6329fbd73caa"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "48a387aaf215a6cfa205cb87f7b257bca1892cfdbad75d3dc57f4f5e8c88d512"
   }
 }

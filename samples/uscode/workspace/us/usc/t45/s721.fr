@@ -376,35 +376,35 @@ module "/us/usc/t45/s721" {
     p "Subsec. (f). " ["Pub. L. 94–5, § 5(c)" -> "/us/pl/94/5/s5/c"] ", substituted “goals of this chapter” for “goals of the final system plan”."
     hash "c9ebd47943649d3fc397dc74f8ea58888e8b90030fcc35704227b06ff7852d49"
   }
-  note "/us/usc/t45/s721/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s721/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
     p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 1, 1980, see " ["section 710(a) of Pub. L. 96–448" -> "/us/pl/96/448/s710/a"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
     hash "8414357495bccb2db0922b729682e002ff9e6cb677e7f522f2d91447135103eb"
   }
-  note "/us/usc/t45/s721/note/statutoryNotes/pl.96.73/effective-date-of-1979-amendment" enacted {
+  note "/us/usc/t45/s721/note/statutoryNotes/pl.96.73/effective-date-of-1979-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1979 Amendment"
     p "Amendment by " ["Pub. L. 96–73" -> "/us/pl/96/73"] " effective Nov. 4, 1978, see " ["section 501(b) of Pub. L. 96–73" -> "/us/pl/96/73/s501/b"] ", set out as a note under " ["section 743 of this title" -> "/us/usc/t45/s743"] "."
     hash "2594e05384664f81adbffdd0b2147f66201cb250a9ba41e873e1a1a5a515f796"
   }
-  note "/us/usc/t45/s721/note/statutoryNotes/pl.94.555/effective-date-of-1976-amendment" enacted {
+  note "/us/usc/t45/s721/note/statutoryNotes/pl.94.555/effective-date-of-1976-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1976 Amendment"
     p "Amendment by " ["Pub. L. 94–555" -> "/us/pl/94/555"] " effective Oct. 1, 1976, see " ["section 303 of Pub. L. 94–555" -> "/us/pl/94/555/s303"] ", set out as a note under " ["section 702 of this title" -> "/us/usc/t45/s702"] "."
     hash "bbcf4d13b2bad24ed28d87ac343046c23afd6c40f613f4c216556bcc67fdfb78"
   }
-  note "/us/usc/t45/s721/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s721/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s721/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s721/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -439,7 +439,7 @@ module "/us/usc/t45/s721" {
   }
   layers {
     operative "ea4f46b0c9ba0b634a12ebea47698d8e46fd1a8cd18181ee681dc2c195c9a600"
-    enacted "4d24b5ea249ce8d876b2fc21da7ca6518866bcfd24d87e232a480cd8b3fd14dd"
-    editorial "0e8a29c5a2668231a32ddeff1d8dd9b7c73742c968e73cdfcd42ed46e9fbc2d8"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c541f0bf24d454867ad5e5d2daa06737b972a5794a724741e7dbb653d10a8dc1"
   }
 }

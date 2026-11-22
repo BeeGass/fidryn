@@ -50,7 +50,7 @@ module "/us/usc/ptIII/rule3012" {
     hash "fd60b2a53915db9b7ee6829bb56bfcf90ee8ff8209be90f14e45572d34989e85"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -58,7 +58,7 @@ module "/us/usc/ptIII/rule3012" {
     p "An adversary proceeding is commenced when the validity, priority, or extent of a lien is at issue as prescribed by Rule 7001. That proceeding is relevant to the basis of the lien itself while valuation under Rule 3012 would be for the purposes indicated above."
     hash "01fd0b030e0d3e99f8accf37acecfb6593bc7e1f0c58576c3a7915b89e8bbc04"
   }
-  note "/us/usc/ptIII/rule3012/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+  note "/us/usc/ptIII/rule3012/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2017 Amendment"
@@ -68,7 +68,7 @@ module "/us/usc/ptIII/rule3012" {
     p "Subdivision (c) clarifies that a determination under this rule with respect to a secured claim of a governmental unit may be made only by motion or in a claim objection, but not until the governmental unit has filed a proof of claim or its time for filing a proof of claim has expired."
     hash "5d10826ad60f18993c6315e07048baa33d5f46762a4c2aa86bf2da59704e64e5"
   }
-  note "/us/usc/ptIII/rule3012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -77,7 +77,7 @@ module "/us/usc/ptIII/rule3012" {
   }
   layers {
     operative "fd60b2a53915db9b7ee6829bb56bfcf90ee8ff8209be90f14e45572d34989e85"
-    enacted "3ecb33d4eea1cdf559cd84c8667bf2dff73f599604aac5663213d03fc7103066"
-    editorial "0f68983e70fd9e3687bba1641d4e1ed44a3521eac7ce9dc7d1a109ccebc157ad"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "39c72a41061541cd0d66130efe66adb17559c289ce7e9e18c317e5094566b879"
   }
 }

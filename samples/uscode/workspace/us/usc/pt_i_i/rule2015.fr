@@ -119,7 +119,7 @@ module "/us/usc/ptII/rule2015" {
     hash "ee8d2b5280a80532829eb9b1f0eeeafceea90aa1c5b70b05ad8323307e4a0c03"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 29, 2002, eff. Dec. 1, 2002; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 23, 2012, eff. Dec. 1, 2012; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -129,14 +129,14 @@ module "/us/usc/ptII/rule2015" {
     p "Subdivision (c) is derived from former Chapter X Rule 10–208(c) which, in turn, was derived from § 190 of the Act. The equity security holders to whom the reports should be sent are those of record at the time of transmittal of such reports."
     hash "76dbda872e12286d4561e0f702c515f5e43c6702f476cf9c2cebceca86179ad2"
   }
-  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Subdivision (a) is amended to add as a duty of the trustee or debtor in possession the filing of a notice of or a copy of the petition. The filing of such notice or a copy of the petition is essential to the protection of the estate from unauthorized post-petition conveyances of real property. Section 549(c) of the Code protects the title of a good faith purchaser for fair equivalent value unless the notice or copy of the petition is filed."
     hash "a4e3f6805eefd19aaad94feddbae0d38f127b973c1a175a4661e40f937659134"
   }
-  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -150,7 +150,7 @@ module "/us/usc/ptII/rule2015" {
     p "New subdivision (b), which prescribes the duties of the debtor in possession and trustee in a chapter 12 case, does not prohibit additional reporting requirements pursuant to local rule or court order."
     hash "ce58e96a50e407b9e89161d6b5640aa3d172931f05d0e483ede11b4f7d060e8f"
   }
-  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1996 Amendment"
@@ -158,7 +158,7 @@ module "/us/usc/ptII/rule2015" {
     p "GAP Report on Rule 2015. No changes since publication, except for a stylistic change in the first sentence of the committee note."
     hash "38d5572b41d47939c6c53f3f89f683c2d3349fe2c893e59cd8cf2a627b761b97"
   }
-  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2002 Amendment"
@@ -167,7 +167,7 @@ module "/us/usc/ptII/rule2015" {
     p "Changes Made After Publication and Comments. No changes were made."
     hash "2a4e864b6ed5e2b2663420480d86a97d1b795c4c0c5251a49b7f5390c095ac32"
   }
-  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -177,7 +177,7 @@ module "/us/usc/ptII/rule2015" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "f2f979bdce4f7f25bbd4a4168514da836b66d38cc46b6a435ef1608491ecfb63"
   }
-  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -189,14 +189,14 @@ module "/us/usc/ptII/rule2015" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" enacted {
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2012 Amendment"
     p "Subdivision (a)(3). Subdivision (a)(3) is amended to correct the reference to § 704. The 2005 amendments to the Code expanded § 704 and created subsections within it. The provision that was previously § 704(8) became § 704(a)(8). The other change to (a)(3) is stylistic."
     hash "3ffcafae1eef506cdf97689a9f766bea62f32cc21f0b10ede79867b31ad642a9"
   }
-  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
@@ -204,7 +204,7 @@ module "/us/usc/ptII/rule2015" {
     p "Former subdivisions (b), (c), (d), and (e) are redesignated (c), (d), (e), and (f)[,] respectively."
     hash "daad920573f7626663863374bda5c231555c81c7d1bc4a2b62997abb0068f085"
   }
-  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -213,7 +213,7 @@ module "/us/usc/ptII/rule2015" {
   }
   layers {
     operative "ee8d2b5280a80532829eb9b1f0eeeafceea90aa1c5b70b05ad8323307e4a0c03"
-    enacted "7d6ffc50cfa9171aa9600e14a5ae01a13c19caf22f52e5bd577dd676c922e557"
-    editorial "c5cf958bdf010189eb6f2dfbde6d2919996c773aea6e97613c44ec6f074963b1"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "aaed92f0dad03a5cdc7148f2926da2b6882913bc86102a25d1288e9fb77ce088"
   }
 }

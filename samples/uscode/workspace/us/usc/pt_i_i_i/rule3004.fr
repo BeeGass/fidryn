@@ -26,7 +26,7 @@ module "/us/usc/ptIII/rule3004" {
     hash "b16b2b400204905b3ea7d8226c7aa2e94088718ebad2ecd061b4538e191a4ad7"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -36,14 +36,14 @@ module "/us/usc/ptIII/rule3004" {
     p "To the extent the claim is allowed and dividends paid thereon, it will be reduced or perhaps paid in full. If the claim is also filed pursuant to Rule 3005, only one distribution thereon may be made. As expressly required by Rule 3005 and by the purpose of this rule such distribution must diminish the claim."
     hash "89a4218a7890042f59f944dded7f5ee43975e9432919e3763a1fed9f9cbd7024"
   }
-  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Under the rule as amended, the debtor or trustee in a chapter 7 or 13 case has 120 days from the first date set for the meeting of creditors to file a claim for the creditor. During the first 90 days of that period the creditor in a chapter 7 or 13 case may file a claim as provided by Rule 3002(c). If the creditor fails to file a claim, the debtor or trustee shall have an additional 30 days thereafter to file the claim. A proof of claim filed by a creditor supersedes a claim filed by the debtor or trustee only if it is timely filed within the 90 days allowed under Rule 3002(c)."
     hash "85f2c6d769b67d4b0f910caa7068d56427f3ce9536572b2b646847e54917783a"
   }
-  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2005 Amendment"
@@ -53,7 +53,7 @@ module "/us/usc/ptIII/rule3004" {
     p "Changes Made After Publication and Comment. No changes were made after publication. The Advisory Committee concluded that Mr. Van Allsburg’s suggestion goes beyond the scope of the published proposal. Consequently, the Committee declined to adopt the suggestion but may consider it in greater detail at a future meeting."
     hash "361814cf14fb9b10b81cc74711a1a7aef3258e6ee646f9becfb39a1c875e7461"
   }
-  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -62,7 +62,7 @@ module "/us/usc/ptIII/rule3004" {
   }
   layers {
     operative "b16b2b400204905b3ea7d8226c7aa2e94088718ebad2ecd061b4538e191a4ad7"
-    enacted "404ec448765f53a1074945f3d4068e5f58c71e1dd1bc809b87ffa4e00a626fc2"
-    editorial "739867b966a62bda4f5b6c2193e1c9c9f44d250f5ebd8e7d6c407c0cff749695"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "46264fdcf24e199f33a66fee32d609c62dc58edaae8ba015c23727b9ab12773f"
   }
 }

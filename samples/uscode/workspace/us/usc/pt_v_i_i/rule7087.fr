@@ -10,14 +10,14 @@ module "/us/usc/ptVII/rule7087" {
     hash "5bcdada6fa6b2dd45a0915d8b8735e44b8c3eefdb329b739c38ce572d1549cd7"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7087/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptVII/rule7087/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The reference to the venue section of title 28 is amended to conform to the 1984 amendments to title 28."
     hash "e011bc2c3e5d023fdd275e07eb35e620cd5cb951f3a605a90920b0f823793e35"
   }
-  note "/us/usc/ptVII/rule7087/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7087/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -26,7 +26,7 @@ module "/us/usc/ptVII/rule7087" {
   }
   layers {
     operative "5bcdada6fa6b2dd45a0915d8b8735e44b8c3eefdb329b739c38ce572d1549cd7"
-    enacted "9595c5efbfbfb18e9f755b61610df51d2a1ce374a8c2f13e9a4aa09e4847a51b"
-    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a3f6aea72ed1e49b5737d3f9a65c5c2bca0f45af9c0e15d58134a6343628c14b"
   }
 }

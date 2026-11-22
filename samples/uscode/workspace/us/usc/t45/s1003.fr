@@ -62,14 +62,14 @@ module "/us/usc/t45/s1003" {
     p "1995—Subsec. (a). " ["Pub. L. 104–88" -> "/us/pl/104/88"] " substituted “the provisions of " ["Public Law 96–131" -> "/us/pl/96/131"] "” for “the provisions of " ["section 11125 of title 49" -> "/us/usc/t49/s11125"] " or " ["Public Law 96–131" -> "/us/pl/96/131"] "”."
     hash "2234291fe995fdbd3ffb6eba07c7c6a94364d81bb79ed6b4c115ee667b22408e"
   }
-  note "/us/usc/t45/s1003/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s1003/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
     p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
     hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
   }
-  note "/us/usc/t45/s1003/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1003/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -78,7 +78,7 @@ module "/us/usc/t45/s1003" {
   }
   layers {
     operative "1c17e71c4e1c5a71ec0de5fae908d466eb020f57bb4c3998a67f5d2277860542"
-    enacted "5ad020da9ac18235ce9ec215188b8cdf8770dcbdce7fa4c927bb83c3b22e8edd"
-    editorial "29ce2846b96417e80d82171f3f59659dd817a0d8ca807ba7fc59c44740166d75"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c16f2e4c1514522ed7494063cac3c1809221a6a53fade28d0daf903dac2573f4"
   }
 }

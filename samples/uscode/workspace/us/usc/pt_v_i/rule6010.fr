@@ -10,21 +10,21 @@ module "/us/usc/ptVI/rule6010" {
     hash "c41f171639ca67c3fd490706ec9c5c1a002d0f7fd6bc08b871ecf9bf041d62f8"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVI/rule6010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is derived from former Bankruptcy Rule 612."
     hash "b1a1f280600461895904b4a84f79987433e0250119c15ab7ae063eca9c91216c"
   }
-  note "/us/usc/ptVI/rule6010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptVI/rule6010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to conform to § 550(a) of the Code which provides that the trustee may recover the property transferred in a voidable transfer. The value of the property may be recovered in lieu of the property itself only if the court so orders."
     hash "0f5f8d81b9ba26530ec642832f21571b5b89eed6d32c77a4def0cc8ea3c88e66"
   }
-  note "/us/usc/ptVI/rule6010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -33,7 +33,7 @@ module "/us/usc/ptVI/rule6010" {
   }
   layers {
     operative "c41f171639ca67c3fd490706ec9c5c1a002d0f7fd6bc08b871ecf9bf041d62f8"
-    enacted "2bc2c5c6a263323b4096201f00e9d2b2420b82184d882e421080aad33b6d2f3d"
-    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c4e31244536a61d07f85c6d18fc74c1f7059d30795ef549dd8c6d0efdf1edddf"
   }
 }

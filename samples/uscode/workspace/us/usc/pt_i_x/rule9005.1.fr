@@ -10,7 +10,7 @@ module "/us/usc/ptIX/rule9005.1" {
     hash "ce5c127bf2f781b698cc118c5e08e73949a72a835e003977fcd65c58288bbd35"
   }
   credit "(Added Apr. 30, 2007, eff. Dec. 1, 2007; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9005.1/note/ungrouped/nolaw/committee-notes-on-rules-2007" enacted {
+  note "/us/usc/ptIX/rule9005.1/note/ungrouped/nolaw/committee-notes-on-rules-2007" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2007"
@@ -18,14 +18,14 @@ module "/us/usc/ptIX/rule9005.1" {
     p "Changes After Publication. No changes were made after publication."
     hash "8e91dc0d51a51983279f88aef21dae5a61cbb1acabf2b3d609856e71d556cee9"
   }
-  note "/us/usc/ptIX/rule9005.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9005.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9005.1 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "f76fd9879bb59e05112427a7fa902780e8d3eb112cef7347c53de7380e12cd61"
   }
-  note "/us/usc/ptIX/rule9005.1/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9005.1/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -34,7 +34,7 @@ module "/us/usc/ptIX/rule9005.1" {
   }
   layers {
     operative "ce5c127bf2f781b698cc118c5e08e73949a72a835e003977fcd65c58288bbd35"
-    enacted "a6073eb412e32ce678df6c0edc135d31aa90a176584246088db196f8e5e57446"
-    editorial "ad9de9be8ec8e04417369d8ac29be4c3b33723755f7f27a4c3817b06479d3845"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c29f2ba2293925e937738ab2a49fbadbaa05177fccc3bb29f85e4fddf5f0e68f"
   }
 }

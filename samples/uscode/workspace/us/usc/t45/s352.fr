@@ -417,7 +417,7 @@ module "/us/usc/t45/s352" {
     }
     hash "bec2007c9cdb88d0ba5eb3b06dd937dd1b2abce759a4de6e758bde26c2d1daad"
   }
-  note "/us/usc/t45/s352/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s352/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
@@ -451,14 +451,14 @@ module "/us/usc/t45/s352" {
     }
     hash "d8efc2ae89874b6de144117d1e6f6a9ee8becec16bf4bd525e920ff94e50f112"
   }
-  note "/us/usc/t45/s352/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment-reduction-of-benefits-in-vi" enacted {
+  note "/us/usc/t45/s352/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment-reduction-of-benefits-in-vi" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1975 Amendment; Reduction of Benefits in View of Coverage Under Nongovernmental Plan; Filing Claims for Payments to Insurers and Employers"
     p "Amendment by section 1(c), (d)(1) of " ["Pub. L. 94–92" -> "/us/pl/94/92"] " effective with respect to days of unemployment and days of sickness in registration periods beginning after June 30, 1975, reduction of benefits in view of coverage under nongovernmental plan, and filing of claims for payments to insurers and employers; and amendment by section 1(d)(2), (e) of " ["Pub. L. 94–92" -> "/us/pl/94/92"] " effective with respect to days of unemployment in registration periods beginning after June 30, 1975, see " ["section 2 of Pub. L. 94–92" -> "/us/pl/94/92/s2"] ", set out as an Effective Date of 1975 Amendment note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "f225140093ef793c7ee28481fce1f79368edc4e5dac76f6cb5fe39753b1592b7"
   }
-  note "/us/usc/t45/s352/note/statutoryNotes/pl.93.445/effective-date-of-1974-amendment" enacted {
+  note "/us/usc/t45/s352/note/statutoryNotes/pl.93.445/effective-date-of-1974-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1974 Amendment"
@@ -475,21 +475,21 @@ module "/us/usc/t45/s352" {
     }
     hash "8aa0121e606e03aa141b53e7ad43c2fddf6cffa8548bec8123a1642b97470330"
   }
-  note "/us/usc/t45/s352/note/statutoryNotes/pl.86.28/effective-date-of-1959-amendment" enacted {
+  note "/us/usc/t45/s352/note/statutoryNotes/pl.86.28/effective-date-of-1959-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1959 Amendment"
     p "Amendment by " ["Pub. L. 86–28" -> "/us/pl/86/28"] " effective with respect to benefits accruing in general benefit years which begin after the benefit year ending June 30, 1958, and in extended benefit periods which begin after Dec. 31, 1957, see " ["section 309 of Pub. L. 86–28" -> "/us/pl/86/28/s309"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "9849e2e36b707486912531e0d3ebc5b1856281c0a0f13fbbb4149c6d8e7bfa5b"
   }
-  note "/us/usc/t45/s352/note/statutoryNotes/act.1955-08-12.ch869/effective-date-of-1955-amendment" enacted {
+  note "/us/usc/t45/s352/note/statutoryNotes/act.1955-08-12.ch869/effective-date-of-1955-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1955 Amendment"
     p ["Act Aug. 12, 1955, ch. 869, § 4" -> "/us/act/1955-08-12/ch869/s4"] ", " ["69 Stat. 716" -> "/us/stat/69/716"] ", provided that the amendment made by section 4 is effective as of the date of its “original enactment” [June 25, 1938]."
     hash "a6dd7257b7244915958177b67b52152f2f18487ee65681e34a38b32421bf963e"
   }
-  note "/us/usc/t45/s352/note/statutoryNotes/nolaw/effective-date-of-1954-amendment" enacted {
+  note "/us/usc/t45/s352/note/statutoryNotes/nolaw/effective-date-of-1954-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1954 Amendment"
@@ -517,7 +517,7 @@ module "/us/usc/t45/s352" {
     }
     hash "adebd0c14faa38c6e7237a4607c75f55e5b13a374578df6e8a3edb4c7d77cb53"
   }
-  note "/us/usc/t45/s352/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" enacted {
+  note "/us/usc/t45/s352/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1940 Amendment"
@@ -734,7 +734,7 @@ module "/us/usc/t45/s352" {
   }
   layers {
     operative "bbc8d42db9369a715d6874d1b96fd39978d4be5cda2ed480ee07151ac0d388d4"
-    enacted "6629aae92b2d423b7244de5e9d64638cb05b7cfdff6d190fb6f4b3eb43b85f63"
-    editorial "821eb945bb4d1c1931f750d146475fea80628b119a1d4c5f3915d30923b9b6f8"
+    enacted "158102e08285f70cd479209b7efa2756e76e45e57b93b4d3b79f93b59c4cfb50"
+    editorial "92b5db8e9ec8e603f812cb595c01a2010bd9f4c6c98a142a22f93c33592821d5"
   }
 }

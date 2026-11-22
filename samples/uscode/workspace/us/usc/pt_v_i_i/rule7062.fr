@@ -10,21 +10,21 @@ module "/us/usc/ptVII/rule7062" {
     hash "663ee01f9098d58dfea87b50cda9d04156e7f12138a9478085786e505e4425d3"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "The additional exceptions set forth in this rule make applicable to those matters the consequences contained in Rule 62(c) and (d) with respect to orders in actions for injunctions."
     hash "f6da601509c5a59f26097f094bc0efe8dd81570776779cc4082cf4455b5727da"
   }
-  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to include as additional exceptions to Rule 62(a) an order granting relief from the automatic stay of actions against codebtors provided by § 1201 of the Code, the sale or lease of property of the estate under § 363, and the assumption or assignment of an executory contract under § 365."
     hash "055a44acdb8884b22aec351802a4879ac4aff7c3911ab292076631f757b8459d"
   }
-  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -32,21 +32,21 @@ module "/us/usc/ptVII/rule7062" {
     p "GAP Report on Rule 7062. No changes since publication."
     hash "c9faef8771fed4dd8d3ac8f782b30ebb6db69a8d58a4c14652b464c1a6b7d4be"
   }
-  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
     p "The rule is amended to retain a 14-day period for the automatic stay of a judgment. F.R.Civ.P. 62(a) now provides for a 30-day stay to accommodate the 28-day time periods under the Federal Rules of Civil Procedure for filing post-judgment motions and the 30-day period for filing a notice of appeal. Under the Bankruptcy Rules, however, those periods are limited to 14 days. See Rules 7052, 8002, 9015, and 9023."
     hash "dc7e8300aab46d8d171b652779ae896d3012cf97264767d0c85f03c9165196bb"
   }
-  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7062 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "d62c35e909fcab7cb1be04de2f9cb38f696affed233cfb9d6b2c588e99877a0c"
   }
-  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7062/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -55,7 +55,7 @@ module "/us/usc/ptVII/rule7062" {
   }
   layers {
     operative "663ee01f9098d58dfea87b50cda9d04156e7f12138a9478085786e505e4425d3"
-    enacted "198d2f457f4cb964148227ed52aad5ade469b8e734ac9dc73117920e25c8e937"
-    editorial "4f5aed417ab3a23fa05b5a6bbd4bfb3a8056b22be46cef7144ad4c69fd6a1f88"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2647e72b9f6ad4b0879536a2fe459fc0a65fed0e94e8d234111e752f5b2ba328"
   }
 }

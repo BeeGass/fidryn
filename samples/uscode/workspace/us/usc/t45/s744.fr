@@ -375,49 +375,49 @@ module "/us/usc/t45/s744" {
     p "Subsec. (j)(2)(B). " ["Pub. L. 94–555, § 206(2)" -> "/us/pl/94/555/s206/2"] ", substituted definition of “mass transportation services” for “mass transportation”."
     hash "41e9c4bc483c332272d19cdd75532ae3f8d9f07145ec3ffa91396b11e0231771"
   }
-  note "/us/usc/t45/s744/note/statutoryNotes/pl.104.287/effective-date-of-1996-amendment" enacted {
+  note "/us/usc/t45/s744/note/statutoryNotes/pl.104.287/effective-date-of-1996-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1996 Amendment"
     p ["Pub. L. 104–287, § 6(f)(4)(A)" -> "/us/pl/104/287/s6/f/4/A"] ", Oct. 11, 1996, " ["110 Stat. 3399" -> "/us/stat/110/3399"] ", provided that the amendment made by section 6(f)(4)(A) is effective Dec. 29, 1995."
     hash "70ec40c90fa3b4526bdc7049c0dec199eb5a90506b17251ec18943ffb585a56f"
   }
-  note "/us/usc/t45/s744/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s744/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
     p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
     hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
   }
-  note "/us/usc/t45/s744/note/statutoryNotes/pl.94.555/effective-date-of-1976-amendment" enacted {
+  note "/us/usc/t45/s744/note/statutoryNotes/pl.94.555/effective-date-of-1976-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1976 Amendment"
     p "Amendment by " ["Pub. L. 94–555" -> "/us/pl/94/555"] " effective Oct. 1, 1976, see " ["section 303 of Pub. L. 94–555" -> "/us/pl/94/555/s303"] ", set out as a note under " ["section 702 of this title" -> "/us/usc/t45/s702"] "."
     hash "bbcf4d13b2bad24ed28d87ac343046c23afd6c40f613f4c216556bcc67fdfb78"
   }
-  note "/us/usc/t45/s744/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s744/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
     p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
     hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
   }
-  note "/us/usc/t45/s744/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s744/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
     p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
     hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
   }
-  note "/us/usc/t45/s744/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s744/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s744/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s744/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -439,7 +439,7 @@ module "/us/usc/t45/s744" {
   }
   layers {
     operative "25941d9eec8015e70fff0a742d0f854f911b805e9eb7fc37785c090f0cefc8e3"
-    enacted "7fa4565106dc715962c9aeaf9d5eb902861f9a4f31c34c139888f9ea95ffcf7e"
-    editorial "5c1b906d5641cd1f1beb7c865784e9d64c304278232c4e4072f0e32ffe90f54e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e7ff54023a3c8c189d212901a84435a7f5fe3a51343cbcc273a5eb9ef03569ad"
   }
 }

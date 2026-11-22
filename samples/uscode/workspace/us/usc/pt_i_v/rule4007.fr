@@ -39,7 +39,7 @@ module "/us/usc/ptIV/rule4007" {
     hash "4d98df84b52c257c1d278cc096896180c928794541b6ec121a66d1db690cf643"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIV/rule4007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIV/rule4007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -50,7 +50,7 @@ module "/us/usc/ptIV/rule4007" {
     p "Subdivision (e). The complaint required by this subdivision should be filed in the court in which the case is pending pursuant to Rule 5005."
     hash "d758b87ccf9276547cad41a6693fe2b033d7797af8f77e2f4bdafc47a1110c9c"
   }
-  note "/us/usc/ptIV/rule4007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIV/rule4007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -58,7 +58,7 @@ module "/us/usc/ptIV/rule4007" {
     p "Subdivision (c) is amended to apply in chapter 12 cases the same time period that applies in chapter 7 and 11 cases for filing a complaint under § 523(c) of the Code to determine dischargeability of certain debts. Under § 1228(a) of the Code, a chapter 12 discharge does not discharge the debts specified in § 523(a) of the Code."
     hash "25bf0f2d790e4083d23e5f4293bb35ab1f887a7fb53bcfc54ca8635ff4be5e64"
   }
-  note "/us/usc/ptIV/rule4007/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptIV/rule4007/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -68,7 +68,7 @@ module "/us/usc/ptIV/rule4007" {
     p "GAP Report on Rule 4007. No changes since publication, except for stylistic changes in the heading of Rule 4007(d)."
     hash "013be8d63b39d253a1a173e6e26f1dcdb94ec28933947f7305d2ff6a83986081"
   }
-  note "/us/usc/ptIV/rule4007/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIV/rule4007/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -77,7 +77,7 @@ module "/us/usc/ptIV/rule4007" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "d1607646602d09c9129f33aa5ff40b982f88c28ffed21514e858ccadc89f9b2a"
   }
-  note "/us/usc/ptIV/rule4007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIV/rule4007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -86,7 +86,7 @@ module "/us/usc/ptIV/rule4007" {
   }
   layers {
     operative "4d98df84b52c257c1d278cc096896180c928794541b6ec121a66d1db690cf643"
-    enacted "a8156ec0714fa6feed1622dd0a78c2dc484123ae453278ed1ecdee609702956c"
-    editorial "ec2004ad145bbba816fada2b58ebcf5a6d151ab2f47dfdc8281a4f689df8cd47"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0a6dbc836c595f708363f7c759297757a3a6367c77b16eb78dd8e42506d98470"
   }
 }

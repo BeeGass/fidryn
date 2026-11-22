@@ -37,7 +37,7 @@ module "/us/usc/ptI/rule1018" {
     hash "6960b6e4b6205f343abe83d0b29d9c77f9e0c8e3f49adb9a875544042eb74e97"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -45,7 +45,7 @@ module "/us/usc/ptI/rule1018" {
     p "Certain terms used in the Federal Rules of Civil Procedure have altered meanings when they are made applicable in cases under the Code by these rules. See Rule 9002 infra. This Rule 1018 requires that the terms “adversary proceedings” when used in the rules in Part VII and “complaint” when used in the Federal Rules of Civil Procedure be given altered meanings when they are made applicable to proceedings relating to a contested petition or proceedings to vacate any order for relief. A motion to vacate an order for relief, whether or not made on a petition that was or could have been contested, is governed by the rules in Part VII referred to in this Rule 1018."
     hash "64d342f48eabb5ed847fe9df39e89acb529e456dc57500a02e9dc2454c6a0d9b"
   }
-  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -53,7 +53,7 @@ module "/us/usc/ptI/rule1018" {
     p "Although this rule does not contain an explicit authorization for the entry of an order for relief when a debtor refuses to cooperate in discovery relating to a contested involuntary petition, the court has ample power under Rule 37(b) F.R.Civ.P., as incorporated by Rule 7037, to enter an order for relief under appropriate circumstances. Rule 37(b) authorizes the court to enter judgment by default or an order that “facts shall be taken as established.”"
     hash "6eee44b237e582c48ab14a97ed1889e85ce405eb7bacb60f6fbf23ed4d3db8c5"
   }
-  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010 Amendment"
@@ -62,14 +62,14 @@ module "/us/usc/ptI/rule1018" {
     p "Changes Made After Publication. No changes since publication."
     hash "d8638859bd9ff4267db7fbc52c46b1848458b7f64d3f48ff64af74e441d7e3cc"
   }
-  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 1018 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "13ef0eec31ffabdba31487b41f646891c1fa0b923556c09ba9235502333b3d10"
   }
-  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -78,7 +78,7 @@ module "/us/usc/ptI/rule1018" {
   }
   layers {
     operative "6960b6e4b6205f343abe83d0b29d9c77f9e0c8e3f49adb9a875544042eb74e97"
-    enacted "3f7fe6f65ec49abd0597d8c1391fa696cbf08795d6814eb1d3c2c671795c0912"
-    editorial "daf4fb3dbb07cf0cb23425f0bb1131dcb7b1f048db5aebba2cad71b21d70efc4"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "397c3bf90da219d9e50526da68e04d846be7659757cd95e6f3775c13c1d6f322"
   }
 }

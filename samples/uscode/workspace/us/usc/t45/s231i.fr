@@ -48,7 +48,7 @@ module "/us/usc/t45/s231i" {
     p "1981—Subsec. (a). " ["Pub. L. 97–35" -> "/us/pl/97/35"] " inserted provisions authorizing Board to recover from any payment which would be made to an individual by Board under " ["section 231f(b)(2) of this title" -> "/us/usc/t45/s231f/b/2"] " amount of annuity payments made to such individual which are erroneous because of such individual’s entitlement to monthly insurance benefits under title II of the Social Security Act."
     hash "dcb90d89949f1b9014a2726d3de16556f5bc15b332b605d990732a17819f99bc"
   }
-  note "/us/usc/t45/s231i/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s231i/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
@@ -57,7 +57,7 @@ module "/us/usc/t45/s231i" {
   }
   layers {
     operative "c2442ec6c7d8c1e374ed92b75c35aa7c3693f84c7c69ebfd7137e9610655574f"
-    enacted "e007f83515d31a4f1a3f70896402a34405b14d04c15345681072fe9f5dae8148"
-    editorial "77a32a07c38626ff61348a681877005a3bc5bd8d807503415964fca00a3674a7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f97d67df53f5bb63f9a2df992990bb1d6c0922fb7d0e466b91b28c1e92d854ae"
   }
 }

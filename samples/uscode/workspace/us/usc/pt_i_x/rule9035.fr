@@ -10,7 +10,7 @@ module "/us/usc/ptIX/rule9035" {
     hash "a7599e28f97b2a8ab30af5380bd3d444353d5f847c7866005dcea414be1925e4"
   }
   credit "(Added Apr. 30, 1991, eff. Aug. 1, 1991; amended Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9035/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+  note "/us/usc/ptIX/rule9035/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991"
@@ -32,7 +32,7 @@ module "/us/usc/ptIX/rule9035" {
     p "This rule will cease to have effect if a United States trustee is authorized in every case in the districts in Alabama and North Carolina."
     hash "791ead4139889e3e3b3c162cee86d3199e73fd0a60bf66b5cda8b373f8ae5c1f"
   }
-  note "/us/usc/ptIX/rule9035/note/ungrouped/pl.103.394/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+  note "/us/usc/ptIX/rule9035/note/ungrouped/pl.103.394/notes-of-advisory-committee-on-rules-1997-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997 Amendment"
@@ -40,7 +40,7 @@ module "/us/usc/ptIX/rule9035" {
     p "GAP Report on Rule 9035. No changes to the published draft."
     hash "738c246df07e53aaa7e3fd3550605a7610d803f7fdc4f15d70676b1ecdeff662"
   }
-  note "/us/usc/ptIX/rule9035/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9035/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -49,7 +49,7 @@ module "/us/usc/ptIX/rule9035" {
   }
   layers {
     operative "a7599e28f97b2a8ab30af5380bd3d444353d5f847c7866005dcea414be1925e4"
-    enacted "6e81bbf6fbcd40e78a412b4c3d65809879933389d0f70487c387891ca0c2bb00"
-    editorial "9ab0aad3dbb4e898f274f21f57cc9863663ff3130242ee548de7aa3c989ac693"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c87755684a73b779c0f0c1327c32449dca27da20e5d3ce58238796f26aa0f23d"
   }
 }

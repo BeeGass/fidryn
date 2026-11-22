@@ -10,7 +10,7 @@ module "/us/usc/ptI/rule1008" {
     hash "6d34ca39a55d4c55570a28c0f73930ae8ef9485e0cd4787b701334b4af0507a9"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -18,14 +18,14 @@ module "/us/usc/ptI/rule1008" {
     p "The verification may be replaced by an unsworn declaration as provided in 28 U.S.C. § 1746. See also, Official Form No. 1 and Advisory Committee Note."
     hash "8979bf1d2585d1d3584cb332b4c7736f7907698337d6c868e5efc47c41027956"
   }
-  note "/us/usc/ptI/rule1008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptI/rule1008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "The amendments to this rule are stylistic."
     hash "2425a4d71ea8cdce368d466213246b8c860960338c0a2940947629e608d503e0"
   }
-  note "/us/usc/ptI/rule1008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -34,7 +34,7 @@ module "/us/usc/ptI/rule1008" {
   }
   layers {
     operative "6d34ca39a55d4c55570a28c0f73930ae8ef9485e0cd4787b701334b4af0507a9"
-    enacted "bdbd5df228fa9e2951f0b6ef776c0e0c61b0a3b5e8a790f68bfcf74e337f3ff2"
-    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f8ce96b0ea4e8ff3c8791c4154c1f70213abf96b123900c851502f74309232bc"
   }
 }

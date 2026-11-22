@@ -167,7 +167,7 @@ module "/us/usc/ptII/rule2019" {
     hash "a3ab44e013f5d0ab04f1cccc6502a7d07bc07c7f329a4b9ae7c344775d634633"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -175,14 +175,14 @@ module "/us/usc/ptII/rule2019" {
     p "Subdivision (b) is derived from §§ 212, 213 of the Act. As used in clause (2), “other authorization” would include a power or warrant of attorney which are specifically mentioned in § 212 of the Act. This rule deals with representation provisions in mortgages, trust deeds, etc. to protect the beneficiaries from unfair practices and the like. It does not deal with the validation or invalidation of security interests generally. If immediate compliance is not possible, the court may permit a representative to be heard on a specific matter, but there is no implicit waiver of compliance on a permanent basis."
     hash "93b84afd4430ca923ae4e19a6ea08fb82b57832cdfe267ca1b22d194260b8ed9"
   }
-  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Subdivision (a) is amended to exclude from the requirements of this rule committees of retired employees appointed pursuant to § 1114 of the Code. The words “with the clerk” are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "6b7961a050b79cadfc0eacaf2c0e4dde1212e37883abb1843d472e47afdf3736"
   }
-  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" enacted {
+  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2011 Amendment"
@@ -211,7 +211,7 @@ module "/us/usc/ptII/rule2019" {
     p "Other changes. Stylistic and organizational changes were made throughout the rule and Committee Note to reduce the length and clarify the meaning of the published proposal."
     hash "e219d871eca3b524d29300070f331654f5e7f0b47b91cb8cbb9a21a58d1e08b2"
   }
-  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -233,7 +233,7 @@ module "/us/usc/ptII/rule2019" {
   }
   layers {
     operative "a3ab44e013f5d0ab04f1cccc6502a7d07bc07c7f329a4b9ae7c344775d634633"
-    enacted "3e9a6ec4b3edcaeb4abe433e841184f70dd40e150db6624a61062f98065aae1e"
-    editorial "48a56cea9282c51d3df04d156badb198351ba51f814d9751c6475b9302c7b010"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f520210f2bd40864419166e5a6f1129c4dfa818135a8e1ff0952cf4611f2e8b8"
   }
 }

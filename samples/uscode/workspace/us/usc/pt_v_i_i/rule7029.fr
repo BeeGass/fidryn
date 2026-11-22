@@ -10,14 +10,14 @@ module "/us/usc/ptVII/rule7029" {
     hash "0d464a7752893359c6bbce297840dea78903b00c85e35278061aa0a91f7a1b31"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7029/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7029/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7029 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "f5968c158220de82172b4330e868897a727dbdec8a99f1304af9993a81cc0a5f"
   }
-  note "/us/usc/ptVII/rule7029/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7029/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -26,7 +26,7 @@ module "/us/usc/ptVII/rule7029" {
   }
   layers {
     operative "0d464a7752893359c6bbce297840dea78903b00c85e35278061aa0a91f7a1b31"
-    enacted "a032fec36423e0f45643f1420998f94b143528d604b84717ba66e62fd8a11bf1"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "744d5261b26f35bce854290df9eef744d4f15d258e67758a2834cb72a4acbd0a"
   }
 }

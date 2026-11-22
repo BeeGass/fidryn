@@ -20,14 +20,14 @@ module "/us/usc/ptVI/rule6009" {
     hash "3bd262debb61eb00d07492da98a664e55955537140b13d44fec8b962daa197af"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVI/rule6009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is derived from former Bankruptcy Rule 610."
     hash "a24c73b740dcdc066f707098303425047be90ddd7defa7fff9d8053da8ef11f8"
   }
-  note "/us/usc/ptVI/rule6009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -36,7 +36,7 @@ module "/us/usc/ptVI/rule6009" {
   }
   layers {
     operative "3bd262debb61eb00d07492da98a664e55955537140b13d44fec8b962daa197af"
-    enacted "11c8e68822c54a1ab4f60a391ae117bccda8b27acdc431ef163fef68cbeb3e41"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0db0a1ed80f119cfe6d02405de2f5f4d49e51a26e53aa0215f5ac4d00ad3081f"
   }
 }

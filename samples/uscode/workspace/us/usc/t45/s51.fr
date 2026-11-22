@@ -20,7 +20,7 @@ module "/us/usc/t45/s51" {
     p "1939—Act Aug. 11, 1939, inserted last par."
     hash "48cee4ec21ec1799cc342478d2ff6e488cc3f727f5da1446fab095b9ef447378"
   }
-  note "/us/usc/t45/s51/note/statutoryNotes/act.1906-06-11.ch3073/short-title" enacted {
+  note "/us/usc/t45/s51/note/statutoryNotes/act.1906-06-11.ch3073/short-title" editorial {
     group statutoryNotes
     topic "shortTitle"
     heading "Short Title"
@@ -33,7 +33,7 @@ module "/us/usc/t45/s51" {
   }
   layers {
     operative "63b95930891d7f83bee991b59e5bbaee4136366b5b1f68a100bd73766d325b21"
-    enacted "2314ba5404700df2affb2c2d50dfe3d88933545749744e9880f4fd90f8152eee"
-    editorial "7475ea7baf30532d128c05fe2993f0216b1c2b59e8564c166a7b158ccb8cc972"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "acd042d540c7ad7f38f849516b7dd9dc0599fd3574dd1b4d5078131ae781faad"
   }
 }

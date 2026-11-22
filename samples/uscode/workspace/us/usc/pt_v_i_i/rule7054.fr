@@ -40,7 +40,7 @@ module "/us/usc/ptVII/rule7054" {
     hash "1f2175a7149ba9380338c6fe6a4f851500639e63143770405cee97d05aa98c07"
   }
   credit "(As amended Apr. 23, 2012, eff. Dec. 1, 2012; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" enacted {
+  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2012 Amendment"
@@ -53,7 +53,7 @@ module "/us/usc/ptVII/rule7054" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "518f0a63f5b361ad2b22e66eee83b18718db7b452ccd1ac0f25a90bbae94d0de"
   }
-  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" enacted {
+  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014 Amendment"
@@ -64,14 +64,14 @@ module "/us/usc/ptVII/rule7054" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "ddb1b2b9c99c81f6ac8ef699d847bc3052c5f5a92d60eff009e308216d250954"
   }
-  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7054 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "67a8f5b06057050b0389b0953368d5e48ec97a6ebc94e94c683ba8c8baaee553"
   }
-  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7054/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -81,7 +81,7 @@ module "/us/usc/ptVII/rule7054" {
   }
   layers {
     operative "1f2175a7149ba9380338c6fe6a4f851500639e63143770405cee97d05aa98c07"
-    enacted "a610ef87478ceba76ea22ea2f4c91bb8e3025b9f4ca669158e39d9631804c78b"
-    editorial "d2771729de7676b6c1be1d9968221a845310fbab6ce7834472c943da1629be35"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e6f662203a5e70fd9559416b1f237485288d68e6728c7a06e72996b07e143952"
   }
 }

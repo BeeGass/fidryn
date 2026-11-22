@@ -50,21 +50,21 @@ module "/us/usc/ptIX/rule9002" {
     hash "d237d7d299279562e8915565310aafc861a7190434b1be5ad16a66b1c2dda1e9"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptIX/rule9002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "This rule is revised to include the words “district judge” in anticipation of amendments to the Federal Rules of Civil Procedure."
     hash "e48cf2d8ee2476d0fe309ab4df871d26262e79adb79abc4d240a8e45201c613d"
   }
-  note "/us/usc/ptIX/rule9002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9002 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "1274f21662e37f8f263fd3075efa98ba5f6b1e1c1df1c8423726805bfa296668"
   }
-  note "/us/usc/ptIX/rule9002/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9002/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -73,7 +73,7 @@ module "/us/usc/ptIX/rule9002" {
   }
   layers {
     operative "d237d7d299279562e8915565310aafc861a7190434b1be5ad16a66b1c2dda1e9"
-    enacted "cdad0dcbb5d5c31a9d0660125abefde6293cef86d45803e0f588b34cb2332b4a"
-    editorial "c734d1ab7ce48a94b19d6058bb8b3b3122f6f8f94e75380cea8c8c2354529f4c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "16e10e77841e3cb7ae62cbbf64f7d46bb452ebb675d0a9bf9db7c80778d2e2b3"
   }
 }

@@ -10,14 +10,14 @@ module "/us/usc/ptIII/rule3022" {
     hash "e725d8fba6fec13711b364cf0e4f056967567ae237afcec002464e15a8692c5f"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "Section 350 of the Code requires the court to close the case after the estate is fully administered and the trustee has been discharged. Section 1143 places a five year limitation on the surrender of securities when required for participation under a plan but this provision should not delay entry of the final decree."
     hash "8938f7ecf895c922bba200f2ad4a3d0b8a25930e03ea1e28f3433221a5e78a91"
   }
-  note "/us/usc/ptIII/rule3022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -25,7 +25,7 @@ module "/us/usc/ptIII/rule3022" {
     p "The court should not keep the case open only because of the possibility that the court’s jurisdiction may be invoked in the future. A final decree closing the case after the estate is fully administered does not deprive the court of jurisdiction to enforce or interpret its own orders and does not prevent the court from reopening the case for cause pursuant to § 350(b) of the Code. For example, on motion of a party in interest, the court may reopen the case to revoke an order of confirmation procured by fraud under § 1144 of the Code. If the plan or confirmation order provides that the case shall remain open until a certain date or event because of the likelihood that the court’s jurisdiction may be required for specific purposes prior thereto, the case should remain open until that date or event."
     hash "fbe1b7897970dcf0fdeed8e84c8945c4c21860b769fec32fb03701b396e79d1f"
   }
-  note "/us/usc/ptIII/rule3022/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3022/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -34,7 +34,7 @@ module "/us/usc/ptIII/rule3022" {
   }
   layers {
     operative "e725d8fba6fec13711b364cf0e4f056967567ae237afcec002464e15a8692c5f"
-    enacted "4932f2312b5ed2ac4f343af48a3426af8da7db7c1ff4855018bc833a14f0cb8c"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "9c304a4f5e8cbe904ab34a50f2618371a75ed953a9adf4f8df275e98678575be"
   }
 }

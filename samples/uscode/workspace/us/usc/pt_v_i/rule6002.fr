@@ -21,7 +21,7 @@ module "/us/usc/ptVI/rule6002" {
     hash "2f1c2d0f7d103ed5ee9889f503a4774f879215d7731e826c703f26cebdef93e0"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -30,21 +30,21 @@ module "/us/usc/ptVI/rule6002" {
     p "Section 543(d) is similar to an abstention provision. It grants the bankruptcy court discretion to permit the custodian to remain in possession and control of the property. In that event, the custodian is excused from complying with § 543(a)–(c) and thus would not be required to turn over the property to the trustee. When there is no duty to turn over to the trustee, Rule 6002 would not be applicable."
     hash "c5bb7b559b89a802d26096e95dd9ab18ab1ef761ca8429ccb0c4bc7618b055ea"
   }
-  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to enable the United States trustee to review, object to, or to otherwise be heard regarding the custodian’s report and accounting. See §§ 307 and 543 of the Code."
     hash "3f20320c7b49e138fd6cb8075917aed516bf82a9d2b0988065f3f43475fde0f8"
   }
-  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "Subdivision (b) is amended to conform to the language of § 102(1) of the Code."
     hash "796fe02fe6eec2b9437a7362d1ec0dd8a99831d3ac549635688d8c44803aa20a"
   }
-  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -53,7 +53,7 @@ module "/us/usc/ptVI/rule6002" {
   }
   layers {
     operative "2f1c2d0f7d103ed5ee9889f503a4774f879215d7731e826c703f26cebdef93e0"
-    enacted "45fd84910d5aeb11227954355630d8de1819d7be3dfa22d46967e3c567f345d4"
-    editorial "10271f83e68212ef9e2dfade67957e8baaa7d60061cb0d952dbd3ccb94e7d028"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "93a7cc8d4c530d4619ba8e678744f2dc7ebd921d693a8ca4e8a01640574b4434"
   }
 }

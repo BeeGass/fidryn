@@ -316,7 +316,7 @@ module "/us/usc/ptIV/rule4001" {
     hash "3a94ce9ae406bf65ec7dcd352f8b2cba69b499fdd8e38c8bc619edd30fd18f78"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 30, 2007, eff. Dec. 1, 2007; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 25, 2019, eff. Dec. 1, 2019; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -328,7 +328,7 @@ module "/us/usc/ptIV/rule4001" {
     p "Subdivision (c) implements § 362(f) which permits ex parte relief from the stay when there will be irreparable damage. This subdivision sets forth the procedure to be followed when relief is sought under § 362(f). It is derived from former Bankruptcy Rule 601(d)."
     hash "4b968ac62b49cdbc45cde00d8f480b56bc3ead03deaaf056447d5fa9e9f8f1e6"
   }
-  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -342,7 +342,7 @@ module "/us/usc/ptIV/rule4001" {
     p "Subdivision (d) is new. In the event the 15 day period for filing objections to the approval of an agreement of the parties described in this subdivision is too long, the parties either may move for a reduction of the period under Rule 9006(c)(1) or proceed under subdivision (b) or (c), if applicable. Rule 9006(c)(1) requires that cause be shown for the reduction of the period in which to object. In applying this criterion the court may consider the option of proceeding under subdivision (b) or (c) and grant a preliminary hearing and relief pending final hearing."
     hash "376373d7d8a9ee05fc2cb51d3b4329f9653f6181791a88b7fc00334d03e1a678"
   }
-  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -354,7 +354,7 @@ module "/us/usc/ptIV/rule4001" {
     p "If the motion papers served under subdivision (a), (b), or (c) do not afford notice sufficient to inform the recipients of the material provisions of the proposed agreement and opportunity for a hearing, approval of the settlement agreement may not be obtained unless the procedural requirements of subdivision (d)(1), (d)(2), and (d)(3) are satisfied. If the 15 day period for filing objections to the approval of the settlement agreement is too long under the particular circumstances of the case, the court may shorten the time for cause under Rule 9006(c)(1)."
     hash "d7efe29c2858bf51189e6ada489fa807674a6151f429ed02041834ad810ee9aa"
   }
-  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -364,7 +364,7 @@ module "/us/usc/ptIV/rule4001" {
     p "GAP Report on Rule 4001. No changes since publication."
     hash "f23f3635960d428b233033d503b56dc2132914ed29c337396395c4fa4144f7eb"
   }
-  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" enacted {
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2007 Amendment"
@@ -379,7 +379,7 @@ module "/us/usc/ptIV/rule4001" {
     p "4. Subdivision (d)(1)(A) was restyled to form a vertical list of the motions subject to that provision."
     hash "9abab99efe4bb29ab90d291180c4137415d584996bd35d51a95c95316ff60ade"
   }
-  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -391,7 +391,7 @@ module "/us/usc/ptIV/rule4001" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010 Amendment"
@@ -404,14 +404,14 @@ module "/us/usc/ptIV/rule4001" {
     p "Final approval of the amendments to this rule is sought without publication."
     hash "c84c231aae3ec9aab56b6ba2e4c6c7fa4f8b7df5fc208d8a22ab31f6f65cd317"
   }
-  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" enacted {
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2019 Amendment"
     p "Subdivision (c) of the rule is amended to exclude chapter 13 cases from that subdivision. This amendment does not speak to the underlying substantive issue of whether the Bankruptcy Code requires or permits a chapter 13 debtor not engaged in business to request approval of postpetition credit."
     hash "e19e74c4118beb6a3ac2ca2fdfd302de5487045e9bd5b0da686615d4d3aac966"
   }
-  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIV/rule4001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -420,7 +420,7 @@ module "/us/usc/ptIV/rule4001" {
   }
   layers {
     operative "3a94ce9ae406bf65ec7dcd352f8b2cba69b499fdd8e38c8bc619edd30fd18f78"
-    enacted "e6dda626b2fcf7dd17de049cc3ace70f97c397680b31686162367149b923830f"
-    editorial "08f4e013c9b8cae8cc72719207be11960be903ba9c15c68dd174b663890938c7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1a1e19e0fba514239449c1e067adf36c7510598b5a1f7bc2d003b336c5c02e94"
   }
 }

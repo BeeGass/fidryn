@@ -21,14 +21,14 @@ module "/us/usc/ptV/rule5008" {
     hash "2730d4fa8013dbc4e73673807655e665b2556054374c3ba6de5720a0c6ee6484"
   }
   credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+  note "/us/usc/ptV/rule5008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991"
     p "This rule [Rule 5008. Funds of the Estate; abrogated Apr. 30, 1991, eff. Aug. 1, 1991] is abrogated in view of the amendments to § 345(b) of the Code and the role of the United States trustee in approving bonds and supervising trustees."
     hash "eeaca1e4bcf6e47b968abf9c583325eef2c7140c44353a0c0af1a3c3aeb200b8"
   }
-  note "/us/usc/ptV/rule5008/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+  note "/us/usc/ptV/rule5008/note/ungrouped/nolaw/committee-notes-on-rules-2008" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008"
@@ -36,7 +36,7 @@ module "/us/usc/ptV/rule5008" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "12cec39b507bad644ff891c28748a0430eaffac4a6416228b962bd5315c18105"
   }
-  note "/us/usc/ptV/rule5008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -45,7 +45,7 @@ module "/us/usc/ptV/rule5008" {
   }
   layers {
     operative "2730d4fa8013dbc4e73673807655e665b2556054374c3ba6de5720a0c6ee6484"
-    enacted "baf38420feb8187990fb0f7501f43841b023dbf89ab18142eaf1fee7ed905d25"
-    editorial "0949f180af4af05827ca1df5a238939bcdd930e45d40b1501dfd1b481c2c0da7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "6f07c4d0ffd74f0a1fdfe2d38229fa5bdef134b04fe8a06a9d8c975f03c15ae8"
   }
 }

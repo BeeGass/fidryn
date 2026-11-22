@@ -274,7 +274,7 @@ module "/us/usc/ptII/rule2006" {
     hash "532e69c50b18025a870ab22b2cdfb4ef2d7ff5694688278d480de2b1c1dc03f0"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -289,7 +289,7 @@ module "/us/usc/ptII/rule2006" {
     p "Subdivision (f) has counterparts in the local rules referred to in the Advisory Committee’s Note to former Bankruptcy Rule 208. Courts have been accorded a wide range of discretion in the handling of disputes involving proxies. Thus the referee was allowed to reject proxies and to proceed forthwith to hold a scheduled election at the same meeting. E.g., In re Portage Wholesale Co., 183 F.2d 959 (7th Cir. 1950); In re McGill, 106 Fed. 57 (6th Cir. 1901); In re Deena Woolen Mills, Inc., 114 F. Supp. 260, 273 (D. Me. 1953); In re Finlay, 3 Am.B.R. 738 (S.D.N.Y. 1900). The bankruptcy judge may postpone an election to permit a determination of issues presented by a dispute as to proxies and to afford those creditors whose proxies are rejected an opportunity to give new proxies or to attend an adjourned meeting to vote their own claims. Cf. In the Matter of Lenrick Sales, Inc., 369 F.2d 439, 442–43 (3d Cir.), cert. denied, 389 U.S. 822 (1967); In the Matter of Construction Supply Corp. 221 F. Supp. 124, 128 (E.D. Va. 1963). This rule is not intended to restrict the scope of the court’s discretion in the handling of disputes as to proxies."
     hash "fb1e8bc2ef2c84342b575928fe822c79c956ebdc218c15e0c8f61249b30b579d"
   }
-  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -297,7 +297,7 @@ module "/us/usc/ptII/rule2006" {
     p "The words “with the clerk” are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "305197eb5c2f30f2079f78cee27b5937e298adb08e361e394fe7cafed8e7a04d"
   }
-  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -309,7 +309,7 @@ module "/us/usc/ptII/rule2006" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -318,7 +318,7 @@ module "/us/usc/ptII/rule2006" {
   }
   layers {
     operative "532e69c50b18025a870ab22b2cdfb4ef2d7ff5694688278d480de2b1c1dc03f0"
-    enacted "4ba29caa1d5fdfba8fa04f54e0238a536c0ed56acaa5ff499f4f48b92a9f8c39"
-    editorial "1a7de5495e7afd35f6be0d9eb0ffdb4c2bf8bf18f7dc774596bb52d169ac5179"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "06207b4741f55b037d9c1685882a705d434e9e213e91fb3d9ba365c78142d659"
   }
 }

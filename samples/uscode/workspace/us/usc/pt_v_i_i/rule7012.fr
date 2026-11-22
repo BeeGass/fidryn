@@ -80,7 +80,7 @@ module "/us/usc/ptVII/rule7012" {
     hash "f370164ee8d63849f25282f6d0b60e94cda2a39309b657de55b9c85fa7a85072"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -88,21 +88,21 @@ module "/us/usc/ptVII/rule7012" {
     p "Rule 12(b)(7) and (h)(2) F.R.Civ.P. refers to Rule 19 F.R.Civ.P. Pursuant to Rule 7002 these references are to Rule 19 F.R.Civ.P. as incorporated and modified by Rule 7019."
     hash "026bcfc5bfcead1a0631b7ed42cdc288aab30e9b614aa9406f7c8de458cb40c0"
   }
-  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The amendment to subdivision (b) requires a response to the allegation that the proceeding is core or non-core. A final order of judgment may not be entered in a non-core proceeding heard by a bankruptcy judge unless all parties expressly consent. 28 U.S.C. § 157(c)."
     hash "007ac823d7a1d7e3f9014e5eab1723a4da40dc73454f1141fa81d95560d0839e"
   }
-  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
     p "The rule is amended to conform to the changes made to the Federal Rules of Civil Procedure through the restyling of those rules effective on December 1, 2007."
     hash "76923e497c4b9c61312745ce5d68065b9395b228da2fec808e60203abfbd5cf5"
   }
-  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -114,21 +114,21 @@ module "/us/usc/ptVII/rule7012" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2016 Amendment"
     p "Subdivision (b) is amended to remove the requirement that the pleader state whether the proceeding is core or non-core and to require in all proceedings that the pleader state whether the party does or does not consent to the entry of final orders or judgment by the bankruptcy court. The amended rule also removes the provision requiring express consent before the entry of final orders and judgments in non-core proceedings. Some proceedings that satisfy the statutory definition of core proceedings, 28 U.S.C. § 157(b)(2), may remain beyond the constitutional power of a bankruptcy judge to adjudicate finally. The amended rule calls for the pleader to make a statement regarding consent, whether or not a proceeding is termed non-core. This amendment complements the requirements of amended Rule 7008(a). The bankruptcy judge’s subsequent determination of the appropriate course of proceedings, including whether to enter final orders and judgments or to issue proposed findings of fact and conclusions of law, is a pretrial matter now provided for in amended Rule 7016."
     hash "6eee6e9f66b0127d1b0d3113518145906f011391736303b38b769a73d474bedb"
   }
-  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7012 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "7ed9e8efef15a1d08f102a59b73bed25b3566f60f665c97d7b61bb93bc224ccb"
   }
-  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7012/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -137,7 +137,7 @@ module "/us/usc/ptVII/rule7012" {
   }
   layers {
     operative "f370164ee8d63849f25282f6d0b60e94cda2a39309b657de55b9c85fa7a85072"
-    enacted "4b9187fe5e8da028f6276c4b067513e4cde9d2c3dd258f91e225c7be60ba9a6e"
-    editorial "b37024fa45915616cb3602e464f2c111a6d10045d32d7d70abca37ddd1c880bc"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d27ddbe835f3bcb63e8a37872bd1753b65fd921ec8e7d70e759606d25a36aae4"
   }
 }

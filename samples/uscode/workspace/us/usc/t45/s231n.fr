@@ -519,7 +519,7 @@ module "/us/usc/t45/s231n" {
     }
     hash "2d97009753a935b780e56144495bc576ab9435a61ea00528c951c0ec979ca199"
   }
-  note "/us/usc/t45/s231n/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s231n/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
@@ -546,7 +546,7 @@ module "/us/usc/t45/s231n" {
     }
     hash "08327e0b8dc24899459e2e63187205e941963f8737225af329acd6ce9333fbbc"
   }
-  note "/us/usc/t45/s231n/note/statutoryNotes/nolaw/termination-of-advisory-committees" enacted {
+  note "/us/usc/t45/s231n/note/statutoryNotes/nolaw/termination-of-advisory-committees" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Termination of Advisory Committees"
@@ -600,7 +600,7 @@ module "/us/usc/t45/s231n" {
     }
     hash "ecf7f684210bfa617154dc92c4df9a7135eff3ea9691c7002987e3dc717b087f"
   }
-  note "/us/usc/t45/s231n/note/statutoryNotes/pl.100.203/commission-on-railroad-retirement-reform" enacted {
+  note "/us/usc/t45/s231n/note/statutoryNotes/pl.100.203/commission-on-railroad-retirement-reform" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Commission on Railroad Retirement Reform"
@@ -743,7 +743,7 @@ module "/us/usc/t45/s231n" {
     }
     hash "201d68a8b8b63bb6852467b66aad8a4f209527084f692c4b8244a0c91c2a1a8d"
   }
-  note "/us/usc/t45/s231n/note/statutoryNotes/pl.97.35/analysis-of-options-that-will-assure-long-term-financial-int" enacted {
+  note "/us/usc/t45/s231n/note/statutoryNotes/pl.97.35/analysis-of-options-that-will-assure-long-term-financial-int" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Analysis of Options That Will Assure Long-Term Financial Integrity of the Railroad Retirement System: Report and Recommendations to Congress"
@@ -752,7 +752,7 @@ module "/us/usc/t45/s231n" {
   }
   layers {
     operative "76a0971cf3ae44e77fa8cf4aef6b5814e6d91f74f2eb3f85d1d1e0cd76cadf1f"
-    enacted "f5a283c1b6fe607b0d3b5c1289a24881472e4133a0b87d18cec0a38ce61bd1f9"
-    editorial "8d6978cfe602ec5ced08df1207756e7b5f366d5980cbbd32dea7b715a5d0852d"
+    enacted "f09c135ca2a073a1fd04378753dd93b3a68a33e7cf34570a70b4a26b9c12e52d"
+    editorial "3ecea1640cd5610f446109f5eff9b9e35f135a332850e14bb8a2c038842583fb"
   }
 }

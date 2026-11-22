@@ -10,7 +10,7 @@ module "/us/usc/t1/s205" {
     hash "dafba0abd130626d26c854ec762426427f235e5b8fc6b6de6dfdc64d7e6fcd92"
   }
   credit "(" ["July 30, 1947, ch. 388" -> "/us/act/1947-07-30/ch388"] ", " ["61 Stat. 639" -> "/us/stat/61/639"] "; " ["Pub. L. 113–235, div. H, title I, § 1301(b)" -> "/us/pl/113/235/dH/tI/s1301/b"] ", Dec. 16, 2014, " ["128 Stat. 2537" -> "/us/stat/128/2537"] ".)"
-  note "/us/usc/t1/s205/note/statutoryNotes/pl.113.235/change-of-name" enacted {
+  note "/us/usc/t1/s205/note/statutoryNotes/pl.113.235/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
@@ -19,7 +19,7 @@ module "/us/usc/t1/s205" {
   }
   layers {
     operative "dafba0abd130626d26c854ec762426427f235e5b8fc6b6de6dfdc64d7e6fcd92"
-    enacted "d57d70e6ce10b8c760beb250f2b35dbf044f742ecc40b97a730e515ae91349e4"
-    editorial "8b7d592e2d0f2e99016686bfbcfb23cde599d486bd05ef7c7ac6ccef0d80705c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "13f763f3919ba163670ca62c67eedc842d325e1e9d2e15a400a55b4baeafb630"
   }
 }

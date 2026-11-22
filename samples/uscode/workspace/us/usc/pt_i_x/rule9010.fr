@@ -47,28 +47,28 @@ module "/us/usc/ptIX/rule9010" {
     hash "d50906a7a40ff8b8388a8da314557bee53dea9bdd38d868b2098dcb101398386"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is substantially the same as former Bankruptcy Rule 910 and does not purport to change prior holdings prohibiting a corporation from appearing pro se. See In re Las Colinas Development Corp., 585 F.2d 7 (1st Cir. 1978)."
     hash "07f88562752f8cd1028b709a2e1cfc5875b7f66a6562aa5e0b370197043c621a"
   }
-  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Subdivision (c) is amended to include a reference to Rule 9012 which is amended to authorize a bankruptcy judge or clerk to administer oaths."
     hash "3ce7df7cb02caabf5d968f7074c4e5327faed8ce245da6d80d73754fc0532fe0"
   }
-  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "References to Official Form numbers in subdivision (c) are deleted in anticipation of future revision and renumbering of the Official Forms."
     hash "a4af48f13315a585ba2cc8c40fa03110e42f1f6306045fd225d7c5b18b9e840e"
   }
-  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -77,7 +77,7 @@ module "/us/usc/ptIX/rule9010" {
   }
   layers {
     operative "d50906a7a40ff8b8388a8da314557bee53dea9bdd38d868b2098dcb101398386"
-    enacted "dd1a45d20b7696cdf51676f8a494bcf905356482bf7e799683c5c032325b22c7"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d073cd2c68431115916008ca96ed5c5ea4aa6a52788107a9469f237a2e9c5d13"
   }
 }

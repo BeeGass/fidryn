@@ -45,7 +45,7 @@ module "/us/usc/ptV/rule5002" {
     hash "2d32cfa45a09c04747132d90cd099ae7ea6ba82e981c2c2a99f60ae15bd62b10"
   }
   credit "(As amended Apr. 29, 1985, eff. Aug. 1, 1985; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptV/rule5002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -55,7 +55,7 @@ module "/us/usc/ptV/rule5002" {
     p "In order for the policy of this rule to be meaningfully implemented, it is necessary to extend the prohibition against appointment or employment to the firm or other business association of the ineligible person and to those affiliated with the firm or business association. “Firm” is defined in Rule 9001 to include a professional partnership or corporation of attorneys or accountants. All other types of business and professional associations and relationships are covered by this rule."
     hash "304aef35283d6b15f4c44c1c310ef8c797dd420f20e5d450e8146b862bbec02e"
   }
-  note "/us/usc/ptV/rule5002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1985-amendment" enacted {
+  note "/us/usc/ptV/rule5002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1985-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1985 Amendment"
@@ -70,7 +70,7 @@ module "/us/usc/ptV/rule5002" {
     p "The amended rule does not regulate professional relationships which do not require approval of a bankruptcy judge. Disqualification of the bankruptcy judge pursuant to 28 U.S.C. § 455 may, however, be appropriate. Under Rule 5004(a), a bankruptcy judge may find that disqualification from only some aspect of the case, rather than the entire case, is necessary. A situation may also arise in which the disqualifying circumstance only comes to light after services have been performed. Rule 5004(b) provides that if compensation from the estate is sought for these services, the bankruptcy judge is disqualified from awarding compensation."
     hash "da10bfd23d5e2205e2b60d6514cc931e4db5821618123e1857dd7dc86ca91694"
   }
-  note "/us/usc/ptV/rule5002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptV/rule5002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -81,7 +81,7 @@ module "/us/usc/ptV/rule5002" {
     p "This rule is not exclusive of other laws or rules regulating ethical conduct. See, e.g., 28 CFR § 45.735–5."
     hash "0601115ce351077ab4c6458de0abcac73489b1a423d262704ebe2633293d2d06"
   }
-  note "/us/usc/ptV/rule5002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -90,7 +90,7 @@ module "/us/usc/ptV/rule5002" {
   }
   layers {
     operative "2d32cfa45a09c04747132d90cd099ae7ea6ba82e981c2c2a99f60ae15bd62b10"
-    enacted "bbeec04ce939a4457eb5546bf2be48804a78f251800f7f9be941cbc09b2192c8"
-    editorial "b18d56c6dd639c2c57b1b18d19bc962f5187f6f3013b2769ff38d966fbabdf8f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "7b73be4e80aba7ec134d1608fd0ae7796ef52f74da27c72bcae479737088732d"
   }
 }

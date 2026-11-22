@@ -33,7 +33,7 @@ module "/us/usc/ptV/rule5011" {
     hash "d548e7ee7f6ac5ebee2766e32ea27107844ebdfe4411b7ef7e9fb4252b530bd0"
   }
   credit "(Added Mar. 30, 1987, eff. Aug. 1, 1987; amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987" enacted {
+  note "/us/usc/ptV/rule5011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987"
@@ -44,14 +44,14 @@ module "/us/usc/ptV/rule5011" {
     p "Subdivision (c). Unless the court so orders, proceedings are not stayed when motions are filed for withdrawal or for abstention from hearing a proceeding. Because of the district court’s authority over cases and proceedings, the subdivision authorizes the district court to order a stay or modify a stay ordered by the bankruptcy judge."
     hash "ab5cea708f0ca208d9bfaf1487ec67ee0b1ec9cd3d095ef7b4a4a03b5d4220f7"
   }
-  note "/us/usc/ptV/rule5011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptV/rule5011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Subdivision (b) is amended to delete the restriction that limits the role of the bankruptcy court to the filing of a report and recommendation for disposition of a motion for abstention under 28 U.S.C. § 1334(c)(2). This amendment is consistent with § 309(b) of the Judicial Improvements Act of 1990 which amended § 1334(c)(2) so that it allows an appeal to the district court of a bankruptcy court’s order determining an abstention motion. This subdivision is also amended to clarify that the motion is a contested matter governed by Rule 9014 and that it must be served on all parties to the proceeding which is the subject of the motion."
     hash "e5071749ac5399d587c1b2db272d920449c9628972d569ab56511c40abbed06c"
   }
-  note "/us/usc/ptV/rule5011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -60,7 +60,7 @@ module "/us/usc/ptV/rule5011" {
   }
   layers {
     operative "d548e7ee7f6ac5ebee2766e32ea27107844ebdfe4411b7ef7e9fb4252b530bd0"
-    enacted "cb10c32a0d39d6744bb8f87f66716651759261f738ccc277f2b7c9790e3eeddd"
-    editorial "00a8fff9f597578928e12053fe13f389fe81df51761946babe805a1f505147ba"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "aa9d62389dc12abca46847685f10c36b2237d89318617227127d77f10c461788"
   }
 }

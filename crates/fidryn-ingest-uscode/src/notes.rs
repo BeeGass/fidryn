@@ -15,9 +15,15 @@
 //! members dropped; a topic that holds any other white-space character is
 //! refused.
 //!
-//! A note is editorial when its group is `editorialNotes`, or when it is
-//! ungrouped and one of its topics is `removalDescription` or
-//! `historicalAndRevision`; every other note is enacted.
+//! A note is enacted when it sets out the text of a law as the publisher
+//! marks it up: when it holds quoted content outside its footnotes, its group
+//! is `statutoryNotes` or it is ungrouped, none of its topics is
+//! `historicalAndRevision`, `removalDescription` or `prospectiveAmendment`,
+//! and, ungrouped, its heading is not that of a note of an advisory
+//! committee, of an extract of a report or a statement, or of a revision
+//! note. Every other note is editorial: the editors' own writing, their
+//! pointers to and paraphrases of provisions set out elsewhere, and the
+//! documents they set out that are not Acts of Congress.
 //!
 //! The address of a note is that of the level that holds it or its `notes`
 //! element, followed by `note`, its group, its law and its heading:
@@ -47,6 +53,19 @@ use std::collections::HashMap;
 /// The group of a note that follows no cross heading, or that stands
 /// directly in a level.
 const UNGROUPED: &str = "ungrouped";
+
+/// The group of the statutory notes, the one group whose notes may be
+/// enacted.
+const STATUTORY: &str = "statutoryNotes";
+
+/// The topics that make a note editorial whatever it holds: a historical and
+/// revision note, the description of what was removed, and an amendment yet
+/// to take effect.
+const EDITORS_TOPICS: [&str; 3] = [
+    "historicalAndRevision",
+    "removalDescription",
+    "prospectiveAmendment",
+];
 
 /// The beginnings of an origin of quoted content that names a law.
 const QUOTED_LAWS: [&str; 3] = ["/us/pl/", "/us/act/", "/us/stat/"];
@@ -145,7 +164,7 @@ fn notes_of<'a, 'i>(
                 anchor: anchor.clone(),
                 note: Note {
                     address: anchor.clone(),
-                    layer: layer(&topic, &[]),
+                    layer: layer(&topic, &[], None, &blocks),
                     group: topic.clone(),
                     topics: Vec::new(),
                     heading: None,
@@ -172,7 +191,7 @@ fn note<'a, 'i>(
         anchor: anchor.clone(),
         note: Note {
             address: anchor.clone(),
-            layer: layer(&group, &topics),
+            layer: layer(&group, &topics, heading.as_ref(), &blocks),
             group,
             topics,
             heading,
@@ -238,16 +257,158 @@ fn group_word(node: Node<'_, '_>) -> Result<String, IngestError> {
     }
 }
 
-/// The layer of a note of the group `group` with the topics `topics`.
-fn layer(group: &str, topics: &[String]) -> Layer {
-    let revision = topics
-        .iter()
-        .any(|topic| topic == "removalDescription" || topic == "historicalAndRevision");
-    if group == "editorialNotes" || (group == UNGROUPED && revision) {
-        Layer::Editorial
-    } else {
+/// The layer of a note of the group `group` with the topics `topics`, the
+/// heading `heading` and the blocks `blocks`: enacted when its blocks hold
+/// quoted content, its group is `statutoryNotes` or it is ungrouped, none of
+/// its topics is one of `EDITORS_TOPICS`, and, ungrouped, it has no heading
+/// that `editorial_heading` matches; editorial otherwise.
+fn layer(group: &str, topics: &[String], heading: Option<&Text>, blocks: &[Block]) -> Layer {
+    let ungrouped = group == UNGROUPED;
+    let enacted = holds_quoted(blocks)
+        && (ungrouped || group == STATUTORY)
+        && !topics
+            .iter()
+            .any(|topic| EDITORS_TOPICS.contains(&topic.as_str()))
+        && !(ungrouped && heading.is_some_and(|heading| editorial_heading(&heading.plain())));
+    if enacted {
         Layer::Enacted
+    } else {
+        Layer::Editorial
     }
+}
+
+/// Whether `blocks` hold quoted content, in a table cell included. A
+/// footnote is no block of the flow it stands in, so quoted content in a
+/// footnote is not counted.
+fn holds_quoted(blocks: &[Block]) -> bool {
+    blocks.iter().any(|block| match block {
+        Block::Quoted(_) => true,
+        Block::Table(table) => table
+            .rows
+            .iter()
+            .flat_map(|row| &row.cells)
+            .any(|cell| holds_quoted(&cell.blocks)),
+        Block::Para(_) | Block::Subheading(_) | Block::Image { .. } => false,
+    })
+}
+
+/// Whether the heading `heading` of an ungrouped note, with `A` to `Z` put in
+/// lower case and each run of white space made one U+0020, matches one of the
+/// three patterns of the notes of advisory committees, of the extracts of
+/// reports and statements, and of revision notes, written here by hand:
+///
+/// 1. `^(notes? (of|on) (the )?advisory committee|advisory committee notes?$|committee notes? on rules)`
+/// 2. `\breport no\b|\b(senate|house|conference) reports?\b|legislative statements?|explanatory statement|statement of (the )?managers|notes of (the )?committee on the judiciary|notes of conference committee|revision amendment|reviser|\bfloor statements?\b`
+/// 3. `historical and revision|^\d{4} acts?$`
+///
+/// Each is searched, `^` and `$` being the two ends of the heading. A word
+/// character of `\b` is an ASCII letter, an ASCII digit or `_`, and `\d` an
+/// ASCII digit, so that no other character is one; the text is compared as
+/// bytes, and the byte of a character outside ASCII is never one either. The
+/// alternatives of each pattern are written out in the lists below, a `?`
+/// giving the words with and without what it makes optional.
+fn editorial_heading(heading: &str) -> bool {
+    let mut folded = String::with_capacity(heading.len());
+    let mut space = false;
+    for character in heading.chars() {
+        if WHITE_SPACE.contains(&character) {
+            space = true;
+            continue;
+        }
+        if space {
+            folded.push(' ');
+            space = false;
+        }
+        folded.push(character.to_ascii_lowercase());
+    }
+    if space {
+        folded.push(' ');
+    }
+    let text = folded.as_bytes();
+    let year = |act: &[u8]| {
+        text.len() == 4 + act.len() && text[..4].iter().all(u8::is_ascii_digit) && &text[4..] == act
+    };
+    ADVISORY_BEGINNINGS
+        .iter()
+        .any(|words| text.starts_with(words.as_bytes()))
+        || ADVISORY_HEADINGS
+            .iter()
+            .any(|words| text == words.as_bytes())
+        || REPORT_WORDS.iter().any(|words| word(text, words))
+        || REPORT_PHRASES.iter().any(|words| holds(text, words))
+        || holds(text, "historical and revision")
+        || year(b" act")
+        || year(b" acts")
+}
+
+/// The beginnings of the headings that pattern 1 of `editorial_heading`
+/// matches: `^notes? (of|on) (the )?advisory committee` and
+/// `^committee notes? on rules`.
+const ADVISORY_BEGINNINGS: [&str; 10] = [
+    "note of advisory committee",
+    "note of the advisory committee",
+    "note on advisory committee",
+    "note on the advisory committee",
+    "notes of advisory committee",
+    "notes of the advisory committee",
+    "notes on advisory committee",
+    "notes on the advisory committee",
+    "committee note on rules",
+    "committee notes on rules",
+];
+
+/// The whole headings that pattern 1 matches: `^advisory committee notes?$`.
+const ADVISORY_HEADINGS: [&str; 2] = ["advisory committee note", "advisory committee notes"];
+
+/// The alternatives of pattern 2 between `\b` and `\b`: `\breport no\b`,
+/// `\b(senate|house|conference) reports?\b` and `\bfloor statements?\b`.
+const REPORT_WORDS: [&str; 9] = [
+    "report no",
+    "senate report",
+    "senate reports",
+    "house report",
+    "house reports",
+    "conference report",
+    "conference reports",
+    "floor statement",
+    "floor statements",
+];
+
+/// The other alternatives of pattern 2, each searched as it stands; of
+/// `legislative statements?` the words without the `s` are found wherever
+/// those with it are.
+const REPORT_PHRASES: [&str; 9] = [
+    "legislative statement",
+    "explanatory statement",
+    "statement of managers",
+    "statement of the managers",
+    "notes of committee on the judiciary",
+    "notes of the committee on the judiciary",
+    "notes of conference committee",
+    "revision amendment",
+    "reviser",
+];
+
+/// The places at which `words` stand in `text`.
+fn places<'a>(text: &'a [u8], words: &'a str) -> impl Iterator<Item = usize> + 'a {
+    let words = words.as_bytes();
+    (0..=text.len().saturating_sub(words.len())).filter(move |&at| text[at..].starts_with(words))
+}
+
+/// Whether `text` holds `words`.
+fn holds(text: &[u8], words: &str) -> bool {
+    places(text, words).next().is_some()
+}
+
+/// Whether `text` holds `words`, which begin and end with a word character,
+/// as `\b` and `\b` around them match: with no word character before them
+/// and none after them.
+fn word(text: &[u8], words: &str) -> bool {
+    let is_word = |byte: &u8| byte.is_ascii_alphanumeric() || *byte == b'_';
+    places(text, words).any(|at| {
+        let end = at + words.len();
+        (at == 0 || !is_word(&text[at - 1])) && text.get(end).is_none_or(|byte| !is_word(byte))
+    })
 }
 
 /// The notes of `read`, in document order, each at its address. A note
@@ -412,6 +573,7 @@ fn heading_segment(heading: &Text) -> String {
 #[cfg(test)]
 mod tests {
     use crate::testing::{Document, MEMBER, RELEASE, assert_fixture, read_fixture, refusal};
+    use Layer::{Editorial, Enacted};
     use fidryn_provision::hash::{
         hash_note, hash_provision, layer_hashes_of_container, layer_hashes_of_unit,
     };
@@ -502,16 +664,17 @@ mod tests {
                 )
             })
             .collect();
+        // None of them holds quoted content, so each is editorial.
         assert_eq!(
             read,
             [
                 ("ungrouped", Layer::Editorial, vec!["removalDescription"]),
                 ("ungrouped", Layer::Editorial, vec!["historicalAndRevision"]),
-                ("ungrouped", Layer::Enacted, vec!["miscellaneous"]),
+                ("ungrouped", Layer::Editorial, vec!["miscellaneous"]),
                 ("editorialNotes", Layer::Editorial, vec!["amendments"]),
-                ("statutoryNotes", Layer::Enacted, vec!["effectiveDate"]),
-                ("execDoc", Layer::Enacted, vec!["executiveOrder"]),
-                ("courtRules", Layer::Enacted, vec!["miscellaneous"]),
+                ("statutoryNotes", Layer::Editorial, vec!["effectiveDate"]),
+                ("execDoc", Layer::Editorial, vec!["executiveOrder"]),
+                ("courtRules", Layer::Editorial, vec!["miscellaneous"]),
             ]
         );
         // The label of each cross heading is counted and not imported.
@@ -530,16 +693,18 @@ mod tests {
                 .as_ref()
                 .is_none_or(|heading| !labels.contains(&heading.plain().as_str()))
         }));
-        // A word the rules do not know is a group like any other, and its
-        // notes are enacted.
+        // A word the rules do not know is a group like any other; its notes
+        // are editorial, quoted content or not, since only the statutory
+        // group and the ungrouped notes hold enacted ones.
         assert_fixture("notes-unknown-group");
         let notes = notes_of(
             "<note role=\"crossHeading\" topic=\"demoNotes2\"><heading>Demo</heading></note>\
-             <note topic=\"amendments\"><heading>Words</heading><p>Words.</p></note>",
+             <note topic=\"amendments\"><heading>Words</heading><p>Words: <quotedContent>\
+             “Quoted.”</quotedContent></p></note>",
         );
         assert_eq!(
             (notes[0].group.as_str(), notes[0].layer),
-            ("demoNotes2", Layer::Enacted)
+            ("demoNotes2", Layer::Editorial)
         );
         // The text a cross heading holds after its label is a note of its
         // group, with no heading and no topics.
@@ -561,35 +726,176 @@ mod tests {
         assert_eq!(notes[0].blocks, [para(vec![words("Held words.")])]);
     }
 
+    /// The address and the layer of every note of the fixture `name`, which
+    /// reads to its expected records, module by module in the order they
+    /// are read and each module's notes in document order.
+    fn layers_of(name: &str) -> Vec<(String, Layer)> {
+        assert_fixture(name);
+        read_fixture(name)
+            .iter()
+            .flat_map(|module| match module {
+                Module::Unit(unit) => unit.notes.as_slice(),
+                Module::Container(container) => container.notes.as_slice(),
+                Module::Curated(_) => &[],
+            })
+            .map(|note| (note.address.to_string(), note.layer))
+            .collect()
+    }
+
+    /// `layers`, each address below `/us/usc/t99/s1/note/` given by its rest.
+    fn in_s1(layers: &[(&str, Layer)]) -> Vec<(String, Layer)> {
+        layers
+            .iter()
+            .map(|(rest, layer)| (format!("/us/usc/t99/s1/note/{rest}"), *layer))
+            .collect()
+    }
+
     #[test]
-    fn an_ungrouped_removal_description_or_revision_note_is_editorial_and_any_other_is_enacted() {
-        let notes = notes_of(
-            "<note topic=\"removalDescription\"><p>A.</p></note>\
-             <note topic=\"amendments historicalAndRevision\"><p>B.</p></note>\
-             <note topic=\"amendments\"><p>C.</p></note>\
-             <note><p>D.</p></note>\
-             <note topic=\"removalDescription x\"><p>E.</p></note>\
-             <note role=\"crossHeading\" topic=\"statutoryNotes\"><heading>S</heading></note>\
-             <note topic=\"removalDescription\"><p>F.</p></note>\
-             <note role=\"crossHeading\" topic=\"editorialNotes\"><heading>E</heading></note>\
-             <note topic=\"miscellaneous\"><p>G.</p></note>",
-        );
-        let layers: Vec<Layer> = notes.iter().map(|note| note.layer).collect();
+    fn a_note_is_enacted_only_when_it_holds_quoted_content_outside_its_footnotes() {
         assert_eq!(
-            layers,
-            [
-                Layer::Editorial,
-                Layer::Editorial,
-                Layer::Enacted,
-                Layer::Enacted,
-                Layer::Editorial,
-                Layer::Enacted,
-                Layer::Editorial,
-            ]
+            layers_of("notes-layer-quoted"),
+            in_s1(&[
+                ("statutoryNotes/pl.999.71/set-out", Enacted),
+                ("statutoryNotes/pl.999.71/pointed-to", Editorial),
+                ("statutoryNotes/pl.999.72/paraphrased", Editorial),
+                ("statutoryNotes/nolaw/footnoted", Editorial),
+                ("statutoryNotes/nolaw/tabled", Enacted),
+                ("statutoryNotes/nolaw/quoted-nothing", Enacted),
+            ])
         );
-        assert_eq!(notes[1].topics, ["amendments", "historicalAndRevision"]);
-        assert_eq!(notes[3].topics, Vec::<String>::new());
-        assert_eq!(notes[4].topics, ["removalDescription", "x"]);
+        // The quoted content of the note `footnoted` is its footnote's, and
+        // the empty quoted content of `quoted-nothing` is a block of its own.
+        let modules = read_fixture("notes-layer-quoted");
+        let unit = unit_at(&modules, "/us/usc/t99/s1");
+        assert!(matches!(
+            unit.footnotes[0].blocks.as_slice(),
+            [Block::Para(_), Block::Quoted(_), Block::Para(_)]
+        ));
+        assert!(matches!(
+            unit.notes[5].blocks.as_slice(),
+            [Block::Para(_), Block::Quoted(quoted)] if quoted.items.is_empty()
+        ));
+    }
+
+    #[test]
+    fn a_note_is_enacted_only_in_the_statutory_group_or_when_ungrouped() {
+        let mut expected = vec![(
+            "/us/usc/t99/ch1/note/ungrouped/nolaw/chapter-set-out".to_owned(),
+            Enacted,
+        )];
+        expected.extend(in_s1(&[
+            ("ungrouped/nolaw/standing-in-the-section", Enacted),
+            ("ungrouped/nolaw/before-any-group", Enacted),
+            ("editorialNotes/nolaw/amendments", Editorial),
+            // What the cross heading of the statutory group holds after its
+            // label.
+            ("statutoryNotes/nolaw/h.1a1d3cdf7c3c50c1", Enacted),
+            ("statutoryNotes/nolaw/statutory", Enacted),
+            ("execDoc/nolaw/executive-order-no-98", Editorial),
+            ("courtRules/nolaw/rules-of-demonstration", Editorial),
+            ("demoNotes3/nolaw/unknown-group", Editorial),
+        ]));
+        assert_eq!(layers_of("notes-layer-groups"), expected);
+    }
+
+    #[test]
+    fn a_note_with_a_topic_of_the_editors_is_editorial() {
+        assert_eq!(
+            layers_of("notes-layer-topics"),
+            in_s1(&[
+                ("ungrouped/nolaw/first-invented-words", Editorial),
+                ("ungrouped/pl.999.73/noheading", Editorial),
+                ("ungrouped/pl.999.74/amendment-of-section", Editorial),
+                ("ungrouped/nolaw/second-topic", Editorial),
+                ("ungrouped/nolaw/near-topic", Enacted),
+                ("ungrouped/nolaw/no-topic-of-the-editors", Enacted),
+                ("statutoryNotes/nolaw/statutory-amendment", Editorial),
+            ])
+        );
+    }
+
+    #[test]
+    fn an_ungrouped_note_headed_as_a_committee_note_a_report_or_a_revision_note_is_editorial() {
+        assert_eq!(
+            layers_of("notes-layer-headings"),
+            in_s1(&[
+                (
+                    "ungrouped/nolaw/notes-of-advisory-committee-on-rules",
+                    Editorial
+                ),
+                ("ungrouped/nolaw/advisory-committee-note", Editorial),
+                (
+                    "ungrouped/nolaw/committee-notes-on-rules-2099-amendment",
+                    Editorial,
+                ),
+                // Its heading is `  NOTES   of`, a tab, `the`, a no-break
+                // space and `ADVISORY Committee `.
+                ("ungrouped/nolaw/notes-of-the-advisory-committee", Editorial),
+                ("ungrouped/nolaw/senate-report-no-99-1", Editorial),
+                ("ungrouped/nolaw/statement-of-the-managers", Editorial),
+                ("ungrouped/nolaw/reviser-s-note", Editorial),
+                // `ë` is no ASCII word character, so `report no` ends a word.
+                ("ungrouped/nolaw/report-no-l", Editorial),
+                ("ungrouped/nolaw/report-nos-99-1-and-99-2", Enacted),
+                ("ungrouped/nolaw/historical-and-revision-notes", Editorial),
+                ("ungrouped/nolaw/2099-act", Editorial),
+                ("ungrouped/nolaw/2099-acts-amended", Enacted),
+                // Its heading writes the year in full-width digits.
+                ("ungrouped/nolaw/act", Enacted),
+                ("ungrouped/nolaw/invented-short-title", Enacted),
+                ("ungrouped/nolaw/h.f216410b9b42d8a9", Enacted),
+                ("statutoryNotes/nolaw/senate-report-no-99-3", Enacted),
+            ])
+        );
+    }
+
+    #[test]
+    fn the_patterns_of_headings_read_letters_digits_and_word_ends_in_ascii() {
+        for (heading, matched) in [
+            ("Notes of Advisory Committee on Rules", true),
+            ("Note on the Advisory Committee", true),
+            ("NOTES  ON\u{A0}THE\tADVISORY COMMITTEE", true),
+            ("Advisory Committee Notes", true),
+            ("Advisory Committee Note", true),
+            ("Advisory Committee Notes on Rules", false),
+            ("Prior Notes of Advisory Committee", false),
+            ("Committee Notes on Rules—2099", true),
+            ("Report No. 1", true),
+            ("Report Nos. 1 and 2", false),
+            ("Report Noël", true),
+            ("Report No_1", false),
+            ("Areport No. 1", false),
+            ("Senate Report", true),
+            ("Senate Reports", true),
+            ("Senate Reportsx", false),
+            ("Xsenate Report", false),
+            ("Ésenate Report", true),
+            ("House Report 99-1", true),
+            ("Conference Reports.", true),
+            ("Legislative Statements", true),
+            ("Explanatory Statement", true),
+            ("Statement of Managers", true),
+            ("Statement of the Managers", true),
+            ("Notes of Committee on the Judiciary", true),
+            ("Notes of the Committee on the Judiciary", true),
+            ("Notes of Conference Committee", true),
+            ("Revision Amendment", true),
+            ("Revisers' Notes", true),
+            ("Floor Statement", true),
+            ("Floor Statements", true),
+            ("Floor Statementsx", false),
+            ("Afloor Statement", false),
+            ("Historical and Revision Notes", true),
+            ("2099 Act", true),
+            ("2099 Acts", true),
+            ("2099 Acts Amended", false),
+            ("12099 Act", false),
+            ("\u{FF12}\u{FF10}\u{FF19}\u{FF19} Act", false),
+            ("Invented Short Title", false),
+            ("", false),
+        ] {
+            assert_eq!(super::editorial_heading(heading), matched, "{heading:?}");
+        }
     }
 
     #[test]
@@ -602,7 +908,8 @@ mod tests {
         let notes = notes_of(
             "<note topic=\"\"><p>A.</p></note>\
              <note topic=\"   \"><p>B.</p></note>\
-             <note topic=\" amendments   historicalAndRevision  \"><p>C.</p></note>",
+             <note topic=\" amendments   historicalAndRevision  \"><p>C: <quotedContent>“C.”\
+             </quotedContent></p></note>",
         );
         let topics: Vec<Vec<&str>> = notes
             .iter()
@@ -612,6 +919,7 @@ mod tests {
             topics,
             [vec![], vec![], vec!["amendments", "historicalAndRevision"]]
         );
+        // The second of its topics makes the note that quotes editorial.
         assert_eq!(notes[2].layer, Layer::Editorial);
         // A line break written in the attribute is a space once the attribute
         // is read; one written as a character reference is not.
@@ -682,7 +990,7 @@ mod tests {
             addresses(&chapter.notes),
             ["/us/usc/t99/ch1/note/ungrouped/nolaw/chapter-note"]
         );
-        assert_eq!(chapter.notes[0].layer, Layer::Enacted);
+        assert_eq!(chapter.notes[0].layer, Layer::Editorial);
         assert!(container_at(&modules, "/us/usc/t99").notes.is_empty());
         // A container has a credit, notes that stand directly in it, and
         // footnotes of its own; its units number their footnotes apart.
@@ -1368,8 +1676,8 @@ mod tests {
                  <note role=\"crossHeading\" topic=\"editorialNotes\"><heading>E</heading></note>\
                  <note topic=\"amendments\"><heading>Amendments</heading><p>{editorial}</p></note>\
                  <note role=\"crossHeading\" topic=\"statutoryNotes\"><heading>S</heading></note>\
-                 <note topic=\"effectiveDate\"><heading>Effective Date</heading><p>{enacted}</p>\
-                 </note></notes>"
+                 <note topic=\"effectiveDate\"><heading>Effective Date</heading><p>It provided: \
+                 <quotedContent>“{enacted}”</quotedContent></p></note></notes>"
             ));
             layer_hashes_of_unit(unit_at(&modules, "/us/usc/t99/s1"))
         };
@@ -1437,8 +1745,8 @@ mod tests {
             let modules = Document::with_body(format!(
                 "<chapter identifier=\"/us/usc/t99/ch1\"><num value=\"1\">CHAPTER 1</num>\
                  <sourceCredit>({credit})</sourceCredit><notes type=\"uscNote\"><note \
-                 topic=\"miscellaneous\"><heading>Note</heading><p>{note}</p></note></notes>\
-                 </chapter>"
+                 topic=\"miscellaneous\"><heading>Note</heading><p>It provided: <quotedContent>\
+                 “{note}”</quotedContent></p></note></notes></chapter>"
             ))
             .read()
             .expect("read");

@@ -71,7 +71,7 @@ module "/us/usc/ptI/rule1015" {
     hash "09d4728ae02bf5aba9e3ce3e445f93c43e6fd69bf011861f1ce14cfdc0fed600"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -83,14 +83,14 @@ module "/us/usc/ptI/rule1015" {
     p "A joint petition of husband and wife, requiring the payment of a single filing fee, is permitted by § 302 of the Code. Consolidation of such a case, however, rests in the discretion of the court; see § 302(b) of the Code."
     hash "193bb0e7ac168ccf391529121b0533248e44bf45260c296598ac6945edea2fc8"
   }
-  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The amendment to subdivision (b) implements the provisions of § 522(b) of the Code, as enacted by the 1984 amendments."
     hash "6b22c46466959f5c827d4740f735bf3cc6ba98e034c82929da2dcf4788accded"
   }
-  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -98,7 +98,7 @@ module "/us/usc/ptI/rule1015" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "2a5507a056a634323fa2f0a37e6b1debf79826177f6a26ec19b30c7cc3fe5012"
   }
-  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010 Amendment"
@@ -106,14 +106,14 @@ module "/us/usc/ptI/rule1015" {
     p "Changes Made After Publication. No changes since publication."
     hash "d0757c345199048ffb483327b21269ba9bf8cc71d47a5dc109fcea40536dc525"
   }
-  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2017 Amendment"
     p "Subdivision (b) is amended to replace “a husband and wife” with “spouses” in light of the Supreme Court’s decision in Obergefell v. Hodges, 135 S. Ct. 2584 (2015)."
     hash "259052424eeff8a26f0b01e939208292f1a9fe08752d609a92ef5a3148ab44bd"
   }
-  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -122,7 +122,7 @@ module "/us/usc/ptI/rule1015" {
   }
   layers {
     operative "09d4728ae02bf5aba9e3ce3e445f93c43e6fd69bf011861f1ce14cfdc0fed600"
-    enacted "70d4aae151bf57af9bea4d1e88c3e3f89cbf26b0ffc77a93438ae3caeac4ec69"
-    editorial "9fec48c6c8f016d63a104d5c772f3f97936cd310c8fb96477e9fdd329745049e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "bd1044bfbf97919a65d3d448134361622cf4f72e7df255a1af34d54021852101"
   }
 }

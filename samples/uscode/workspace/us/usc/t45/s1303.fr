@@ -113,7 +113,7 @@ module "/us/usc/t45/s1303" {
     p "Section 4024(e) and section 4024(f), referred to in par. (6), are section 4024(e) and (f) of " ["Pub. L. 99–509" -> "/us/pl/99/509"] ", and are set out as a note under " ["section 797 of this title" -> "/us/usc/t45/s797"] "."
     hash "49a335fe559a7ac98e6a2906a5385761440bb0e56740d929c698da4f1765d330"
   }
-  note "/us/usc/t45/s1303/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1303/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -227,7 +227,7 @@ module "/us/usc/t45/s1303" {
   }
   layers {
     operative "665e87dc4b76a76befa5f243b556e8c0ce950c1ead91e9b0a82ff33a6e316953"
-    enacted "6d1df37b8cc86b034bdcbff2f1979494610c573fd71e5c6fe6a11b358c9f9a17"
-    editorial "c561c1ae5e24e8b065436a1c336e6e23169bb86dd88bd9ed4d9e84e49379f6a9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "6110ba46a499a83ec08c26b5523b48db07795a8c78e2f298e3cc9f591b0ed8f9"
   }
 }

@@ -162,7 +162,7 @@ module "/us/usc/t45/s1323" {
     hash "eacd7e8f1e0d4c6e9fe3ac67f0b6517e0bafe2bfdcbbfc1f97266618a2dcd5b7"
   }
   credit "(" ["Pub. L. 99–509, title IV, § 4023" -> "/us/pl/99/509/tIV/s4023"] ", Oct. 21, 1986, " ["100 Stat. 1901" -> "/us/stat/100/1901"] ".)"
-  note "/us/usc/t45/s1323/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s1323/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
@@ -171,7 +171,7 @@ module "/us/usc/t45/s1323" {
   }
   layers {
     operative "eacd7e8f1e0d4c6e9fe3ac67f0b6517e0bafe2bfdcbbfc1f97266618a2dcd5b7"
-    enacted "9b09c9711dddaebdc47e7f0b113426b11774cc3f46c4a470d26c7235abf2614b"
-    editorial "b479ed4d8759877d57e4440c72c6deb6363e1b9a6f74a9fe72b591c863960066"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f6d4ab9e79b26a1ef33426927fef421207dfb408d318b697d17ac4e22c1980ae"
   }
 }

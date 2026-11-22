@@ -10,7 +10,7 @@ module "/us/usc/ptII/rule2020" {
     hash "9e08ee71de28f94bfd68f3aa45035a9a88f8a0e17c5bbfa110f6035f6dae0b95"
   }
   credit "(Added Apr. 30, 1991, eff. Aug. 1, 1991; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+  note "/us/usc/ptII/rule2020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991"
@@ -18,7 +18,7 @@ module "/us/usc/ptII/rule2020" {
     p "This rule provides for review of acts already committed by the United States trustee, but does not provide for advisory opinions in advance of the act. This rule is not intended to limit the discretion of the United States trustee, provided that the United States trustee’s act is authorized by, and in compliance with, the Code, title 28, these rules, and other applicable law."
     hash "f985d6a3cd2b0bedcbf586faa4ad74ac55ee11541805fbf1c35f864a03078364"
   }
-  note "/us/usc/ptII/rule2020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -27,7 +27,7 @@ module "/us/usc/ptII/rule2020" {
   }
   layers {
     operative "9e08ee71de28f94bfd68f3aa45035a9a88f8a0e17c5bbfa110f6035f6dae0b95"
-    enacted "72e27c71ceb7d1ce372327aac4c2ce4f9d3f48f1ee2a07e5f6f91b423ecd43e0"
-    editorial "6e221db452d28524b07181ff93d05672627360650a5762869a1fa53bda8724d3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "58b397a5a70036afc85b3b5e7f3060d648b5016f296e1e87c13569e6a618d7b6"
   }
 }

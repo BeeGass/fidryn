@@ -55,14 +55,14 @@ module "/us/usc/t45/s1018" {
     p "1984—Subsec. (b). " ["Pub. L. 98–620" -> "/us/pl/98/620"] " struck out provision requiring the court to render a final decision no later than 60 days after the filing of the last such appeal."
     hash "2b80dc03138a5f8b18d12950e8b1e7217bf7c4563d58e08bb1d6005e622ea887"
   }
-  note "/us/usc/t45/s1018/note/statutoryNotes/pl.98.620/effective-date-of-1984-amendment" enacted {
+  note "/us/usc/t45/s1018/note/statutoryNotes/pl.98.620/effective-date-of-1984-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1984 Amendment"
     p "Amendment by " ["Pub. L. 98–620" -> "/us/pl/98/620"] " not applicable to cases pending on Nov. 8, 1984, see " ["section 403 of Pub. L. 98–620" -> "/us/pl/98/620/s403"] ", set out as a note under " ["section 1657 of Title 28" -> "/us/usc/t28/s1657"] ", Judiciary and Judicial Procedure."
     hash "b3d0854af378192f7a53e70489f9fc3f7946aec91d2ce245380969a27892e6fd"
   }
-  note "/us/usc/t45/s1018/note/statutoryNotes/pl.96.448/effective-date" enacted {
+  note "/us/usc/t45/s1018/note/statutoryNotes/pl.96.448/effective-date" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date"
@@ -74,7 +74,7 @@ module "/us/usc/t45/s1018" {
   }
   layers {
     operative "d8fc10c143ecb79086a8e775f6d70857bb96f84998e16620d68f6112ee227629"
-    enacted "c294e4f0f7a9dcdc0e67a2347164740fd2c129db7ded3191a2c08906dde17601"
-    editorial "358fc2612fc9c5a1049ffca484467b853e7cb1b0afea2b3ec49e3d7203da3fac"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "22246d4db990e4ae8b89488d96a1ae19ec71b9f361f0771523dccc5d68108426"
   }
 }

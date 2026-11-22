@@ -1022,28 +1022,28 @@ module "/us/usc/t45/s358" {
     }
     hash "bb3af8e6cdd1b5e280023f558d8ef30b6c1b3cc611fb4a602c27e0ba4fa66874"
   }
-  note "/us/usc/t45/s358/note/statutoryNotes/pl.98.76/effective-date-of-1983-amendment" enacted {
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.98.76/effective-date-of-1983-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1983 Amendment"
     p "Amendment by " ["Pub. L. 98–76" -> "/us/pl/98/76"] " applicable to compensation paid for services rendered after Dec. 31, 1983, see " ["section 503(c) of Pub. L. 98–76" -> "/us/pl/98/76/s503/c"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "a36699cd5b7cbd5ccdf17fbbfd021a14edd14b1758c0b5d63924dc6a5d623ccb"
   }
-  note "/us/usc/t45/s358/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
     p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Oct. 1, 1981, and applicable only with respect to annuities awarded on or after that date, see " ["section 1129 of Pub. L. 97–35" -> "/us/pl/97/35/s1129"] ", set out as a note under " ["section 231 of this title" -> "/us/usc/t45/s231"] "."
     hash "f34eedda9e0a73372e03d4a62b8df5d0ec73b66dc4aad6dab3e7c1e5b987c19c"
   }
-  note "/us/usc/t45/s358/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment" enacted {
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1975 Amendment"
     p "Amendment by " ["Pub. L. 94–92" -> "/us/pl/94/92"] " effective with respect to compensation paid for services rendered after Dec. 31, 1975, see " ["section 2 of Pub. L. 94–92" -> "/us/pl/94/92/s2"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "f2ba637f0f633170fd562de44ebc0b4bf7b9ed908566eb3e3e3ee1c6df0c60a8"
   }
-  note "/us/usc/t45/s358/note/statutoryNotes/pl.88.133/effective-date-of-1963-amendment" enacted {
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.88.133/effective-date-of-1963-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1963 Amendment"
@@ -1051,28 +1051,28 @@ module "/us/usc/t45/s358" {
     p ["Pub. L. 88–133, title III, § 304" -> "/us/pl/88/133/tIII/s304"] ", Oct. 5, 1963, " ["77 Stat. 223" -> "/us/stat/77/223"] ", provided that the amendment made by section 304 is effective with respect to contributions collected by the Railroad Retirement Board after Dec. 31, 1961."
     hash "d83b33ad259a365de16176a816a24bf93f84bd225cb440fb0650cc5fa6d31e12"
   }
-  note "/us/usc/t45/s358/note/statutoryNotes/pl.86.28/effective-date-of-1959-amendment" enacted {
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.86.28/effective-date-of-1959-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1959 Amendment"
     p "Amendment by sections 306(4), (5) and 307(1) of " ["Pub. L. 86–28" -> "/us/pl/86/28"] " effective first day of calendar month next following May 1959, and applicable only with respect to compensation paid for services rendered in calendar months after May 1959, see " ["section 309 of Pub. L. 86–28" -> "/us/pl/86/28/s309"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "9cae218d01fd8fda9de7bbb0c0a96a4a6a532750f395c88453b9b92e2e8a11b6"
   }
-  note "/us/usc/t45/s358/note/statutoryNotes/pl.85.927/effective-date-of-1958-amendment" enacted {
+  note "/us/usc/t45/s358/note/statutoryNotes/pl.85.927/effective-date-of-1958-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1958 Amendment"
     p "Amendment by " ["Pub. L. 85–927" -> "/us/pl/85/927"] " effective Sept. 6, 1958, except as otherwise indicated, see " ["section 207(c) of Pub. L. 85–927" -> "/us/pl/85/927/s207/c"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "e5491c4ad18c46a3258951b0ea60b804fb41eaea802bcca74a247d6a7c4a35a8"
   }
-  note "/us/usc/t45/s358/note/statutoryNotes/nolaw/effective-date-of-1954-amendment" enacted {
+  note "/us/usc/t45/s358/note/statutoryNotes/nolaw/effective-date-of-1954-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1954 Amendment"
     p "Amendment by act Aug. 31, 1954, effective July 1, 1954, see section 401 of act Aug. 31, 1954, set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "e9786b4be163d0a8ffd8af6eb98fd468d5469dea7119ccfa9a11be8a637ba011"
   }
-  note "/us/usc/t45/s358/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" enacted {
+  note "/us/usc/t45/s358/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1946 Amendment"
@@ -1104,7 +1104,7 @@ module "/us/usc/t45/s358" {
   }
   layers {
     operative "13b3d6be1e94381737e367151e4e2bc1408c407422196ef6f01be1aa8fc9d2a6"
-    enacted "a00f82de6121bf59610623c723c8564d37847e2dff5f2e316930d3c616ca7db8"
-    editorial "6f0105eca28a40e09e45de16969854c04ce616cca35850dfbbb5840c4ba563dc"
+    enacted "86e7d4e5611ff64620a287f50024d8c379e19b0a06fc314843c00b5020b506b9"
+    editorial "432c687353b4990ef0aa144ee3cb8e925582f57acee7c593ad4fd659cd74f3b3"
   }
 }

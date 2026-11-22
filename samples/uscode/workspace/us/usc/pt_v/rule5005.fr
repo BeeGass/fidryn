@@ -115,7 +115,7 @@ module "/us/usc/ptV/rule5005" {
     hash "de9fbcd40b56be71b237971bdaada25db0b428f2ac1b97dc5dcdc32d5144b593"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 12, 2006, eff. Dec. 1, 2006; Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -123,14 +123,14 @@ module "/us/usc/ptV/rule5005" {
     p "Subdivision (b) is the same as former Bankruptcy Rule 509(c)."
     hash "1ce8e6dfd62021bdacafb9868a970db4109906a235a1555fd3a176034a752c92"
   }
-  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Subdivision (a) is amended to conform with the 1984 amendments."
     hash "8ed810d2e94f93ab1794d8c2ec6f71e20069433801ad9030b6608e9fc386727d"
   }
-  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -140,14 +140,14 @@ module "/us/usc/ptV/rule5005" {
     p "Subdivision (c) is amended to include the erroneous delivery of papers intended to be transmitted to the United States trustee."
     hash "e7c399361cf6d3b53864ba68ecaa1f78db53e8c4e3961f76937aa7aeb32802e7"
   }
-  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "Subdivision (a) is amended to conform to the 1991 amendment to Rule 5(e) F.R.Civ.P. It is not a suitable role for the office of the clerk to refuse to accept for filing papers not conforming to requirements of form imposed by these rules or by local rules or practices. The enforcement of these rules and local rules is a role for a judge. This amendment does not require the clerk to accept for filing papers sent to the clerk’s office by facsimile transmission."
     hash "df8e130349c689045e6ff3083d1665773dd4431bca7e2540a25c96a741ded6e0"
   }
-  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1996 Amendment"
@@ -162,7 +162,7 @@ module "/us/usc/ptV/rule5005" {
     p "GAP Report on Rule 5005. No changes since publication."
     hash "2c5b3d8f1885937dfaa5387cea616616cacfb1f7b44b2fe14b21fa4f26fd798d"
   }
-  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/committee-notes-on-rules-2006-amendment" enacted {
+  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/committee-notes-on-rules-2006-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2006 Amendment"
@@ -171,7 +171,7 @@ module "/us/usc/ptV/rule5005" {
     p "Changes Made After Publication. The published version of the Rule did not include the sentence set out on lines 7–10 above [sic]. The Advisory Committee concluded, based on the written comments received and additional Advisory Committee consideration, that the text of the rule should include a statement regarding the need for courts to protect access to the courts for those whose status might not allow for electronic participation in cases. The published version had relegated this notion to the Committee Note, but further deliberations led to the conclusion that this matter is too important to leave to the Committee Note and instead should be included in the text of the rule."
     hash "261e42b36d067f1de93b6438ea07fc7ec9e2d55150ad8ec5e7ce245d4afb527d"
   }
-  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
@@ -180,21 +180,21 @@ module "/us/usc/ptV/rule5005" {
     p "A filing made through a person’s electronic-filing account and authorized by that person, together with that person’s name on a signature block, constitutes the person’s signature. A person’s electronic-filing account means an account established by the court for use of the court’s electronic-filing system, which account the person accesses with the user name and password (or other credentials) issued to that person by the court."
     hash "f3e8d0f6ca03a507c12cba3ad92f9900a04e02e905a2613307ed81c141be69e2"
   }
-  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "Subdivision (b)(1) is amended to authorize the clerk or parties to transmit papers to the United States trustee by electronic means in accordance with Rule 9036, regardless of whether the United States trustee is a registered user with the court’s electronic-filing system. Subdivision (b)(2) is amended to recognize that parties meeting transmittal obligations to the United States trustee using the court’s electronic-filing system need not file a statement evidencing transmittal under Rule 5005(b)(2). The amendment to subdivision (b)(2) also eliminates the requirement that statements evidencing transmittal filed under Rule 5005(b)(2) be verified."
     hash "8047d0aa3b01cd288d645c9e5c0731e637e679373747b054ce908ea57dc8e543"
   }
-  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 5005 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "ab9bec072ba57780f013bc25dce7752d9c9a44a7502c8d1a85923c0234f7ca7d"
   }
-  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptV/rule5005/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -203,7 +203,7 @@ module "/us/usc/ptV/rule5005" {
   }
   layers {
     operative "de9fbcd40b56be71b237971bdaada25db0b428f2ac1b97dc5dcdc32d5144b593"
-    enacted "b2f27112159272ed20658f65de6517baf4f92d2b9bb458c7563c768c77d28bd0"
-    editorial "750791f0350a5fcb760e059f386983c387d304543a473399a0917d941ae2ba5b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b472010e3e8b2eee9e581e89383584c7d3d0d978ca48328cb7e3c635f89ac530"
   }
 }

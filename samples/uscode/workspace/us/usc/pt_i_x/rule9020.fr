@@ -10,7 +10,7 @@ module "/us/usc/ptIX/rule9020" {
     hash "8b15c1c0d4e7e1913a5056a85562fe1c88dac7cfc62ba9a117e8201bf4c39f0f"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2001, eff. Dec. 1, 2001; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -21,7 +21,7 @@ module "/us/usc/ptIX/rule9020" {
     p "The Federal Rules of Civil Procedure do not specifically provide the procedure for the imposition of civil contempt sanctions. The decisional law governing the procedure for imposition of civil sanctions by the district courts will be equally applicable to the bankruptcy courts."
     hash "f7abc667c4270df0f2a45b46263e53151b4dffb1f9b892a2937b960752578f6a"
   }
-  note "/us/usc/ptIX/rule9020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptIX/rule9020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -29,14 +29,14 @@ module "/us/usc/ptIX/rule9020" {
     p "Sound judicial administration requires that the initial determination of whether contempt has been committed should be made by the bankruptcy judge. If timely objections are not filed to the bankruptcy judge’s order, the order has the same force and effect as an order of the district court. If objections are filed within 10 days of service of the order, the district court conducts a de novo review pursuant to Rule 9033 and any order of contempt is entered by the district court on completion of the court’s review of the bankruptcy judge’s order."
     hash "7c388749dc12e9a083ebe9eb573a9dadf60e58fd249ecb2f53ac1245109a7c73"
   }
-  note "/us/usc/ptIX/rule9020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIX/rule9020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "The words “with the clerk” in subdivision (c) are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "e3146792e2bdbc971a59fea67b0dd71fe057b1ba856b410fa59c16a1c88bfef7"
   }
-  note "/us/usc/ptIX/rule9020/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+  note "/us/usc/ptIX/rule9020/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2001 Amendment"
@@ -48,7 +48,7 @@ module "/us/usc/ptIX/rule9020" {
     p "Changes Made After Publication and Comments. No changes were made in the text of the proposed amendments. Stylistic changes were made to the Committee Note."
     hash "659eb577d3d6015e563371e76d93a0b958a678522bd64010f88d102cf1d64487"
   }
-  note "/us/usc/ptIX/rule9020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -57,7 +57,7 @@ module "/us/usc/ptIX/rule9020" {
   }
   layers {
     operative "8b15c1c0d4e7e1913a5056a85562fe1c88dac7cfc62ba9a117e8201bf4c39f0f"
-    enacted "3994d2c63d83b0d0cbc115f2fe1f6f245f898f9d2cf6483f7b02e51b43d8eb67"
-    editorial "63158ef09b3f632f2ff7765f2c4c25acf20417424c15464e16ba73220b840533"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "4448ba3597e3ca8df65b23d83c9acd8e7d22ea826bf94b73c483fa5c235c0178"
   }
 }

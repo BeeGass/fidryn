@@ -61,7 +61,7 @@ module "/us/usc/t45/s1007" {
     p "1980—Subsec. (a). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " inserted reference to the agreement entered into in Washington on Mar. 4, 1980, and included the title of the agreement."
     hash "bbed37f1a2740fb737fad698e962d9c0c47c5571d8ab1e9b6d6b0af2c79b7261"
   }
-  note "/us/usc/t45/s1007/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s1007/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
@@ -70,7 +70,7 @@ module "/us/usc/t45/s1007" {
   }
   layers {
     operative "c73f22346b312a1e87cbddbb44ea186dc8dd8650a0ca912e40eecf15b136a182"
-    enacted "138ffe4f21bc64395cebaae1574c2fc63935b64ad3526d7dfbceda12403bb7e8"
-    editorial "d4d7deceb20d1a7892c10a71908267ff282fb30cb05df23357ad157cd23055b6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "30b778d8f73c875bc871b89021a17e4176ad61465d5aa3f8861cf16b68c797b7"
   }
 }

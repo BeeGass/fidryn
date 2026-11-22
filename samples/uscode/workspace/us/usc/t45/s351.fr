@@ -307,7 +307,7 @@ module "/us/usc/t45/s351" {
     p "Subsec. (n). Act June 20, 1939, § 20, inserted provisions relating to inclusion within “benefit year” half-months containing days of unemployment."
     hash "1d75e18b9c78977e8a015b91fa27878b90af3f16d3ffbd012adaf9d6d65267e2"
   }
-  note "/us/usc/t45/s351/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s351/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
@@ -446,7 +446,7 @@ module "/us/usc/t45/s351" {
     }
     hash "374990539be9b2bebbc8ea3b5e98b9c2e1fc525a5046647a722c2be3578e8d7f"
   }
-  note "/us/usc/t45/s351/note/statutoryNotes/nolaw/effective-date-of-1946-amendments" enacted {
+  note "/us/usc/t45/s351/note/statutoryNotes/nolaw/effective-date-of-1946-amendments" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1946 Amendments"
@@ -486,7 +486,7 @@ module "/us/usc/t45/s351" {
     }
     hash "b425122191dc6e2a16124e9fdb779793876cf55a569e9d5f2a3faedc4ea8177f"
   }
-  note "/us/usc/t45/s351/note/statutoryNotes/pl.100.360/exclusion-from-wages-and-compensation-of-refunds-required-fr" enacted {
+  note "/us/usc/t45/s351/note/statutoryNotes/pl.100.360/exclusion-from-wages-and-compensation-of-refunds-required-fr" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Exclusion From Wages and Compensation of Refunds Required From Employers To Compensate for Duplication of Medicare Benefits by Health Care Benefits Provided by Employers"
@@ -638,7 +638,7 @@ module "/us/usc/t45/s351" {
   }
   layers {
     operative "14d34be7bbc7b4719bf7423c406b40bbae2b407bc2ccc80fffe46c5fb73dd757"
-    enacted "ac322a53b706e7e8908447e9699718fc7020a0c0c323f1eaebb7ea4b4bf96da4"
-    editorial "9d0f5cd0ca3d78750acb4d586e293c5fbcaab12fff4f1c2d96af3b75ecbbf890"
+    enacted "7b1ac20e93c918c7a9421c317e9b2630f46b6b1ba6e98a15b164d61fbd3edaac"
+    editorial "3197713a76d538551ff8423564348f9ca39ed3129db7e78a2d3721ce0b5ff66d"
   }
 }

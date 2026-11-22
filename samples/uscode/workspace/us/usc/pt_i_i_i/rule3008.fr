@@ -10,7 +10,7 @@ module "/us/usc/ptIII/rule3008" {
     hash "ccbbaecf0c3ecad5baae858b7df31efdd511b866c72fcddc3ca13a89d9755920"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -20,7 +20,7 @@ module "/us/usc/ptIII/rule3008" {
     p "The rule expands § 502(j) which provides for reconsideration of an allowance only before the case is closed. Authorities have disagreed as to whether reconsideration may be had after a case has been reopened. Compare 3 Collier Bankruptcy ¶57.23[4] (14th ed. 1964), see generally 3 id. ¶502.10 (15th ed. 1979), with 2 Remington, Bankruptcy 498 (Henderson ed. 1956). If a case is reopened as provided in § 350(b) of the Code, reconsideration of the allowance or disallowance of a claim may be sought and granted in accordance with this rule."
     hash "556e0e6ffbe511517d3437c49f832fedb0d100b5478964c6447230047d651ead"
   }
-  note "/us/usc/ptIII/rule3008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -29,7 +29,7 @@ module "/us/usc/ptIII/rule3008" {
   }
   layers {
     operative "ccbbaecf0c3ecad5baae858b7df31efdd511b866c72fcddc3ca13a89d9755920"
-    enacted "256fbf54dbaaded6f7bc6ca03ac2d6d3d7a50ddce4daef6b64c1fc8e13453b8d"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "9937c95b300130240dcc39520a84e514daa7ebd997768c35443916ac065ceb81"
   }
 }

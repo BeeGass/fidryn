@@ -26,7 +26,7 @@ module "/us/usc/t45/s665" {
     p "1995—Subsec. (a). " ["Pub. L. 104–88" -> "/us/pl/104/88"] " substituted “Board” for “Interstate Commerce Commission”."
     hash "00e9232735de160031e0c8a5350abe1074abbc1cb8bc201c248c8ed434b54cb3"
   }
-  note "/us/usc/t45/s665/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s665/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
@@ -35,7 +35,7 @@ module "/us/usc/t45/s665" {
   }
   layers {
     operative "6589752872f921d68cc09959ea39997ebccccb052ae0bb4f1ecd5bdaa7a1cce3"
-    enacted "fc16462d8cc9ac140a17ab6cba0a545a6c0acc3f90b51237827e0b493a490934"
-    editorial "7e8be1cd22967444461315c025f16c82ae2ab88fe87843116b328d35b0772a3e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d9f24fd7b9b0a08595e7d4045a14f9ba1a3ac8a4a7550fd89cc44678434c47c2"
   }
 }

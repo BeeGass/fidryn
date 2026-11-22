@@ -31,7 +31,7 @@ module "/us/usc/ptVII/rule7007.1" {
     hash "65c04bf711cbfadb4d7896ba2e25ce4e168aacfe8b86c9af21103e57f8307a68"
   }
   credit "(Added Mar. 27, 2003, eff. Dec. 1, 2003; amended Apr. 30, 2007, eff. Dec. 1, 2007; Apr. 14, 2021, eff. Dec. 1, 2021; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2003" enacted {
+  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2003" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2003"
@@ -42,7 +42,7 @@ module "/us/usc/ptVII/rule7007.1" {
     p "Changes Made After Publication and Comments. No changes since publication."
     hash "2de51c0e4353e0ba400a8c40a7cbf9eed793a9415edb9a452def3af8716f7f17"
   }
-  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" enacted {
+  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2007 Amendment"
@@ -50,14 +50,14 @@ module "/us/usc/ptVII/rule7007.1" {
     p "Changes After Publication. No changes were made after publication."
     hash "63352767f9f2832aea043eb99d78895d222c58ae4041625d39e8785c91c4cb62"
   }
-  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" enacted {
+  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2021 Amendment"
     p "The rule is amended to conform to recent amendments to Fed. R. Bankr. P. 8012 and Fed. R. App. P. 26.1, and the anticipated amendment to Fed. R. Civ. P. 7.1. Subdivision (a) is amended to encompass nongovernmental corporations that seek to intervene. Stylistic changes are made to subdivision (b) to reflect that some statements will be filed by nonparties seeking to intervene."
     hash "0ae3b19676965d4dc9cd616b171141f9fb711e947597fd159c8081376b7f5927"
   }
-  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7007.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -66,7 +66,7 @@ module "/us/usc/ptVII/rule7007.1" {
   }
   layers {
     operative "65c04bf711cbfadb4d7896ba2e25ce4e168aacfe8b86c9af21103e57f8307a68"
-    enacted "b0d33a021fdde62cd6619f5193656b2848d87b6b08341364860a8bf4ae8a9b54"
-    editorial "4fe4227f2c4e6591994902fe0c0c69c173d5fa410be61e972da81781ccd9ba65"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "57501fbcf1fc1658154e3e30c7b48b4107a8cf56ea1c133e0dc28361319177e2"
   }
 }

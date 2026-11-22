@@ -45,7 +45,7 @@ module "/us/usc/ptII/rule2013" {
     hash "bc5a58391831bc303668df498a41d7255d71af6539a0ce2737e82c887a351117"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -55,14 +55,14 @@ module "/us/usc/ptII/rule2013" {
     p "Subdivision (b) provides a convenient source for public review of fees paid from debtors’ estates in the bankruptcy courts. Thus, public recognition of appointments, fairly distributed and based on professional qualifications and expertise, will be promoted and notions of improper favor dispelled. This rule is in keeping with the findings of the Congressional subcommittees as set forth in the House Report of the Committee on the Judiciary, No. 95–595, 95th Cong., 1st Sess. 89–99 (1977). These findings included the observations that there were frequent appointments of the same person, contacts developed between the bankruptcy bar and the courts, and an unusually close relationship between the bar and the judges developed over the years. A major purpose of the new statute is to dilute these practices and instill greater public confidence in the system. Rule 2013 implements that laudatory purpose."
     hash "bb7ebc1947ae959f46555eebacc75f627cffba555a9125c9288856aac753a18c"
   }
-  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "In subdivisions (b) and (c) the word awarded is substituted for the word paid. While clerks do not know if fees are paid, they can determine what fees are awarded by the court."
     hash "3552587c3e09ef2e0a281b9620707741dc6eed7fa11e48d18dcc7e9d422921b8"
   }
-  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -72,7 +72,7 @@ module "/us/usc/ptII/rule2013" {
     p "The rule is not applicable to standing trustees serving in chapter 12 cases. See § 1202 of the Code."
     hash "0c5b795ac343a11d4da731107bc1a2a63833ac290d29591baf8d20565adc243a"
   }
-  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -87,7 +87,7 @@ module "/us/usc/ptII/rule2013" {
   }
   layers {
     operative "bc5a58391831bc303668df498a41d7255d71af6539a0ce2737e82c887a351117"
-    enacted "38d46ca714748f0b9e333546c0c3b7af10c9b5527047f75a45d1158b2f2075cd"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "ed98a986124e2af41481cf7ec0ad4af7f69bdbf213d78f5a51a5044165e41ce2"
   }
 }

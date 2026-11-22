@@ -41,14 +41,14 @@ module "/us/usc/ptIX/rule9004" {
     hash "0aeea3c06fa0a97b157b5eb953cc1d46fa6513afca1d30c9a207edc715a31076"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIX/rule9004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "Subdivision (b). Additional requirements applicable to the caption for a petition are found in Rule 1005, to the caption for notices to creditors in Rule 2002(m), and to the caption for a pleading or other paper filed in an adversary proceeding in Rule 7010. Failure to comply with this or any other rule imposing a merely formal requirement does not ordinarily result in the loss of rights. See Rule 9005."
     hash "cf73569f617cbeeae73fca8c504cf9459438679a1ff2c7f414ea4b0b1a89f19d"
   }
-  note "/us/usc/ptIX/rule9004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -57,7 +57,7 @@ module "/us/usc/ptIX/rule9004" {
   }
   layers {
     operative "0aeea3c06fa0a97b157b5eb953cc1d46fa6513afca1d30c9a207edc715a31076"
-    enacted "12748040b87ae5778adb9ee4b275e48639b7de222963ee5a866d3b361e7ef5df"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "bdf59510becd88e3c1a79e73b918a7d43eee551e141ef82353bb49318ba633c7"
   }
 }

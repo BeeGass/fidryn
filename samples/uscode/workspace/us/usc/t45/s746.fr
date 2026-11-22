@@ -85,21 +85,21 @@ module "/us/usc/t45/s746" {
     p "Subsec. (c)(3)(B). " ["Pub. L. 94–248, § 3" -> "/us/pl/94/248/s3"] ", inserted provisions relating to adjustment of number of shares of common stock to reflect any stock splits, stock combinations, etc."
     hash "03fb793746151d50d658104b1bd94c4a9d380d317b58efabba2eb3b796ad86dc"
   }
-  note "/us/usc/t45/s746/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s746/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
     p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
     hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
   }
-  note "/us/usc/t45/s746/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s746/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s746/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s746/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -115,7 +115,7 @@ module "/us/usc/t45/s746" {
   }
   layers {
     operative "0763a090d770911343bb51bb37ccb278e2d7d78ad00a72c68e03f151d09f821d"
-    enacted "e42879ee668b650652d5ed34d0a412352cb7254045e9dabd087a3c20e24dceeb"
-    editorial "cf8fe32e349fb699db259db5744b7c509bf0e135d77b1b866b6b6c1899304c9a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "4828b88ed8edea63a0b8aa6a97edc417bf181d76155733e9f0b6ba76fa7cb2a9"
   }
 }
