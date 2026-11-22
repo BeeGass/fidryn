@@ -91,6 +91,48 @@ module "/us/usc/t45/s151" {
   footnote 1 "1" {
     p "So in original."
   }
+  definition "/us/usc/t45/s151" {
+    term "Adjustment Board"
+    kind means
+    words "When used in this chapter and for the purposes of this chapter"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s151" {
+    term "Mediation Board"
+    kind means
+    words "When used in this chapter and for the purposes of this chapter"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s151" {
+    term "carrier"
+    kind includes
+    words "When used in this chapter and for the purposes of this chapter"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s151" {
+    term "carrier"
+    kind does_not_include
+    words "When used in this chapter and for the purposes of this chapter"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s151" {
+    term "commerce"
+    kind means
+    words "When used in this chapter and for the purposes of this chapter"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s151" {
+    term "employee"
+    kind does_not_include
+    words "When used in this chapter and for the purposes of this chapter"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s151" {
+    term "representative"
+    kind means
+    words "When used in this chapter and for the purposes of this chapter"
+    basis unresolved
+  }
   layers {
     operative "180a7eb8dde5870f26e8ef67c1c2808fa942036ee549a94fb84e3dca5c83e924"
     enacted "31a067f1770263653690bbb4d488684076d29965f7997b31d2db56bac12d354c"

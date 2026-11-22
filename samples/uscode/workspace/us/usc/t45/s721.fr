@@ -423,6 +423,13 @@ module "/us/usc/t45/s721" {
   footnote 4 "4" {
     p "So in original. Should be “Corporation,”."
   }
+  definition "/us/usc/t45/s721/g" {
+    term "Corporation"
+    kind includes
+    words "For purposes of this subsection"
+    region "/us/usc/t45/s721/g"
+    basis restated
+  }
   definition "/us/usc/t45/s721/h/7" {
     term "Corporation"
     kind includes

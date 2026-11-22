@@ -155,6 +155,13 @@ module "/us/usc/t45/s791" {
   footnote 1 "1" {
     p "See References in Text note below."
   }
+  definition "/us/usc/t45/s791/a/3" {
+    term "antitrust laws"
+    kind includes
+    words "As used in this subsection"
+    region "/us/usc/t45/s791/a"
+    basis restated
+  }
   layers {
     operative "9036014a1e000d43e1821dbf630dd09f4326ef56faf517076cdcb6a22a7c219c"
     enacted "5fb507082ad15e804db6962d4859007ae176d79953b52ff21c2225329ee85693"

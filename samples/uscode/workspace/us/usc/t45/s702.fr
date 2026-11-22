@@ -315,6 +315,13 @@ module "/us/usc/t45/s702" {
     region "/us/usc/t45/ch16"
     basis restated
   }
+  definition "/us/usc/t45/s702/16" {
+    term "railroad in reorganization"
+    kind means
+    words "As used in this chapter, unless the context otherwise requires"
+    region "/us/usc/t45/ch16"
+    basis restated
+  }
   definition "/us/usc/t45/s702/17" {
     term "Region"
     kind means

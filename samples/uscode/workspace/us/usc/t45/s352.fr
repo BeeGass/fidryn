@@ -725,6 +725,13 @@ module "/us/usc/t45/s352" {
   footnote 2 "2" {
     p "So in original."
   }
+  definition "/us/usc/t45/s352/a/1/A/iv" {
+    term "period of continuing unemployment"
+    kind means
+    words "for the purposes of this subparagraph"
+    region "/us/usc/t45/s352/a/1/A"
+    basis restated
+  }
   layers {
     operative "bbc8d42db9369a715d6874d1b96fd39978d4be5cda2ed480ee07151ac0d388d4"
     enacted "6629aae92b2d423b7244de5e9d64638cb05b7cfdff6d190fb6f4b3eb43b85f63"

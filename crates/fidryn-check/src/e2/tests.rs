@@ -1,7 +1,6 @@
 //! Tests of lowering and of the checks of one module. Every module here is
 //! invented, in the invented corpus `/zz/demo`, and so is every text.
 
-use super::module_check::definition_text;
 use super::{Lowered, check_module, check_source, lower};
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
 use fidryn_provision::hash::{hash_provision, layer_hashes_of_unit, tree_hashes};
@@ -2393,71 +2392,6 @@ fn a_definition_stands_in_the_text_without_its_superscript_numbers() {
             format!("\"{value}\""),
             "{value}"
         );
-    }
-}
-
-#[test]
-fn the_text_of_a_definition_leaves_out_markers_and_superscript_numbers_with_one_space() {
-    let sup = |words: &str| Run::Sup(words.to_owned());
-    let sub = |words: &str| Run::Sub(words.to_owned());
-    for (runs, read) in [
-        // A space on each side: the space before goes.
-        (
-            vec![words("section 5(a) "), sup("1"), words(" of this title.")],
-            "section 5(a) of this title.",
-        ),
-        (vec![words("The "), sup("2"), words(" term")], "The term"),
-        // No space before: no space goes.
-        (
-            vec![words("In this section,"), sup("1"), words(" the term")],
-            "In this section, the term",
-        ),
-        (
-            vec![words("a list."), sup("1"), words(" For purposes")],
-            "a list. For purposes",
-        ),
-        (
-            vec![words("“widget"), sup("3"), words("” means")],
-            "“widget” means",
-        ),
-        (
-            vec![link("section 5", "/zz/demo/t1/s5"), sup("1"), words(" of")],
-            "section 5 of",
-        ),
-        // A space before and the end of the text after.
-        (
-            vec![words("In this section: "), sup("1")],
-            "In this section:",
-        ),
-        (vec![words("in section 5."), sup("1")], "in section 5."),
-        // A space before and no space after: no space goes.
-        (vec![words("a "), sup("12"), words("b")], "a b"),
-        // At the start of the text, the space after goes.
-        (vec![sup("2"), words(" The term")], "The term"),
-        (vec![sup("2"), mark("1", 1), words(" The term")], "The term"),
-        (vec![sup("1")], ""),
-        // Two numbers together take one space.
-        (vec![words("x "), sup("1"), sup("2"), words(" y")], "x y"),
-        // A superscript that is not only the digits 0 to 9 is read.
-        (
-            vec![words("In this section,"), sup("a"), words(" the term")],
-            "In this section,a the term",
-        ),
-        (
-            vec![words("a 5"), sup("th"), words(" gauge")],
-            "a 5th gauge",
-        ),
-        (vec![words("x"), sup("²")], "x²"),
-        (vec![words("x "), sup("1a"), words(" y")], "x 1a y"),
-        // A marker gives nothing; a digit written as words is text.
-        (
-            vec![words("section 2"), mark("1", 1), words("1 of")],
-            "section 21 of",
-        ),
-        (vec![words("H"), sub("2"), words("O")], "H2O"),
-    ] {
-        let text = text(runs);
-        assert_eq!(definition_text(&text), read, "{text:?}");
     }
 }
 

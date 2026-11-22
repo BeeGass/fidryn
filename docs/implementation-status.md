@@ -446,8 +446,10 @@ Limits:
   records (`crates/fidryn-provision/src/address.rs:14`).
 - Definitions are extracted by the closed patterns of the reference only,
   and a definition written in another form is not extracted
-  (`crates/fidryn-ingest-uscode/src/definitions.rs:144`; in that file, test
-  `paragraphs_outside_the_patterns_define_nothing`).
+  (`crates/fidryn-ingest-uscode/src/definitions.rs:510`; in
+  `crates/fidryn-ingest-uscode/src/definitions/tests.rs`, tests
+  `every_vector_gives_the_records_it_expects` and
+  `section_3_holds_paragraphs_the_rules_read_and_paragraphs_they_refuse`).
 
 [Limits](law-modules.md#limits) in the reference states the others: of the
 cache, the diagnostics, definitions, change sets, the two readings of the

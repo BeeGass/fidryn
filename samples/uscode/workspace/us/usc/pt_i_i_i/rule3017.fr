@@ -269,6 +269,13 @@ module "/us/usc/ptIII/rule3017" {
     p "The language of Rule 3017 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "e9b5d2029b7748709f8a10586403e1ed3b37328b2866c3edb5cced295287afff"
   }
+  definition "/us/usc/ptIII/rule3017/d/4" {
+    term "creditors"
+    term "equity security holders"
+    kind includes
+    words "In this Rule 3017(d)"
+    basis unresolved
+  }
   layers {
     operative "6cc55190a60ab63482bd01b530e95b428d7a2e4424b0b0f840ed963cf8472f4e"
     enacted "b64db36be29ffa781f5d22a568f7db5745179a01ea1fdd81f428fe26ff7be280"

@@ -7,7 +7,7 @@ use fidryn_provision::hash::{
 };
 use fidryn_provision::{
     Address, Block, ContainerModule, CuratedModule, Definition, DefinitionKind, Footnote, Hash32,
-    Item, LayerHashes, Module, Note, PartRole, Provision, QuotedItem, Run, Text, UnitModule,
+    Item, LayerHashes, Module, Note, PartRole, Provision, QuotedItem, UnitModule,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -85,69 +85,16 @@ fn kind_word(kind: DefinitionKind) -> &'static str {
     }
 }
 
-/// Whether `run` is a superscript run whose words are only the digits `0` to
-/// `9`, at least one: a footnote number marked as a superscript.
-fn superscript_number(run: &Run) -> bool {
-    match run {
-        Run::Sup(words) => !words.is_empty() && words.bytes().all(|byte| byte.is_ascii_digit()),
-        _ => false,
-    }
-}
-
-/// The words a run gives to the text the checks of a definition read: none
-/// for a footnote marker and for a superscript number.
-fn read_words(run: &Run) -> &str {
-    match run {
-        Run::Mark { .. } => "",
-        run if superscript_number(run) => "",
-        Run::Words(words) | Run::Ref { words, .. } | Run::Sup(words) | Run::Sub(words) => words,
-    }
-}
-
-/// The text of `text` that the checks of a definition read: its runs in
-/// order, without its footnote markers and without its superscript runs
-/// made only of the digits `0` to `9`. With each such run one space goes
-/// too: the space just before it, when just after it there is a space or
-/// the end of the text; or, when it begins the text, the space just after
-/// it. A digit written in any other run is text.
-pub(super) fn definition_text(text: &Text) -> String {
-    let mut out = String::new();
-    // A number began the text, and the space just after it goes.
-    let mut space_after = false;
-    for (index, run) in text.runs.iter().enumerate() {
-        if superscript_number(run) {
-            if out.is_empty() {
-                space_after = true;
-            } else if out.ends_with(' ') {
-                let after = text.runs[index + 1..]
-                    .iter()
-                    .map(read_words)
-                    .find(|words| !words.is_empty());
-                if after.is_none_or(|words| words.starts_with(' ')) {
-                    out.pop();
-                }
-            }
-            continue;
-        }
-        let mut words = read_words(run);
-        if space_after && !words.is_empty() {
-            words = words.strip_prefix(' ').unwrap_or(words);
-            space_after = false;
-        }
-        out.push_str(words);
-    }
-    out
-}
-
-/// The text a definition is read in (see [`definition_text`]) of each
-/// paragraph and subheading of the text parts of `provision` whose role
-/// `wanted` accepts, those in its tables and quoted content included, and
-/// nothing of its children.
+/// The text a definition is read in ([`fidryn_provision::Text::read_text`]:
+/// without footnote markers and without superscript runs made only of
+/// digits) of each paragraph and subheading of the text parts of
+/// `provision` whose role `wanted` accepts, those in its tables and quoted
+/// content included, and nothing of its children.
 fn texts_of(provision: &Provision, wanted: impl Fn(PartRole) -> bool) -> Vec<String> {
     fn blocks(list: &[Block], out: &mut Vec<String>) {
         for block in list {
             match block {
-                Block::Para(text) | Block::Subheading(text) => out.push(definition_text(text)),
+                Block::Para(text) | Block::Subheading(text) => out.push(text.read_text().text),
                 Block::Table(table) => {
                     for cell in table.rows.iter().flat_map(|row| &row.cells) {
                         blocks(&cell.blocks, out);

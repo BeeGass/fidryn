@@ -391,6 +391,20 @@ module "/us/usc/t45/s743" {
   footnote 3 "3" {
     p "So in original. Probably should be “(including”."
   }
+  definition "/us/usc/t45/s743/b/3/A/ii" {
+    term "railroad rolling stock"
+    kind means
+    words "As used in this subparagraph"
+    region "/us/usc/t45/s743/b/3/A"
+    basis restated
+  }
+  definition "/us/usc/t45/s743/b/6/B" {
+    term "railroad in reorganization"
+    kind includes
+    words "As used in this subparagraph"
+    region "/us/usc/t45/s743/b/6/B"
+    basis restated
+  }
   layers {
     operative "7546e214452c40cf4a71d4890fcef82e43d4cc429e7fc1a771ff438f8dddd122"
     enacted "7d8f32e865e48e97471ef3b5e7872d6ea8d9a7996df442d3a4874081ade822d7"

@@ -1028,7 +1028,7 @@
             ],
             "kind": "includes",
             "words": null,
-            "condition": "with respect to a gadget",
+            "condition": "of each gadget",
             "region": null,
             "basis": "enacted",
             "borrowed_from": null,
@@ -1488,7 +1488,7 @@
           {
             "at": "/zz/demo/t1/s6/a",
             "terms": [
-              "gauge"
+              "Gauge"
             ],
             "kind": "borrowed",
             "words": null,
@@ -1496,7 +1496,7 @@
             "region": null,
             "basis": "unresolved",
             "borrowed_from": null,
-            "borrowed_words": "the invented gauge act",
+            "borrowed_words": "the following table",
             "see_note": null
           }
         ]

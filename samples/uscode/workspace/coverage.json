@@ -82,15 +82,15 @@
       "/us/stat": 2516
     },
     "definitions": {
-      "enacted": 7,
-      "restated": 100,
-      "unresolved": 37
+      "enacted": 8,
+      "restated": 116,
+      "unresolved": 66
     },
     "definitions_by_kind": {
       "borrowed": 7,
-      "does_not_include": 1,
-      "includes": 15,
-      "means": 121
+      "does_not_include": 8,
+      "includes": 31,
+      "means": 144
     },
     "not_imported": {
       "tables_of_contents": 19,
@@ -107,21 +107,21 @@
       "positive_law": true,
       "units": 39,
       "provisions": 129,
-      "definitions": 10
+      "definitions": 11
     },
     {
       "source": "usc11a.xml",
       "positive_law": false,
       "units": 230,
       "provisions": 2362,
-      "definitions": 4
+      "definitions": 17
     },
     {
       "source": "usc45.xml",
       "positive_law": false,
       "units": 294,
       "provisions": 2366,
-      "definitions": 130
+      "definitions": 162
     }
   ]
 }

@@ -64,6 +64,25 @@ impl Run {
             Run::Mark { .. } => "",
         }
     }
+
+    /// Whether this run is a superscript whose words are only the digits `0`
+    /// to `9`, at least one: a footnote number marked as a superscript.
+    fn is_superscript_number(&self) -> bool {
+        match self {
+            Run::Sup(words) => !words.is_empty() && words.bytes().all(|byte| byte.is_ascii_digit()),
+            _ => false,
+        }
+    }
+
+    /// The words this run gives to the text of [`Text::read_text`]: none for
+    /// a footnote marker and for a footnote number marked as a superscript.
+    fn read_words(&self) -> &str {
+        if self.is_superscript_number() {
+            ""
+        } else {
+            self.words()
+        }
+    }
 }
 
 impl Text {
@@ -90,6 +109,79 @@ impl Text {
     pub fn plain(&self) -> String {
         self.runs.iter().map(Run::words).collect()
     }
+
+    /// The text that rules over the words of this text read, and where each
+    /// link stands in it: the words of its runs in order, without its
+    /// footnote markers and without its superscript runs made only of the
+    /// digits `0` to `9`, at least one, which are footnote numbers marked as
+    /// superscripts. With each such run one space goes too: the space just
+    /// before it, which is the last character kept so far, when just after
+    /// it there is a space or the end of the text; or, when nothing has been
+    /// kept so far, the space just after it. A superscript run that holds
+    /// anything else, and a digit written in any other run, is read.
+    pub fn read_text(&self) -> ReadText<'_> {
+        let mut read = ReadText {
+            text: String::new(),
+            links: Vec::new(),
+        };
+        // A number began the text, and the space just after it goes.
+        let mut space_after = false;
+        for (index, run) in self.runs.iter().enumerate() {
+            if run.is_superscript_number() {
+                if read.text.is_empty() {
+                    space_after = true;
+                } else if read.text.ends_with(' ') {
+                    let after = self.runs[index + 1..]
+                        .iter()
+                        .map(Run::read_words)
+                        .find(|words| !words.is_empty());
+                    if after.is_none_or(|words| words.starts_with(' ')) {
+                        read.text.pop();
+                        let end = read.text.len();
+                        for link in &mut read.links {
+                            link.end = link.end.min(end);
+                            link.start = link.start.min(end);
+                        }
+                    }
+                }
+                continue;
+            }
+            let mut words = run.read_words();
+            if space_after && !words.is_empty() {
+                words = words.strip_prefix(' ').unwrap_or(words);
+                space_after = false;
+            }
+            let start = read.text.len();
+            read.text.push_str(words);
+            if let Run::Ref { target, .. } = run {
+                read.links.push(LinkPlace {
+                    start,
+                    end: read.text.len(),
+                    target,
+                });
+            }
+        }
+        read
+    }
+}
+
+/// The text that rules over the words of a [`Text`] read
+/// ([`Text::read_text`]), and the place of each of its links.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReadText<'t> {
+    pub text: String,
+    /// The links of the text, in order.
+    pub links: Vec<LinkPlace<'t>>,
+}
+
+/// Where the words of a link stand in a [`ReadText`], from the byte `start`
+/// to the byte `end`, and the link's target as the source writes it, which
+/// may be empty.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct LinkPlace<'t> {
+    pub start: usize,
+    pub end: usize,
+    pub target: &'t str,
 }
 
 /// A block of text.
@@ -538,6 +630,120 @@ mod tests {
         ]);
         assert_eq!(text.plain(), "See section 2 of 103 and H2O.");
         assert_eq!(Text::default().plain(), "");
+    }
+
+    #[test]
+    fn the_read_text_leaves_out_markers_and_superscript_numbers_with_one_space() {
+        for (runs, read) in [
+            // A space on each side: the space before goes.
+            (
+                vec![words("section 5(a) "), sup("1"), words(" of this title.")],
+                "section 5(a) of this title.",
+            ),
+            (vec![words("The "), sup("2"), words(" term")], "The term"),
+            // No space before: no space goes.
+            (
+                vec![words("In this section,"), sup("1"), words(" the term")],
+                "In this section, the term",
+            ),
+            (
+                vec![words("a list."), sup("1"), words(" For purposes")],
+                "a list. For purposes",
+            ),
+            (
+                vec![words("“widget"), sup("3"), words("” means")],
+                "“widget” means",
+            ),
+            (
+                vec![link("section 5", "/zz/demo/t1/s5"), sup("1"), words(" of")],
+                "section 5 of",
+            ),
+            // A space before and the end of the text after.
+            (
+                vec![words("In this section: "), sup("1")],
+                "In this section:",
+            ),
+            (vec![words("in section 5."), sup("1")], "in section 5."),
+            // A space before and no space after: no space goes.
+            (vec![words("a "), sup("12"), words("b")], "a b"),
+            // At the start of the text, the space after goes.
+            (vec![sup("2"), words(" The term")], "The term"),
+            (vec![sup("2"), mark("1", 1), words(" The term")], "The term"),
+            (vec![sup("1")], ""),
+            // Two numbers together take one space: the space before the
+            // first is the last character kept when the second is read.
+            (vec![words("x "), sup("1"), sup("2"), words(" y")], "x y"),
+            (vec![words("a "), sup("1"), sup("2"), words(" b")], "a b"),
+            (vec![sup("1"), sup("2"), words(" b")], "b"),
+            // A superscript that is not only the digits 0 to 9 is read.
+            (
+                vec![words("In this section,"), sup("a"), words(" the term")],
+                "In this section,a the term",
+            ),
+            (
+                vec![words("a 5"), sup("th"), words(" gauge")],
+                "a 5th gauge",
+            ),
+            (vec![words("x"), sup("²")], "x²"),
+            (vec![words("x "), sup("1a"), words(" y")], "x 1a y"),
+            // A marker gives nothing; a digit written as words is text.
+            (
+                vec![words("section 2"), mark("1", 1), words("1 of")],
+                "section 21 of",
+            ),
+            (vec![words("H"), sub("2"), words("O")], "H2O"),
+        ] {
+            let text = text(runs);
+            assert_eq!(text.read_text().text, read, "{text:?}");
+        }
+    }
+
+    #[test]
+    fn the_read_text_places_each_link_where_its_words_stand() {
+        let place = |start, end, target| LinkPlace { start, end, target };
+        for (runs, read, links) in [
+            (
+                vec![
+                    words("See "),
+                    link("section 2", "/zz/demo/t1/s2"),
+                    sup("1"),
+                    words(" and "),
+                    link("section 3", ""),
+                    words("."),
+                ],
+                "See section 2 and section 3.",
+                vec![place(4, 13, "/zz/demo/t1/s2"), place(18, 27, "")],
+            ),
+            // The space that goes before a number is the last of a link's
+            // words; the space that goes after one at the start is the first.
+            (
+                vec![link("section 2 ", "/zz/demo/t1/s2"), sup("1"), words(" of")],
+                "section 2 of",
+                vec![place(0, 9, "/zz/demo/t1/s2")],
+            ),
+            (
+                vec![sup("1"), link(" section 2", "/zz/demo/t1/s2"), words(" of")],
+                "section 2 of",
+                vec![place(0, 9, "/zz/demo/t1/s2")],
+            ),
+            // A marker and a number before a link move it.
+            (
+                vec![
+                    words("a "),
+                    mark("1", 1),
+                    sup("2"),
+                    words(" "),
+                    link("b", "/zz/demo/b"),
+                ],
+                "a b",
+                vec![place(2, 3, "/zz/demo/b")],
+            ),
+        ] {
+            let text = text(runs);
+            let read_text = text.read_text();
+            assert_eq!(read_text.text, read, "{text:?}");
+            assert_eq!(read_text.links, links, "{text:?}");
+        }
     }
 
     #[test]

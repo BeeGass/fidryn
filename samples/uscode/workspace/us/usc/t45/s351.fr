@@ -496,6 +496,24 @@ module "/us/usc/t45/s351" {
   footnote 1 "1" {
     p "See References in Text note below."
   }
+  definition "/us/usc/t45/s351/a" {
+    term "employer"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/a" {
+    term "employer"
+    kind includes
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/a" {
+    term "employer"
+    kind does_not_include
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
   definition "/us/usc/t45/s351/b" {
     term "carrier"
     kind means
@@ -526,11 +544,42 @@ module "/us/usc/t45/s351" {
     words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
     basis unresolved
   }
+  definition "/us/usc/t45/s351/i/1" {
+    term "compensation"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
   definition "/us/usc/t45/s351/i/2/A" {
     term "monthly compensation base"
     kind means
     words "For purposes of subdivision (1)"
     basis unresolved
+  }
+  definition "/us/usc/t45/s351/j" {
+    term "remuneration"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/j" {
+    term "remuneration"
+    kind includes
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/j" {
+    term "remuneration"
+    kind does_not_include
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/k" {
+    term "subsidiary remuneration"
+    kind means
+    words "For the purpose of this subsection"
+    region "/us/usc/t45/s351/k"
+    basis restated
   }
   definition "/us/usc/t45/s351/l/2" {
     term "statement of sickness"
@@ -572,6 +621,13 @@ module "/us/usc/t45/s351" {
     term "Board"
     kind means
     words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s351/s" {
+    term "United States"
+    kind means
+    words "For the purposes of this chapter, except when used in amending the provisions of other Acts"
+    condition "when used in a geographical sense"
     basis unresolved
   }
   definition "/us/usc/t45/s351/t" {
