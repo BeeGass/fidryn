@@ -32,8 +32,9 @@ root, are those of the releases in order, and the next release is the one after 
 last of them, so a replay that is stopped and started again finishes the release it
 was in and goes on, and never makes a commit twice or skips a release. Before
 `uscode/` is replaced, the text form is kept in `.git/fidryn-replay.json` with its
-release, so that a replay stopped between the replacement and the commit commits that
-release with it; the file is removed once the commit holds the message.
+release and whether its two readings were compared, so that a replay stopped between
+the replacement and the commit commits that release with it; the file is removed once
+the commit holds the message.
 
 Before it asks git anything or writes anything, the tool holds the repository to be a
 repository of its own: `.git` is a directory in it, and git takes the directory to be
@@ -52,16 +53,26 @@ a directory or anything else of that name stops the replay and is left as it is.
 Anything else stops the replay with a sentence that says what it found.
 
 Each run of `fidryn`, and each run of the two scripts of the independent reading, which
-run with the Python that runs the tool, has a limit of its own on its address space, set
-in the child before the program starts, and on its time; a run that exceeds one stops
-the replay. The two texts are compared from two temporary files without a name in the
-system's directory for temporary files, each as large as the text of the release, and
-one line of each is held at a time. A release whose text form was kept before its
-replacement was compared before it was kept. Git's configuration decides whether a
-commit is signed; no option is passed either way. Git's automatic housekeeping is
-turned off for these commits (`gc.auto=0`), so that no packing runs in the background
-while the replay works. The cache of the checks is neither the repository nor inside
-it, the two paths compared with every link in the part of each that exists resolved.
+run with the Python that runs the tool, is started in a session of its own, with a limit
+on its time and a limit on the address space of each of its processes, set in the child
+before the program starts; a run that exceeds one stops the replay. `fidryn` runs as one
+process, so its limit bounds the whole run. A script with `--jobs N` above 1 reads
+through N worker processes at a time, beside its own process and a small process of
+Python's that tracks what the workers share, and each of them is held to the limit: such
+a run may take up to N + 2 times `--memory-limit`, and in practice about N + 1 times
+it, so a script's run is held to M bytes by a `--memory-limit` of M divided by N + 2,
+or by fewer `--jobs`. When a run reaches its time, or the tool is interrupted, every
+process of its session, the workers included, is killed before the replay stops. The
+two texts are compared from two temporary files without a name in the system's
+directory for temporary files, each as large as the text of the release, and one line
+of each is held at a time. The kept text form of a release says whether its two
+readings were compared before it was kept, and a run without `--no-readings` that finds
+them not compared compares them before it commits the release. Git's configuration
+decides whether a commit is signed; no option is passed either way. Git's automatic
+housekeeping is turned off for these commits (`gc.auto=0`), so that no packing runs in
+the background while the replay works. The cache of the checks is neither the repository
+nor inside it, the two paths compared with every link in the part of each that exists
+resolved.
 
 Usage: uv run --locked python -I tools/replay_uscode.py --archives DIR --repository DIR
   --fidryn PATH --cache-dir DIR [--jobs N] [--memory-limit BYTES] [--time-limit SECONDS]
@@ -141,6 +152,8 @@ GITATTRIBUTES = "* -text\n"
 GITIGNORE = ".fidryn-cache/\nuscode.next/\n"
 MEMORY_LIMIT = 16 << 30
 TIME_LIMIT = 30 * 60
+# How long the tool waits for the system to clear the processes of a run it has killed.
+SESSION_GRACE = 10
 SUMMARY = re.compile(
     r"modules: (?P<modules>\d+); from cache: \d+; errors: (?P<errors>\d+); "
     r"warnings: (?P<warnings>\d+)"
@@ -374,52 +387,83 @@ def run_script(
 ) -> str:
     """Runs the script `script` of the independent reading with the Python that runs the
     tool, isolated from the environment (`-I`), under the limits of every run, as
-    `run_fidryn` runs `fidryn`."""
+    `run_fidryn` runs `fidryn`. The limit on the address space holds each process of the
+    run, its workers among them, and not their sum."""
     command = [sys.executable, "-I", str(script), *arguments]
     return run_limited(command, " ".join([script.name, *arguments]), cwd, limits, out)
+
+
+def end_session(process: subprocess.Popen[bytes]) -> None:
+    """Kills every process left in the session that `process` began, the workers of a
+    script among them, and returns once the system holds none of them, or once it has
+    been given `SESSION_GRACE` seconds to clear the processes it was sent the kill."""
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        return
+    process.wait()
+    deadline = time.monotonic() + SESSION_GRACE
+    while time.monotonic() < deadline:
+        try:
+            os.killpg(process.pid, 0)
+        except ProcessLookupError:
+            return
+        time.sleep(0.01)
 
 
 def run_limited(
     command: Sequence[str], name: str, cwd: Path, limits: Limits, out: IO[bytes] | None
 ) -> str:
     """Runs `command`, which messages call `name`, under its limits, and returns what it
-    printed on stdout, or writes that to `out` and returns nothing when `out` is given."""
+    printed on stdout, or writes that to `out` and returns nothing when `out` is given.
+
+    The run is started in a session of its own, with the limit on its address space set
+    in each of its processes. It ends when the program has exited and no process of it
+    holds its output open, as the workers of a script do; when it reaches its time first,
+    or the tool is interrupted, every process of its session is killed before the tool
+    goes on."""
     started = time.monotonic()
     try:
-        ran = subprocess.run(
+        process = subprocess.Popen(
             list(command),
             cwd=cwd,
             stdout=subprocess.PIPE if out is None else out,
             stderr=subprocess.PIPE,
-            timeout=limits.seconds,
             preexec_fn=address_space(limits.memory),
-            check=False,
+            start_new_session=True,
         )
-    except subprocess.TimeoutExpired as error:
-        raise StopReplayError(
-            f"`{name}` ran longer than {limits.seconds} seconds, the limit of a run, and was "
-            "stopped"
-        ) from error
     except OSError as error:
         raise CannotRunError(f"{command[0]}: {error}") from error
-    stderr = ran.stderr.decode("utf-8", "replace")
-    if ran.returncode < 0:
+    with process:
         try:
-            signal_name = signal.Signals(-ran.returncode).name
+            output, errors = process.communicate(timeout=limits.seconds)
+        except subprocess.TimeoutExpired as error:
+            end_session(process)
+            raise StopReplayError(
+                f"`{name}` ran longer than {limits.seconds} seconds, the limit of a run, and "
+                "was stopped with every process of it"
+            ) from error
+        except BaseException:
+            end_session(process)
+            raise
+    stderr = errors.decode("utf-8", "replace")
+    if process.returncode < 0:
+        try:
+            signal_name = signal.Signals(-process.returncode).name
         except ValueError:
-            signal_name = f"the signal {-ran.returncode}"
+            signal_name = f"the signal {-process.returncode}"
         raise StopReplayError(
             f"`{name}` was ended by {signal_name}; a run that needs more than its limit of "
             f"{limits.memory} bytes of address space ends so\n{stderr}"
         )
-    if ran.returncode != 0:
-        raise StopReplayError(f"`{name}` exited with status {ran.returncode}\n{stderr}")
+    if process.returncode != 0:
+        raise StopReplayError(f"`{name}` exited with status {process.returncode}\n{stderr}")
     if stderr:
         print(stderr, end="", file=sys.stderr, flush=True)
     printed = ""
     if out is None:
         try:
-            printed = ran.stdout.decode("utf-8")
+            printed = output.decode("utf-8")
         except UnicodeDecodeError as error:
             raise StopReplayError(f"`{name}` printed what is not UTF-8") from error
     print(f"  ({time.monotonic() - started:.1f} s) {name}", flush=True)
@@ -575,15 +619,34 @@ def message_of(repository: Path, commit: str) -> bytes:
     return raw[end + 2 :]
 
 
-def read_state(repository: Path) -> tuple[str, str] | None:
+@dataclass(frozen=True)
+class Kept:
+    """The text form kept for the commit of a release, and whether the two readings of
+    the release were compared before it was kept."""
+
+    release: str
+    message: str
+    compared: bool
+
+
+def read_state(repository: Path) -> Kept | None:
+    """The text form kept in `.git`, or None when none is. A kept form that does not
+    say whether the readings were compared counts as not compared."""
     path = repository / ".git" / STATE
     if kind_of(path) == "missing":
         return None
     document = read_json(path, "the text form kept for a commit")
     release, message = document.get("release"), document.get("message")
-    if not isinstance(release, str) or not isinstance(message, str):
-        raise StopReplayError(f"{path} holds no release and message")
-    return release, message
+    compared = document.get("compared", False)
+    if (
+        not isinstance(release, str)
+        or not isinstance(message, str)
+        or not isinstance(compared, bool)
+    ):
+        raise StopReplayError(
+            f"{path} holds no release, message and whether the two readings were compared"
+        )
+    return Kept(release, message, compared)
 
 
 def write_file(path: Path, text: str) -> None:
@@ -624,11 +687,9 @@ def write_file(path: Path, text: str) -> None:
         partial.unlink(missing_ok=True)
 
 
-def write_state(repository: Path, release: str, message: str) -> None:
-    write_file(
-        repository / ".git" / STATE,
-        json.dumps({"release": release, "message": message}, ensure_ascii=False) + "\n",
-    )
+def write_state(repository: Path, release: str, message: str, compared: bool) -> None:
+    document = {"release": release, "message": message, "compared": compared}
+    write_file(repository / ".git" / STATE, json.dumps(document, ensure_ascii=False) + "\n")
 
 
 def remove_state(repository: Path) -> None:
@@ -712,14 +773,14 @@ class Replay:
             raise StopReplayError(f"`fidryn ingest` printed {out!r} for the release {release}")
         self.say(release, out.strip())
 
-    def readings(self, release: str, archives: Path) -> None:
-        """Compares the two readings of `release`, whose import is in `uscode.next/`:
-        the text records `fidryn text` reads back from its modules against those the
-        independent reading prints for `archives`, line for line, and the tables of
-        contents the independent profile counts in `archives` against those its ledger
-        counts. A difference stops the replay."""
+    def readings(self, release: str, archives: Path, directory: str = NEXT) -> None:
+        """Compares the two readings of `release`, whose import is in `directory` of the
+        repository: the text records `fidryn text` reads back from its modules against
+        those the independent reading prints for `archives`, line for line, and the
+        tables of contents the independent profile counts in `archives` against those
+        its ledger counts. A difference stops the replay."""
         jobs = ["--jobs", str(self.jobs)]
-        command = [str(self.fidryn), "text", NEXT, "--json"]
+        command = [str(self.fidryn), "text", directory, "--json"]
         try:
             with tempfile.TemporaryFile() as ours, tempfile.TemporaryFile() as theirs:
                 run_fidryn(command, self.repository, self.limits, ours)
@@ -740,18 +801,19 @@ class Replay:
                 f"`{PROFILE_SCRIPT.name}` printed what does not read for {release}: {error}"
             ) from error
         counted = count_at(profile, ("import", "not_imported", "tables_of_contents"))
-        ledger = read_json(self.repository / NEXT / LEDGER, "the coverage ledger of the import")
+        ledger_path = self.repository / directory / LEDGER
+        ledger = read_json(ledger_path, "the coverage ledger of the import")
         held = count_at(ledger, ("totals", "not_imported", "tables_of_contents"))
         if counted is None or held is None:
             raise StopReplayError(
-                f"`{PROFILE_SCRIPT.name}` or {NEXT}/{LEDGER} gives no count of the tables of "
-                f"contents of {release}"
+                f"`{PROFILE_SCRIPT.name}` or {directory}/{LEDGER} gives no count of the tables "
+                f"of contents of {release}"
             )
         if counted != held:
             raise StopReplayError(
                 f"the tables of contents of {release} are counted {counted} by "
                 f"`{PROFILE_SCRIPT.name}` and {held} in the ledger of the import, "
-                f"{NEXT}/{LEDGER}"
+                f"{directory}/{LEDGER}"
             )
         self.say(release, f"the two readings agree: {records} records, {held} tables of contents")
 
@@ -901,9 +963,11 @@ class Replay:
                 f"commit is of {RELEASES[index - 1]}"
             )
 
-    def release(self, index: int, kept: str | None) -> None:
+    def release(self, index: int, kept: Kept | None) -> None:
         """Commits `RELEASES[index]`; `kept` is the text form kept before a replacement
-        that a replay stopped before its commit."""
+        that a replay stopped before its commit. A kept release whose two readings were
+        not compared is compared before its commit, unless this run leaves the
+        comparison out."""
         release = RELEASES[index]
         found = kind_of(self.repository / NEXT)
         if found not in ("missing", "directory"):
@@ -924,17 +988,27 @@ class Replay:
                 message = subject(0) + "\n"
             else:
                 message = self.change_set(index)
-            write_state(self.repository, release, message)
+            write_state(self.repository, release, message, self.compare)
             replace_workspace(self.repository, release)
         else:
-            message = kept
+            message = kept.message
             self.say(release, "the text form was kept: the replacement is finished")
-            if found != "missing":
-                self.check(release, NEXT)
-                replace_workspace(self.repository, release, kept=True)
-            else:
-                self.check(release, WORKSPACE)
+            # The import is still in `uscode.next/` when the replacement had not begun,
+            # and in `uscode/` when it was done.
+            directory = WORKSPACE if found == "missing" else NEXT
+            self.check(release, directory)
+            if directory == WORKSPACE:
                 complete_import(self.repository / WORKSPACE, release)
+            if self.compare and not kept.compared:
+                self.say(
+                    release,
+                    "the two readings were not compared before the text form was kept, and "
+                    "are compared now",
+                )
+                self.readings(release, archives, directory)
+                write_state(self.repository, release, message, True)
+            if directory == NEXT:
+                replace_workspace(self.repository, release, kept=True)
         self.commit(index, message)
 
     def run(self) -> None:
@@ -954,18 +1028,17 @@ class Replay:
                     f"{commits[index]} has the message of the release {RELEASES[index]}, and "
                     f"its {WORKSPACE}/{MANIFEST} is of the release {release}"
                 )
-        kept: str | None = None
+        kept: Kept | None = None
         state = read_state(self.repository)
         if state is not None:
-            release, message = state
-            if done and release == RELEASES[done - 1]:
-                self.verify(done - 1, commits[done - 1], message)
-            elif done < len(RELEASES) and release == RELEASES[done]:
-                kept = message
+            if done and state.release == RELEASES[done - 1]:
+                self.verify(done - 1, commits[done - 1], state.message)
+            elif done < len(RELEASES) and state.release == RELEASES[done]:
+                kept = state
             else:
                 raise StopReplayError(
-                    f"{self.repository / '.git' / STATE} keeps the text form of {release}, "
-                    "which is neither the last release committed nor the next"
+                    f"{self.repository / '.git' / STATE} keeps the text form of "
+                    f"{state.release}, which is neither the last release committed nor the next"
                 )
         if done:
             print(f"{done} of {len(RELEASES)} releases are committed", flush=True)
@@ -1005,13 +1078,20 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--memory-limit",
         type=int,
         default=MEMORY_LIMIT,
-        help=f"the address space of each run, in bytes (default {MEMORY_LIMIT})",
+        help=(
+            f"the address space of each process of each run, in bytes (default {MEMORY_LIMIT}); "
+            "a run of a script with --jobs N above 1 has N workers, its own process and a "
+            "small tracker, and may take up to N + 2 times it"
+        ),
     )
     parser.add_argument(
         "--time-limit",
         type=int,
         default=TIME_LIMIT,
-        help=f"the time of each run, in seconds (default {TIME_LIMIT})",
+        help=(
+            f"the time of each run, in seconds (default {TIME_LIMIT}); a run that reaches it "
+            "is killed with every process of it"
+        ),
     )
     parser.add_argument(
         "--no-readings",

@@ -312,7 +312,10 @@ that fails does, naming the release and either the line, the address of
 its record, the beginnings of both lines and where they first differ, or
 the two counts. `--no-readings` leaves the comparison out, for a replay
 of releases whose readings were compared before, and the tool prints one
-line that says so.
+line that says so. The text form a run keeps for a release says whether
+it compared the release's readings, and a later run without
+`--no-readings` that finds a kept release not compared compares it before
+it commits it.
 
 ```sh
 uv run --locked python -I tools/replay_uscode.py --archives DIR --repository DIR --fidryn PATH --cache-dir DIR
@@ -336,8 +339,18 @@ name, which a run that was stopped left, is removed first, and a link, a
 directory or anything else of that name stops it and is left alone. Anything
 else stops it with what it found. The cache may not be the repository nor
 lie inside it, with links resolved on both sides. Each run of `fidryn`
-and of the two scripts has a limit of its own on its address space and
-its time (`--memory-limit`, `--time-limit`). Exit `0` when every release is
+and of the two scripts is started in a session of its own, with a limit
+on its time (`--time-limit`) and a limit on the address space of each of
+its processes (`--memory-limit`). `fidryn` runs as one process, so its
+limit bounds the whole run. A script with `--jobs N` above 1 reads
+through N worker processes at a time, beside its own process and a small
+process of Python's that tracks what the workers share, and each of them
+is held to the limit: such a run may take up to N + 2 times
+`--memory-limit`, about N + 1 times it in practice, so a keeper who means
+a script's run to take at most M bytes gives `--memory-limit` M divided by
+N + 2, or gives fewer `--jobs`. When a run reaches its time, or the tool
+is interrupted, every process of its session, the workers included, is
+killed before the replay stops. Exit `0` when every release is
 committed, `1` when the replay stops at what it found, `2` when a command
 or a file cannot be run, read or written. `test_replay_order.py` holds
 the list to the publisher's, the reading of a history to the commits it
@@ -357,7 +370,12 @@ one whose counts of tables of contents differ, which is not committed,
 the repository left as a check that fails leaves it, and which the replay
 commits when it is started again with readings that agree; a replay with
 `--no-readings`, which compares nothing, commits every release and says
-so in one line; replays stopped by a failure, of the stand-in, of a hook
+so in one line; a release kept by a run with `--no-readings`, after its
+replacement and before it, which a run without the option compares
+before its commit, and one kept after its comparison, which is not
+compared again; a script stopped by its time limit, of which no process,
+its workers included, is left when the tool reports the stop; replays
+stopped by a failure, of the stand-in, of a hook
 or of one call of the tool, before the replacement, before the commit,
 between the removal of the manifest and of the directory, and after the
 commit, and started again; a workspace changed after its commit; a path

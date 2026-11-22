@@ -230,10 +230,15 @@ interchange schema versions are maintained independently of the interpreter.
   `conformance/usc_profile.py` counts to those of the import's ledger; a
   difference stops the replay before the commit, naming the release and
   the first line that differs or the two counts, and `--no-readings` skips
-  the comparison and says so. A replay that is stopped goes on from the
-  release it was in; it removes only `uscode/`, under stated conditions,
-  and gives each run of `fidryn` and of the two scripts a limit on its
-  address space and its time.
+  the comparison and says so; a release kept uncompared by such a run is
+  compared by the next run without the option before its commit. A replay
+  that is stopped goes on from the release it was in; it removes only
+  `uscode/`, under stated conditions. It starts each run of `fidryn` and
+  of the two scripts in a session of its own, with a limit on its time and
+  on the address space of each of its processes, and kills every process
+  of a run that reaches its time; a script with `--jobs N` above 1 runs as
+  N workers, its own process and a small tracker, so that it may take up
+  to N + 2 times `--memory-limit`.
   `tools/draw_definition_samples.py` draws, with a seed and a generator
   written out in the tool, the two samples of 500 that a person reads to
   judge the extracted definitions and to estimate the ones the closed
