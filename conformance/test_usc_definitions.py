@@ -3,7 +3,9 @@
 The documents are the invented fixtures `fixtures/uslm/definitions-*.xml`, which the
 tests of `fidryn-ingest-uscode` read, and small invented documents of the title 99
 written here. The definitions each one gives are those that the importer's tests
-expect of the same document, written out by hand. The workspaces that `--against`
+expect of the same document, written out by hand; those of `definitions-second.xml` are
+the file `fixtures/definitions/second-expected.jsonl`, which the importer's tests read
+too. The workspaces that `--against`
 compares with are written here too, their `definition` blocks in the canonical form.
 """
 
@@ -24,6 +26,7 @@ from uslm_common import Container, Note, Para, Part, Provision, Table, Text, Uni
 
 SCRIPT = HERE / "usc_definitions.py"
 VECTORS = HERE / "fixtures" / "definitions" / "vectors.jsonl"
+SECOND_EXPECTED = HERE / "fixtures" / "definitions" / "second-expected.jsonl"
 VECTORS_SHA256 = "ffc209c55aa669d3144d7ace126333e4a00d54f998a70246d4e75e74db66ab6c"
 VECTOR_COUNT = 238
 # The fields of a record, in their order.
@@ -438,6 +441,15 @@ class FixtureRows(unittest.TestCase):
         self.assertEqual(
             self.records_of("definitions-restated"), restated(RESTATED_BASES, RESTATED_NOTES)
         )
+
+    def test_the_second_fixture_gives_the_records_written_for_it(self) -> None:
+        # The records of `definitions-second.xml` were written from the rules, one by one,
+        # and the importer's tests hold it to the same file, line for line.
+        expected = [
+            json.loads(line) for line in SECOND_EXPECTED.read_text(encoding="utf-8").splitlines()
+        ]
+        self.assertEqual(len(expected), 16)
+        self.assertEqual(self.records_of("definitions-second"), expected)
 
     def test_the_records_are_compact_json_sorted_by_address_and_line(self) -> None:
         result, written = self.run_on("definitions-sentence")

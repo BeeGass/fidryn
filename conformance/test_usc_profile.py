@@ -198,6 +198,9 @@ class ProfileFixtures(unittest.TestCase):
     def test_definitions_restated(self) -> None:
         self.check("definitions-restated")
 
+    def test_definitions_second(self) -> None:
+        self.check("definitions-second")
+
     def test_notes_empty_topic(self) -> None:
         self.check("notes-empty-topic")
 

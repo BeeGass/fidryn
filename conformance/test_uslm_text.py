@@ -81,6 +81,9 @@ CASES = {
     "definitions-restated": "definitions in a file whose positive-law flag is no, with notes "
     "headed References in Text in the editorial group, in quoted content and in the statutory "
     "group",
+    "definitions-second": "definitions with a condition in each of its places, source words, a "
+    "meaning made under a linked provision, a later sentence, block and continuation, nested "
+    "quotation and footnote numbers",
     "notes-empty-topic": "a note whose topic attribute is empty, and one whose topic is one space",
     "notes-spaced-topics": "topics with two spaces between them, with a line break between them, "
     "and with spaces before, between and after them in a note named by its hash",
@@ -307,6 +310,9 @@ class TextFixtures(unittest.TestCase):
 
     def test_definitions_restated(self) -> None:
         self.check("definitions-restated")
+
+    def test_definitions_second(self) -> None:
+        self.check("definitions-second")
 
     def test_notes_empty_topic(self) -> None:
         self.check("notes-empty-topic")
