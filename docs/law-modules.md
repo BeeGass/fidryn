@@ -2508,10 +2508,10 @@ first difference when one of them does not hold:
    which it implements on its own, sharing no code with the ingester;
 7. the definitions that `conformance/usc_definitions.py` finds in the
    archives, by its own implementation of the [rules](#definitions), are
-   those that the `definition` blocks of the committed workspace hold,
-   field for field
+   those that the modules of the committed workspace hold, as the check
+   reads them, field for field
    ([A second implementation of the rules](#a-second-implementation-of-the-rules));
-   the script names the first definition that differs;
+   the step names the module of the first definition that differs;
 8. the check of `curated/` with its dependency finds no error and no
    warning, a pin that is no longer the lock's (`E740`) among the errors
    and a stale binding (`W750`) among the warnings, counts at least one

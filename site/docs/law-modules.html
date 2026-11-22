@@ -2358,10 +2358,10 @@ reads from the publisher's XML by the <a href="#the-ingester-for-the-united-stat
 which it implements on its own, sharing no code with the ingester;</li>
 <li>the definitions that <code>conformance/usc_definitions.py</code> finds in the
 archives, by its own implementation of the <a href="#definitions">rules</a>, are
-those that the <code>definition</code> blocks of the committed workspace hold,
-field for field
+those that the modules of the committed workspace hold, as the check
+reads them, field for field
 (<a href="#a-second-implementation-of-the-rules">A second implementation of the rules</a>);
-the script names the first definition that differs;</li>
+the step names the module of the first definition that differs;</li>
 <li>the check of <code>curated/</code> with its dependency finds no error and no
 warning, a pin that is no longer the lock's (<code>E740</code>) among the errors
 and a stale binding (<code>W750</code>) among the warnings, counts at least one

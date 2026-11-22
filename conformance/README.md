@@ -249,8 +249,9 @@ does not begin a block in that form, and exits `1`, naming the first
 definition that differs and, when the other side has one of the same
 provision and terms, the field, unless the release gives the definitions
 that the workspace holds, as many times each.
-`cargo xtask uscode-sample` runs it on the sample against the committed
-workspace.
+`cargo xtask uscode-sample` runs it on the sample and holds the records it
+writes to the definitions of the committed workspace's modules, as the
+check reads them.
 
 ```sh
 uv run --locked python -I conformance/usc_definitions.py /path/to/release --records definitions.jsonl

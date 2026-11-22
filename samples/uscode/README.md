@@ -123,7 +123,7 @@ difference:
 7. it fails when the definitions that `conformance/usc_definitions.py`, a
    second implementation of the definition rules, finds in the archives are
    not, field for field, those that the modules of `workspace/` hold, and
-   the script names the first definition that differs;
+   names the module of the first definition that differs;
 8. it checks `curated/` with its dependency, and fails, naming the file and
    the first thing that is wrong, on an error, such as a pin that is no
    longer the lock's (`E740`), on a warning, such as a binding whose
