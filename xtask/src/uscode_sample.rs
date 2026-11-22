@@ -1163,45 +1163,36 @@ fn definition_order(definition: &Definition) -> (Vec<u8>, Vec<u8>) {
 fn compare_definitions(workspace: &Path, records: &Path) -> Result<usize> {
     let found = read_records(records)?;
     let held = held_definitions(workspace)?;
-    let mut by_script: Vec<(Vec<u8>, Vec<u8>, &Definition)> = found
-        .iter()
-        .map(|definition| {
-            let (at, line) = definition_order(definition);
-            (at, line, definition)
-        })
-        .collect();
-    let mut by_module: Vec<(Vec<u8>, Vec<u8>, &(String, Definition))> = held
-        .definitions
-        .iter()
-        .map(|pair| {
-            let (at, line) = definition_order(&pair.1);
-            (at, line, pair)
-        })
-        .collect();
-    by_script.sort_by(|a, b| (&a.0, &a.1).cmp(&(&b.0, &b.1)));
-    by_module.sort_by(|a, b| (&a.0, &a.1).cmp(&(&b.0, &b.1)));
+    let mut by_script: Vec<&Definition> = found.iter().collect();
+    by_script.sort_by_cached_key(|definition| definition_order(definition));
+    let mut by_module: Vec<&(String, Definition)> = held.definitions.iter().collect();
+    by_module.sort_by_cached_key(|(_, definition)| definition_order(definition));
     // What one side has and the other does not, as many times as it has
     // it more often, each in the order of the records.
     let (mut only_found, mut only_held) = (Vec::new(), Vec::new());
     let (mut i, mut j) = (0, 0);
     while i < by_script.len() || j < by_module.len() {
-        let script = by_script.get(i).map(|(at, line, _)| (at, line));
-        let module = by_module.get(j).map(|(at, line, _)| (at, line));
+        let script = by_script
+            .get(i)
+            .map(|definition| definition_order(definition));
+        let module = by_module
+            .get(j)
+            .map(|(_, definition)| definition_order(definition));
         match (script, module) {
             (Some(a), Some(b)) if a == b => {
                 i += 1;
                 j += 1;
             }
             (Some(a), Some(b)) if a < b => {
-                only_found.push(by_script[i].2);
+                only_found.push(by_script[i]);
                 i += 1;
             }
             (Some(_), None) => {
-                only_found.push(by_script[i].2);
+                only_found.push(by_script[i]);
                 i += 1;
             }
             _ => {
-                only_held.push(by_module[j].2);
+                only_held.push(by_module[j]);
                 j += 1;
             }
         }
