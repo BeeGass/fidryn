@@ -30,6 +30,7 @@ import socket
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 import urllib.request
 import zipfile
@@ -422,7 +423,7 @@ class Resumed(Replays):
         self.stopped(1, "commit")
         self.assertEqual(len(self.history()), 1)
         kept = json.loads(self.state().read_text(encoding="utf-8"))
-        self.assertEqual(kept, {"release": "42-5", "message": text_form(1)})
+        self.assertEqual(kept, {"release": "42-5", "message": text_form(1), "compared": True})
         self.assertFalse((self.repository / "uscode.next").exists())
         manifest = (self.repository / "uscode" / "workspace.json").read_text(encoding="utf-8")
         self.assertEqual(json.loads(manifest)["release"], "42-5")
@@ -576,6 +577,203 @@ class Readings(Replays):
         self.assertEqual(stdout.count(line), 1, stdout)
         self.assertNotIn("the two readings agree", stdout)
         self.assertNotIn("text", [command.split()[0] for command in self.commands()])
+
+    def kept_state(self) -> dict[str, object]:
+        value = json.loads(self.state().read_text(encoding="utf-8"))
+        if not isinstance(value, dict):
+            raise AssertionError(value)
+        return value
+
+    def test_a_release_kept_by_a_run_with_no_readings_is_compared_before_its_commit(
+        self,
+    ) -> None:
+        # A run with the option keeps the text form of 42-5, after the replacement, and
+        # says that its readings were not compared.
+        (self.failing / "commit-42-5").touch()
+        status, _, stderr = self.replay(None, None, "--no-readings")
+        self.assertEqual(status, 1, stderr)
+        self.assertEqual(
+            self.kept_state(), {"release": "42-5", "message": text_form(1), "compared": False}
+        )
+        (self.failing / "commit-42-5").unlink()
+        # Started again without it, the replay compares 42-5 in `uscode/` before the
+        # commit, and readings that differ stop it there, the form still kept uncompared.
+        (self.failing / "text-42-5").touch()
+        before = len(self.commands())
+        status, _, stderr = self.replay()
+        self.assertEqual(status, 1, stderr)
+        self.assertIn("the two readings of 42-5 differ at line 2", stderr)
+        self.assertIn("text uscode --json", self.commands()[before:])
+        self.assertEqual(len(self.history()), 1)
+        self.assertIs(self.kept_state()["compared"], False)
+        (self.failing / "text-42-5").unlink()
+        status, stdout, stderr = self.replay()
+        self.assertEqual((status, stderr), (0, ""))
+        self.assertIn(
+            "42-5: the two readings were not compared before the text form was kept, and are "
+            "compared now\n",
+            stdout,
+        )
+        self.assertIn("42-5: the two readings agree: 2 records, 0 tables of contents\n", stdout)
+        self.assertEqual(self.assert_complete(), self.uninterrupted())
+
+    def test_a_release_kept_with_no_readings_before_its_replacement_is_compared(self) -> None:
+        # The run with the option stops between the removal of the manifest and of the
+        # directory, so that the import of 42-5 is still in `uscode.next/`.
+        workspace = str(self.repository / "uscode")
+        rmdir = os.rmdir
+
+        def stopping(target: str | os.PathLike[str]) -> None:
+            if os.fspath(target) == workspace:
+                raise OSError("Invented: the replay stops here")
+            rmdir(target)
+
+        with mock.patch.object(os, "rmdir", new=stopping):
+            status, _, stderr = self.replay(None, None, "--no-readings")
+        self.assertEqual(status, 2, stderr)
+        self.assertIs(self.kept_state()["compared"], False)
+        before = len(self.commands())
+        status, stdout, stderr = self.replay()
+        self.assertEqual((status, stderr), (0, ""))
+        self.assertIn("42-5: the two readings agree", stdout)
+        self.assertIn("text uscode.next --json", self.commands()[before:])
+        self.assertEqual(self.assert_complete(), self.uninterrupted())
+
+    def test_a_release_kept_after_its_comparison_is_not_compared_again(self) -> None:
+        (self.failing / "commit-42-5").touch()
+        status, _, stderr = self.replay()
+        self.assertEqual(status, 1, stderr)
+        self.assertIs(self.kept_state()["compared"], True)
+        (self.failing / "commit-42-5").unlink()
+        before = len(self.commands())
+        status, stdout, stderr = self.replay()
+        self.assertEqual((status, stderr), (0, ""))
+        # 42-5 is checked again and committed, and only 42-7 is read back.
+        resumed = [line.split()[0] for line in self.commands()[before:]]
+        self.assertEqual(resumed[:2], ["check", "ingest"])
+        self.assertEqual(resumed.count("text"), 1)
+        self.assertNotIn("are compared now", stdout)
+        self.assertNotIn("42-5: the two readings agree", stdout)
+        self.assertIn("42-7: the two readings agree", stdout)
+        self.assertEqual(self.assert_complete(), self.uninterrupted())
+
+
+# An invented stand-in for a script of the independent reading, which reads through two
+# worker processes as the scripts do with `--jobs 2`, and whose workers never finish.
+# The script's own process and each worker write their number to the file it is given.
+SLOW_READING = '''"""Invented: a stand-in for a script of the independent reading. It reads no law."""
+
+import multiprocessing
+import os
+import sys
+import time
+from concurrent.futures import ProcessPoolExecutor
+
+
+def work(path: str) -> None:
+    with open(path, "a", encoding="utf-8") as stream:
+        stream.write(f"{os.getpid()}\\n")
+    time.sleep(3600)
+
+
+if __name__ == "__main__":
+    with open(sys.argv[1], "a", encoding="utf-8") as stream:
+        stream.write(f"{os.getpid()}\\n")
+    context = multiprocessing.get_context("spawn")
+    with ProcessPoolExecutor(2, mp_context=context, max_tasks_per_child=1) as pool:
+        list(pool.map(work, [sys.argv[1]] * 2))
+'''
+
+
+def numbers_in(path: Path) -> list[int]:
+    if not path.exists():
+        return []
+    return [int(line) for line in path.read_text(encoding="utf-8").split()]
+
+
+def stat_of(number: int) -> list[str] | None:
+    """The fields of the process `number` after its name, from its state letter on (`Z`
+    for one that has ended and is not yet cleared), or None when the system holds none."""
+    try:
+        text = (Path("/proc") / str(number) / "stat").read_text(encoding="utf-8")
+    except OSError:
+        return None
+    return text.rsplit(")", 1)[1].split()
+
+
+def running(numbers: list[int]) -> list[int]:
+    """The processes among `numbers` that have not ended."""
+    return [number for number in numbers if (stat_of(number) or ["Z"])[0] != "Z"]
+
+
+def session_of(session: int) -> list[int]:
+    """The processes of the session `session` that the system holds."""
+    found = []
+    for entry in Path("/proc").iterdir():
+        fields = stat_of(int(entry.name)) if entry.name.isdigit() else None
+        if fields is not None and int(fields[3]) == session:
+            found.append(int(entry.name))
+    return found
+
+
+def kill_run(path: Path) -> None:
+    """Kills every process left of the run whose processes wrote their numbers to `path`,
+    and of the session of the first of them: what a failed test must not leave running.
+    A process is killed only when it is one of Python's, which every process of the run
+    is."""
+    numbers = numbers_in(path)
+    for number in running(numbers + (session_of(numbers[0]) if numbers else [])):
+        try:
+            command = (Path("/proc") / str(number) / "cmdline").read_bytes()
+        except OSError:
+            continue
+        if b"python" in command.split(b"\0", 1)[0]:
+            with contextlib.suppress(ProcessLookupError):
+                os.kill(number, 9)
+
+
+class ScriptRuns(unittest.TestCase):
+    def test_a_script_stopped_by_its_time_limit_leaves_no_process_of_its_run(self) -> None:
+        if not Path("/proc/self/stat").exists():
+            raise unittest.SkipTest("the test reads the processes of a session from /proc")
+        root = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        script = root / "reading.py"
+        script.write_text(SLOW_READING, encoding="utf-8")
+        numbers = root / "numbers"
+        self.addCleanup(kill_run, numbers)
+        communicate = subprocess.Popen.communicate
+
+        def once_started(
+            process: subprocess.Popen[bytes],
+            given: bytes | None = None,
+            timeout: float | None = None,
+        ) -> tuple[bytes, bytes]:
+            # The time limit runs from when the script and both workers have started, so
+            # that the stop finds the workers running however fast the machine is.
+            deadline = time.monotonic() + 120
+            while len(numbers_in(numbers)) < 3 and time.monotonic() < deadline:
+                time.sleep(0.05)
+            return communicate(process, given, timeout)
+
+        limits = replay_uscode.Limits(2 << 30, 1)
+        with (
+            mock.patch.object(subprocess.Popen, "communicate", new=once_started),
+            contextlib.redirect_stdout(io.StringIO()),
+            self.assertRaises(replay_uscode.StopReplayError) as stopped,
+        ):
+            replay_uscode.run_script(script, [str(numbers)], root, limits)
+        started = numbers_in(numbers)
+        self.assertEqual(len(started), 3, "the script and its two workers started")
+        # The script and its workers have ended before the tool reports the stop, and so
+        # has every other process of the session the run was started in, such as the
+        # tracker of what the workers share.
+        self.assertEqual(running(started), [])
+        self.assertEqual(running(session_of(started[0])), [])
+        self.assertIn(
+            "`reading.py " + str(numbers) + "` ran longer than 1 seconds, the limit of a run, "
+            "and was stopped with every process of it",
+            str(stopped.exception),
+        )
 
 
 class Refusals(Replays):

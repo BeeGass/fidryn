@@ -1358,9 +1358,12 @@ class MemberReader:
         return Table(rows)
 
     def check_column(self, element: Element) -> None:
-        """A column holds nothing, white space included."""
-        if tag_of(element) != "xhtml:col" or len(element) or element.text:
-            self.refuse("a column group that holds more than empty columns", element)
+        """A column, in a column group or directly in a table, holds nothing, white space
+        included; a column group holds columns alone."""
+        if tag_of(element) != "xhtml:col":
+            self.refuse("a column group that holds more than columns", element)
+        if len(element) or element.text:
+            self.refuse("a column that holds text, white space included, or an element", element)
 
     def read_row(self, element: Element, group: str, context: Context, scope: Scope) -> Row:
         if tag_of(element) != "xhtml:tr":
