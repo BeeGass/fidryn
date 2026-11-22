@@ -5,26 +5,27 @@ Reads the official XML release point published by the Office of the Law Revision
 Counsel, as `uslm_text.py` reads it (a directory of archives, one archive, or one XML
 file), with the independent reading of `uslm_common.py`, and extracts from its units
 the definitions that the rules of Definitions in `docs/law-modules.md` find: the second
-version of those rules, D1 to D16. This is a second implementation of them, written from
-their text, that shares no code with the importer. Each rule below names the rule it
-implements by its number, such as D7.3.
+version of those rules, with their clarifications. It implements the rules D1 to D14 and
+the record of D15. This is a second implementation of them, written from their text,
+that shares no code with the importer. Each rule below names the rule it implements by
+its number, such as D7.3.
 
 The text the rules read is the text of D1.1, made from the reading of a paragraph: the
 words of its runs, a footnote marker (a `ref` of the class `footnoteRef`) giving
 nothing, and a superscript run (`sup` or `xhtml:sup`) made only of the digits 0 to 9
 left out with one space beside it. Every other superscript is read.
 
-`--records FILE` gets one JSON object for each definition, to a line, with the fields
-of D15.1 in their order: `at`, `terms`, `kind`, `words` (`null` for `unstated`),
-`condition`, `region`, `basis`, `borrowed_from`, `borrowed_words` and `see_note`,
-`null` where the definition has none. The lines are sorted by the bytes of `at`, then by
-the bytes of the line.
+`--records FILE` gets one JSON object for each definition, to a line, with every one of
+the ten fields of D15.1, in their order: `at`, `terms`, `kind`, `words` (`null` for
+`unstated`), `condition`, `region`, `basis`, `borrowed_from`, `borrowed_words` and
+`see_note`, `null` where the definition has none (clarification 13). The lines are
+sorted by the bytes of `at`, then by the bytes of the line.
 
 `--against DIR` compares them with the definitions that the `definition` blocks of the
 module files of the workspace `DIR` hold, read in their canonical form (the grammar line
 of D15.2): a line that begins with the word `definition` must begin a block in that
-form. Unless the two are the same, the script names the first definition that differs
-and exits 1.
+form, and a field the block does not write reads as `null`. Unless the two are the same,
+the script names the first definition that differs and exits 1.
 
 Usage: uv run --locked python -I conformance/usc_definitions.py ARCHIVE_DIR --records FILE
   [--against DIR] [--jobs N]
@@ -1081,12 +1082,14 @@ def recorded_term(term: str) -> str:
 
 
 def read_terms(plain: str, at: int) -> tuple[tuple[str, ...], int] | None:
-    """D7.6, D7.7: the terms that begin at `at` and where they end."""
+    """D7.6, D7.7: the terms that begin at `at` and where they end. In both forms the
+    comma that ends a term is taken off once, and only from a term longer than one
+    character (clarification 10), as `recorded_term` does: `“a,,” “b”` records `a,`
+    and `b`, and `“,” “x”` records `,` and `x`."""
     first = TERMS_FIRST.match(plain, at)
     second = TERMS_SECOND.match(plain, at)
     if second is not None and (first is None or second.end() > first.end()):
         words = ONE_TERM.findall(second.group())
-        words = [without_comma(term) for term in words[:-1]] + words[-1:]
         end = second.end()
     elif first is not None:
         words = ONE_TERM.findall(first.group())

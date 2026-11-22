@@ -423,6 +423,9 @@ class FixtureRows(unittest.TestCase):
         self.assertEqual(result.stderr, "")
         records = [json.loads(line) for line in written.splitlines()]
         self.assertEqual(result.stdout, f"{len(records)} definitions in the release 999-1\n")
+        # Every line has the ten fields, in their order, `null` for an absent one.
+        for record in records:
+            self.assertEqual(tuple(record), RECORD_FIELDS)
         return records
 
     def test_the_sentence_form_has_a_reach_of_its_own_or_none(self) -> None:
@@ -530,6 +533,162 @@ class Rules(unittest.TestCase):
                     see_note=f"{S1}/note/editorialNotes/nolaw/references-in-text",
                 )
             ],
+        )
+
+
+def unstated(
+    terms: tuple[str, ...] = ("x",),
+    kind: str = "means",
+    condition: str | None = None,
+    borrowed_words: str | None = None,
+) -> list[Record]:
+    """The one record of a paragraph of section 1 with no reach."""
+    return [definition(S1, terms, kind, condition=condition, borrowed_words=borrowed_words)]
+
+
+def references_in_text(paragraph: str) -> str:
+    """The editorial notes of section 1: one "References in Text" note whose paragraph
+    is `paragraph`."""
+    return (
+        '<notes type="uscNote"><note role="crossHeading" topic="editorialNotes">'
+        "<heading>Editorial Notes</heading></note>"
+        '<note topic="referencesInText"><heading>References in Text</heading>'
+        f"<p>{paragraph}</p></note></notes>"
+    )
+
+
+class Clarifications(unittest.TestCase):
+    """The clarifications of the specification (`clarifications.md`, 2026-11-22), each on
+    the text it gives, read by the script in this process."""
+
+    def test_1_the_space_beside_superscript_numbers_is_judged_in_the_order_of_the_runs(
+        self,
+    ) -> None:
+        # The runs `a `, superscript `1`, superscript `2`, ` b`; and superscript `1`,
+        # superscript `2`, ` b`.
+        self.assertEqual(
+            usc_definitions.read_text(Text("a 12 b", (), ((2, 3), (3, 4)))).plain, "a b"
+        )
+        self.assertEqual(usc_definitions.read_text(Text("12 b", (), ((0, 1), (1, 2)))).plain, "b")
+        self.assertEqual(
+            defined(
+                with_section(
+                    content(
+                        "The term “x” has the meaning given such term in section 5 "
+                        "<sup>1</sup><sup>2</sup> of this title."
+                    )
+                )
+            ),
+            unstated(kind="borrowed", borrowed_words="section 5 of this title"),
+        )
+        self.assertEqual(
+            defined(
+                with_section(under("In this section:", "<sup>1</sup><sup>2</sup> " + SMALL_DEVICE))
+            ),
+            widget(f"{S1}/1", "In this section", S1, "enacted"),
+        )
+
+    def test_2_the_paragraphs_of_a_note_are_read_through_the_text_of_d1_1(self) -> None:
+        runs = Text("This section1, referred to in subsec. (a), is …", (), ((12, 13),))
+        self.assertEqual(
+            usc_definitions.read_text(runs).plain, "This section, referred to in subsec. (a), is …"
+        )
+        inner = "<content>In this section, the term “x” means y.</content>" + references_in_text(
+            "This section<sup>1</sup>, referred to in subsec. (a), is invented."
+        )
+        self.assertEqual(
+            defined(with_section(inner).replace(FLAG_YES, FLAG_NO)),
+            [
+                definition(
+                    S1,
+                    ("x",),
+                    words="In this section",
+                    region=S1,
+                    basis="restated",
+                    see_note=f"{S1}/note/editorialNotes/nolaw/references-in-text",
+                )
+            ],
+        )
+
+    def test_3_shall_is_looked_for_as_a_standing_word(self) -> None:
+        self.assertEqual(
+            defined(with_section(content("In the case of Marshall County, the term “x” means y."))),
+            unstated(condition="In the case of Marshall County"),
+        )
+
+    def test_4_a_link_counts_only_at_the_place_of_the_object(self) -> None:
+        self.assertEqual(
+            defined(
+                with_section(
+                    content(
+                        "For purposes of this Act, the term “x” means a y of "
+                        '<ref href="/us/usc/t99/s9">this Act</ref>.'
+                    )
+                )
+            ),
+            [definition(S1, ("x",), words="For purposes of this Act")],
+        )
+
+    def test_5_a_provision_with_two_chapeau_parts_reads_nothing_below_it(self) -> None:
+        self.assertEqual(
+            defined(
+                with_section(
+                    "<chapeau>In this section:</chapeau><chapeau>Also:</chapeau>"
+                    f'<paragraph identifier="{S1}/1"><num value="1">(1)</num>'
+                    "<content>“x” means y.</content></paragraph>"
+                )
+            ),
+            [],
+        )
+
+    def test_6_the_second_term_is_compared_as_it_is_recorded(self) -> None:
+        self.assertEqual(
+            defined(with_section(content("The term “x” means y, and “x,” means z."))), unstated()
+        )
+
+    def test_7_the_second_term_and_its_verb_form_lie_within_the_sentence(self) -> None:
+        self.assertEqual(
+            defined(with_section(content("The term “x” means y or “z”, as defined. A, means w."))),
+            unstated(),
+        )
+
+    def test_8_an_aside_may_be_empty(self) -> None:
+        self.assertEqual(defined(with_section(content("The term “x”, , means y."))), unstated())
+
+    def test_9_a_lowercase_letter_is_a_to_z(self) -> None:
+        self.assertEqual(
+            defined(
+                with_section(
+                    content("In the case of a gadget, élite or common, the term “x” means y.")
+                )
+            ),
+            unstated(condition="In the case of a gadget, élite or common"),
+        )
+
+    def test_10_the_comma_that_ends_a_term_is_taken_off_once_and_not_from_a_comma(
+        self,
+    ) -> None:
+        self.assertEqual(
+            defined(with_section(content("The term “,” “x” means y."))), unstated((",", "x"))
+        )
+        self.assertEqual(
+            defined(with_section(content("The term “a,,” “b” means c."))), unstated(("a,", "b"))
+        )
+
+    def test_11_head_words_stand_with_no_letter_just_before_them(self) -> None:
+        self.assertEqual(
+            defined(
+                with_section(
+                    content("Except for bathe terms elsewhere, in this section, “x” means y.")
+                )
+            ),
+            [definition(S1, ("x",), words="in this section", region=S1, basis="enacted")],
+        )
+
+    def test_12_an_end_of_a_sentence_is_judged_on_the_objects_own_characters(self) -> None:
+        self.assertEqual(
+            defined(with_section(content("In this section. The term “x” means y."))),
+            [definition(S1, ("x",), words="In this section.")],
         )
 
 
@@ -838,7 +997,11 @@ def vector_difference(vector: dict[str, Any], found: list[Record]) -> str | None
     otherwise a sentence that names the vector and the first record that differs, and,
     when the other side has a record of the same provision and terms, the first field
     that differs."""
-    expected: list[Record] = vector["expect"]
+    # A key that an expected record leaves out reads as `null`; the script's own records
+    # have every key, in order.
+    expected: list[Record] = [
+        {name: record.get(name) for name in RECORD_FIELDS} for record in vector["expect"]
+    ]
     for record in found:
         if tuple(record) != RECORD_FIELDS:
             return f"vector {vector['id']}: a record has the fields {list(record)}"
@@ -880,6 +1043,21 @@ class Vectors(unittest.TestCase):
         vectors = self.vectors()
         self.assertEqual(len(vectors), VECTOR_COUNT)
         self.assertEqual(len({vector["id"] for vector in vectors}), VECTOR_COUNT)
+
+    def test_a_missing_key_is_read_as_null(self) -> None:
+        # A record that leaves out the keys of absent fields, as the third reading of the
+        # rules writes them, is the record with those fields `null`.
+        vector = self.vectors()[0]
+        found = vector_records(vector)
+        self.assertEqual(found[0]["condition"], None)
+        shortened = {
+            key: value
+            for key, value in vector["expect"][0].items()
+            if key not in ("condition", "borrowed_words")
+        }
+        self.assertIsNone(vector_difference({**vector, "expect": [shortened]}, found))
+        # The script's own records keep every key.
+        self.assertIsNotNone(vector_difference({**vector, "expect": vector["expect"]}, [shortened]))
 
     def test_every_vector_gives_the_records_it_expects(self) -> None:
         failures = []

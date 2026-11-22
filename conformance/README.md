@@ -248,13 +248,16 @@ sorted by the bytes of the provision's address and then by the bytes of
 the line, with the fields of a definition in their order: `at`, `terms`,
 `kind`, `words` (`null` for `unstated`), `condition`, `region`, `basis`,
 `borrowed_from`, `borrowed_words` and `see_note`, the fields of a
-`definition` block, `null` where the definition has none. A definition of
+`definition` block. Every line has all ten keys, in that order, with
+`null` where the definition has none of a field; where records are
+compared, a key that a record leaves out reads as `null`. A definition of
 kind `borrowed` has exactly one of `borrowed_from` and `borrowed_words`.
 The script prints their number and the release. With `--against DIR` it
 reads the `definition` blocks of the module files of the workspace `DIR`
 in their canonical form, its fields in the order of the grammar of the
 block (`condition` after `words`, and one of `borrowed_from` and
-`borrowed_words` after `basis`), refuses a line that begins with the word
+`borrowed_words` after `basis`), a field a block does not write read as
+`null`, refuses a line that begins with the word
 `definition` and does not begin a block in that form, and exits `1`,
 naming the first definition that differs and, when the other side has one
 of the same provision and terms, the field, unless the release gives the
@@ -281,11 +284,13 @@ differ; `2` when an input cannot be read or the records cannot be
 written. `test_usc_definitions.py` holds the script to every vector: it
 builds the vector's unit in the model of the reading of `uslm_common.py`,
 hands it to the rules as the reading of the publisher's XML does, and
-compares the records with those expected, as many times each, naming the
-vector and the first field that differs. It holds the script to the
-definitions of the fixtures `definitions-*.xml` and of small invented
-documents of the title 99 that it writes, footnote markers and
-superscripts among them, and holds `--against` to workspaces that it
+compares the records with those expected, as many times each, a key an
+expected record leaves out read as `null`, naming the vector and the
+first field that differs. It holds the script to the definitions of the
+fixtures `definitions-*.xml`, every line of them with its ten keys in
+order, and of small invented documents of the title 99 that it writes,
+footnote markers and superscripts among them, and the text that each of
+the clarifications of the rules gives; and it holds `--against` to workspaces that it
 writes: the same definitions, one definition missing on each side, a
 field that differs, `condition` and `borrowed_words` among them, a block
 in another form, a block with both `borrowed_from` and `borrowed_words`,
@@ -465,8 +470,9 @@ and holds them to it: they count the units, containers, provisions, notes
 and footnotes the ledger counts, and every definition's provision has a
 record. It gives each definition the paragraph it was extracted from: of
 the blocks of its provision's text parts that are paragraphs, the one
-with a sentence whose first term in curly quotation marks is the
-definition's first term, the sentences and the term read with the rules
+with a sentence at whose start the rules read a pattern and whose first
+term in curly quotation marks, which begins in it, is the definition's
+first term, the sentences, the pattern and the term read with the rules
 of `usc_definitions.py`; a paragraph that no definition was given is one
 from which none was extracted. It starts no program. Each line holds the seed, the release,
 the size of the population, the place in the draw, what a reader needs to
@@ -486,7 +492,10 @@ the tool reads or a sample is there already, `2` when an input cannot be
 read or the output written. `test_draw_definition_samples.py` holds the
 generator to the known answers of SplitMix64, the draws of the two samples
 drawn from the release 119-142 to theirs, the first terms of the
-sentences of a paragraph, and the draw, the two populations (a definition
+sentences of a paragraph (a term that holds an end of a sentence, and a
+sentence that reads no pattern, among them), the placing of a definition
+on the block it was extracted from when an earlier block begins with the
+same term, and the draw, the two populations (a definition
 of a later sentence and one of a proviso part among them), the lines and
 the refusals of a block in another form, of a block with both borrowed
 fields, of a ledger that counts other definitions, of records of other

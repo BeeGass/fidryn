@@ -20,12 +20,12 @@ file yet:
   basis and the borrowed words (each `null` when there is none), and the text of the
   paragraph it was extracted from: of the paragraphs that the rules of Definitions read,
   the blocks of the provision's text parts that are paragraphs (not those in a table),
-  the one with a sentence whose first term in curly quotation marks is the definition's
-  first term, the second such sentence for a second definition of that term, and so
-  on. The rules read a definition from any of those paragraphs, at the start of any of
-  its sentences, and the terms of a reading begin at its first quotation mark; the
-  sentences, the text and the terms are read as `conformance/usc_definitions.py` reads
-  them (a term without a final comma and without the stray marks of nested quotation).
+  the one with a sentence at whose start the rules read a pattern and whose first term
+  in curly quotation marks, which begins in it, is the definition's first term, the
+  second such sentence for a second definition of that term, and so on. The rules read
+  a definition from any of those paragraphs, at the start of any of its sentences, and
+  the terms of a reading begin at its first quotation mark; the sentences, the text,
+  the pattern and the terms are read as `conformance/usc_definitions.py` reads them.
 - `near-misses.jsonl`: 500 paragraphs of operative text drawn without replacement from
   those that hold a term in curly quotation marks, `“` and `”` around at least one
   character that is neither, followed within 60 characters, from the end of the term
@@ -70,7 +70,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "conformance"))
 
-from usc_definitions import read_text, recorded_term, sentences
+from usc_definitions import read_pattern, read_text, sentences
 from uslm_common import Text
 
 SIZE = 500
@@ -162,9 +162,12 @@ def loose_match(words: str) -> tuple[str, str] | None:
 def first_terms(block: dict[str, Any]) -> list[str]:
     """The terms that a definition read from the paragraph `block` of a text record can
     have as its first term: for each sentence of the paragraph's text as the rules of
-    Definitions read it, its first term in curly quotation marks, as the rules record
-    a term. The rules read a paragraph at the start of each of its sentences, and the
-    terms of a reading begin at its first quotation mark."""
+    Definitions read it, its first term in curly quotation marks, as the rules record a
+    term, when that term begins before the end of the sentence (it may run past it, as
+    the invented “R.M.S. Widget” does) and the rules read a pattern at the start of the
+    sentence.
+    The rules read a paragraph at the start of each of its sentences, and the terms of a
+    reading begin at its first quotation mark."""
     text = read_text(
         Text(
             str(block["p"]),
@@ -174,9 +177,12 @@ def first_terms(block: dict[str, Any]) -> list[str]:
     )
     found = []
     for start, end in sentences(text.plain):
-        term = TERM.search(text.plain, start, end)
-        if term is not None:
-            found.append(recorded_term(term[1]))
+        term = TERM.search(text.plain, start)
+        if term is None or term.start() >= end:
+            continue
+        reading = read_pattern(text, start)
+        if reading is not None:
+            found.append(reading.terms[0])
     return found
 
 
@@ -478,9 +484,9 @@ def hold_records(provisions: Provisions, totals: dict[str, Any], ledger: Path) -
 
 def place_definitions(definitions: list[Definition], provisions: Provisions) -> None:
     """Gives each definition the paragraph it was extracted from: the paragraphs that
-    the rules read of its provision, once for each of their sentences whose first term
-    is the definition's first term, in order, the second such for a second definition
-    of that term, and so on."""
+    the rules read of its provision, once for each of their sentences that `first_terms`
+    offers with the definition's first term, in order, the second such for a second
+    definition of that term, and so on."""
     taken: dict[tuple[str, str], int] = {}
     for definition in definitions:
         if definition.address not in provisions.read:

@@ -268,10 +268,82 @@ class FirstTerms(unittest.TestCase):
                 ["a", "c"],
             ),
             (text("The term “a” means b.1 The term “c” means d."), ["a"]),
+            # A term that holds an end of a sentence ("R.M.S" is no abbreviation) is the
+            # first term of the sentence it begins in.
+            (
+                text("For purposes of this section, the term “R.M.S. Widget” means a ship."),
+                ["R.M.S. Widget"],
+            ),
+            # A sentence offers its first term only when the rules read a pattern there.
+            (text("“x” is used below."), []),
+            (text("The term “x” is used below. In this section, the term “x” means y."), ["x"]),
         ]
         for block, expected in cases:
             with self.subTest(block["p"]):
                 self.assertEqual(draw.first_terms(block), expected)
+
+
+class Placement(unittest.TestCase):
+    """A definition is given the paragraph it was extracted from, on a workspace of one
+    invented unit, section 1, whose items are given."""
+
+    def drawn(self, items: list[dict[str, Any]], definitions: str) -> tuple[list[Any], list[Any]]:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            workspace = root / "workspace"
+            (workspace / "zz" / "demo" / "t1").mkdir(parents=True)
+            (workspace / "workspace.json").write_text(manifest(), encoding="utf-8")
+            count = definitions.count("  definition ")
+            (workspace / "coverage.json").write_text(
+                ledger(
+                    units=1,
+                    provisions=1,
+                    notes={"enacted": 0, "editorial": 0},
+                    definitions={"enacted": count, "restated": 0, "unresolved": 0},
+                ),
+                encoding="utf-8",
+            )
+            (workspace / "zz" / "demo" / "t1" / "s1.fr").write_text(
+                module(f"{T1}/s1", definitions), encoding="utf-8"
+            )
+            (workspace / "zz" / "demo" / "t1.fr").write_text(module(T1, ""), encoding="utf-8")
+            records = [
+                {**RECORDS[0], "members": [f"{T1}/s1"]},
+                provision(f"{T1}/s1", "section", items, unit=True),
+            ]
+            assert RECORDS[0]["address"] == T1
+            (root / "records.jsonl").write_text(
+                "".join(
+                    json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
+                    for record in records
+                ),
+                encoding="utf-8",
+            )
+            out = root / "out"
+            draw.draw_samples(workspace, root / "records.jsonl", 1, out)
+            return tuple(  # type: ignore[return-value]
+                [json.loads(line) for line in (out / file).read_text(encoding="utf-8").splitlines()]
+                for file in ("extracted.jsonl", "near-misses.jsonl")
+            )
+
+    def test_an_earlier_sentence_that_defines_nothing_is_not_taken(self) -> None:
+        defining = "In this section, the term “x” means y."
+        extracted, near = self.drawn(
+            [{"part": "content", "blocks": [text("“x” is used below."), text(defining)]}],
+            definition(f"{T1}/s1", "x", "In this section", f"{T1}/s1"),
+        )
+        self.assertEqual([line["text"] for line in extracted], [defining])
+        # The block extracted from is no near miss; the other holds no verb form.
+        self.assertEqual(near, [])
+
+    def test_a_term_that_holds_an_end_of_a_sentence_is_placed(self) -> None:
+        defining = "For purposes of this section, the term “R.M.S. Widget” means an invented ship."
+        extracted, near = self.drawn(
+            [part("content", defining)],
+            definition(f"{T1}/s1", "R.M.S. Widget", "For purposes of this section", f"{T1}/s1"),
+        )
+        self.assertEqual([line["text"] for line in extracted], [defining])
+        self.assertEqual(near, [])
 
 
 class LooseMatch(unittest.TestCase):
