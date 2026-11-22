@@ -130,6 +130,15 @@ interchange schema versions are maintained independently of the interpreter.
   records give it. Before, it used only the pattern at each sentence,
   which could take a paragraph that a later rule refuses.
 
+### Security
+
+- The locked `url` is updated to 2.5.9 (from 2.5.8), and with it
+  `form_urlencoded` to 1.2.3 (from 1.2.2), for RUSTSEC-2026-0592, a stack
+  overflow in `Url::origin()` on a URL with nested `blob:` prefixes.
+  Fidryn holds `url` only through `ureq`, the HTTP client of
+  `fidryn-adapt`. No crate of the workspace calls `Url::origin()` or
+  `url::quirks::origin()`, and neither does `ureq` 2.12.1.
+
 ## [0.3.0] - 2026-11-22
 
 ### Changed
