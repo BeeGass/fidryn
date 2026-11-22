@@ -5,7 +5,7 @@ interchange schema versions are maintained independently of the interpreter.
 
 ## [Unreleased]
 
-## [0.3.0] - 2026-11-18
+## [0.3.0] - 2026-11-22
 
 ### Changed
 
