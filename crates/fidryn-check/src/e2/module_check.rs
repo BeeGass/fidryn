@@ -1,13 +1,13 @@
 //! The checks of one module over its lowered model.
 
-use super::{Declared, Lowered, Spans, Value};
+use super::{Declared, DefinitionSpans, Lowered, Spans, Value};
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
 use fidryn_provision::hash::{
     hash_container, hash_note, layer_hashes_of_container, layer_hashes_of_unit, tree_hashes,
 };
 use fidryn_provision::{
-    Address, Block, ContainerModule, CuratedModule, DefinitionKind, Footnote, Hash32, Item,
-    LayerHashes, Module, Note, PartRole, Provision, QuotedItem, UnitModule,
+    Address, Block, ContainerModule, CuratedModule, Definition, DefinitionKind, Footnote, Hash32,
+    Item, LayerHashes, Module, Note, PartRole, Provision, QuotedItem, UnitModule,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -20,9 +20,13 @@ use std::collections::{BTreeMap, BTreeSet};
 ///   the module writes; the footnotes are numbered from 1, without a gap,
 ///   in the order they are written, and every footnote marker names a
 ///   footnote of the module; and every definition names a provision of the
-///   unit whose text holds each term, whose text or the chapeau of one of
-///   whose ancestors holds the reach words when they are stated, and, when
-///   its kind is `borrowed`, says what it borrows from (`E710`);
+///   unit whose text holds each term and the source words, whose text or the
+///   chapeau of one of whose ancestors holds the reach words when they are
+///   stated and the condition when there is one, and, when its kind is
+///   `borrowed`, says what it borrows from in exactly one of `borrowed_from`
+///   and `borrowed_words`, which a definition of any other kind does not
+///   have (`E710`). Those texts are read without their footnote markers and
+///   without their superscript runs made only of digits;
 /// - no name of a curated module is declared twice, its citations and its
 ///   bindings sharing one set of names (`E200`).
 pub fn check_module(lowered: &Lowered) -> Vec<Diagnostic> {
@@ -71,14 +75,26 @@ fn below(address: &Address, other: &Address) -> bool {
     address != other && address.is_within(other)
 }
 
-/// The plain text of each paragraph and subheading of the text parts of
+/// The word a module writes for `kind`.
+fn kind_word(kind: DefinitionKind) -> &'static str {
+    match kind {
+        DefinitionKind::Means => "means",
+        DefinitionKind::Includes => "includes",
+        DefinitionKind::DoesNotInclude => "does_not_include",
+        DefinitionKind::Borrowed => "borrowed",
+    }
+}
+
+/// The text a definition is read in ([`fidryn_provision::Text::read_text`]:
+/// without footnote markers and without superscript runs made only of
+/// digits) of each paragraph and subheading of the text parts of
 /// `provision` whose role `wanted` accepts, those in its tables and quoted
 /// content included, and nothing of its children.
 fn texts_of(provision: &Provision, wanted: impl Fn(PartRole) -> bool) -> Vec<String> {
     fn blocks(list: &[Block], out: &mut Vec<String>) {
         for block in list {
             match block {
-                Block::Para(text) | Block::Subheading(text) => out.push(text.plain()),
+                Block::Para(text) | Block::Subheading(text) => out.push(text.read_text().text),
                 Block::Table(table) => {
                     for cell in table.rows.iter().flat_map(|row| &row.cells) {
                         blocks(&cell.blocks, out);
@@ -399,7 +415,7 @@ impl Check<'_> {
                     );
                 }
             }
-            if let Some(words) = &definition.words {
+            if definition.words.is_some() || definition.condition.is_some() {
                 // The chapeaus of the ancestors, the parent first. Each
                 // ancestor is found by its address, which no other provision
                 // of a module that passes the checks of its addresses has.
@@ -411,7 +427,10 @@ impl Check<'_> {
                         .get(&provision.address)
                         .and_then(|placed| placed.parent);
                 }
-                if !stands(&texts, words) && !stands(&chapeaus, words) {
+                if let Some(words) = &definition.words
+                    && !stands(&texts, words)
+                    && !stands(&chapeaus, words)
+                {
                     self.error(
                         DiagnosticCode::E710,
                         spans.words,
@@ -421,13 +440,73 @@ impl Check<'_> {
                         ),
                     );
                 }
+                if let Some(condition) = &definition.condition
+                    && !stands(&texts, condition)
+                    && !stands(&chapeaus, condition)
+                {
+                    self.error(
+                        DiagnosticCode::E710,
+                        spans.condition.unwrap_or(spans.words),
+                        format!(
+                            "the condition `{condition}` stands neither in the text of provision \
+                             `{at}` nor in the chapeau of one of its ancestors"
+                        ),
+                    );
+                }
             }
-            if definition.kind == DefinitionKind::Borrowed && definition.borrowed_from.is_none() {
+            if let Some(source) = &definition.borrowed_words
+                && !stands(&texts, source)
+            {
                 self.error(
                     DiagnosticCode::E710,
-                    spans.kind,
-                    "a definition of kind `borrowed` has no `borrowed_from`",
+                    spans.borrowed_words.unwrap_or(spans.kind),
+                    format!(
+                        "the source words `{source}` do not stand in the text of provision `{at}`"
+                    ),
                 );
+            }
+            self.source_of(definition, spans);
+        }
+    }
+
+    /// A definition of kind `borrowed` has exactly one of `borrowed_from`
+    /// and `borrowed_words`, and one of any other kind has neither.
+    fn source_of(&mut self, definition: &Definition, spans: &DefinitionSpans) {
+        let linked = spans.borrowed_from.unwrap_or(spans.kind);
+        let unlinked = spans.borrowed_words.unwrap_or(spans.kind);
+        match (
+            definition.kind,
+            definition.borrowed_from.is_some(),
+            definition.borrowed_words.is_some(),
+        ) {
+            (DefinitionKind::Borrowed, false, false) => self.error(
+                DiagnosticCode::E710,
+                spans.kind,
+                "a definition of kind `borrowed` has neither `borrowed_from` nor `borrowed_words`",
+            ),
+            (DefinitionKind::Borrowed, true, true) => self.error(
+                DiagnosticCode::E710,
+                unlinked,
+                "a definition of kind `borrowed` has both `borrowed_from` and `borrowed_words`",
+            ),
+            (DefinitionKind::Borrowed, _, _) => {}
+            (kind, from, words) => {
+                let kind = kind_word(kind);
+                for (given, field, span) in [
+                    (from, "borrowed_from", linked),
+                    (words, "borrowed_words", unlinked),
+                ] {
+                    if given {
+                        self.error(
+                            DiagnosticCode::E710,
+                            span,
+                            format!(
+                                "a definition of kind `{kind}` has `{field}`, which only a \
+                                 definition of kind `borrowed` has"
+                            ),
+                        );
+                    }
+                }
             }
         }
     }

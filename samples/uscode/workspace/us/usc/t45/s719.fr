@@ -207,14 +207,14 @@ module "/us/usc/t45/s719" {
     }
     hash "da8db91227e43c240e45b1ffa58862d52e6b74e3d0c3057182826f425a7649d7"
   }
-  note "/us/usc/t45/s719/note/statutoryNotes/pl.100.352/effective-date-of-1988-amendment" enacted {
+  note "/us/usc/t45/s719/note/statutoryNotes/pl.100.352/effective-date-of-1988-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1988 Amendment"
     p "Amendment by " ["Pub. L. 100–352" -> "/us/pl/100/352"] " effective ninety days after June 27, 1988, except that such amendment not to apply to cases pending in Supreme Court on such effective date or affect right to review or manner of reviewing judgment or decree of court which was entered before such effective date, see " ["section 7 of Pub. L. 100–352" -> "/us/pl/100/352/s7"] ", set out as a note under " ["section 1254 of Title 28" -> "/us/usc/t28/s1254"] ", Judiciary and Judicial Procedure."
     hash "feff9722fe583140dc628b7a0fa8adfc8defc8e4756e12aae08abbfdb687d079"
   }
-  note "/us/usc/t45/s719/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s719/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
@@ -239,14 +239,14 @@ module "/us/usc/t45/s719" {
     }
     hash "7a005731e30be411d9c1f270188bc69e2270e8993e399c276901327b3850ed4d"
   }
-  note "/us/usc/t45/s719/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s719/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
     p "Application of National Environmental Policy Act to actions of Commission not affected by title VI of " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", see " ["section 619 of Pub. L. 94–210" -> "/us/pl/94/210/s619"] ", set out as a note under " ["section 791 of this title" -> "/us/usc/t45/s791"] "."
     hash "7ce373698c822f6cf7cb1f07e93f5e378a6239d819a9e93ab08ae9f21b104a45"
   }
-  note "/us/usc/t45/s719/note/courtRules/nolaw/rules-of-the-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s719/note/courtRules/nolaw/rules-of-the-special-court-regional-rail-reorganization-act" editorial {
     group courtRules
     topic "miscellaneous"
     heading "Rules of the Special Court, Regional Rail Reorganization Act of 1973"
@@ -258,7 +258,7 @@ module "/us/usc/t45/s719" {
   }
   layers {
     operative "515ff2e21332268fd321a00be317ae02b49b9591dbdd669ca21ca03ff67c4c97"
-    enacted "c131ff0ab4c97adc63710f13cc6ad7e259f6dddcb5be7c714d9aea664719addd"
-    editorial "3c51b248cbf2a714e1bad0c8e9162c4468240b9c6c0357c13e3ab49af128cac2"
+    enacted "29c189a81581df0e90632e70aa8b3c907abcf6f52559ea329e1b7610427b9e9b"
+    editorial "25414c327816015cde3ac6bfd68fc3668a719b88722dcb9ef4071f9a390b5225"
   }
 }

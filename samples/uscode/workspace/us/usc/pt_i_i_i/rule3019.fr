@@ -68,21 +68,21 @@ module "/us/usc/ptIII/rule3019" {
     hash "77a08ad4db06df8c8dba81d3d7f7461b98e1322258543749c62b5a989795b7bb"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule implements §§ 942, 1127 and 1323 of the Code. For example, § 1127 provides for modification before and after confirmation but does not deal with the minor modifications that do not adversely change any rights. The rule makes clear that a modification may be made, after acceptance of the plan without submission to creditors and equity security holders if their interests are not affected. To come within this rule, the modification should be one that does not change the rights of a creditor or equity security holder as fixed in the plan before modification."
     hash "a394e342600001a381bec8400124ae86fddb56ccb5ee13d658580094ca32cacc"
   }
-  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "This rule is amended to limit its application to chapter 9 and chapter 11 cases. Modification of plans after confirmation in chapter 12 and chapter 13 cases is governed by Rule 3015. The addition of the comma in the second sentence is stylistic and makes no substantive change."
     hash "50e94619b2e7b778809f225eca295d9bab0bd34cb93382c01e9917f53c47683f"
   }
-  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -90,7 +90,7 @@ module "/us/usc/ptIII/rule3019" {
     p "Changes Made After Publication. The last sentence of the published rule provided that an objection to modification of a plan is governed by Rule 9014. The sentence is deleted and the reference to Rule 9014 is moved to the first sentence of subdivision (b) of the rule. The Committee Note was revised to make the reference to the 2005 amendments to the Bankruptcy Code consistent with their identification in other Committee Notes."
     hash "59b023aed70a7ab5bea927e1d8c2acef116b846727e6d8cfc4292d92aebd43ec"
   }
-  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -102,14 +102,14 @@ module "/us/usc/ptIII/rule3019" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. Subdivision (c) is added to the rule to govern requests to modify a plan after confirmation in such cases under § 1193(b) or (c) of the Code."
     hash "be17e5b45f3747eb6781602e13549894ff2d4bc9988fc53022bde10134f5cd5e"
   }
-  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -118,7 +118,7 @@ module "/us/usc/ptIII/rule3019" {
   }
   layers {
     operative "77a08ad4db06df8c8dba81d3d7f7461b98e1322258543749c62b5a989795b7bb"
-    enacted "254f802aae7c957f030aba8ede4db08ba89a2e781f3589311498d49d4e323a8f"
-    editorial "481a29cece4762f6be8757dd125c94d33aea502eb0895d8309f12f773f0b280f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "4c791112c3002df24154d3c1bffe2b8540b9b4c0e773a30dc5ef0112662d4089"
   }
 }

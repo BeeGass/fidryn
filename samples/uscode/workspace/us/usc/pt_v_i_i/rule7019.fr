@@ -20,28 +20,28 @@ module "/us/usc/ptVII/rule7019" {
     hash "4ff7d6d8875231c159a39f855e0712ac97973ed0a7312c8dd80ce80c54a24b87"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule addresses a situation different from that encountered by the district court when its jurisdiction is based on diversity of citizenship under 28 U.S.C. § 1332. Joining of a party whose citizenship is the same as that of an adversary destroys the district court’s jurisdiction over the entire civil action but under [former] 28 U.S.C. § 1471 the attempted joinder of such a person would not affect the bankruptcy court’s jurisdiction over the original adversary proceeding."
     hash "f7bb6cc8ea4eb0495b2ce424711ba7708716ffa478f2a556cc9297ebeb16f8b8"
   }
-  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The rule is amended to delete the reference to retention of the adversary proceeding if venue is improper. See 28 U.S.C. § 1412."
     hash "abf22f29d4b233a5a81d861e93d5567cfac8aebe7bc3d670048c8e3469c4c695"
   }
-  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7019 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "3b84c8ae964bc8178623ef0ab96911443cfee1f3429572f65e75909974a69a10"
   }
-  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7019/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -50,7 +50,7 @@ module "/us/usc/ptVII/rule7019" {
   }
   layers {
     operative "4ff7d6d8875231c159a39f855e0712ac97973ed0a7312c8dd80ce80c54a24b87"
-    enacted "cac3f7e54a86afc88c5155f9dbee1e8f7f4d83f816fc18737722a7aaf7b74b54"
-    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "da410b3afab9616735fe7c3c57df8f1c9e9e74265962387e06748698a40c3c5e"
   }
 }

@@ -102,7 +102,7 @@ module "/us/usc/ptII/rule2004" {
     hash "8e601bedfc44e8dde2414524e61d6b05d9c01c86057520deecbe99b41d42e753"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 29, 2002, eff. Dec. 1, 2002; Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -116,14 +116,14 @@ module "/us/usc/ptII/rule2004" {
     p "Spousal privilege. The limitation on the spousal privilege formerly contained in § 21a of the Act is not carried over in the Code. For privileges generally, see Rule 501 of the Federal Rules of Evidence made applicable in cases under the Code by Rule 1101 thereof."
     hash "5ac82cf507a90b615cea9b323b8925cec7dd38990bb01c77cbab73a487dc05a5"
   }
-  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "This rule is amended to allow the examination in a chapter 12 case to cover the same matters that may be covered in an examination in a chapter 11 or 13 case."
     hash "379a6e196138beaed137cfe04604386a5aab9b4de9170a2b98c21d422c2b3ce6"
   }
-  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2002 Amendment"
@@ -132,7 +132,7 @@ module "/us/usc/ptII/rule2004" {
     p "Changes Made After Publication and Comments. The typographical error was corrected, but no other changes were made."
     hash "47c08134c9c1dbb172eb54ecd598d6a10c71974c41f24dc3bdd739e2af1a12bd"
   }
-  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" enacted {
+  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2020 Amendment"
@@ -140,7 +140,7 @@ module "/us/usc/ptII/rule2004" {
     p "Second, subdivision (c) is amended to bring its subpoena provision into conformity with the current version of F.R.Civ.P. 45, which Rule 9016 makes applicable in bankruptcy cases. Under Rule 45, a subpoena always issues from the court where the action is pending, even for a deposition in another district, and an attorney admitted to practice in the issuing court may issue and sign it. In light of this procedure, a subpoena for a Rule 2004 examination is now properly issued from the court where the bankruptcy case is pending and by an attorney authorized to practice in that court, even if the examination is to occur in another district."
     hash "d3c84474ac475e40cf098ae89ee35cf0a22d22c0b3154255d5aa4d76f2d39cb6"
   }
-  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -149,7 +149,7 @@ module "/us/usc/ptII/rule2004" {
   }
   layers {
     operative "8e601bedfc44e8dde2414524e61d6b05d9c01c86057520deecbe99b41d42e753"
-    enacted "bc0e4c4505fd41fb669acdb0db0c4d3baa5ba7fab1ffe16886ad84d8305b6fad"
-    editorial "ab7404fd1323febc64ff0cdfbb8cc657ff9e30282d28a416fd17618beab98c9d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "98c5159e7d4d8e3680346d963548f17c22e89a64daf56a1d32a948390d23bca8"
   }
 }

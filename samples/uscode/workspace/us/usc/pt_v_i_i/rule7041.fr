@@ -20,7 +20,7 @@ module "/us/usc/ptVII/rule7041" {
     hash "159a933ee903db907c260700b83eced4a08327a6d604137ab79055cb734e0933"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -28,7 +28,7 @@ module "/us/usc/ptVII/rule7041" {
     p "Rule 41 F.R.Civ.P. refers to Rule 19 F.R.Civ.P. Pursuant to Rule 7002 that reference is to Rule 19 F.R.Civ.P. as incorporated and modified by Rule 7019."
     hash "80524979f7e3d2140717df2eb0d74775946ae52b83004a2ea5d2805a0516c13a"
   }
-  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -36,14 +36,14 @@ module "/us/usc/ptVII/rule7041" {
     p "The rule is also amended to clarify that the court may direct that other persons receive notice of a plaintiff’s motion to dismiss a complaint objecting to discharge."
     hash "2d6055e72b98eb568e7a886984ee6d2f3856a296420e31054d68ed468585a5e7"
   }
-  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7041 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "fc8e8e91d5f0a0cdfeaf93cd983d951ae4390d9eda7a507d684eb56d125cb495"
   }
-  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7041/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -52,7 +52,7 @@ module "/us/usc/ptVII/rule7041" {
   }
   layers {
     operative "159a933ee903db907c260700b83eced4a08327a6d604137ab79055cb734e0933"
-    enacted "2c1e33441b2171d811117a6e30a79ed43e08f996bd7deaf551b030c07373432b"
-    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "30fbcbc86ffb4f655abd513dbdb7aa9a5d5e196abbc5e78c271497aa9160f887"
   }
 }

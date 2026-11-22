@@ -31,35 +31,35 @@ module "/us/usc/ptIII/rule3011" {
     hash "786d4307a1bce93355d32392ded6fcc7070f3e5976527b995d95cd2e47fff409"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 24, 2023, eff. Dec. 1, 2023; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is derived from former Bankruptcy Rule 310. The operative provisions of that rule, however, are contained in § 347(a) of the Code, requiring the trustee to stop payment of checks remaining unpaid 90 days after distribution. The rule adds the requirement of filing a list of the names and addresses of the persons entitled to these dividends. This rule applies in a chapter 7 or 13 case but not in a chapter 9 or 11 case. The latter cases are governed by § 347(b) of the Code which provides for unclaimed distributions to be returned to the debtor or other entity acquiring the assets of the debtor."
     hash "fa716b2f1db926f77ff2ac6ee1bc6a10b49f7d0d5b5df753fe37a6583c059e0e"
   }
-  note "/us/usc/ptIII/rule3011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "The title of this rule is amended to include chapter 12 cases. The words “with the clerk” are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "7dcf24a10dbfe44cf918722d8afe980100e5252443995e5c9f7bd2eedef2ed79"
   }
-  note "/us/usc/ptIII/rule3011/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptIII/rule3011/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. The rule is amended to include such cases because § 347(a) of the Code applies to them."
     hash "ad35155eb8a7a8ed3d26eada7eee5bbbf075c24805c257f01031c4cd6d959ef1"
   }
-  note "/us/usc/ptIII/rule3011/note/ungrouped/nolaw/committee-notes-on-rules-2023-amendment" enacted {
+  note "/us/usc/ptIII/rule3011/note/ungrouped/nolaw/committee-notes-on-rules-2023-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2023 Amendment"
     p "Rule 3011 is amended to require the clerk to provide searchable access (as by providing a link to the U.S. Bankruptcy Unclaimed Funds Locator) on the court’s website to information about unclaimed funds deposited pursuant to § 347(a). The court may limit access to information about such funds in a specific case for cause, including, for example, if such access risks disclosing the identity of claimants whose privacy should be protected, or if the information about the unclaimed funds is so old as to be unreliable."
     hash "672bbb209eb085e712c3fa237fc9542b3ae97adab06e0ca4ed68598e51c600ed"
   }
-  note "/us/usc/ptIII/rule3011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -68,7 +68,7 @@ module "/us/usc/ptIII/rule3011" {
   }
   layers {
     operative "786d4307a1bce93355d32392ded6fcc7070f3e5976527b995d95cd2e47fff409"
-    enacted "de659384d1f1e0d776f669c02e94b2819aff6671a120f182cfc3a92242be6509"
-    editorial "b24c897ec8ba998448be0e4859c6400c67c8e05d783a9999489ab5e965595878"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a087174ae389c3c2440f3d510ccfa7963f6551d99cfbb1f11c9cbc07018c85c9"
   }
 }

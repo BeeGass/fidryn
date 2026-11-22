@@ -45,35 +45,35 @@ module "/us/usc/t45/s228e...228z–1" {
     p "Section 228z–1, " ["Pub. L. 86–28" -> "/us/pl/86/28"] ", pt. I, § 5, May 19, 1959, " ["73 Stat. 28" -> "/us/stat/73/28"] ", related to additional increases in certain pensions and annuities."
     hash "08ce909e17643bdad1bdcedfb0bf60757a17b1598c4b4d8d3d0615897333bef8"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.93.69/actuarial-soundness-of-the-railroad-retirement-system" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.93.69/actuarial-soundness-of-the-railroad-retirement-system" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Actuarial Soundness of the Railroad Retirement System"
     p ["Pub. L. 93–69, title I, § 107" -> "/us/pl/93/69/tI/s107"] ", July 10, 1973, " ["87 Stat. 165" -> "/us/stat/87/165"] ", authorized certain designated representatives of employees and representatives of carriers to submit to the Senate Committee on Labor and Public Welfare and the House Committee on Interstate and Foreign Commerce, no later than Apr. 1, 1974, a report containing their recommendations for restructuring the railroad retirement system to assure long-term actuarial soundness."
     hash "faa6a63cc31c906a9d4287e0d7e9f615b61e17553b82b14f34aeef1362f8ed21"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.93.58/adopted-child-s-reentitlement-to-annuity" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.93.58/adopted-child-s-reentitlement-to-annuity" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Adopted Child’s Reentitlement to Annuity"
     p ["Pub. L. 93–58, § 4(b)" -> "/us/pl/93/58/s4/b"] ", July 6, 1973, " ["87 Stat. 141" -> "/us/stat/87/141"] ", provided that any child whose entitlement to an annuity under " ["section 228e(c) of this title" -> "/us/usc/t45/s228e/c"] " was terminated by reason of his or her adoption prior to July 6, 1973, and who otherwise would have been entitled to an annuity under such section for a month after July, 1973, could become reentitled to his or her annuity by proper application."
     hash "7dbe22bcfd1dfe6fb555a71a69a7e1d77de4ce2e8967459e86bf14579c79534e"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/act.1946-07-31.ch709/certain-persons-becoming-employers" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/act.1946-07-31.ch709/certain-persons-becoming-employers" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Certain Persons Becoming Employers"
     p ["Act July 31, 1946, ch. 709, § 409" -> "/us/act/1946-07-31/ch709/s409"] ", " ["60 Stat. 743" -> "/us/stat/60/743"] ", provided that in the application of " ["section 228f of this title" -> "/us/usc/t45/s228f"] " with respect to persons who were not employers before the enactment of act July 31, 1946, the dates Jan. 1, 1946, and Jan. 1, 1947, were to be substituted for Mar. 1, 1937 and July 1, 1937, respectively."
     hash "ece80df511395ab3d4a868cafce7c673de0762c9b9c2890bc45dda4ee5267e50"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.91.377/commission-on-railroad-retirement" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.91.377/commission-on-railroad-retirement" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Commission on Railroad Retirement"
     p ["Pub. L. 91–377, § 7" -> "/us/pl/91/377/s7"] ", Aug. 12, 1970, " ["84 Stat. 792" -> "/us/stat/84/792"] ", as amended by " ["Pub. L. 92–46, § 7" -> "/us/pl/92/46/s7"] ", July 2, 1971, " ["85 Stat. 102" -> "/us/stat/85/102"] ", established a commission on railroad retirement, prescribed its composition, designated the rates of pay for its members, authorized a study of the retirement system and its financing, authorized appropriations for funding the expenses of the commission, and required that the commission submit a full report on its work no later than June 30, 1972."
     hash "b16ec412f26787d7e581b9014783f0ceb0b39c81f0975f53f7ac7535a68db88e"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.93.69/congressional-declaration-of-1974-legislative-intent" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.93.69/congressional-declaration-of-1974-legislative-intent" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Congressional Declaration of 1974 Legislative Intent"
@@ -90,28 +90,28 @@ module "/us/usc/t45/s228e...228z–1" {
     }
     hash "fd94a5e2cb6fe446094a12fe678cf42ed82e05662c18876972e22e6dc7ceb1e8"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.91.377/determination-of-amounts-of-social-security-benefits" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.91.377/determination-of-amounts-of-social-security-benefits" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Determination of Amounts of Social Security Benefits"
     p ["Pub. L. 91–377, § 4(c)" -> "/us/pl/91/377/s4/c"] ", Aug. 12, 1970, " ["84 Stat. 792" -> "/us/stat/84/792"] ", provided that the amount by which a social security benefit computed under " ["Pub. L. 90–248" -> "/us/pl/90/248"] ", Jan. 2, 1968, " ["81 Stat. 821" -> "/us/stat/81/821"] ", known as the Social Security Amendments of 1967, for purposes of " ["Pub. L. 91–377" -> "/us/pl/91/377"] ", was to be deemed to be an amount equal to 87 per cent of such benefit computed under " ["Pub. L. 91–172, title X" -> "/us/pl/91/172/tX"] ", Dec. 30, 1969, " ["83 Stat. 737" -> "/us/stat/83/737"] ", known as the Social Security Amendments of 1969, and the amount by which an individual’s social security benefit was increased by reason of the Social Security Amendments of 1969 was to be deemed to be 13 per cent of such individual’s social security benefit as computed under the Social Security Amendments of 1969."
     hash "15d60de82e8f22fc7889e859065023325213aa0a95f32a4fde26ec4dd532ea2d"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.89.97/entitlement-to-annuity-or-pension-under-railroad-retirement" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.89.97/entitlement-to-annuity-or-pension-under-railroad-retirement" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Entitlement to Annuity or Pension Under Railroad Retirement Act of 1937 as Including Entitlement Under Railroad Retirement Act of 1935"
     p ["Pub. L. 89–97, title I, § 105(a)(2)" -> "/us/pl/89/97/tI/s105/a/2"] ", July 30, 1965, " ["79 Stat. 335" -> "/us/stat/79/335"] ", provided that for purposes of section 21 of the Railroad Retirement Act of 1937, section 21 of act Aug. 29, 1935, as added by " ["section 105(a)(1) of Pub. L. 89–97" -> "/us/pl/89/97/s105/a/1"] ", and for certain other purposes, entitlement to an annuity or pension under this subchapter was to be deemed to include entitlement under subchapter II of this chapter."
     hash "ac456ab8f1324a4310a27e46046ac9b44da62952e42514de539c4dbc7b1f91bd"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/act.1935-08-29.ch812/hospital-insurance-benefits-for-the-aged" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/act.1935-08-29.ch812/hospital-insurance-benefits-for-the-aged" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Hospital Insurance Benefits for the Aged"
     p ["Act Aug. 29, 1935, ch. 812, § 21" -> "/us/act/1935-08-29/ch812/s21"] ", as added July 30, 1965, " ["Pub. L. 89–97, title I, § 105(a)(1)" -> "/us/pl/89/97/tI/s105/a/1"] ", " ["79 Stat. 335" -> "/us/stat/79/335"] ", required the Railroad Retirement Board to certify to the Secretary of Health, Education, and Welfare, in order to provide hospital insurance benefits for annuitants, pensioners, and certain other aged individuals for purposes of the Social Security program, the name of anyone aged 65 who was entitled to an annuity or pension under this subchapter, would have been so entitled had he ceased compensated service and had applied for such annuity, or bore a particular relationship to certain qualified employees, and specified such additional information as such certification was to include."
     hash "d1e362befeb9e57001edf9b8ac5f9bf4e5af2ef2681e316a39e7f7b928f74747"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.93.69/increases-in-certain-pensions-and-annuities" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.93.69/increases-in-certain-pensions-and-annuities" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Increases in Certain Pensions and Annuities"
@@ -123,28 +123,28 @@ module "/us/usc/t45/s228e...228z–1" {
     p ["Pub. L. 89–699, § 201(g)" -> "/us/pl/89/699/s201/g"] ", Oct. 30, 1966, " ["80 Stat. 1077" -> "/us/stat/80/1077"] ", provided for 7 per cent increases in pensions under " ["section 228f of this title" -> "/us/usc/t45/s228f"] ", annuities under subchapter II of this chapter, certain survivor annuities, and certain widows’ and widowers’ insurance annuities, provided that there would be a reduction in the amount of the increase where the recipient was also a recipient of certain social security benefits."
     hash "1a3476bcfaf2d4154fe2619f382a62d2b734e76cf26ca2cd88cd30554c6afa9d"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.92.460/permanency-of-increases-in-certain-pensions-and-annuities" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.92.460/permanency-of-increases-in-certain-pensions-and-annuities" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Permanency of Increases in Certain Pensions and Annuities"
     p ["Pub. L. 92–460, § 6" -> "/us/pl/92/460/s6"] ", Sept. 4, 1972, " ["86 Stat. 767" -> "/us/stat/86/767"] ", provided that it was the policy of Congress that the 20 per cent increase in pension and annuity benefits provided by " ["section 2 of Pub. L. 92–460" -> "/us/pl/92/460/s2"] ", as well as the 10 per cent and 15 per cent increases provided by " ["section 5 of Pub. L. 92–46" -> "/us/pl/92/46/s5"] " and " ["section 4(b)(1) of Pub. L. 91–377" -> "/us/pl/91/377/s4/b/1"] ", respectively, could become permanent only if measures were taken to assure that the Railroad Retirement Account would remain solvent, and required representatives of employees, retirees, and carriers to submit to Congress reports containing their recommendations for such solvency measures no later than Mar. 1, 1973, and required the Railroad Retirement Board to submit its solvency recommendations to Congress no later than Apr. 1, 1973."
     hash "1b7267fa4e5093fce35ebc298d2f262a9eaf59650d678946e06cda728575c937"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.90.257/presumption-of-higher-increases-in-annuities" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.90.257/presumption-of-higher-increases-in-annuities" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Presumption of Higher Increases in Annuities"
     p ["Pub. L. 90–257, § 108(b)" -> "/us/pl/90/257/s108/b"] ", Feb. 15, 1968, " ["82 Stat. 23" -> "/us/stat/82/23"] ", provided that in cases where an annuity was payable in the month before the month with respect to which increases in benefits under title II of the Social Security Act, sections 401 et seq. of Title 42, The Public Health and Welfare, provided for by " ["Pub. L. 90–248" -> "/us/pl/90/248"] ", Jan. 2, 1968, " ["81 Stat. 821" -> "/us/stat/81/821"] ", known as the Social Security Amendments of 1967, became effective in an amount determined under this subchapter, other than under the first proviso of " ["section 228c(e) of this title" -> "/us/usc/t45/s228c/e"] ", the provisions of " ["Pub. L. 90–257" -> "/us/pl/90/257"] " were to be presumed to provide a higher amount of increase in annuity than the provisions of the Social Security Amendments of 1967 would provide under the first proviso of " ["section 228c(e) of this title" -> "/us/usc/t45/s228c/e"] "."
     hash "b4a0a916352dd05b3e36b6b9fcb7bb45a30c7892f18fe88b6ed2512c050b9298"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.89.97/railroad-retirement-and-old-age-survivors-and-disability-ins" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.89.97/railroad-retirement-and-old-age-survivors-and-disability-ins" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Railroad Retirement and Old-Age, Survivors, and Disability Insurance System"
     p ["Pub. L. 89–97, § 105(c)" -> "/us/pl/89/97/s105/c"] ", July 30, 1965, " ["79 Stat. 336" -> "/us/stat/79/336"] ", provided that amendments preserving the relationship between the railroad retirement and old-age, survivors, and disability insurance systems were contained in " ["section 326 of Pub. L. 89–97" -> "/us/pl/89/97/s326"] ", which amended sections 228 and 228e of this title."
     hash "ca9d7f2a51e11a5098d83cbf08c7aede14656a95470cca3d45f0b7c94b0a40e2"
   }
-  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.91.215/transfer-of-funds-for-payment-of-supplemental-annuities" enacted {
+  note "/us/usc/t45/s228e...228z–1/note/statutoryNotes/pl.91.215/transfer-of-funds-for-payment-of-supplemental-annuities" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Transfer of Funds for Payment of Supplemental Annuities"
@@ -154,7 +154,7 @@ module "/us/usc/t45/s228e...228z–1" {
   }
   layers {
     operative "11f881e01b6fd878aabbcfa00ed40fcdec963cfb4b76c369703a90d233c3629f"
-    enacted "4c71f053820729471e00fc2f790c618a214f040c8475bc577d67bdedfa083e56"
-    editorial "30f5bc162f5d931dd5b36680fc963960df5b90f47c2eda1257564f4ca1b563de"
+    enacted "d2e8da9fc0657b69f313d0bcefd9225953b6259fc0eb01bbb5b3407d02ab4b4a"
+    editorial "322c8ccb0e6ed9ef25f1e388c20380b47c6221385ba6ac4293a52e15413e0c72"
   }
 }

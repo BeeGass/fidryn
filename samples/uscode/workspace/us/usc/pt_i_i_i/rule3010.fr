@@ -21,28 +21,28 @@ module "/us/usc/ptIII/rule3010" {
     hash "d091b9062a6004a97eb43dc0cc85f2cf88707184f9c13f1f28e0e4e9c84b1da7"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule permits a court to eliminate the disproportionate expense and inconvenience incurred by the issuance of a dividend check of less than $5 (or $15 in a chapter 13 case). Creditors are more irritated than pleased to receive such small dividends, but the money is held subject to their specific request as are unclaimed dividends under § 347(a) of the Code. When the trustee deposits undistributed dividends pursuant to a direction in accordance with this rule the trustee should file with the clerk a list of the names and addresses, so far as known, of the persons entitled to the money so deposited and the respective amounts payable to them pursuant to Rule 3011. In a chapter 13 case, the small dividend will accumulate and will be payable at the latest, with the final dividend. Local rule or order may change the practice permitted in this rule and, in that connection, the order may be incorporated in the order confirming a chapter 13 plan."
     hash "e726b95a7de76f96f03554d1509ceea79fb96dc4e2a03b6e11307bcb2a6d0784"
   }
-  note "/us/usc/ptIII/rule3010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Subdivision (b) is amended to include chapter 12 cases."
     hash "b934ad7595121d868cb02a5c33150c42d3a339c4ac7d95a6a204298656527a28"
   }
-  note "/us/usc/ptIII/rule3010/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+  note "/us/usc/ptIII/rule3010/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2022 Amendment"
     p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. To avoid the undue cost and inconvenience of distributing small payments, the title and subdivision (b) are amended to include subchapter V cases."
     hash "6767d9eeb55c332678a09d5036cc5f008bc60740e8ee5e8ac30a95aaf54017c7"
   }
-  note "/us/usc/ptIII/rule3010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -51,7 +51,7 @@ module "/us/usc/ptIII/rule3010" {
   }
   layers {
     operative "d091b9062a6004a97eb43dc0cc85f2cf88707184f9c13f1f28e0e4e9c84b1da7"
-    enacted "64efcbfa2fcdbd23b1fc730cf23dceed119623afe93e2aaf9811fe7ba2422cb4"
-    editorial "80d02a190cd3d787a86332a7bd9f8c00e7a602192bfe62900405c9b098b88bb8"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "cc070add8df7961cfa1a8136dd45b2dcf3dcb9588b7d1bf35471060681cbd0a4"
   }
 }

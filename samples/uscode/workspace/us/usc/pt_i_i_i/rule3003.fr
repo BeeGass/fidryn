@@ -66,7 +66,7 @@ module "/us/usc/ptIII/rule3003" {
     hash "f069407a449bbb8d80c5dc4cae7e7c668afa7c6782b32618d12193f8e6f9c863"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -78,7 +78,7 @@ module "/us/usc/ptIII/rule3003" {
     p "Holders of equity security interests need not file proofs of interest. Voting and distribution participation is dependent on ownership as disclosed by the appropriate records of a transfer agent or the corporate or other business records at the time prescribed in Rules 3017 and 3021."
     hash "70e425ca2aafd6322238af138429b1f877903f5dbf8465ba8e3ecb2e487e6de4"
   }
-  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -86,7 +86,7 @@ module "/us/usc/ptIII/rule3003" {
     p "The caption of paragraph (4) of subdivision (c) is amended to indicate that it applies to a proof of claim."
     hash "fb95593a72f6d7ecfe20ff0b43f54909c8d821a757e247303febe97a6489fb88"
   }
-  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -94,7 +94,7 @@ module "/us/usc/ptIII/rule3003" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "98552cda62f8da578d8e64936623adc938a97971513add0465594f3256d4f4a1"
   }
-  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -103,7 +103,7 @@ module "/us/usc/ptIII/rule3003" {
   }
   layers {
     operative "f069407a449bbb8d80c5dc4cae7e7c668afa7c6782b32618d12193f8e6f9c863"
-    enacted "83e741013148c140cd3a509f5f50d792206a6874dbd97b868a78b1489dcf88d7"
-    editorial "bca4e64bfe5e2de0ae5940691907691d6f1d9028b168e3e52a6429af2c6cd4e2"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a406e35a1fa71f4833d887c0079f6ae3ade478b21f0fb30664b0e3f077f4bae9"
   }
 }

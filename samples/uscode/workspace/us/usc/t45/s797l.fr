@@ -27,7 +27,7 @@ module "/us/usc/t45/s797l" {
     p "A prior section 797l, " ["Pub. L. 93–236, title VII, § 713" -> "/us/pl/93/236/tVII/s713"] ", as added " ["Pub. L. 97–35, title XI, § 1143(a)" -> "/us/pl/97/35/tXI/s1143/a"] ", Aug. 13, 1981, " ["95 Stat. 668" -> "/us/stat/95/668"] ", authorized appropriations to carry out activities for protection of employees of Consolidated Rail Corporation, prior to repeal by " ["Pub. L. 99–509, title IV, § 4033(a)(2)" -> "/us/pl/99/509/tIV/s4033/a/2"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] "."
     hash "7df0a42b4f5c8ee5e0fa505b161e4b8ef04232602b7228f26ac37934c8501b11"
   }
-  note "/us/usc/t45/s797l/note/statutoryNotes/pl.104.88/effective-date" enacted {
+  note "/us/usc/t45/s797l/note/statutoryNotes/pl.104.88/effective-date" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date"
@@ -36,7 +36,7 @@ module "/us/usc/t45/s797l" {
   }
   layers {
     operative "608322b83e73b76a48f0deb55f9307c67ef64bf88b0b07f82e6f6da557ac3c39"
-    enacted "8fd3a0117c28b037928956970b28f26ec9aca85e0a849cd95b06b1bf76a4a287"
-    editorial "25d90538fca24a2dbd08f919886aa070189e1452254231d0b8a1968044c916ec"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a09908fb0147275defc3877a83eee9654045f8ad7f6cded73199bf0ca6e13830"
   }
 }

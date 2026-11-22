@@ -143,14 +143,14 @@ module "/us/usc/ptVIII/rule8006" {
     hash "75b0d684b1f3bbd17a526b1bc6e50b5e0075c942b248ee0d0bf5b2f9828970ec"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024; Apr. 23, 2025, eff. Dec. 1, 2025.)"
-  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8006, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 29, 1994, eff. Aug. 1, 1994; Mar. 26, 2009, eff. Dec. 1, 2009, related to record and issues on appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "e592bf23ae6610c560050de5ac5657e52931d34101d40684ddcd9b898c90e152"
   }
-  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -163,7 +163,7 @@ module "/us/usc/ptVIII/rule8006" {
     p "Changes Made After Publication and Comment. In subdivisions (b) and (g), cross-references were added. In subdivision (f)(4), the statement regarding the inapplicability of Rule 9014 was deleted as unnecessary. A clarifying change was made to the first paragraph of the Committee Note."
     hash "5853391d4f95a2a0a6912caa75cbd1122187e283a6fc9a519013946c9ce0eeaf"
   }
-  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
@@ -171,21 +171,21 @@ module "/us/usc/ptVIII/rule8006" {
     p "The bankruptcy court may file a supplemental statement within 14 days after the certification, even if the appeal is no longer pending before it according to subdivision (b). If the appeal is pending in the district court or BAP during that 14-day period, the appellate court is authorized to file a statement. In all cases, the filing of a statement by the court is discretionary."
     hash "6580fedd52241869ddf9fac01d1c81147f89ca8c41577edb323c0edaa51bb62c"
   }
-  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 8006 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "1d6af22295b895e3d7ad1349ecc0fa48a21c5fef2c2df08205c90a5f637846f0"
   }
-  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2025-amendment" enacted {
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/committee-notes-on-rules-2025-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2025 Amendment"
     p "Rule 8006(g) is revised to clarify that any party to the appeal may file a request that a court of appeals authorize a direct appeal. There is no obligation to do so if no party wishes the court of appeals to authorize a direct appeal."
     hash "68f144d17b492ab7602ca3f2d11087b5e043b563db810962e66d8032aa8ec04a"
   }
-  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVIII/rule8006/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -197,7 +197,7 @@ module "/us/usc/ptVIII/rule8006" {
   }
   layers {
     operative "75b0d684b1f3bbd17a526b1bc6e50b5e0075c942b248ee0d0bf5b2f9828970ec"
-    enacted "980d18573d3cdf9446e8bfb423bd410a97e9ee29d57490aed95967fb8fd807ef"
-    editorial "122aa1a6eaaa80a6ef96a86f02859185384727f6202874ce46979967a8295100"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "54dad5b7c8c183bd6882a243b2b62079977a54a799b115c1370f8b8253937f75"
   }
 }

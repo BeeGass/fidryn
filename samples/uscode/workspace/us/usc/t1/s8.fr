@@ -28,6 +28,7 @@ module "/us/usc/t1/s8" {
     term "born alive"
     kind means
     words "As used in this section"
+    condition "with respect to a member of the species homo sapiens"
     region "/us/usc/t1/s8"
     basis enacted
   }

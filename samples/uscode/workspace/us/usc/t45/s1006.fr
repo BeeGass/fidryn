@@ -15,7 +15,7 @@ module "/us/usc/t45/s1006" {
     p "Section, " ["Pub. L. 96–254, title I, § 107" -> "/us/pl/96/254/tI/s107"] ", May 30, 1980, " ["94 Stat. 402" -> "/us/stat/94/402"] ", set forth provisions respecting employment of Rock Island Railroad employees. See " ["section 797c of this title" -> "/us/usc/t45/s797c"] "."
     hash "304c4649aad9541371e6e13c8fd3f4ff5b8c8defaca1c8ae18919a98f0b84d38"
   }
-  note "/us/usc/t45/s1006/note/statutoryNotes/pl.97.35/effective-date-of-repeal" enacted {
+  note "/us/usc/t45/s1006/note/statutoryNotes/pl.97.35/effective-date-of-repeal" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date of Repeal"
@@ -24,7 +24,7 @@ module "/us/usc/t45/s1006" {
   }
   layers {
     operative "1a8b9bbd8dc3e8b75a0c8bd8bc1930a19ee9359c3d4f2dbfac8b76b976bf933b"
-    enacted "8e8aea54d055a16faef9244d06b2d84c29d2801570ed911635fc4eb575904090"
-    editorial "3f6dd0cdb06e5450b0d07087ad080b2da1044c2936cd42e914cad42882857bb5"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b01206a1c82030811121d4edc5df1e44124e9c1ddc3957c9ebc765d8f61ae2ef"
   }
 }

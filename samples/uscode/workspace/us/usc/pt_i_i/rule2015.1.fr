@@ -78,7 +78,7 @@ module "/us/usc/ptII/rule2015.1" {
     hash "786ede075b1b1198dc57d33ae39f6fc1c6d5fee73540f77e2cf25fa4b2f30ec7"
   }
   credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2015.1/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+  note "/us/usc/ptII/rule2015.1/note/ungrouped/nolaw/committee-notes-on-rules-2008" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008"
@@ -88,7 +88,7 @@ module "/us/usc/ptII/rule2015.1" {
     p "Changes Made After Publication. Two stylistic changes were made to the rule. The reference to the court’s authority to order otherwise was moved from the beginning to the end of the first sentence of subdivision (a). On line 19, the word “patient” was substituted for “health” to be consistent with the Code."
     hash "dc252fa9efddb07197bac0c46c734ede09868c9e83a5fc58a0e08b0d2873551d"
   }
-  note "/us/usc/ptII/rule2015.1/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptII/rule2015.1/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -100,7 +100,7 @@ module "/us/usc/ptII/rule2015.1" {
     p "• 25-day periods become 28-day periods"
     hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
   }
-  note "/us/usc/ptII/rule2015.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2015.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -109,7 +109,7 @@ module "/us/usc/ptII/rule2015.1" {
   }
   layers {
     operative "786ede075b1b1198dc57d33ae39f6fc1c6d5fee73540f77e2cf25fa4b2f30ec7"
-    enacted "06460fe2824a380ec4506429cfed39ba93af77209c58363db33dcfd2a88404d5"
-    editorial "a7a87ea82ce26b6544cc3c69e822448f599834e4961f55d5c8be47261511261c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0385e59162494462fefa2419cca1fbf09a28fe0b7486456d884aca605ddb2902"
   }
 }

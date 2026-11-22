@@ -22,35 +22,35 @@ module "/us/usc/t45/s228a...228c–1" {
     p "Section 228c–1, " ["act Aug. 29, 1935, ch. 812, § 4" -> "/us/act/1935-08-29/ch812/s4"] ", as restated " ["June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", pt. I, § 1, as added " ["Oct. 8, 1940, ch. 757" -> "/us/act/1940-10-08/ch757"] ", title VI, pt. II, § 625, " ["54 Stat. 1014" -> "/us/stat/54/1014"] "; amended " ["Apr. 8, 1942, ch. 227" -> "/us/act/1942-04-08/ch227"] ", §§ 1–8, " ["56 Stat. 204–206" -> "/us/stat/56/204-206"] "; " ["July 31, 1946, ch. 709, § 212" -> "/us/act/1946-07-31/ch709/s212"] ", " ["60 Stat. 729" -> "/us/stat/60/729"] "; " ["Oct. 30, 1951, ch. 632, § 4" -> "/us/act/1951-10-30/ch632/s4"] ", " ["65 Stat. 683" -> "/us/stat/65/683"] "; " ["Aug. 1, 1956, ch. 837" -> "/us/act/1956-08-01/ch837"] ", title IV, § 408(a), (b), " ["70 Stat. 876" -> "/us/stat/70/876"] "; Oct. 5, 1963, " ["Pub. L. 88–133, title I" -> "/us/pl/88/133/tI"] ", §§ 3, 4, " ["77 Stat. 219" -> "/us/stat/77/219"] "; Oct. 30, 1966, " ["Pub. L. 89–700, title I, § 104" -> "/us/pl/89/700/tI/s104"] ", " ["80 Stat. 1081" -> "/us/stat/80/1081"] ", related to consideration of time spent in military service in computation of annuities. See " ["section 228a of this title" -> "/us/usc/t45/s228a"] "."
     hash "f73fea64dadbead6d1332ca9488ea1c9e41b649d3a11454bf55a13c4fb25cfa4"
   }
-  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/act.1946-07-31.ch709/annuities-pensions-and-joint-and-survivor-annuity-elections" enacted {
+  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/act.1946-07-31.ch709/annuities-pensions-and-joint-and-survivor-annuity-elections" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Annuities, Pensions, and Joint and Survivor Annuity Elections"
     p ["Act July 31, 1946, ch. 709" -> "/us/act/1946-07-31/ch709"] ", §§ 404–407, " ["60 Stat. 742" -> "/us/stat/60/742"] ", provided that the rights of persons to whom pensions or annuities were awarded before July 31, 1946 were to be governed by the applicable provisions of law in effect prior to that date, that the election of a joint and survivor annuity made before July 31, 1946, by a person to whom the annuity accrued before Jan. 1, 1947, was to be given effect as though the provisions of law under which the election was made had continued to be operative, that death payments under sections 219 and 228e of this title, other than survivor annuities pursuant to an election, were to be made only with respect to deaths occurring before Jan. 1, 1947, and that any person to whom an annuity accrued before Jan. 1, 1947, and who would as of the date of the initial accrual have been entitled to an annuity in a greater amount by reason of the amendments by act July 31, 1946, had such amendments been in effect at the date of initial accrual, was to be awarded the annuity in such greater amount without additional application therefor."
     hash "91a38eb009415c2ca86230ffd5226df9beba403f7f537f6a76631e73b49c20ee"
   }
-  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/act.1946-07-31.ch709/reduction-of-annuity-because-of-prior-disability-annuity-ter" enacted {
+  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/act.1946-07-31.ch709/reduction-of-annuity-because-of-prior-disability-annuity-ter" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Reduction of Annuity Because of Prior Disability Annuity Terminated by Recovery"
     p ["Act July 31, 1946, ch. 709, § 408" -> "/us/act/1946-07-31/ch709/s408"] ", " ["60 Stat. 742" -> "/us/stat/60/742"] ", provided that no annuities accruing after July 1946 were to be reduced under " ["section 228b(a)(3) of this title" -> "/us/usc/t45/s228b/a/3"] " in order to compensate for an annuity terminated by recovery from a disability."
     hash "9955d1d48ac3fa9fd5894ac4b9ea7245196a91c6c0b22b62a0185b607769df91"
   }
-  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/act.1954-06-16.ch300/dual-benefit-provision-retroactive-payment-to-survivors" enacted {
+  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/act.1954-06-16.ch300/dual-benefit-provision-retroactive-payment-to-survivors" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Dual Benefit Provision; Retroactive Payment to Survivors"
     p ["Act June 16, 1954, ch. 300, § 2" -> "/us/act/1954-06-16/ch300/s2"] ", " ["68 Stat. 250" -> "/us/stat/68/250"] ", provided that in the case of a decedent dying before July 1, 1954, so much of any annuity or pension payment due such decedent under " ["section 228c(b) of this title" -> "/us/usc/t45/s228c/b"] ", was to be paid only to the widow or widower of the decedent, if living, or to the child or children of such decedent, in the alternative, if living."
     hash "cb3fdb3a52ac2959cdf720986cfe5cea65a8463f52c4c9abe7c725a109aead67"
   }
-  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/pl.92.46/percentage-adjustment" enacted {
+  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/pl.92.46/percentage-adjustment" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Percentage Adjustment"
     p ["Pub. L. 92–46, § 4" -> "/us/pl/92/46/s4"] ", July 2, 1971, " ["85 Stat. 101" -> "/us/stat/85/101"] ", authorized the Railroad Retirement Board to make certain adjustments in allowance percentages under this subchapter, so that the percentages when applied against certain social security benefits, would result in amounts comparable to those in effect prior to the changes made by " ["Pub. L. 92–5" -> "/us/pl/92/5"] ", Mar. 17, 1971, " ["85 Stat. 5" -> "/us/stat/85/5"] ", known as the Social Security Amendments of 1971."
     hash "d4fef9b8969e57e279f0977617e2e4bfcb1a7b77692d90f0573629bf09b3ffb5"
   }
-  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/pl.93.69/recertifications-by-railroad-retirement-board" enacted {
+  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/pl.93.69/recertifications-by-railroad-retirement-board" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Recertifications by Railroad Retirement Board"
@@ -65,7 +65,7 @@ module "/us/usc/t45/s228a...228c–1" {
     p ["Act June 23, 1948, ch. 608, § 3" -> "/us/act/1948-06-23/ch608/s3"] ", " ["62 Stat. 577" -> "/us/stat/62/577"] ", provided in part that all recertifications required by reason of act June 23, 1948 were to be made by the Board without application therefor."
     hash "b2bafea0506f5bb01dbf661a287c567a5c26401078881b07b5deb824b79c009f"
   }
-  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/pl.91.215/restrictions-on-establishment-of-new-annuities-and-use-of-ce" enacted {
+  note "/us/usc/t45/s228a...228c–1/note/statutoryNotes/pl.91.215/restrictions-on-establishment-of-new-annuities-and-use-of-ce" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Restrictions on Establishment of New Annuities and Use of Certain Labor Tactics"
@@ -74,7 +74,7 @@ module "/us/usc/t45/s228a...228c–1" {
   }
   layers {
     operative "420aeda8c40013f9c40c865686947199444beb19a3294f0b91a3fb6d899acec8"
-    enacted "93325d83c3e97fecac9c5881d15a2b06eb950ef0d06595ca7d6b9b4a1a8acd78"
-    editorial "ce0e457dc53b6ac78a5c81b609bf6ecb9ad9f886f1c98c9bc597b97e2b592bac"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "cd0fb99c7a27e63d66e9d0312c6999135423104fbefb40be2410b0b8284f8a11"
   }
 }

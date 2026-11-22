@@ -17,7 +17,7 @@ module "/us/usc/ptV/rule5012" {
     hash "9c956f7b1b923381a0a248556690e2e17cf20f08ce769b394b426568e9b18819"
   }
   credit "(Added Apr. 28, 2010, eff. Dec. 1, 2010; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5012/note/ungrouped/nolaw/committee-notes-on-rules-2010" enacted {
+  note "/us/usc/ptV/rule5012/note/ungrouped/nolaw/committee-notes-on-rules-2010" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2010"
@@ -25,7 +25,7 @@ module "/us/usc/ptV/rule5012" {
     p "Changes Made After Publication. No changes since publication."
     hash "f53eb43f25248c735d8584d0daf408331cb5aebfc66750c647583c46abf9cfd4"
   }
-  note "/us/usc/ptV/rule5012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -34,7 +34,7 @@ module "/us/usc/ptV/rule5012" {
   }
   layers {
     operative "9c956f7b1b923381a0a248556690e2e17cf20f08ce769b394b426568e9b18819"
-    enacted "778f5408f73d02d86f1a2bb46f4504c6e9f36bcfc43a42d6494da5870e8e1678"
-    editorial "b3e324eddd645d5a457105e972da769976d9beb3fadab6c95b5b398e1fcd15e5"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "20e6032a65bf96b4ea099c9931b0d7109f6b1426f7ab3c8adff5e06c38d3f306"
   }
 }

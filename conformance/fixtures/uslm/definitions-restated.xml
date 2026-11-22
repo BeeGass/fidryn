@@ -32,7 +32,7 @@
 <note role="crossHeading" topic="editorialNotes"><heading><b>Editorial Notes</b></heading></note>
 <note topic="referencesInText"><heading>References in Text</heading><p>An invented note quotes:</p><quotedContent><p>“This chapter, referred to in text, is invented.”</p></quotedContent></note>
 <note role="crossHeading" topic="statutoryNotes"><heading><b>Statutory Notes and Related Subsidiaries</b></heading></note>
-<note topic="referencesInText"><heading>References in Text</heading><p>This chapter, referred to in text, is invented.</p></note>
+<note topic="referencesInText"><heading>References in Text</heading><p>This chapter, referred to in text, is invented. An invented act provided that: <quotedContent>“Gears turn.”</quotedContent></p></note>
 </notes>
 </section>
 </chapter>

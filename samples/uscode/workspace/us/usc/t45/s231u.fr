@@ -85,7 +85,7 @@ module "/us/usc/t45/s231u" {
     p "1983—Subsec. (a). " ["Pub. L. 98–76" -> "/us/pl/98/76"] " amended subsec. (a) generally, substituting provisions requiring Railroad Retirement Board to annually prepare and report on a five-year projection of ability of Railroad Retirement Account to pay benefits during five-year period for provisions which required Board to prepare a report in any fiscal year in which it determined that more than 50 percent of borrowing authority under this subchapter would be used."
     hash "e1ad8cedbd694aa182af15aca0b8670a46456ba6d2d857d2953574749ba3e2b4"
   }
-  note "/us/usc/t45/s231u/note/statutoryNotes/pl.97.35/effective-date" enacted {
+  note "/us/usc/t45/s231u/note/statutoryNotes/pl.97.35/effective-date" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date"
@@ -97,7 +97,7 @@ module "/us/usc/t45/s231u" {
   }
   layers {
     operative "5fde765cac37bc485997a9be6d4bab5039f66f32f7050c47007e6612ce1bd763"
-    enacted "cf53790ddd1d3d4436f90c1ce75ee101a8e85ed00fb1205a7731486f5cb2fe88"
-    editorial "11d82d7a47922b1414b1e07fa31e0cdbb447f3fc3e3fd5b0bb5965496313e1c5"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5a7153d68a37ef2b162f41b282d50b1e58a59f486ba9eec55f4747ecd195c7cd"
   }
 }

@@ -53,7 +53,7 @@ module "/us/usc/t45/s61...64b" {
     p "Section 64b, " ["act Mar. 4, 1907, ch. 2939, § 6" -> "/us/act/1907-03-04/ch2939/s6"] ", as added Dec. 26, 1969, " ["Pub. L. 91–169, § 1" -> "/us/pl/91/169/s1"] ", " ["83 Stat. 465" -> "/us/stat/83/465"] ", provided that Secretary of Transportation was to have duty to carry out provisions of this chapter."
     hash "aace38ac0714cda3a803ee2c22444c1076604b08887e89421f3e84d2ffa9a014"
   }
-  note "/us/usc/t45/s61...64b/note/statutoryNotes/act.1907-03-04.ch2939/short-title" enacted {
+  note "/us/usc/t45/s61...64b/note/statutoryNotes/act.1907-03-04.ch2939/short-title" editorial {
     group statutoryNotes
     topic "shortTitle"
     heading "Short Title"
@@ -62,7 +62,7 @@ module "/us/usc/t45/s61...64b" {
   }
   layers {
     operative "f11f99c5a8161f86bc766317e75e5f733b04014e7c686e4fad1e3073d4878ebf"
-    enacted "4120cb1bf887b0c5df3f7017a5f794031cf49f615ef5066b1981083774dd5161"
-    editorial "36f5d5384e20228dfed1cf568680f2e9c3a69016c9e201b12b193a47310dee09"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "6ac576c7d036be2522e302d6e4cfb20a13f15eab17e1bea170f9208f3ec164d7"
   }
 }

@@ -21,14 +21,14 @@ module "/us/usc/ptVIII/rule8020" {
     hash "72f5f3fc9985a12a695c26ed80514af015bcad9afa910378072d5e537bdba8c6"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8020/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8020/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8020, Apr. 11, 1997, eff. Dec. 1, 1997, related to damages and costs for frivolous appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "191c50836a34998f43af5e215955a71c55547d6e042a83b697ea8cda76436dc8"
   }
-  note "/us/usc/ptVIII/rule8020/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8020/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -36,7 +36,7 @@ module "/us/usc/ptVIII/rule8020" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "e5afe0ad58c5f00f81cd0d548c2fe4688c024bf8c436b08c8be095f9ea068cc2"
   }
-  note "/us/usc/ptVIII/rule8020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -45,7 +45,7 @@ module "/us/usc/ptVIII/rule8020" {
   }
   layers {
     operative "72f5f3fc9985a12a695c26ed80514af015bcad9afa910378072d5e537bdba8c6"
-    enacted "105792ff1fa435dac0f99da86a058757550039d8638690881b9a211a2ee1e915"
-    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "305102c252f85c95e5bf5b5cbdcc6f6611525b155b7cda34ca0d700dac9f5f62"
   }
 }

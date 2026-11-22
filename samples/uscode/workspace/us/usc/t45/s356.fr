@@ -20,14 +20,14 @@ module "/us/usc/t45/s356" {
     p "1939—Act June 20, 1939, struck out requirement that return shall be in form required by Board, inserted proviso relating to return containing duplicative information, and substituted provisions relating to conclusiveness of returns not questioned within eighteen months after last return is filed, for provisions relating to conclusiveness of returns not questioned within four years after last date on which return was required to be made."
     hash "3959e2f7f6ae82170a751703f046e41f1826e4b9827cfdcb41eb321ef4a52e62"
   }
-  note "/us/usc/t45/s356/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" enacted {
+  note "/us/usc/t45/s356/note/statutoryNotes/nolaw/effective-date-of-1946-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1946 Amendment"
     p "Amendment by act July 31, 1946, effective July 31, 1946, see section 401 of act July 31, 1946."
     hash "66fc5e6c2e6464b1794a09ea4c0dc8a6ad6bcc7f54c53e757a595cdf51acfef5"
   }
-  note "/us/usc/t45/s356/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" enacted {
+  note "/us/usc/t45/s356/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1940 Amendment"
@@ -36,7 +36,7 @@ module "/us/usc/t45/s356" {
   }
   layers {
     operative "973293305d9b306ba0b5f14c82d12e52aa72742d8095f405dcc330d1978e0d93"
-    enacted "f584d303eead41aefcd00460b213be0f26f3508d413aa6cbdd3ea0480abab575"
-    editorial "93f7e1688cd8d4833b3faa8f7b30ed1491bb36d8e998cbae9f41ee2337ccde4f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c7a0ef7aebfd6046950468ef59a787a349a21afcb77c8467aa13d3cc89a91f12"
   }
 }

@@ -18,7 +18,7 @@ module "/us/usc/t1/s113" {
     p "1966—" ["Pub. L. 89–497" -> "/us/pl/89/497"] " made slip laws and the Treaties and Other International Acts Series competent legal evidence of the several acts of Congress and the treaties and other international agreements contained therein."
     hash "8945b25cdd7b7e7c1c8cf92e0c8b1bbff85f9bc0cbeecfdf5926498f147978c2"
   }
-  note "/us/usc/t1/s113/note/statutoryNotes/pl.98.497/effective-date-of-1984-amendment" enacted {
+  note "/us/usc/t1/s113/note/statutoryNotes/pl.98.497/effective-date-of-1984-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1984 Amendment"
@@ -27,7 +27,7 @@ module "/us/usc/t1/s113" {
   }
   layers {
     operative "a94c18ffaf9dba8a5cfa860d58e0a5f5f2b4f4c9a8da04c1a0ed42e5f37f2223"
-    enacted "a72d6a85f5b778f36e2399ca1d79a0bfe70076eaa639d5de73401ff00ccc7df2"
-    editorial "2b291a5c0408f85322b7ff84bd2fff14003456167785fe3ce5c9bc03cecab179"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "05fca266875b1783adc4b729be1c8801be879b4829e8774067ef62275c37bc0e"
   }
 }

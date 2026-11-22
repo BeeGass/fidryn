@@ -58,7 +58,7 @@ module "/us/usc/ptIX/rule9036" {
     hash "0f37c69e8d0853a211c41e4bd9e83f3ce796fc95714c6609a495938445187d28"
   }
   credit "(Added Apr. 22, 1993, eff. Aug. 1, 1993; amended Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 25, 2019, eff. Dec. 1, 2019; Apr. 14, 2021, eff. Dec. 1, 2021; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993" enacted {
+  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993"
@@ -68,7 +68,7 @@ module "/us/usc/ptIX/rule9036" {
     p "Electronic transmission pursuant to this rule completes the notice requirements. The creditor or interested party is not thereafter entitled to receive the relevant notice by mail."
     hash "f955d2e4c18beb937bbc33f621d3844b06b32210cbb764924e58f4370c5935bc"
   }
-  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2005 Amendment"
@@ -77,7 +77,7 @@ module "/us/usc/ptIX/rule9036" {
     p "Changes Made After Publication and Comment. No changes since publication."
     hash "2c6402092b0ad7668d275cab99d7b76fd3f5adea985b5e7ec16dd38c65f15fb1"
   }
-  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" enacted {
+  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2019 Amendment"
@@ -86,7 +86,7 @@ module "/us/usc/ptIX/rule9036" {
     p "With the consent of the person served, electronic service also may be made by means that do not use the court’s system. Consent can be limited to service at a prescribed address or in a specified form, and it may be limited by other conditions."
     hash "7a47fb2e32802ff7ce52c6b8037c0cd9bcf9bc997b5283113213bc9e1f1c7f97"
   }
-  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" enacted {
+  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2021 Amendment"
@@ -95,7 +95,7 @@ module "/us/usc/ptIX/rule9036" {
     p "The title of the rule is revised to more accurately reflect the rule’s applicability to methods of electronic noticing and service. Rule 9036 does not preclude noticing and service by physical means otherwise authorized by the court or these rules."
     hash "915b9518a97ae0b265693a6c3d9648ffcd9b1a32399784d08861d7d54a55c813"
   }
-  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -104,7 +104,7 @@ module "/us/usc/ptIX/rule9036" {
   }
   layers {
     operative "0f37c69e8d0853a211c41e4bd9e83f3ce796fc95714c6609a495938445187d28"
-    enacted "b4c21eb0c5c98366b2e2b42d03d0738396c727871b8a97f8c2b5c3201fdb0e80"
-    editorial "56720362641f743f063f4d879f4851332776688b1f715d418ad4200fe3d5528a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "83ecfd26a091914a218a9a67a219c9b54067fda5c53fdd75aee8e5f41bf594f7"
   }
 }

@@ -216,7 +216,7 @@ module "/us/usc/t45/s1203" {
     p "2003—Subsec. (b)(1). " ["Pub. L. 108–7" -> "/us/pl/108/7"] " struck out at end: “In the event of reversion to the United States, pursuant to " ["section 1209 of this title" -> "/us/usc/t45/s1209"] ", of the State’s interests in all or part of the lands subject to such easement, such easement shall terminate with respect to the lands subject to such reversion, and no new exclusive-use easement with respect to such reverted lands shall be granted except by Act of Congress.”"
     hash "6f96c8d966ebb63139067ed98952d2ff8841344efbdb2b7291dac1600744dc8d"
   }
-  note "/us/usc/t45/s1203/note/statutoryNotes/nolaw/transfer-of-alaska-railroad-to-state-of-alaska" enacted {
+  note "/us/usc/t45/s1203/note/statutoryNotes/nolaw/transfer-of-alaska-railroad-to-state-of-alaska" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Transfer of Alaska Railroad to State of Alaska"
@@ -307,7 +307,7 @@ module "/us/usc/t45/s1203" {
   }
   layers {
     operative "300160a39979edca54cef83028a482f88ec020df2159964ded8f7afb09ddf2dc"
-    enacted "4e844ceea2a195170b703e79995422535a384ba43bc9a91fc6ccccfc723b0904"
-    editorial "2b434cfad08981724c84f0a8702264bc360173ff24e8cee25d2d35a5589fc3a1"
+    enacted "295fb7b4de2948e1b6f9643c0588dea634a8300f68049043d8695ca62322c567"
+    editorial "022e458abe1a4fc9a9260d264e9ee84d0f723986a3a121aa9bba18061abb571e"
   }
 }

@@ -226,14 +226,14 @@ module "/us/usc/ptVIII/rule8015" {
     hash "1f12fe244101d56817af319bb22c7e67fe05d5d202f838748b1e1b66f7de013b"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8015, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Mar. 26, 2009, eff. Dec. 1, 2009, related to motion for rehearing, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "a120eb322b7056627c9e43820159bb74a9d2404481e180d3502a6db2719822f9"
   }
-  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -248,7 +248,7 @@ module "/us/usc/ptVIII/rule8015" {
     p "Changes Made After Publication and Comment. In subdivision (f), “or order in a particular case” was deleted as unnecessary. The discussion in the Committee Note about brief lengths was revised, and the discussion of subdivision (f) was expanded."
     hash "50d8d5b1ae569899621751514949f1161f1ba99f8a9a4fb8071256b620177973"
   }
-  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
@@ -258,14 +258,14 @@ module "/us/usc/ptVIII/rule8015" {
     p "A new subdivision (g) is added to set out a global list of items excluded from length computations, and the list of exclusions in former subdivision (a)(7)(B)(iii) is deleted. The certificate-of-compliance provision formerly in subdivision (a)(7)(C) is relocated to a new subdivision (h) and now applies to filings under all type-volume limits (other than Rule 8014(f)’s word limit)—including the new word limits in Rules 8013, 8016, 8017, and 8022. Conforming amendments are made to Official Form 417C."
     hash "efbc35ade1748b241a3fe1e8667747da9f1e6f05f8e2cae4801857cbafc96481"
   }
-  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" enacted {
+  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2020 Amendment"
     p "The amendment to subdivision (g) is made to reflect recent amendments to Rule 8011(d) that eliminated the requirement of proof of service when filing and service are completed using a court’s electronic-filing system. Because each item listed in Rule 8015(g) will not always be required, the initial article is deleted. The word “corporate” is deleted before “disclosure statement” to reflect a concurrent change in the title of Rule 8012."
     hash "00dd759bf23384ad1142f9540d1479ba158786cf634841c4fe0f4ad3216e4174"
   }
-  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -274,7 +274,7 @@ module "/us/usc/ptVIII/rule8015" {
   }
   layers {
     operative "1f12fe244101d56817af319bb22c7e67fe05d5d202f838748b1e1b66f7de013b"
-    enacted "6b39bb26e152cb478d230155ae8cc64a6cb5b9cd153c59a72f7ed418397ff90e"
-    editorial "9bd3e91f90a7aba65330077820eaec12523711029e53abd6638d77c2dfe5e86a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f4b2ea5f4c070545a2d9eac1ca08003e76c8b6b6ca66f9a29393dfac2ed0311d"
   }
 }

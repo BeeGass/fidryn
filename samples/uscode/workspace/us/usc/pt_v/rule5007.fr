@@ -36,7 +36,7 @@ module "/us/usc/ptV/rule5007" {
     hash "bd0c3d3e2d3586a227b38b9c6b7add66d846c23c361147a23f1b13f014422a41"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptV/rule5007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptV/rule5007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -45,14 +45,14 @@ module "/us/usc/ptV/rule5007" {
     p "Subdivision (c) is derived from former Bankruptcy Rule 511(c). This subdivision extends to a sound recording the same evidentiary status as a transcript under [former] 28 U.S.C. § 773(b)."
     hash "6affb9b45427f7a5362768949d83236750375313f032f6262640b561d77e1eb0"
   }
-  note "/us/usc/ptV/rule5007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptV/rule5007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "The words “with the clerk” in the final sentence of subdivision (a) are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "bd4748d5a8c1431c1408ca1117b704d6fc8b09b26627ceedc6f50bd17417f503"
   }
-  note "/us/usc/ptV/rule5007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptV/rule5007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -61,7 +61,7 @@ module "/us/usc/ptV/rule5007" {
   }
   layers {
     operative "bd0c3d3e2d3586a227b38b9c6b7add66d846c23c361147a23f1b13f014422a41"
-    enacted "d5f45ad67fe9a60b5126efdf0bd395b965338b52c42875c06a18b00ceb950ff9"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a01fdcf8018af8efef59c950cc72bfbedd7a7ff76d241ffd7900e6f32b0cf143"
   }
 }

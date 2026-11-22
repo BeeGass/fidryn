@@ -36,14 +36,14 @@ module "/us/usc/ptIII/rule3021" {
     hash "938a0988c21f8be96d86f4349c5bca9810a4fbec8114698bfb85ab737f957be7"
   }
   credit "(As amended Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
     p "This rule is derived from former Chapter X Rule 10–405(a). Subdivision (b) of that rule is covered by § 1143 of the Code."
     hash "fdf4473b0be287989fe264448509ef7ad3e8d6d48b16408c64cf1103101b0d57"
   }
-  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1997 Amendment"
@@ -52,7 +52,7 @@ module "/us/usc/ptIII/rule3021" {
     p "GAP Report on Rule 3021. No changes to the published draft."
     hash "6d3f798bd44503ed572b1b032ef36535075db6a27469e0ab84f7ff8cf13eb2f4"
   }
-  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -60,7 +60,7 @@ module "/us/usc/ptIII/rule3021" {
     p "GAP Report on Rule 3021. No changes since publication."
     hash "9d258f79ec649cf39d08c431cddffec4359a48415f24a2ce26dbcf85a0605770"
   }
-  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3021/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -81,7 +81,7 @@ module "/us/usc/ptIII/rule3021" {
   }
   layers {
     operative "938a0988c21f8be96d86f4349c5bca9810a4fbec8114698bfb85ab737f957be7"
-    enacted "dba9fadbaba9287c8303ea3cf1a10ba4fb4b5fb1722d172d3c66aa4e70bbbd88"
-    editorial "74b68b0dd80dcb7fb9d01be4e93edc31626a7a6e4127fd6c1daf6f071045ab32"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "46a126d17a6b131c966a106686b95e85311bf98e11bb31a22711628e7d4b1043"
   }
 }

@@ -69,14 +69,14 @@ module "/us/usc/t45/s231r" {
     p "Subsec. (d)(2). " ["Pub. L. 107–90, § 103(h)(2)" -> "/us/pl/107/90/s103/h/2"] ", inserted “(or five or more years of service, all of which accrues after December 31, 1995)” after “ten years of service”."
     hash "6277ab8bb66613283e1d0c555e2fcbad5505bce2503a05c3d4b5b92348173386"
   }
-  note "/us/usc/t45/s231r/note/statutoryNotes/pl.96.88/change-of-name" enacted {
+  note "/us/usc/t45/s231r/note/statutoryNotes/pl.96.88/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
     p "“Secretary of Health and Human Services” substituted for “Secretary of Health, Education, and Welfare” in subsec. (c) pursuant to " ["section 509(b) of Pub. L. 96–88" -> "/us/pl/96/88/s509/b"] " which is classified to " ["section 3508(b) of Title 20" -> "/us/usc/t20/s3508/b"] ", Education."
     hash "e4d78bc690c8beb1997a0f6a333a9525c678e1aaf8752138312417a7dca7b008"
   }
-  note "/us/usc/t45/s231r/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" enacted {
+  note "/us/usc/t45/s231r/note/statutoryNotes/pl.107.90/effective-date-of-2001-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 2001 Amendment"
@@ -85,7 +85,7 @@ module "/us/usc/t45/s231r" {
   }
   layers {
     operative "1f09d74f6065b3bac74d6a0e1c31183d7b09d2b467940f20d9a6e279c3059538"
-    enacted "30d9aeab5ee142eb4fa4dd4359783c32528550c98d7376b09a84d051763733ac"
-    editorial "f624545b284914463e33622eafc26d3a8ebe5f3ea02415b2ff085a47ed109990"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "319f3842dc6a6f765ccf7a297d46e56fd7bf638c84eb66d1dbe934932475def9"
   }
 }

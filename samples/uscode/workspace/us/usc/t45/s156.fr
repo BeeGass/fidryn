@@ -17,7 +17,7 @@ module "/us/usc/t45/s156" {
     p "1934—Act June 21, 1934, inserted “in agreements” after “intended change” in text, struck out provision formerly contained in text concerning changes requested by more than one class, and substituted “Mediation Board” for “Board of Mediation” wherever appearing."
     hash "2cdedbf79ea2f742f09a3206b85f8cf2c21b2f7a87f77919016034007e628c19"
   }
-  note "/us/usc/t45/s156/note/execDoc/nolaw/wage-and-salary-adjustments" enacted {
+  note "/us/usc/t45/s156/note/execDoc/nolaw/wage-and-salary-adjustments" editorial {
     group execDoc
     topic "miscellaneous"
     heading "Wage and Salary Adjustments"
@@ -26,7 +26,7 @@ module "/us/usc/t45/s156" {
   }
   layers {
     operative "448308c510b25fc7f537ec97926d547e0eca5ec0304e1a7736331508d8383856"
-    enacted "afca1613e23d9d1244dd1af9ca6711496e67d29f9aaf98c4800bcd0533fa8bc1"
-    editorial "11128044b871d8cee993c6cb190beb5f3d50bdaa54326ded43361515df6c4bd6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "bb67904388f49e5518a25dd150adc36220b0993504abc7f6b3f7ab8355d1a77f"
   }
 }

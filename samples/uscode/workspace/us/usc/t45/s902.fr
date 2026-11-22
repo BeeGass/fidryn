@@ -57,7 +57,7 @@ module "/us/usc/t45/s902" {
     p "1980—Par. (6). " ["Pub. L. 96–254" -> "/us/pl/96/254"] " redefined “restructured Milwaukee Railroad” to mean the entity that is designated as the reorganized railroad under the reorganization plan for the Milwaukee Railroad finally certified by the Commission."
     hash "7998937af1af20fbccb5e16c8ac13e9175a33a416502117d603a58e2a9fde71c"
   }
-  note "/us/usc/t45/s902/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s902/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -101,7 +101,7 @@ module "/us/usc/t45/s902" {
   }
   layers {
     operative "7fa7186b62685bfb676e74ff61b0d296de2d5b5598a7695aa7c607eb5f187e3c"
-    enacted "77460fecd27a3d8c7a1409effc5b8609cf0e9d1092f53c08df757cda669be5b1"
-    editorial "e1012ab5a61d15657a48b82cae158fb4f50ad19b7b0561203d1f69a66287caa2"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "9ac0238030250f7f6268a9b969dcd077cc44f238e6721979c0debd0c9bf9649a"
   }
 }

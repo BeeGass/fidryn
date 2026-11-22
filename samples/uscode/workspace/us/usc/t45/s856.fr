@@ -15,7 +15,7 @@ module "/us/usc/t45/s856" {
     p "Section, " ["Pub. L. 94–210, title VII, § 708" -> "/us/pl/94/210/tVII/s708"] ", as added " ["Pub. L. 102–533, § 4(a)" -> "/us/pl/102/533/s4/a"] ", Oct. 27, 1992, " ["106 Stat. 3516" -> "/us/stat/106/3516"] ", directed Secretary to develop and report to Congress within one year after Oct. 27, 1992, on a program master plan for improvements in passenger service between Boston and New York."
     hash "3a5327e88d12e9acb2a206e9e2f67d051209b7aeb4718bdf879b42c8c9170714"
   }
-  note "/us/usc/t45/s856/note/statutoryNotes/pl.103.429/effective-date-of-repeal" enacted {
+  note "/us/usc/t45/s856/note/statutoryNotes/pl.103.429/effective-date-of-repeal" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date of Repeal"
@@ -24,7 +24,7 @@ module "/us/usc/t45/s856" {
   }
   layers {
     operative "989eaf6f9bee230c406246a0c19750e9e198ed2e0d38e9c61e03612e0463589e"
-    enacted "b533a2f6379c4da65ba393dc0705a002527e17104deb6400d1b319536ff42c79"
-    editorial "66b3aa89c71280df010568c43344eb1bab86779d27b54e34f32cf3d70409e96e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a3b7ffab4b4d68aee9a4cae74fd533967a81f5fa8ee5a5d02c069fa6c0390efd"
   }
 }

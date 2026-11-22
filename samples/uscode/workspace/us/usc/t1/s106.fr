@@ -433,7 +433,7 @@ module "/us/usc/t1/s106" {
     }
     hash "f2346f93b4779b599a2cc0a928f76b54bbfb6a50d9f4db78d573cfb400ce25a2"
   }
-  note "/us/usc/t1/s106/note/execDoc/pl.101.508/certification-of-printed-enrollments-of-certain-public-laws" enacted {
+  note "/us/usc/t1/s106/note/execDoc/pl.101.508/certification-of-printed-enrollments-of-certain-public-laws" editorial {
     group execDoc
     topic "executiveMemo"
     heading "Certification of Printed Enrollments of Certain Public Laws"
@@ -459,7 +459,7 @@ module "/us/usc/t1/s106" {
   }
   layers {
     operative "cba08dc94a0c6e845666013a78c81b4237f8763fb14e37a2727dda87a51ba270"
-    enacted "2489bc293d4462e06acd06ea830b3418606b41f54c42d6642399b27b47a1df64"
-    editorial "3ab23192f160f33c37da3ba0fa5f473fd0d08ff8498cdf1c3d31cec52fd5d163"
+    enacted "9b455d1e10334192e86efc24a1fca6ab9e0f6a4cc47acc02b2f9c4b3413ef6e7"
+    editorial "4ad98644daa6fff90654af1368556fbdcd68515646bf8229fcb90f9d678a8ab6"
   }
 }

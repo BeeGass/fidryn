@@ -38,7 +38,7 @@ module "/us/usc/ptI/rule1004.2" {
     hash "1e793aef14a4abba8a95ff18708e42aee8347ab58764f6e598e0c4fa0fe7ae7d"
   }
   credit "(Added Apr. 26, 2011, eff. Dec. 1, 2011; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1004.2/note/ungrouped/nolaw/committee-notes-on-rules-2011" enacted {
+  note "/us/usc/ptI/rule1004.2/note/ungrouped/nolaw/committee-notes-on-rules-2011" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2011"
@@ -49,7 +49,7 @@ module "/us/usc/ptI/rule1004.2" {
     p "No comments were submitted on proposed Rule 1004.2 after its republication in August 2009."
     hash "30dd18df46eec103b30dc8397f24b53ff3df1380d9d97ef2dce2e66a50bd9266"
   }
-  note "/us/usc/ptI/rule1004.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1004.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -58,7 +58,7 @@ module "/us/usc/ptI/rule1004.2" {
   }
   layers {
     operative "1e793aef14a4abba8a95ff18708e42aee8347ab58764f6e598e0c4fa0fe7ae7d"
-    enacted "95a45f83e8e5dbf1bf3c2daf3695dd33f7d59ab82ce4e063489ac4ef36c71ace"
-    editorial "f7679f589337f8bcc7040a1d02a4b4d2eb42c6a2b5562a4d617fb9f49057667b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "edc4d96529e99144b6d454381c548e71114c6eba8dea3c7d3b93139caf797c39"
   }
 }

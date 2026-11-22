@@ -17,14 +17,14 @@ module "/us/usc/t45/s907" {
     p "1983—" ["Pub. L. 97–468" -> "/us/pl/97/468"] " substituted “April 1, 1984” for “April 1, 1981”."
     hash "77c3c6b965bc0e16923023010fcc4695c9b2108cd14a123aa17d5b3c18dd14fc"
   }
-  note "/us/usc/t45/s907/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s907/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
     p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
     hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
   }
-  note "/us/usc/t45/s907/note/statutoryNotes/pl.99.272/exemption-of-national-railroad-passenger-corporation-in-hiri" enacted {
+  note "/us/usc/t45/s907/note/statutoryNotes/pl.99.272/exemption-of-national-railroad-passenger-corporation-in-hiri" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Exemption of National Railroad Passenger Corporation in Hiring Qualified Train and Engine Employees"
@@ -33,7 +33,7 @@ module "/us/usc/t45/s907" {
   }
   layers {
     operative "69ed82ceaea8ab1970905023e234da268b15621809d13331e7d651df790c3ae7"
-    enacted "642b0ff723de15aa1cd9eadcd976c1ed4608d1c926a8c2ad27241c663a953b42"
-    editorial "24408ac6ae737e91cff0482c576fab1227f6d50de9e66f9414e83ef4ef87394d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "ead09303404dc7475029506d933683b81829db4c439d61a25547addc69b1fa73"
   }
 }

@@ -31,7 +31,7 @@ module "/us/usc/ptI/rule1013" {
     hash "1769ef6d1cc8dd240ff1573da1fb1ff8f31402b28aae235502ee9eee3918595f"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -40,21 +40,21 @@ module "/us/usc/ptI/rule1013" {
     p "Subdivision (e) of former Bankruptcy Rule 115 has not been carried over because its provisions are covered by § 303(i) of the Code."
     hash "329760a8d07e870078bd67a3e86a38e56b4dbaa92654c7522fb40e4ce0be8819"
   }
-  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Reference to the Official Form number is deleted in anticipation of future revision and renumbering of the Official Forms."
     hash "52442a076009196e6a2b2d867281fd4e269c30b1b658ab961039c969e7314a5c"
   }
-  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "Subdivision (c) is abrogated because the official form for the order for relief was abrogated in 1991. Other amendments are stylistic and make no substantive change."
     hash "65612cdbfe33d8de66bee2f95944598defcf1f5ebfdd33d80de47a8fbd6d8569"
   }
-  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -63,7 +63,7 @@ module "/us/usc/ptI/rule1013" {
   }
   layers {
     operative "1769ef6d1cc8dd240ff1573da1fb1ff8f31402b28aae235502ee9eee3918595f"
-    enacted "5d16a082a868fdf90ce20fb483e04b7f39e443fc937339c6f95d5517eeaa98f4"
-    editorial "d202609dfe2eeac2eab4f0c7973ec5056d55b5d9af32ea8a4f5d21ef9431f8f6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f3e2980adb32f06033eb947ed69ea2f8a208717ef995e3b52f8cb2488e97a933"
   }
 }

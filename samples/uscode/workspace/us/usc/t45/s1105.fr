@@ -66,28 +66,28 @@ module "/us/usc/t45/s1105" {
     p "Subsec. (c). " ["Pub. L. 99–509, § 4033(c)(1)(A)" -> "/us/pl/99/509/s4033/c/1/A"] ", inserted “or part 2 of the Conrail Privatization Act” after “subtitle” in first sentence and “or part 2 of the Conrail Privatization Act, as the case may be,” after “subtitle” in second sentence."
     hash "c23df0de33e04566cd1e7d094ac1fc7dfe4d602ab1d638475e9e262997a6beda"
   }
-  note "/us/usc/t45/s1105/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" enacted {
+  note "/us/usc/t45/s1105/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1996 Amendment"
     p "Amendment by " ["Pub. L. 104–317" -> "/us/pl/104/317"] " effective 90 days after Oct. 19, 1996, and except as otherwise provided, applicable to proceedings that arise or continue after such effective date, see " ["section 605(e) of Pub. L. 104–317" -> "/us/pl/104/317/s605/e"] ", set out as a note under " ["section 719 of this title" -> "/us/usc/t45/s719"] "."
     hash "5738327b8d935a396acd7128541b68a5aca7d2af8e8abb78fb66fd0602156b40"
   }
-  note "/us/usc/t45/s1105/note/statutoryNotes/pl.100.352/effective-date-of-1988-amendment" enacted {
+  note "/us/usc/t45/s1105/note/statutoryNotes/pl.100.352/effective-date-of-1988-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1988 Amendment"
     p "Amendment by " ["Pub. L. 100–352" -> "/us/pl/100/352"] " effective ninety days after June 27, 1988, except that such amendment not to apply to cases pending in Supreme Court on such effective date or affect right to review or manner of reviewing judgment or decree of court which was entered before such effective date, see " ["section 7 of Pub. L. 100–352" -> "/us/pl/100/352/s7"] ", set out as a note under " ["section 1254 of Title 28" -> "/us/usc/t28/s1254"] ", Judiciary and Judicial Procedure."
     hash "feff9722fe583140dc628b7a0fa8adfc8defc8e4756e12aae08abbfdb687d079"
   }
-  note "/us/usc/t45/s1105/note/statutoryNotes/pl.104.317/cases-pending-in-special-court" enacted {
+  note "/us/usc/t45/s1105/note/statutoryNotes/pl.104.317/cases-pending-in-special-court" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Cases Pending in Special Court"
     p "For applicability of amendment by " ["Pub. L. 104–317" -> "/us/pl/104/317"] " to cases pending in special court established under " ["section 719(b) of this title" -> "/us/usc/t45/s719/b"] ", see " ["section 605(d) of Pub. L. 104–317" -> "/us/pl/104/317/s605/d"] ", set out as a note under " ["section 719 of this title" -> "/us/usc/t45/s719"] "."
     hash "bf9e53b9760c06f1e7c46589af9e28a3f4cfda82afc8255912891b5cf80e2be7"
   }
-  note "/us/usc/t45/s1105/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s1105/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
@@ -96,7 +96,7 @@ module "/us/usc/t45/s1105" {
   }
   layers {
     operative "dbd4f710d0e819500d005c859fcf43eccfa89ea6482d184a9fd6ee1321063492"
-    enacted "b5ce6158ebd3c1c54d3a2c33569fdcc124022762fe8da8a4a461991dab2928b1"
-    editorial "dc93376a62bae451ce9d30d42815b9b4de6804ddd727410b7709d4943eccf9e7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "361059b9c0dd8fefb4825767967624cd8f3910f063acc1aaeec3af2feba96cc0"
   }
 }

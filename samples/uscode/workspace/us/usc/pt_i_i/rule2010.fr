@@ -31,7 +31,7 @@ module "/us/usc/ptII/rule2010" {
     hash "0df6bf5552c4d645dfc2bfa16f910a80b44f0ccfb46238b6e52b307658e55b2c"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -40,14 +40,14 @@ module "/us/usc/ptII/rule2010" {
     p "Subdivision (d) is derived from former Bankruptcy Rule 212(f). Reference should be made to § 322(a) and (d) of the Code which requires the bond to be filed with the bankruptcy court and places a two year limitation for the commencement of a proceeding on the bond. A bond filed under this rule should conform to Official Form No. 25. A proceeding on the bond of a trustee is governed by the rules in Part VII. See the Note accompanying Rule 7001. See also Rule 9025."
     hash "d57d74b6eb3fc9356459ef67c7845e7274b9e4db74c780f45f84547e8b1bacd4"
   }
-  note "/us/usc/ptII/rule2010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptII/rule2010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Subdivision (b) is deleted because of the amendment to Rule 2008."
     hash "49f4b7e8e463da93b1fd9c7cbf22d532ca715673070a187a4d5da737c8af86a1"
   }
-  note "/us/usc/ptII/rule2010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2010/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -55,7 +55,7 @@ module "/us/usc/ptII/rule2010" {
     p "Subdivision (b) is abrogated because an order approving a bond is no longer necessary in view of the 1986 amendments to § 322 of the Code. Subdivision (c) is redesignated as subdivision (b)."
     hash "f8674e8b6e2734a60b5f3a86c78cc6b4126cbef2f550c7f7496788c12d7cf650"
   }
-  note "/us/usc/ptII/rule2010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2010/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -64,7 +64,7 @@ module "/us/usc/ptII/rule2010" {
   }
   layers {
     operative "0df6bf5552c4d645dfc2bfa16f910a80b44f0ccfb46238b6e52b307658e55b2c"
-    enacted "8d768774d10ce413e49b93ee721c2cd8a04d19c9044671ef3daa4bcacea68ffc"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1adcffdf43a4e94b24d81aee806687009eb71939d598ae7f04211169e8c9571d"
   }
 }

@@ -66,14 +66,14 @@ module "/us/usc/t45/s725" {
     p "1975—" ["Pub. L. 94–5" -> "/us/pl/94/5"] " expanded provisions covering interim agreements for the acquisition, maintenance, and improvement of railroad properties, substituted provisions setting out the requisite conditions of such agreements for provisions making only a general requirement that such agreements identify the type and quality of improvements to be made, raised from $150,000,000 to $300,000,000 the maximum amount of outstanding obligations, and substituted provisions directing the Association in the final system plan to designate that portion of the obligations which shall be refinanced and that portion from which the Corporation shall be released of its obligations for provisions prohibiting the Secretary’s entry into agreements unless he issues regulations setting forth procedures and guidelines for the administration of this section, substituted provisions authorizing the Secretary to convey to the Corporation property or interests held by the Secretary pursuant to this section or " ["section 723 of this title" -> "/us/usc/t45/s723"] " for provisions relieving the Corporation of the duty of compensating railroads in reorganization for that portion of transferred properties attributable to the acquisition, maintenance, or improvement of such properties under this section."
     hash "d6e01629eedf675d68ccf0dbbf9ab33fd53e7d3a8e2516f09d2a158a0ab776b0"
   }
-  note "/us/usc/t45/s725/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s725/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s725/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s725/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -82,7 +82,7 @@ module "/us/usc/t45/s725" {
   }
   layers {
     operative "3b5d5526c01ec29748afbd00af4f9e01271ecf243f47451c83e4635b8a392da3"
-    enacted "e447f89ed658063d7f9a7fe63fb154b0b63d816a9b823f168f9f5c3366b29e65"
-    editorial "77731436e52d35a4614598834af293e92bea47c8d680cd2d6660405b65a31149"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "49746e45fa72b80e12da58351b73d29006a6ccaeac811ca70d947fe4d0c92665"
   }
 }

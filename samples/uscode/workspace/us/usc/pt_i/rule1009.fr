@@ -52,7 +52,7 @@ module "/us/usc/ptI/rule1009" {
     hash "56c00d3752db0575ffde62ea151395f051c3b894879ac0e7dac8e9bb2809fbee"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 12, 2006, eff. Dec. 1, 2006; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -61,7 +61,7 @@ module "/us/usc/ptI/rule1009" {
     p "If a list or schedule is amended to include an additional creditor, the effect on the dischargeability of the creditor’s claim is governed by the provisions of § 523(a)(3) of the Code."
     hash "6dbc25fb82bcb058014a8d15adc942e9fe8dbe7a402a512eff6b5c653c326a25"
   }
-  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -69,7 +69,7 @@ module "/us/usc/ptI/rule1009" {
     p "Subdivision (b) is added to treat amendments of the statement of intention separately from other amendments. The intention of the individual debtor must be performed within 45 days of the filing of the statement, unless the court extends the period. Subdivision (b) limits the time for amendment to the time for performance under § 521(2)(B) [now 521(a)(2)(B)] of the Code or any extension granted by the court."
     hash "5442c1fa13607cdf0da18079af07c7311dda2b75874648fa1f16141d3c256f10"
   }
-  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -77,7 +77,7 @@ module "/us/usc/ptI/rule1009" {
     p "Subdivision (c) is derived from Rule X–1002(a) and is designed to provide the United States trustee with current information to enable that office to participate effectively in the case."
     hash "d43649740fadc53b4883f88a8dbd6f73d2016c0be9045ac9c005520ca4ecb322"
   }
-  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/committee-notes-on-rules-2006-amendment" enacted {
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/committee-notes-on-rules-2006-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2006 Amendment"
@@ -87,7 +87,7 @@ module "/us/usc/ptI/rule1009" {
     p "Changes Made After Publication. No changes since publication."
     hash "a34bbf2ab72fe77e8bb904b65701f1f08af27e5c0e14f40087f399e020ed4cec"
   }
-  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -95,7 +95,7 @@ module "/us/usc/ptI/rule1009" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "9598dc23b96f0eb90bcdfe1b6b8e34bff29380b86377c7737554e7f47af38d11"
   }
-  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -104,7 +104,7 @@ module "/us/usc/ptI/rule1009" {
   }
   layers {
     operative "56c00d3752db0575ffde62ea151395f051c3b894879ac0e7dac8e9bb2809fbee"
-    enacted "9520f537de5639289cd4b4d429a04d10f743af4364f42909b4e984a463ec406d"
-    editorial "8be34d70afd7bd6e5e419559729fd344416791502e2ff34968bc4dffbce4d12a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c68a9e28c9ff7f196768c861567ffbdf58e63fa992d795966a09ea3d7df605a1"
   }
 }

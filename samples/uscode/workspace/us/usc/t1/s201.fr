@@ -36,14 +36,14 @@ module "/us/usc/t1/s201" {
     p "1954—Subsec. (a). Act Sept. 3, 1954, substituted “Administrator of General Services” for “Secretary of State”."
     hash "ad0348c314474b48caee283ad3b108d658d64efb2f07e1aa078817a50cfe56a6"
   }
-  note "/us/usc/t1/s201/note/statutoryNotes/pl.113.235/change-of-name" enacted {
+  note "/us/usc/t1/s201/note/statutoryNotes/pl.113.235/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
     p "“Director of the Government Publishing Office” substituted for “Public Printer” in subsec. (b) on authority of " ["section 1301(d) of Pub. L. 113–235" -> "/us/pl/113/235/s1301/d"] ", set out as a note under " ["section 301 of Title 44" -> "/us/usc/t44/s301"] ", Public Printing and Documents."
     hash "60666fc0c929a0fb68f6e17abad3e7a17ec91d802759667716641af0093adaec"
   }
-  note "/us/usc/t1/s201/note/statutoryNotes/pl.98.497/effective-date-of-1984-amendment" enacted {
+  note "/us/usc/t1/s201/note/statutoryNotes/pl.98.497/effective-date-of-1984-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1984 Amendment"
@@ -52,7 +52,7 @@ module "/us/usc/t1/s201" {
   }
   layers {
     operative "aa46151723bedab3a10e01af42051e0522d2ddd694a818563a276537ae549c17"
-    enacted "0f20fd0adcbdb374699f4aa9b939fba55e9d663da4289a0a99b137b42560f896"
-    editorial "c374993e531ff75d8051adc9ac809c215187915a5c28df3980acfd878dc3d829"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "dee7b03da076dca4a4c800be1d86ea1f804062cb904310d83169671fde1e1eed"
   }
 }

@@ -374,16 +374,19 @@ pub struct Footnote {
 }
 
 /// `definition String { term String { term String } kind Ident words ( String | unstated )
-/// [region String] basis Ident [borrowed_from String] [see_note String] }`.
+/// [condition String] [region String] basis Ident [borrowed_from String | borrowed_words String]
+/// [see_note String] }`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Definition {
     pub at: Str,
     pub terms: Vec<Str>,
     pub kind: Ident,
     pub words: Words,
+    pub condition: Option<Str>,
     pub region: Option<Str>,
     pub basis: Ident,
     pub borrowed_from: Option<Str>,
+    pub borrowed_words: Option<Str>,
     pub see_note: Option<Str>,
     pub span: Span,
 }

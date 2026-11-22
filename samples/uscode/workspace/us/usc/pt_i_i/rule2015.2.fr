@@ -16,7 +16,7 @@ module "/us/usc/ptII/rule2015.2" {
     hash "c1f8b77d9377c141eabab2dd9994341e0101acf140a70f14539df2a7007d37e6"
   }
   credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2015.2/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+  note "/us/usc/ptII/rule2015.2/note/ungrouped/nolaw/committee-notes-on-rules-2008" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008"
@@ -26,7 +26,7 @@ module "/us/usc/ptII/rule2015.2" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "01169a311878e7a2af99108b2b584e2d4bb8daaf5e231521c0db957710f9011d"
   }
-  note "/us/usc/ptII/rule2015.2/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptII/rule2015.2/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -38,7 +38,7 @@ module "/us/usc/ptII/rule2015.2" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptII/rule2015.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2015.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -47,7 +47,7 @@ module "/us/usc/ptII/rule2015.2" {
   }
   layers {
     operative "c1f8b77d9377c141eabab2dd9994341e0101acf140a70f14539df2a7007d37e6"
-    enacted "b2a2871c3bd8207bfc19fb1c11f604d2ae24eee28d0fdf7dd03be0753b2019b2"
-    editorial "a7a87ea82ce26b6544cc3c69e822448f599834e4961f55d5c8be47261511261c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3c6f838f3e797e55680e02260b8b8c6bc5ac8407b59e53d5fb9be8b787807a5c"
   }
 }

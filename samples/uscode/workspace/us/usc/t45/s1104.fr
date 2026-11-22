@@ -72,14 +72,14 @@ module "/us/usc/t45/s1104" {
     p "1996—Par. (8). " ["Pub. L. 104–317" -> "/us/pl/104/317"] " amended par. generally. Prior to amendment, par. read as follows: “ ‘Special court’ means the judicial panel established under section 209 of the Regional Rail Reorganization Act of 1973 (" ["45 U.S.C. 719" -> "/us/usc/t45/s719"] ").”"
     hash "d2bceec9e864a16d9e0356373b29505215d28cb8896e286b1fefce54f0bfc45f"
   }
-  note "/us/usc/t45/s1104/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" enacted {
+  note "/us/usc/t45/s1104/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1996 Amendment"
     p "Amendment by " ["Pub. L. 104–317" -> "/us/pl/104/317"] " effective 90 days after Oct. 19, 1996, and except as otherwise provided, applicable proceedings that arise or continue after such effective date, see " ["section 605(e) of Pub. L. 104–317" -> "/us/pl/104/317/s605/e"] ", set out as a note under " ["section 719 of this title" -> "/us/usc/t45/s719"] "."
     hash "ee82237079a54380bde1bf8742436788cb8f7e82843247c438f1bc716c550c19"
   }
-  note "/us/usc/t45/s1104/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1104/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -136,7 +136,7 @@ module "/us/usc/t45/s1104" {
   }
   layers {
     operative "5a65d93b6e2abfca8e7d123a03ffe5c72bf96613b27d89904ddf22d97fac811d"
-    enacted "49fb76befceb72038b593e89a5036cfd87dbbe240621be86942550cd4f5f5d02"
-    editorial "ce5d58760cd2a1945b785ba4ca5613fa6d8ad5d37f47da3ec0615b9317cb78dc"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "bb2659b67da0ee382f10df116fa943183a44f5c701af90e5553be64491de69c6"
   }
 }

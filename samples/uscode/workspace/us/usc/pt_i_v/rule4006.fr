@@ -30,7 +30,7 @@ module "/us/usc/ptIV/rule4006" {
     hash "e54863f93b057abab47990ad0e37744a9a9c48b356aeb74785021c4cd6e93f34"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIV/rule4006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIV/rule4006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -38,7 +38,7 @@ module "/us/usc/ptIV/rule4006" {
     p "This rule requires the clerk to notify creditors if a debtor fails to obtain a discharge because a waiver of discharge was filed under § 727(a)(10) or as a result of an order denying or revoking the discharge under § 727(a) or (d)."
     hash "18f2c75dd4dec93161f3224ce7b72d934a94e2fb18e0aa29b1e1fc6554962bf1"
   }
-  note "/us/usc/ptIV/rule4006/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIV/rule4006/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -46,7 +46,7 @@ module "/us/usc/ptIV/rule4006" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "0f82ebf81b589b51792667017a398b24f487459d784927206b0d7301c010e07c"
   }
-  note "/us/usc/ptIV/rule4006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIV/rule4006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -55,7 +55,7 @@ module "/us/usc/ptIV/rule4006" {
   }
   layers {
     operative "e54863f93b057abab47990ad0e37744a9a9c48b356aeb74785021c4cd6e93f34"
-    enacted "eeaf0e982be612d6633a753be64aca0daa6ca6bdce45546aadecded7961562c6"
-    editorial "30ce1f81e8d550d3e2498d3fc346e4067d5f2f3375ac4d71e441753b6313823b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "8e8b82cc984f2dfce86926d0f228a4688f4ac65f8c6038900f9627c63d396383"
   }
 }

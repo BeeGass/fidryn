@@ -10,7 +10,7 @@ module "/us/usc/ptVI/rule6008" {
     hash "8ce710c3dbb1ecacdc4dbaac4a6fecc63f066a0dba7b9755ecfc835de58804b5"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVI/rule6008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -18,7 +18,7 @@ module "/us/usc/ptVI/rule6008" {
     p "The rule applies also to a debtor exercising a right of redemption pursuant to § 722. A proceeding under that section is governed by Rule 9014."
     hash "86bf009502c7782592b22bf38dd6c2534d0e69a8b27daa087b98f259f67c73ec"
   }
-  note "/us/usc/ptVI/rule6008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -27,7 +27,7 @@ module "/us/usc/ptVI/rule6008" {
   }
   layers {
     operative "8ce710c3dbb1ecacdc4dbaac4a6fecc63f066a0dba7b9755ecfc835de58804b5"
-    enacted "d5fbb94e2a9dfb26753f10bc21476dc9bdd4623d58b497743415e3e81c19881d"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f7e931e33eee11a50c91e38d0636a312568114cbffd70f3bb224ed3c9a2d6f72"
   }
 }

@@ -114,7 +114,7 @@ module "/us/usc/ptII/rule2016" {
     hash "51295b1171b1d14f4a2b361a72d3adccdf300b8a0901617a4420475b17ce6acd"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 27, 2003, eff. Dec. 1, 2003; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -123,7 +123,7 @@ module "/us/usc/ptII/rule2016" {
     p "Regular associate of a law firm is defined in Rule 9001(9) to include any attorney regularly employed by, associated with, or counsel to that law firm. Firm is defined in Rule 9001(6) to include a partnership or professional corporation."
     hash "9976dc7e986a98993a0b5f2a22324de79640d54f8bea9f7915a81241438e6819"
   }
-  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -131,7 +131,7 @@ module "/us/usc/ptII/rule2016" {
     p "Subdivision (b) is amended to require that the attorney for the debtor file the § 329 statement before the meeting of creditors. This will assist the parties in conducting the examination of the debtor. In addition, the amended rule requires the attorney to supplement the § 329 statement if an undisclosed payment is made to the attorney or a new or amended agreement is entered into by the debtor and the attorney."
     hash "729127ab9b0343d432887657d28c9572ceea6e628df093bea4b4f469498598d9"
   }
-  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -140,7 +140,7 @@ module "/us/usc/ptII/rule2016" {
     p "The words “with the court” are deleted in subdivisions (a) and (b) as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "9f09be2ecd052a4a40d9378f56d648ed3df03768f53bc2f60a20d4d3c0c7011c"
   }
-  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" enacted {
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2003 Amendment"
@@ -148,7 +148,7 @@ module "/us/usc/ptII/rule2016" {
     p "Changes Made After Publication and Comments. No changes since publication."
     hash "0d74bcab4e8699c6cf4a75f69dfa04c60b66924c6cff8ad3199c26dbcd1f1c0a"
   }
-  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -162,7 +162,7 @@ module "/us/usc/ptII/rule2016" {
     p "Other changes are stylistic."
     hash "81ed2d83b471c60dc74a25b20f81248401d1d2aaa2fa3aee16c569a2936a6f44"
   }
-  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -171,7 +171,7 @@ module "/us/usc/ptII/rule2016" {
   }
   layers {
     operative "51295b1171b1d14f4a2b361a72d3adccdf300b8a0901617a4420475b17ce6acd"
-    enacted "e87ed9963c20c3f4164b0e69c98e9bd1351a6489f25c9c1a24aa96c1c78a1e01"
-    editorial "0096cec247aab72f0e6ec4d2e086229000628957761cba375ece119394cb0f77"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "244bfb6727a3ce4ab232ea183b43641d2ed1d47258de52cf40a5804d1005755a"
   }
 }

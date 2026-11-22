@@ -118,7 +118,7 @@ module "/us/usc/t45/s701" {
     }
     hash "aeb87e294149703a0c1a8c05d011e101735ca1548c13f4c3549074c42fab67c1"
   }
-  note "/us/usc/t45/s701/note/statutoryNotes/pl.93.236/short-title" enacted {
+  note "/us/usc/t45/s701/note/statutoryNotes/pl.93.236/short-title" editorial {
     group statutoryNotes
     topic "shortTitle"
     heading "Short Title"
@@ -135,7 +135,7 @@ module "/us/usc/t45/s701" {
     }
     hash "ab0c66a42722bcc4bdaa7c9672fdcd34cf7d92f44d09e239d790a8c884c8ee04"
   }
-  note "/us/usc/t45/s701/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s701/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
@@ -144,7 +144,7 @@ module "/us/usc/t45/s701" {
   }
   layers {
     operative "1703f5d24306885a8ce2ff3cb59dbd9c898ae55b29cc17a2eddd1ba077d57417"
-    enacted "62ba9ae8384adfe604da3adb17a75bad54fc2f840e7d73a123084e6090bc6670"
-    editorial "5714f23897cccd0f37ee9224d19e7b83a8eb0e78dc60504f4f83495836e0d080"
+    enacted "480501a8d1a6c7b8f547e556e964e1b4722878efafee2056c935c9c08b2a6c22"
+    editorial "2e8db6b19bee59a2f17a7c34f8a1dc4e17257a85c1df8684f32145dfd7731e41"
   }
 }

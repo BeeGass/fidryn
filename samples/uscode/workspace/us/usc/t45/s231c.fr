@@ -381,7 +381,7 @@ module "/us/usc/t45/s231c" {
     }
     hash "71cf56ecb976df317e3008dfb67148f702e6a5f24db4440f577b7183b1007021"
   }
-  note "/us/usc/t45/s231c/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s231c/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
@@ -418,7 +418,7 @@ module "/us/usc/t45/s231c" {
   }
   layers {
     operative "fb68589199e0eee6baa3a9aa7f80119911ed66e8c6dceeb916f2213f275a3957"
-    enacted "051fcc65e7d5ed4c92f0d1971fe916d96c6a78daa3fc682f61e433d00cda6ef1"
-    editorial "174f5e7c5d714bfbbd84a33f0b5c71bd5ca87a9e8e32c51be5df07e938bb0e7e"
+    enacted "ff4adeca3691561ce393e732236f353284a60bb52f4a6f8b82743bbd130a1866"
+    editorial "14188cef11367fbb6b48a7240ec6a5d208854b3977f900722f241f729c951ac7"
   }
 }

@@ -10,14 +10,14 @@ module "/us/usc/ptVII/rule7042" {
     hash "950aca2d2b106babc327e8fc6b282efdea63e503f675a88da535f075d7d59ed6"
   }
   credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7042/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7042/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7042 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "dc472bb7d70810a545a80290ea5d944b0577af15459b78a3a7f329bcb31a4dce"
   }
-  note "/us/usc/ptVII/rule7042/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7042/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -26,7 +26,7 @@ module "/us/usc/ptVII/rule7042" {
   }
   layers {
     operative "950aca2d2b106babc327e8fc6b282efdea63e503f675a88da535f075d7d59ed6"
-    enacted "87eff02e4e6731ae64c054e4e1ea508e547956bb3b36da48ce088534545f58f0"
-    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e580f5c3e8c14f2693642a831c3a3fd0d8ff478e9d52e3759f03d1478aadcd8d"
   }
 }

@@ -10,6 +10,13 @@ module "/us/usc/t45/s57" {
     hash "8fe8d244a7b2c07e2ff6b2686d29db181c9cd9ae1f1553d77c6c82b1c200022f"
   }
   credit "(" ["Apr. 22, 1908, ch. 149, § 7" -> "/us/act/1908-04-22/ch149/s7"] ", " ["35 Stat. 66" -> "/us/stat/35/66"] ".)"
+  definition "/us/usc/t45/s57" {
+    term "common carrier"
+    kind includes
+    words "as used in this chapter"
+    region "/us/usc/t45/ch2"
+    basis restated
+  }
   layers {
     operative "8fe8d244a7b2c07e2ff6b2686d29db181c9cd9ae1f1553d77c6c82b1c200022f"
     enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"

@@ -147,42 +147,42 @@ module "/us/usc/t45/s712" {
     p "Subsec. (b)(8). " ["Pub. L. 94–5, § 2(a)(3)" -> "/us/pl/94/5/s2/a/3"] ", added par. (8)."
     hash "6f0cbe5bed2af77a3f7d0e7c140350dd738fcb5560e211ce437c284b44e261fd"
   }
-  note "/us/usc/t45/s712/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s712/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
     p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as an Effective Date note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
     hash "ce7dcc740f9bc75628da6da8e14fc1eb7bee2a77c67bd18e04c70e99f0b41d10"
   }
-  note "/us/usc/t45/s712/note/statutoryNotes/pl.96.73/effective-date-of-1979-amendment" enacted {
+  note "/us/usc/t45/s712/note/statutoryNotes/pl.96.73/effective-date-of-1979-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1979 Amendment"
     p "Amendment by " ["Pub. L. 96–73" -> "/us/pl/96/73"] " effective Oct. 1, 1979, see " ["section 501(a) of Pub. L. 96–73" -> "/us/pl/96/73/s501/a"] "."
     hash "96e603f5f2ac32b9f4f053b94bd7f23938f3cf5b5f71e987bb50f3460734de22"
   }
-  note "/us/usc/t45/s712/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" enacted {
+  note "/us/usc/t45/s712/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Termination of Reporting Requirements"
     p "For termination, effective May 15, 2000, of provisions of law requiring submittal to Congress of any annual, semiannual, or other regular periodic report listed in House Document No. 103–7 (in which reports required under subsecs. (d)(1), (3), (e), and (f) of this section are listed as the 3rd through 6th items on page 195), see " ["section 3003 of Pub. L. 104–66" -> "/us/pl/104/66/s3003"] ", as amended, and section 1(a)(4) [div. A, § 1402(1)] of " ["Pub. L. 106–554" -> "/us/pl/106/554"] ", set out as notes under " ["section 1113 of Title 31" -> "/us/usc/t31/s1113"] ", Money and Finance."
     hash "b7b3bffa22eb538f84ffd657548744c333e13a724abe0cd125aa464c8206384d"
   }
-  note "/us/usc/t45/s712/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s712/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
     p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
     hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
   }
-  note "/us/usc/t45/s712/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s712/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s712/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s712/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -203,7 +203,7 @@ module "/us/usc/t45/s712" {
   }
   layers {
     operative "ca6bac6611c36b5cf2d95622fb1e74bfef208a324ac84b2179f1815db2f488ce"
-    enacted "31080528d1e61eb86282c68d2f469bab3c2becdad9edc6dbc8bff8c2da17ad0a"
-    editorial "4ff734bb8ed2b30cc2a60f29e6fc9685cb89341f4d60beed725a9c01605cc326"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "85091ab05817726058fe26e26df33020a6be612d11eae7b185a5f75661388f0c"
   }
 }

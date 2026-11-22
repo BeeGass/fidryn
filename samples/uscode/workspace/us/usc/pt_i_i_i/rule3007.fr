@@ -159,7 +159,7 @@ module "/us/usc/ptIII/rule3007" {
     hash "667d674f37e3a021189331d16a94022cb86e173aedce16b17a4c4cfc34140add"
   }
   credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 30, 2007, eff. Dec. 1, 2007; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 14, 2021, eff. Dec. 1, 2021; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -169,14 +169,14 @@ module "/us/usc/ptIII/rule3007" {
     p "By virtue of the automatic allowance of a claim not objected to, a dividend may be paid on a claim which may thereafter be disallowed on objection made pursuant to this rule. The amount of the dividend paid before the disallowance in such event would be recoverable by the trustee in an adversary proceeding."
     hash "893b8b663f65acaa05f5d2bdfa0c36e58709cd8265bbbe906bdee1460f5a6286"
   }
-  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "The words “with the court” are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
     hash "df3f0877f4df580e50671a9c7c6f62d1d89778a3fbebd8c89d3dfc78021369e9"
   }
-  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" enacted {
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2007 Amendment"
@@ -189,7 +189,7 @@ module "/us/usc/ptIII/rule3007" {
     p "The Advisory Committee did accept several of Judge Grant’s suggestions, and the rule was amended by deleting the grounds for objection to claims based on the filing of a superceding proof of claim under proposed subdivision (d)(3) and the transfer of claims under proposed subdivision (d)(4). Subdivision (d)(3) now permits objections to claims that have been amended by a subsequently filed proof of claim and the paragraphs within subdivision (d) have been renumbered to reflect the deletion. The Committee Note also no longer includes any reliance on § 502(j) for the statement indicating that a subsequent claim objection can be filed to a claim that was previously included in an omnibus claim objection."
     hash "718c998753ce59f6f3ba5c79b7f621cbdf593daea8dee33c89f593c78fbdd779"
   }
-  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2017 Amendment"
@@ -197,21 +197,21 @@ module "/us/usc/ptIII/rule3007" {
     p "As amended, subdivision (a) no longer requires that a hearing be scheduled or held on every objection. The rule requires the objecting party to provide notice and an opportunity for a hearing on the objection, but, by deleting from the subdivision references to “the hearing,” it permits local practices that require a claimant to timely request a hearing or file a response in order to obtain a hearing. The official notice form served with a copy of the objection will inform the claimant of any actions it must take. However, while a local rule may require the claimant to respond to the objection to a proof of claim, the court will still need to determine if the claim is valid, even if the claimant does not file a response to a claim objection or request a hearing."
     hash "29494506e947da3c71044b6db4ab6fa0f18956857acc01dfaff64fa668d775bc"
   }
-  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" enacted {
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2021 Amendment"
     p "Subdivision (a)(2)(A)(ii) is amended to clarify that the special service method required by Rule 7004(h) must be used for service of objections to claims only on insured depository institutions as defined in section 3 of the Federal Deposit Insurance Act, 12 U.S.C. § 1813. Rule 7004(h) was enacted by Congress as part of the Bankruptcy Reform Act of 1994. It applies only to insured depository institutions that are insured by the Federal Deposit Insurance Corporation and does not include credit unions, which are instead insured by the National Credit Union Administration. A credit union, therefore, may be served with an objection to a claim according to Rule 3007(a)(2)(A)—by first-class mail sent to the person designated for receipt of notice on the credit union’s proof of claim."
     hash "cedaa7d85cc7d4b9e15846646205363fc81b44f79173bb8db1afec1af70a9388"
   }
-  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 3007 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "0578f85d6fc86b8bcb65690204a0021dca07604271da952fe272ef01a92c2518"
   }
-  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -220,7 +220,7 @@ module "/us/usc/ptIII/rule3007" {
   }
   layers {
     operative "667d674f37e3a021189331d16a94022cb86e173aedce16b17a4c4cfc34140add"
-    enacted "9013b71cc173cc3d252ddf65ccb322896bc2a9dd3b415b5996126bac77f7af8d"
-    editorial "1f220efa6f456e19fd137f6d741c2c69fe620f8c29b62cd46db201d93c2dca83"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "ee03a9c8d56c5489681141b0706533ad3a42e48ffe1bd0e20482b99499a7707a"
   }
 }

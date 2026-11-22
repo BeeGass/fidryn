@@ -70,42 +70,42 @@ module "/us/usc/t45/s361" {
     p "Subsec. (c). Act June 20, 1939, § 15, substituted “, including personal services in the District of” for “. Such advance shall be repaid from the fund at”."
     hash "8ade08bad465b56a0b3a6d64e952a7a1c6923cd7c5066fa58e165ea451738436"
   }
-  note "/us/usc/t45/s361/note/statutoryNotes/pl.100.647/effective-date-of-1988-amendment" enacted {
+  note "/us/usc/t45/s361/note/statutoryNotes/pl.100.647/effective-date-of-1988-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1988 Amendment"
     p "Amendment by " ["Pub. L. 100–647" -> "/us/pl/100/647"] " applicable with respect to compensation paid in months beginning after Sept. 30, 1988, see " ["section 7103(c) of Pub. L. 100–647" -> "/us/pl/100/647/s7103/c"] ", set out as a note under " ["section 358 of this title" -> "/us/usc/t45/s358"] "."
     hash "2343e30d9292b4f4b26532f83ff55f6541d187c0d3094990304648bf78642850"
   }
-  note "/us/usc/t45/s361/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment" enacted {
+  note "/us/usc/t45/s361/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1975 Amendment"
     p "Amendment by " ["Pub. L. 94–92" -> "/us/pl/94/92"] " effective with respect to compensation paid for services rendered after Dec. 31, 1975, see " ["section 2 of Pub. L. 94–92" -> "/us/pl/94/92/s2"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "f2ba637f0f633170fd562de44ebc0b4bf7b9ed908566eb3e3e3ee1c6df0c60a8"
   }
-  note "/us/usc/t45/s361/note/statutoryNotes/pl.93.445/effective-date-of-1974-amendment" enacted {
+  note "/us/usc/t45/s361/note/statutoryNotes/pl.93.445/effective-date-of-1974-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1974 Amendment"
     p "Amendment by " ["Pub. L. 93–445" -> "/us/pl/93/445"] " effective Jan. 1, 1975, see " ["section 603 of Pub. L. 93–445" -> "/us/pl/93/445/s603"] ", set out as a note under " ["section 402 of Title 42" -> "/us/usc/t42/s402"] ", The Public Health and Welfare."
     hash "5fa55b4cf8ad1c4e9c627a6cb7ce22c58124f616c18c46e9c5b5749b769ab526"
   }
-  note "/us/usc/t45/s361/note/statutoryNotes/pl.85.927/effective-date-of-1958-amendment" enacted {
+  note "/us/usc/t45/s361/note/statutoryNotes/pl.85.927/effective-date-of-1958-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1958 Amendment"
     p "Amendment by " ["Pub. L. 85–927" -> "/us/pl/85/927"] " effective Sept. 6, 1958, except as otherwise indicated, see " ["section 207(c) of Pub. L. 85–927" -> "/us/pl/85/927/s207/c"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "e5491c4ad18c46a3258951b0ea60b804fb41eaea802bcca74a247d6a7c4a35a8"
   }
-  note "/us/usc/t45/s361/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" enacted {
+  note "/us/usc/t45/s361/note/statutoryNotes/nolaw/effective-date-of-1940-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1940 Amendment"
     p "For effective date of amendment by act Oct. 10, 1940, see section 1 of act Oct. 10, 1940, see note set out under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "506a81d8e5a605c788adabaa6ab90004e3807ef46df7075848fbb5e6ec90fc27"
   }
-  note "/us/usc/t45/s361/note/execDoc/nolaw/transfer-of-functions" enacted {
+  note "/us/usc/t45/s361/note/execDoc/nolaw/transfer-of-functions" editorial {
     group execDoc
     topic "transferOfFunctions"
     heading "Transfer of Functions"
@@ -114,7 +114,7 @@ module "/us/usc/t45/s361" {
   }
   layers {
     operative "f05747778e42ce2860369e74130fc5ad6fe7e8d8a53729d6677bdcab47782d97"
-    enacted "df8247e0b3407abe2fcaeb822ce1e1953002097351997946605d322323c1c9c9"
-    editorial "c088db888e167636accdaa53025e5aa996e8d87e23f5295452b3ceb977023a07"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f479bd344cb92bb46350717a23423375c29b79d07dc6e116b7c282dfa0882023"
   }
 }

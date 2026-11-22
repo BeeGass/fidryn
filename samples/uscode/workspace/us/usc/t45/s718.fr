@@ -106,7 +106,7 @@ module "/us/usc/t45/s718" {
     p "1976—Subsec. (d). " ["Pub. L. 94–210" -> "/us/pl/94/210"] " added subsec. (d)."
     hash "dba4281d29cb998d17f49d42b18715951d610293f2a2c0405bf1f5ad3f82b728"
   }
-  note "/us/usc/t45/s718/note/statutoryNotes/pl.104.14/change-of-name" enacted {
+  note "/us/usc/t45/s718/note/statutoryNotes/pl.104.14/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
@@ -114,21 +114,21 @@ module "/us/usc/t45/s718" {
     p "Committee on Commerce of the Senate abolished and replaced by Committee on Commerce, Science, and Transportation of the Senate, effective Feb. 11, 1977. See Rule XXV of Standing Rules of the Senate, as amended by Senate Resolution No. 4 (popularly cited as the “Committee System Reorganization Amendments of 1977”), approved Feb. 4, 1977."
     hash "0c9d025435b12b8fa6c6e216e138e249c84aa4f319a6c89bdac64ac21bd533b4"
   }
-  note "/us/usc/t45/s718/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s718/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
     p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
     hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
   }
-  note "/us/usc/t45/s718/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s718/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s718/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s718/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -140,7 +140,7 @@ module "/us/usc/t45/s718" {
   }
   layers {
     operative "76d2f1319f4c442eff7a120d5607e0787fbb1028d863d8a0bcd1d5927025ab30"
-    enacted "ed950d3096627bcf9442b42edd9ab5d69f7a8aa57906de78c983cbbfdee7c375"
-    editorial "1572f5c13c8a9c1243fa8da56f20f8933e812e23e12e89f851089134e87ec9ca"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "516dafedc207709fecf9efe8128dc264f2d660f3582d069b9a0c85baa490c2e5"
   }
 }

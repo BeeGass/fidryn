@@ -81,7 +81,7 @@ module "/us/usc/ptII/rule2007.2" {
     hash "b756e36206a67641dff6a781f8a41f854da62a2b377315f0f8b48d55e11e641a"
   }
   credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2007.2/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+  note "/us/usc/ptII/rule2007.2/note/ungrouped/nolaw/committee-notes-on-rules-2008" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008"
@@ -92,7 +92,7 @@ module "/us/usc/ptII/rule2007.2" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "013647b7fbcf339d01b52149b660b676b1e490c58e30457eff6c98247f16c2ec"
   }
-  note "/us/usc/ptII/rule2007.2/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptII/rule2007.2/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -104,7 +104,7 @@ module "/us/usc/ptII/rule2007.2" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptII/rule2007.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2007.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -113,7 +113,7 @@ module "/us/usc/ptII/rule2007.2" {
   }
   layers {
     operative "b756e36206a67641dff6a781f8a41f854da62a2b377315f0f8b48d55e11e641a"
-    enacted "219a9e05c0e72b1e81e3b18e809a951fb4f0c1e6ca7af807fb11cbd45d3abb19"
-    editorial "a7a87ea82ce26b6544cc3c69e822448f599834e4961f55d5c8be47261511261c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "c2c29d586f468a0122e9b8a2085c6c603cc0e30055f6d5424e42f2b954fd3e88"
   }
 }

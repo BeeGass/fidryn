@@ -100,7 +100,7 @@ module "/us/usc/ptIV/rule4003" {
     hash "20413b4e6fb178ef20adaa8b4fd39f991ed5b802cefdbd7dade53ff074bbb279"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 17, 2000, eff. Dec. 1, 2000; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -110,14 +110,14 @@ module "/us/usc/ptIV/rule4003" {
     p "Subdivision (d) provides that a proceeding by the debtor, permitted by § 522(f) of the Code, is a contested matter rather than the more formal adversary proceeding. Proceedings within the scope of this subdivision are distinguished from proceedings brought by the trustee to avoid transfers. The latter are classified as adversary proceedings by Rule 7001."
     hash "a9eb3670f4be67faca9c93db3c52869a0f4aafe4f9fad83b31b5b6e66503752c"
   }
-  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
     p "Subdivision (b) is amended to facilitate the filing of objections to exemptions claimed on a supplemental schedule filed under Rule 1007(h)."
     hash "dd27c266256734095ff60c125ea5797cbd3b8516c4e468f87f30f12f9e5178fd"
   }
-  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" enacted {
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2000 Amendment"
@@ -125,7 +125,7 @@ module "/us/usc/ptIV/rule4003" {
     p "GAP Report on Rule 4003(b). The words “trustee or creditor” were replaced by “party in interest” to conform to § 522(l) of the Bankruptcy Code which permits any party in interest to object to claimed exemptions. Style revisions also were made to the published draft."
     hash "ed71bffabfca1784506cc02d955709588c581c6bafa7ffbccb3605ba60822ae5"
   }
-  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -137,14 +137,14 @@ module "/us/usc/ptIV/rule4003" {
     p "Changes Made After Publication. The deadline for filing objections to exemptions under subdivision (b)(1) was returned to 30 days after the conclusion of the § 341 meeting of creditors rather than the 60 day period proposed in the published rule. The second paragraph of the Committee Note which discussed this change was therefore deleted. Subdivisions (b)(2) and (b)(3) were amended to add the debtor and the debtor’s attorney to the list of persons to whom objections to exemptions must be delivered."
     hash "18149719835b18c9b612725843ffb35e94936f766e2b84e6a3936af86a3ee28e"
   }
-  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2017 Amendment"
     p "Subdivision (d) is amended to provide that a request under § 522(f) to avoid a lien or other transfer of exempt property may be made by motion or by a chapter 12 or chapter 13 plan. A plan that proposes lien avoidance in accordance with this rule must be served as provided under Rule 7004 for service of a summons and complaint. Lien avoidance not governed by this rule requires an adversary proceeding."
     hash "6fad7dde024e00c4cf5898ff7bf20e09b3b06574d70e67605abbf62e22168f2b"
   }
-  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIV/rule4003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -153,7 +153,7 @@ module "/us/usc/ptIV/rule4003" {
   }
   layers {
     operative "20413b4e6fb178ef20adaa8b4fd39f991ed5b802cefdbd7dade53ff074bbb279"
-    enacted "cfad8ec0a995f7a8256c8f3bf58674700a29c9617abb22ccd1483104d45dd9f0"
-    editorial "82cc12becee2a2ff7073850193973f4b97d248274024c3c13183141abc855616"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "cc394836b25df8141ad3ac687443646ef10e05751c0cda110e9c83bd2b683854"
   }
 }

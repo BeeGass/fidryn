@@ -69,7 +69,7 @@ module "/us/usc/ptII/rule2015.3" {
     hash "8e9ce4e6b4e114dcf33d577f48d1b0fafc6fe888d0e5a5a75bc8083a6025adc1"
   }
   credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2015.3/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+  note "/us/usc/ptII/rule2015.3/note/ungrouped/nolaw/committee-notes-on-rules-2008" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008"
@@ -77,7 +77,7 @@ module "/us/usc/ptII/rule2015.3" {
     p "Changes After Publication. In subdivision (e), the 20 day period was changed to 14 days. This better reconciles the timing of the notice and the scheduling of the § 341 meeting of creditors, and it is also consistent with the upcoming time computation amendments."
     hash "9f123076286bb63fba6dfee42842b604354876b43640ed062487162940c2ce26"
   }
-  note "/us/usc/ptII/rule2015.3/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptII/rule2015.3/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -89,7 +89,7 @@ module "/us/usc/ptII/rule2015.3" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptII/rule2015.3/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2015.3/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -98,7 +98,7 @@ module "/us/usc/ptII/rule2015.3" {
   }
   layers {
     operative "8e9ce4e6b4e114dcf33d577f48d1b0fafc6fe888d0e5a5a75bc8083a6025adc1"
-    enacted "fc6072e297aef9f204504d80abccac37bfe619a9fcd0fbc5374a09798e9d4069"
-    editorial "a7a87ea82ce26b6544cc3c69e822448f599834e4961f55d5c8be47261511261c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1cc1233abc98ac1cb8dd8a7265c430e0a8c2a8937764e01890e28a5171479722"
   }
 }

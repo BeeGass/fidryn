@@ -18,8 +18,8 @@
     "tables_of_contents": 0
   },
   "notes": {
-    "editorial": 0,
-    "enacted": 2
+    "editorial": 1,
+    "enacted": 1
   },
   "notes_by_group": {
     "ungrouped": 2
@@ -35,7 +35,7 @@
       "exact": 0,
       "malformed": 0,
       "no-unit": 0,
-      "outside": 0,
+      "outside": 1,
       "range-form": 0,
       "target-status": 0,
       "unit-only": 0
@@ -45,7 +45,7 @@
       "exact": 0,
       "malformed": 0,
       "no-unit": 0,
-      "outside": 1,
+      "outside": 0,
       "range-form": 0,
       "target-status": 0,
       "unit-only": 0

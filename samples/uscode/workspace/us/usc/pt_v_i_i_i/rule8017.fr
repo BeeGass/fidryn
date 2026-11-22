@@ -139,14 +139,14 @@ module "/us/usc/ptVIII/rule8017" {
     hash "055b86511592e443c019ebef864ffeb60242ce523cee278c5bdf084df5d50d16"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/prior-rule" enacted {
+  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/prior-rule" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Prior Rule"
     p "A prior Rule 8017, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 26, 2009, eff. Dec. 1, 2009, related to stay of judgment of district court or bankruptcy appellate panel, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
     hash "81976929215fda8821f80bee9fcd5fafc4e33154546f3bccaadf88ef22f7a36a"
   }
-  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -156,7 +156,7 @@ module "/us/usc/ptVIII/rule8017" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "65b085c5aa075358604d59a65300e4ddfcfcc7a7a6c5ba21de7f74d618127c2a"
   }
-  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
@@ -164,7 +164,7 @@ module "/us/usc/ptVIII/rule8017" {
     p "The amendment to subdivision (a)(2) authorizes orders or local rules that prohibit the filing of or permit the striking of an amicus brief by party consent if the brief would result in a judge’s disqualification. The amendment does not alter or address the standards for when an amicus brief requires a judge’s disqualification. It is modeled on an amendment to F.R.App.P. 29(a). A comparable amendment to subdivision (b) is not necessary. Subdivision (b)(1) authorizes local rules and orders governing filings during a court’s consideration of whether to grant rehearing. These local rules or orders may prohibit the filing of or permit the striking of an amicus brief that would result in a judge’s disqualification. In addition, under subdivision (b)(2), a court may deny leave to file an amicus brief that would result in a judge’s disqualification."
     hash "5e51748c317bb019fc06f201bcde2f6b446fbd89e72383ad2a60d69b43d28783"
   }
-  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -173,7 +173,7 @@ module "/us/usc/ptVIII/rule8017" {
   }
   layers {
     operative "055b86511592e443c019ebef864ffeb60242ce523cee278c5bdf084df5d50d16"
-    enacted "0e4a2a7c4c7990941dc1f83abf2706610e28897d54415f22a012504775f19dda"
-    editorial "a987651c0d32d92de7c440e372f6f86e589b3fc6109cdd03963682e5747570f9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "67e9830ed935a559cad209670d723a65fa4878f0413a59dc2e41d22dfe2b5473"
   }
 }

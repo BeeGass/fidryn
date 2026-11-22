@@ -29,14 +29,14 @@ module "/us/usc/t45/s56" {
     p "1939—Act Aug. 11, 1939, changed limitation in first sentence from two to three years."
     hash "67c11679b5000a9c53852a9c3620fc9d05aa64b37cb37933a6118545ef1ffca4"
   }
-  note "/us/usc/t45/s56/note/statutoryNotes/nolaw/change-of-name" enacted {
+  note "/us/usc/t45/s56/note/statutoryNotes/nolaw/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
     p "“District court” substituted in text for “circuit court” to conform to act Mar. 3, 1911, which transferred powers and duties of circuit courts to district courts."
     hash "875e3373d90030d23169cbbeb6117d7bbeac768db86b61b9241fe32b532e46b0"
   }
-  note "/us/usc/t45/s56/note/statutoryNotes/act.1948-06-25.ch646/effective-date-of-1948-amendment" enacted {
+  note "/us/usc/t45/s56/note/statutoryNotes/act.1948-06-25.ch646/effective-date-of-1948-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1948 Amendment"
@@ -45,7 +45,7 @@ module "/us/usc/t45/s56" {
   }
   layers {
     operative "df8fd050ba66069377159304698fe7f49be679d841287ccc7e417b1cde3ff322"
-    enacted "87042b3c8e7637731e57b7b2bd4929b952c23e259a04dae21e0f5b2329f910b8"
-    editorial "d9e5a3ec04582b937bafab6d93b1bedefa3bfd1102b0fda5a58477a76a6bbb02"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "e4c480581e611483049e8a2f8687e23bfddb0bab7ad9ef6050545fb3a4ebe26a"
   }
 }

@@ -31,7 +31,7 @@ module "/us/usc/ptII/rule2017" {
     hash "513a627e53487891c433511072ef476b624a07c6a0549a0188bbfc861f5dd495"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptII/rule2017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptII/rule2017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -39,7 +39,7 @@ module "/us/usc/ptII/rule2017" {
     p "This rule is not to be construed to permit post-petition payments or transfers which may be avoided under other provisions of the Code."
     hash "963fc08cd5a1694cf922af3db7d030737a01cd3d3c1cb35350c963b38633d3eb"
   }
-  note "/us/usc/ptII/rule2017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptII/rule2017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -47,7 +47,7 @@ module "/us/usc/ptII/rule2017" {
     p "The United States trustee supervises and monitors the administration of bankruptcy cases other than chapter 9 cases and pursuant to § 307 of the Code may raise, appear and be heard on issues relating to fees paid to the debtor’s attorney. It is consistent with that role to expect the United States trustee to review statements filed under Rule 2016(b) and to file motions relating to excessive fees pursuant to § 329 of the Code."
     hash "19612e1ede06a1303676ee46961b138e9ec7937c720a6ea571c690c9d25b73ff"
   }
-  note "/us/usc/ptII/rule2017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptII/rule2017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -56,7 +56,7 @@ module "/us/usc/ptII/rule2017" {
   }
   layers {
     operative "513a627e53487891c433511072ef476b624a07c6a0549a0188bbfc861f5dd495"
-    enacted "b03cdabfa4c870a82685d8ee50c8f269973fb103dd338640934009ed6efb1288"
-    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "49e4e0bea55547f417a77d67bcce45b5e5a286742024dc9a3d2772805c649789"
   }
 }

@@ -302,42 +302,42 @@ module "/us/usc/t45/s741" {
     p "Subsec. (j). " ["Pub. L. 94–216, § 1" -> "/us/pl/94/216/s1"] ", redesignated former subsec. (i) “Corporate simplification” as (j)."
     hash "50e9c0dc8841317effb68a245ee99d386d92ef8034a9280b41833acc9699b245"
   }
-  note "/us/usc/t45/s741/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s741/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
     p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
     hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
   }
-  note "/us/usc/t45/s741/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s741/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
     p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as an Effective Date note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
     hash "ce7dcc740f9bc75628da6da8e14fc1eb7bee2a77c67bd18e04c70e99f0b41d10"
   }
-  note "/us/usc/t45/s741/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" enacted {
+  note "/us/usc/t45/s741/note/statutoryNotes/pl.104.66/termination-of-reporting-requirements" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Termination of Reporting Requirements"
     p "For termination, effective May 15, 2000, of provisions in subsec. (h) of this section relating to the requirement that the Corporation transmit an annual report to Congress, see " ["section 3003 of Pub. L. 104–66" -> "/us/pl/104/66/s3003"] ", as amended, set out as a note under " ["section 1113 of Title 31" -> "/us/usc/t31/s1113"] ", Money and Finance, and the 7th item on page 199 of House Document No. 103–7."
     hash "fb0a6aa3dd3a6d6e52274446400064f626aea65ca92a3849532d6c5896567466"
   }
-  note "/us/usc/t45/s741/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s741/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
     p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
     hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
   }
-  note "/us/usc/t45/s741/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+  note "/us/usc/t45/s741/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
   }
-  note "/us/usc/t45/s741/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s741/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
@@ -349,7 +349,7 @@ module "/us/usc/t45/s741" {
   }
   layers {
     operative "9109443502e5780a70fa408ac225bf0153a6260ff23c1aa441b6a14c15b8ccdd"
-    enacted "b936674669060fb7156669daa78c2efdc45320e2fed370ee93d0a4d0fb7cd60e"
-    editorial "4f773b0bf8d24f7a803d73b77a85b3e34494180085e90e0b414ddb39b2c489e9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "ec9908989176ad3771fcccd87bdc8d724f4f7dcc697164e8ae6d2492e7bd6a7c"
   }
 }

@@ -109,14 +109,14 @@ module "/us/usc/t45/s1207" {
     p "1986—Subsec. (a)(6)(A). " ["Pub. L. 99–514" -> "/us/pl/99/514"] " substituted “Internal Revenue Code of 1986” for “Internal Revenue Code of 1954”, which for purposes of codification was translated as “title 26” thus requiring no change in text."
     hash "e4b4e5d54504ed92a6fda2a97c6e0a36b53bbcc0f5876d6459d1f78c3d12a5f5"
   }
-  note "/us/usc/t45/s1207/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+  note "/us/usc/t45/s1207/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1995 Amendment"
     p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
     hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
   }
-  note "/us/usc/t45/s1207/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s1207/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -151,7 +151,7 @@ module "/us/usc/t45/s1207" {
   }
   layers {
     operative "03bc5279f4c2d3bbb9e80ad647433876788407b38076f6cbbe9f7fd3e1d2b156"
-    enacted "d07245821ca3dc1f79f62147e47122d5036ba3923edbc5a010fec5b708d29cb1"
-    editorial "33236eef145c1131e836c394314248a93a4a2d48177f282779706f487f346e50"
+    enacted "2e5e8574229027dc89dfa993204f3ab41c9cef7e1b3ffa8bd8ab45a7c3ffb7a7"
+    editorial "0b0ec22db94c2db322e883429abe479e2f7c310884c00ba2cd14d5f58a55638e"
   }
 }

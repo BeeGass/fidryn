@@ -15,7 +15,7 @@ module "/us/usc/t45/s910" {
     p "Section, " ["Pub. L. 96–101, § 11" -> "/us/pl/96/101/s11"] ", Nov. 4, 1979, " ["93 Stat. 742" -> "/us/stat/93/742"] ", set forth provisions respecting employment of Milwaukee Railroad employees. See " ["section 797c of this title" -> "/us/usc/t45/s797c"] "."
     hash "edc95fc722a9e2fc72031b91f40bc91bd8700bae262525765bc4d1782b1ca94a"
   }
-  note "/us/usc/t45/s910/note/statutoryNotes/pl.97.35/effective-date-of-repeal" enacted {
+  note "/us/usc/t45/s910/note/statutoryNotes/pl.97.35/effective-date-of-repeal" editorial {
     group statutoryNotes
     topic "effectiveDate"
     heading "Effective Date of Repeal"
@@ -24,7 +24,7 @@ module "/us/usc/t45/s910" {
   }
   layers {
     operative "f2a27d615779c30e62453b94a507264d1ff05cbafdcd54905cfe55f2b9bf12c0"
-    enacted "6ac41a6a0976d2f9517f4990efe866c40892d641d32fa614aa036452f1b5aaa6"
-    editorial "ee24c98f693e2bd8c1606882d4058ec04fd0e98fa43362c515f45e988cbf390c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "371dadae14093124265f6adc8b08725ddc3539558dae0a5cd9dda2e7107949cf"
   }
 }

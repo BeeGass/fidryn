@@ -10,14 +10,14 @@ module "/us/usc/ptVII/rule7008" {
     hash "ee611a0d383371b8f1b743371326a09598b3e3b6cd077f6a049408d5c513177f"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "Proceedings before a bankruptcy judge are either core or non-core. 28 U.S.C. § 157. A bankruptcy judge may enter a final order or judgment in a core proceeding. In a non-core proceeding, absent consent of the parties, the bankruptcy judge may not enter a final order or judgment but may only submit proposed findings of fact and conclusions of law to the district judge who will enter the final order or judgment. 28 U.S.C. § 157(c)(1). The amendment to subdivision (a) of this rule requires an allegation as to whether a proceeding is core or non-core. A party who alleges that the proceeding is non-core shall state whether the party does or does not consent to the entry of a final order or judgment by the bankruptcy judge. Failure to include the statement of consent does not constitute consent. Only express consent in the pleadings or otherwise is effective to authorize entry of a final order or judgment by the bankruptcy judge in a non-core proceeding. Amendments to Rule 7012 require that the defendant admit or deny the allegation as to whether the proceeding is core or non-core."
     hash "23df72688a9df5452d1f6531fe2b9b76d3a3806edec1937b31229e08acdf6c46"
   }
-  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" enacted {
+  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014 Amendment"
@@ -26,21 +26,21 @@ module "/us/usc/ptVII/rule7008" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "6dd444e9e1b78d4bd16a9e8fa12eab5c20933de45b4f0b1b9066c9691eba9041"
   }
-  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2016 Amendment"
     p "The rule is amended to remove the requirement that the pleader state whether the proceeding is core or non-core and to require in all proceedings that the pleader state whether the party does or does not consent to the entry of final orders or judgment by the bankruptcy court. Some proceedings that satisfy the statutory definition of core proceedings, 28 U.S.C. § 157(b)(2), may remain beyond the constitutional power of a bankruptcy judge to adjudicate finally. The amended rule calls for the pleader to make a statement regarding consent, whether or not a proceeding is termed non-core. Rule 7012(b) has been amended to require a similar statement in a responsive pleading. The bankruptcy judge will then determine the appropriate course of proceedings under Rule 7016."
     hash "6328193dd6de8e028f1f3797398efca8906fe2a033244b5041ffc059f94f91f0"
   }
-  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 7008 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "9d489000e7f8dfff4e7cc8b84c8df7dbc892d946589f53905882a9215a1b3d8c"
   }
-  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptVII/rule7008/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -49,7 +49,7 @@ module "/us/usc/ptVII/rule7008" {
   }
   layers {
     operative "ee611a0d383371b8f1b743371326a09598b3e3b6cd077f6a049408d5c513177f"
-    enacted "d2ac22e839ca218a00a10e3452a10e4c4be3069723e9043be765b094aac2d2cb"
-    editorial "176cd1dc9c159a04284086ce1f85382034e2a74cbc47a6d0549bfefdb3d190aa"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "33f0b4a6ebe2c5d1ec352bd92e3366f3b964ddb59b214254e0f62810ddeb837c"
   }
 }

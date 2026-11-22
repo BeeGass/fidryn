@@ -78,7 +78,7 @@ module "/us/usc/ptVIII/rule8021" {
     hash "d4ff0c713ee7429cf3e7c5f1a49b3e3e37c7eb76554f5175a6fcbbb6f51613db"
   }
   credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVIII/rule8021/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+  note "/us/usc/ptVIII/rule8021/note/ungrouped/nolaw/committee-notes-on-rules-2014" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2014"
@@ -86,21 +86,21 @@ module "/us/usc/ptVIII/rule8021" {
     p "Changes Made After Publication and Comment. No changes were made after publication and comment."
     hash "099ec9b2b5c06c03d423c49f6cc861beb238268b680b6144de5e685611d361d6"
   }
-  note "/us/usc/ptVIII/rule8021/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+  note "/us/usc/ptVIII/rule8021/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2018 Amendment"
     p "The amendment of subdivision (c) conforms this rule with the amendment of F.R.Civ.P. 62, which is made applicable in adversary proceedings by Rule 7062. Rule 62 formerly required a party to provide a “supersedeas bond” to obtain a stay of the judgment and proceedings to enforce the judgment. As amended, Rule 62(b) allows a party to obtain a stay by providing a “bond or other security.”"
     hash "59c878da05b979a0bfeda8ccc79ef51215ce54538ac65a0b542f94777e572678"
   }
-  note "/us/usc/ptVIII/rule8021/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" enacted {
+  note "/us/usc/ptVIII/rule8021/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2020 Amendment"
     p "Subdivision (d) is amended to delete the reference to proof of service. This change reflects the recent amendment to Rule 8011(d) that eliminated the requirement of proof of service when filing and service are completed using a court’s electronic-filing system."
     hash "869be0b97008632db5bc30aefa043db3d72b4b9cc0046472a6a3771a28cae7a6"
   }
-  note "/us/usc/ptVIII/rule8021/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVIII/rule8021/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -109,7 +109,7 @@ module "/us/usc/ptVIII/rule8021" {
   }
   layers {
     operative "d4ff0c713ee7429cf3e7c5f1a49b3e3e37c7eb76554f5175a6fcbbb6f51613db"
-    enacted "f9757eb883eb49576a771d9b3c3f67c4168f7f271ae3f3bc3234f5f3671c6530"
-    editorial "9bd3e91f90a7aba65330077820eaec12523711029e53abd6638d77c2dfe5e86a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3bb13b295c50fd41a5a3562afd3ebd69051b2cc07dcb5c4251277f852396bd38"
   }
 }

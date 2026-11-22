@@ -45,7 +45,7 @@ module "/us/usc/ptI/rule1011" {
     hash "2caf9f8c9e726f0f0cd1921deb740797bc1d314935c1ce2ff5d063bd5f49b592"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 26, 2004, eff. Dec. 1, 2004; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -58,21 +58,21 @@ module "/us/usc/ptI/rule1011" {
     p "Subdivision (e). This subdivision makes it clear that no reply needs to be made to an answer, including one asserting a counterclaim, unless the court orders otherwise."
     hash "fc41fe2223fc8071cd95dde2f531854e82413a16e859b81af219728719c8f6a1"
   }
-  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
     p "The rule has been broadened to make applicable in ancillary cases the provisions concerning responsive pleadings to involuntary petitions."
     hash "08142f9830cb2845196e7f8744acc771bb98e5bef4aef61ecc6808fbbb2f4c92"
   }
-  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2004-amendment" enacted {
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2004-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2004 Amendment"
     p "The amendment to Rule 1004 that became effective on December 1, 2002, deleted former subdivision (a) of that rule leaving only the provisions relating to involuntary petitions against partnerships. The rule no longer includes subdivisions. Therefore, this technical amendment changes the reference to Rule 1004(b) to Rule 1004."
     hash "9cdad1caaacac70620619d8ca7c50e33bd2e2f35ccf6a7579fcdf68ef6a96e47"
   }
-  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008 Amendment"
@@ -80,7 +80,7 @@ module "/us/usc/ptI/rule1011" {
     p "The rule is also amended in tandem with the amendment to Rule 1010 to require the parties responding to an involuntary petition and a petition for recognition of a foreign proceeding to file corporate ownership statements to assist the court in determining whether recusal is necessary."
     hash "c0ce33b2c7c95f6796c35ba0090f2a6cc66eba95f9a9259b5c1a967e3d22250f"
   }
-  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -93,21 +93,21 @@ module "/us/usc/ptI/rule1011" {
     p "Changes Made After Publication. No changes were made after publication."
     hash "f8eb45e81f249c959fc1e6dc20edf7c1add6f287f9ba0ff09b6c2c011b4c5b5b"
   }
-  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2016 Amendment"
     p "This rule is amended to remove provisions regarding chapter 15 proceedings. The requirements for responses to a petition for recognition of a foreign proceeding are found in Rule 1012."
     hash "c69822ca69d3b9de236e9c1b3d99ffd2dc9e804a5892b16a200fef3211450dab"
   }
-  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 1011 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "30f001d2d660518627f84dd72f84a9347f6edab28b5e93215f4e08e75fd0ec69"
   }
-  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptI/rule1011/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -116,7 +116,7 @@ module "/us/usc/ptI/rule1011" {
   }
   layers {
     operative "2caf9f8c9e726f0f0cd1921deb740797bc1d314935c1ce2ff5d063bd5f49b592"
-    enacted "1331f6bc41bc148e2affa7db5a2f6dd7778a429adfbf9e30a75a67842b538883"
-    editorial "bdadffd63de97b20c34aa27a5b2678e58b79ffe7e1a86349185479c0a978352d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3479180a441b1d9bdf014072e7360fee16a17fd1d39f35eb8b838c46b6fa1a3e"
   }
 }

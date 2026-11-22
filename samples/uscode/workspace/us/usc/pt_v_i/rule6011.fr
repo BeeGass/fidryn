@@ -78,7 +78,7 @@ module "/us/usc/ptVI/rule6011" {
     hash "c00a223e285224b8d1675b0512b2b54d476c41c160f7692806b146ea19871dec"
   }
   credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6011/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+  note "/us/usc/ptVI/rule6011/note/ungrouped/nolaw/committee-notes-on-rules-2008" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2008"
@@ -89,7 +89,7 @@ module "/us/usc/ptVI/rule6011" {
     p "Changes Made After Publication. Subdivision (b)(2) was amended to add the Attorney General of the State where a health care facility is located to the list of entities entitled to notice of the disposal of patient records."
     hash "43e4e919999fcbd132a682b77dfd952745dd48a2de6717055e8847188d838278"
   }
-  note "/us/usc/ptVI/rule6011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -98,7 +98,7 @@ module "/us/usc/ptVI/rule6011" {
   }
   layers {
     operative "c00a223e285224b8d1675b0512b2b54d476c41c160f7692806b146ea19871dec"
-    enacted "36ff154979592396e60459b4d89aafa80c31082bebee8335497d193092fe6d97"
-    editorial "0949f180af4af05827ca1df5a238939bcdd930e45d40b1501dfd1b481c2c0da7"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "fae840b7b073155521fece9bd6a0186f8afd57c722dfdbdace4d8b4455f9e71c"
   }
 }

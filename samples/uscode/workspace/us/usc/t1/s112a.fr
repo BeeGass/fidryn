@@ -48,14 +48,14 @@ module "/us/usc/t1/s112a" {
     }
     hash "5260c2788aa986255b622142af370e5d93d39924fa422ade49763b9846528c65"
   }
-  note "/us/usc/t1/s112a/note/statutoryNotes/act.1895-01-12.ch23/effect-of-repeal-of-section-73-of-act-jan-12-1895" enacted {
+  note "/us/usc/t1/s112a/note/statutoryNotes/act.1895-01-12.ch23/effect-of-repeal-of-section-73-of-act-jan-12-1895" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Effect of Repeal of Section 73 of Act Jan. 12, 1895"
     p "This section and " ["section 112 of this title" -> "/us/usc/t1/s112"] " as not affected by the repeal of section 73 of " ["act Jan. 12, 1895, ch. 23" -> "/us/act/1895-01-12/ch23"] ", " ["28 Stat. 615" -> "/us/stat/28/615"] ", which related to the same subject matter, see section 56(i) of " ["act Oct. 31, 1951, ch. 655" -> "/us/act/1951-10-31/ch655"] ", " ["65 Stat. 729" -> "/us/stat/65/729"] "."
     hash "a290fa31629b74cce18226a43938c0d6992f8eead3725f8b5089077ba93043c2"
   }
-  note "/us/usc/t1/s112a/note/statutoryNotes/pl.94.59/written-requests-for-documents" enacted {
+  note "/us/usc/t1/s112a/note/statutoryNotes/pl.94.59/written-requests-for-documents" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Written Requests for Documents"
@@ -64,7 +64,7 @@ module "/us/usc/t1/s112a" {
   }
   layers {
     operative "946c3cebdeaff2e6123134582132acec2697a9df38d9495b666e3324236e8a7f"
-    enacted "ca28cc9654d4321c84af5ee721b5caca8cdd9af288c2c4f41662be2fcb6f4f2e"
-    editorial "e36d9d5ffa418e5469b8b1999a0b1a131c91776be4a4f152c5771897d5458e4e"
+    enacted "1c39fda7d08d2db76e71631b8a42b70a478cefa6226b985e12d62bba432eb1a7"
+    editorial "8e15bd4fa1c3101a788d8cd2c034d573d7b7aa2ba074e1b83d27c8797710f934"
   }
 }

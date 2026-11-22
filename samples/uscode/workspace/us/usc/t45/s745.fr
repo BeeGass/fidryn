@@ -226,42 +226,42 @@ module "/us/usc/t45/s745" {
     p "1980—Subsec. (f). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " added subsec. (f)."
     hash "15f92463289c90f751d5ac0a9addb077aa3cdd356916108b44249b0064d47bbd"
   }
-  note "/us/usc/t45/s745/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" enacted {
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1996 Amendment"
     p "Amendment by " ["Pub. L. 104–317" -> "/us/pl/104/317"] " effective 90 days after Oct. 19, 1996, and except as otherwise provided, applicable to proceedings that arise or continue after such effective date, see " ["section 605(e) of Pub. L. 104–317" -> "/us/pl/104/317/s605/e"] ", set out as a note under " ["section 719 of this title" -> "/us/usc/t45/s719"] "."
     hash "5738327b8d935a396acd7128541b68a5aca7d2af8e8abb78fb66fd0602156b40"
   }
-  note "/us/usc/t45/s745/note/statutoryNotes/pl.98.620/effective-date-of-1984-amendment" enacted {
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.98.620/effective-date-of-1984-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1984 Amendment"
     p "Amendment by " ["Pub. L. 98–620" -> "/us/pl/98/620"] " not applicable to cases pending on Nov. 8, 1984, see " ["section 403 of Pub. L. 98–620" -> "/us/pl/98/620/s403"] ", set out as a note under " ["section 1657 of Title 28" -> "/us/usc/t28/s1657"] ", Judiciary and Judicial Procedure."
     hash "b3d0854af378192f7a53e70489f9fc3f7946aec91d2ce245380969a27892e6fd"
   }
-  note "/us/usc/t45/s745/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1981 Amendment"
     p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as an Effective Date note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
     hash "ce7dcc740f9bc75628da6da8e14fc1eb7bee2a77c67bd18e04c70e99f0b41d10"
   }
-  note "/us/usc/t45/s745/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1980 Amendment"
     p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 1, 1980, see " ["section 710(a) of Pub. L. 96–448" -> "/us/pl/96/448/s710/a"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
     hash "8414357495bccb2db0922b729682e002ff9e6cb677e7f522f2d91447135103eb"
   }
-  note "/us/usc/t45/s745/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+  note "/us/usc/t45/s745/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
     p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
     hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
   }
-  note "/us/usc/t45/s745/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
@@ -269,14 +269,14 @@ module "/us/usc/t45/s745" {
     p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
     hash "8df987ce55ef91d27f02ab3e754938301447cac8bb0f6033019330c324c8ba4c"
   }
-  note "/us/usc/t45/s745/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Applicability of National Environmental Policy Act"
     p "Application of National Environmental Policy Act to actions of Commission not affected by title VI of " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", see " ["section 619 of Pub. L. 94–210" -> "/us/pl/94/210/s619"] ", set out as a note under " ["section 791 of this title" -> "/us/usc/t45/s791"] "."
     hash "7ce373698c822f6cf7cb1f07e93f5e378a6239d819a9e93ab08ae9f21b104a45"
   }
-  note "/us/usc/t45/s745/note/statutoryNotes/pl.94.210/rail-abandonment-and-discontinuance-of-service-report" enacted {
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.94.210/rail-abandonment-and-discontinuance-of-service-report" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Rail Abandonment and Discontinuance of Service Report"
@@ -296,9 +296,16 @@ module "/us/usc/t45/s745" {
     region "/us/usc/t45/s745"
     basis restated
   }
+  definition "/us/usc/t45/s745/f/4/B" {
+    term "employee deprived of employment"
+    kind means
+    words "As used in this paragraph"
+    region "/us/usc/t45/s745/f/4"
+    basis restated
+  }
   layers {
     operative "f464d64bc350963d453b93299bcc7e7826dfebbf6f85d31877cc595b0b6e92ff"
-    enacted "068392bf97c2fe5e0a2df7783184b01b7b7f0d95209cf9edb21cf7556d122854"
-    editorial "158a685a3c3190807590a3ea9a91da88b40ac4243b27bc6e1d405e3d31d81ff0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "28f4c3ddbeb2f05ea7c338ae41118eed68c67c1d4b0423f652cae1654ca95d89"
   }
 }

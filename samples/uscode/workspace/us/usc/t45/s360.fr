@@ -72,28 +72,28 @@ module "/us/usc/t45/s360" {
     p "1939—Subsec. (a). Act June 20, 1939, substituted “(f)” for “(g)”."
     hash "7fe2428249c56033988f41a13f0d7190741362fdd1dc01c963bc57be71446417"
   }
-  note "/us/usc/t45/s360/note/statutoryNotes/pl.100.647/effective-date-of-1988-amendment" enacted {
+  note "/us/usc/t45/s360/note/statutoryNotes/pl.100.647/effective-date-of-1988-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1988 Amendment"
     p "Amendment by " ["Pub. L. 100–647" -> "/us/pl/100/647"] " applicable with respect to compensation paid in months beginning after Sept. 30, 1988, see " ["section 7103(c) of Pub. L. 100–647" -> "/us/pl/100/647/s7103/c"] ", set out as a note under " ["section 358 of this title" -> "/us/usc/t45/s358"] "."
     hash "2343e30d9292b4f4b26532f83ff55f6541d187c0d3094990304648bf78642850"
   }
-  note "/us/usc/t45/s360/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment" enacted {
+  note "/us/usc/t45/s360/note/statutoryNotes/pl.94.92/effective-date-of-1975-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1975 Amendment"
     p "Amendment by " ["Pub. L. 94–92" -> "/us/pl/94/92"] " effective with respect to compensation paid for services rendered after Dec. 31, 1975; and effective Aug. 9, 1975, respectively, see " ["section 2 of Pub. L. 94–92" -> "/us/pl/94/92/s2"] ", set out as a note under " ["section 351 of this title" -> "/us/usc/t45/s351"] "."
     hash "03491219d9e0f6cb8d48c603f9f8b10a4ee58b638189eb8463395ecee8374390"
   }
-  note "/us/usc/t45/s360/note/statutoryNotes/pl.93.445/effective-date-of-1974-amendment" enacted {
+  note "/us/usc/t45/s360/note/statutoryNotes/pl.93.445/effective-date-of-1974-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1974 Amendment"
     p "Amendment by " ["Pub. L. 93–445" -> "/us/pl/93/445"] " effective Jan. 1, 1975, see " ["section 603 of Pub. L. 93–445" -> "/us/pl/93/445/s603"] ", set out as a note under " ["section 402 of Title 42" -> "/us/usc/t42/s402"] ", The Public Health and Welfare."
     hash "5fa55b4cf8ad1c4e9c627a6cb7ce22c58124f616c18c46e9c5b5749b769ab526"
   }
-  note "/us/usc/t45/s360/note/statutoryNotes/pl.88.133/effective-date-of-1963-amendment" enacted {
+  note "/us/usc/t45/s360/note/statutoryNotes/pl.88.133/effective-date-of-1963-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 1963 Amendment"
@@ -110,7 +110,7 @@ module "/us/usc/t45/s360" {
     }
     hash "a9bb4a2827aeab7a60cdd7b24f15974b2159b642da18bc120b97680927902a1f"
   }
-  note "/us/usc/t45/s360/note/execDoc/nolaw/transfer-of-functions" enacted {
+  note "/us/usc/t45/s360/note/execDoc/nolaw/transfer-of-functions" editorial {
     group execDoc
     topic "transferOfFunctions"
     heading "Transfer of Functions"
@@ -122,7 +122,7 @@ module "/us/usc/t45/s360" {
   }
   layers {
     operative "a8cbbadfbe0a48ea023c582c9306ebff003c3bb6c3e22e623614575aa84cef1d"
-    enacted "dc8030c0baa7da914f910f651cb61ae33f2aabd70f63985a563bc052529f1d61"
-    editorial "b1514f0c78a2d3b3eb65c557c7b6b707f1adea7b98d7a96ec7caf8d8c15e97c2"
+    enacted "37e60970b29c6e2636ab3997ba720d361de3e2f901adff960f2c1d1984663a1d"
+    editorial "c69d21bfdc61b3368aa15f4881ff65a22819e3d4d4ec5e8c9a32c11086257601"
   }
 }

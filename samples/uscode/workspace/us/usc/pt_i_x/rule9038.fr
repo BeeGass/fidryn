@@ -100,7 +100,7 @@ module "/us/usc/ptIX/rule9038" {
     hash "c74ab64a1a071fa22250c96b8eec3cf3cb5e9fe71329739601b0c515bae30b13"
   }
   credit "(Added Apr. 24, 2023, eff. Dec. 1, 2023; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptIX/rule9038/note/ungrouped/nolaw/committee-notes-on-rules-2023" enacted {
+  note "/us/usc/ptIX/rule9038/note/ungrouped/nolaw/committee-notes-on-rules-2023" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2023"
@@ -114,14 +114,14 @@ module "/us/usc/ptIX/rule9038" {
     p "Subdivision (c)(5) excepts from the authority to extend time periods any time provision imposed by statute. The Bankruptcy Rules Enabling Act, 28 U.S.C. § 2075, does not authorize the Bankruptcy Rules to supersede conflicting laws. Accordingly, a time limit in a rule that is a restatement of a deadline imposed by statute or an incorporation by reference of such a deadline may not be extended under this rule. However, if a statute merely incorporates by reference a time period imposed by a rule, that period may be extended."
     hash "34af8f8c524918b0fee3aa00a8384e78481b7de13a4d84da7789bef7ea8c9d6b"
   }
-  note "/us/usc/ptIX/rule9038/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptIX/rule9038/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
     p "The language of Rule 9038 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "87ea1f2f926949ddae3e42516103d61eeebd30cc9226f6878dc859e080b71429"
   }
-  note "/us/usc/ptIX/rule9038/note/ungrouped/nolaw/references-in-text" enacted {
+  note "/us/usc/ptIX/rule9038/note/ungrouped/nolaw/references-in-text" editorial {
     group ungrouped
     topic "referencesInText"
     heading "References in Text"
@@ -130,7 +130,7 @@ module "/us/usc/ptIX/rule9038" {
   }
   layers {
     operative "c74ab64a1a071fa22250c96b8eec3cf3cb5e9fe71329739601b0c515bae30b13"
-    enacted "792df5ef3e3796250adf2d9e8ee754ac9b0fe782ba9a22aed0f4ccb68b80ed3d"
-    editorial "746901bbabf0734c91761f422423e4e1ad147b7c60896e0fcc1a32c92d952868"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "976b191fece1a000bfe7c774d0bd734123095c0d669230d0edd38babc3a032da"
   }
 }

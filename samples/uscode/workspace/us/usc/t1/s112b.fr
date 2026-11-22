@@ -382,21 +382,21 @@ module "/us/usc/t1/s112b" {
     p "1977—" ["Pub. L. 95–45" -> "/us/pl/95/45"] " substituted “Committee on International Relations of the House of Representatives” for “Committee on Foreign Affairs of the House of Representatives” and inserted requirement that any department or agency of the United States Government which enters into any international agreement on behalf of the United States transmit to the Department of State the text of such agreement not later than twenty days after the agreement has been signed."
     hash "70519ebb2d28378749d8ab600042b78cd429bb19a59aaf8d1a53b9f0574cb516"
   }
-  note "/us/usc/t1/s112b/note/statutoryNotes/nolaw/change-of-name" enacted {
+  note "/us/usc/t1/s112b/note/statutoryNotes/nolaw/change-of-name" editorial {
     group statutoryNotes
     topic "changeOfName"
     heading "Change of Name"
     p "Committee on International Relations of House of Representatives changed to Committee on Foreign Affairs of House of Representatives by House Resolution No. 6, One Hundred Tenth Congress, Jan. 5, 2007."
     hash "f1ad0fc62272a02004702f8c97ca3f5a4f502e002fc95401e68d107923c4b03e"
   }
-  note "/us/usc/t1/s112b/note/statutoryNotes/pl.117.263/effective-date-of-2022-amendment" enacted {
+  note "/us/usc/t1/s112b/note/statutoryNotes/pl.117.263/effective-date-of-2022-amendment" editorial {
     group statutoryNotes
     topic "effectiveDateOfAmendment"
     heading "Effective Date of 2022 Amendment"
     p "Amendment by " ["Pub. L. 117–263" -> "/us/pl/117/263"] " effective 270 days after Dec. 23, 2022, see " ["section 5947(c) of Pub. L. 117–263" -> "/us/pl/117/263/s5947/c"] ", set out as a note under " ["section 112a of this title" -> "/us/usc/t1/s112a"] "."
     hash "368dcba7dc9c3634e64c0fb073e1fe4178ba432cbf80e1f4c4491351ad6df119"
   }
-  note "/us/usc/t1/s112b/note/statutoryNotes/nolaw/short-title" enacted {
+  note "/us/usc/t1/s112b/note/statutoryNotes/nolaw/short-title" editorial {
     group statutoryNotes
     topic "shortTitle"
     heading "Short Title"
@@ -442,7 +442,7 @@ module "/us/usc/t1/s112b" {
     }
     hash "2b895ced01a4faccbbe87c9f2720e4eb6315ded080354f153108ececd0867a3b"
   }
-  note "/us/usc/t1/s112b/note/statutoryNotes/pl.100.204/enforcement" enacted {
+  note "/us/usc/t1/s112b/note/statutoryNotes/pl.100.204/enforcement" editorial {
     group statutoryNotes
     topic "miscellaneous"
     heading "Enforcement"
@@ -485,9 +485,17 @@ module "/us/usc/t1/s112b" {
     region "/us/usc/t1/s112b"
     basis enacted
   }
+  definition "/us/usc/t1/s112b/k/7/A" {
+    term "text"
+    kind includes
+    words "In this section"
+    condition "with respect to an international agreement or qualifying non-binding instrument"
+    region "/us/usc/t1/s112b"
+    basis enacted
+  }
   layers {
     operative "fe4262fb3d8f7cf6c1df90607195b512b13b063aea62798c87fdf35f704b4faa"
-    enacted "49326f01c2f7cb4f3638088cd98df36aea735b5a35e84c3f2c4e569defe77c09"
-    editorial "a287888ff624325e4ded887fd252af8e685d7024242f8c013401a0d9902b1c79"
+    enacted "815aeec6ba0c53666b7fdf0eaf432999c2c46e746477910883c9db57ba7fcc34"
+    editorial "24533bf27a024646122b70e1be4b00e5a005e8b5004296fc39a04858cd300849"
   }
 }

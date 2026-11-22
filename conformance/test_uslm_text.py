@@ -81,6 +81,9 @@ CASES = {
     "definitions-restated": "definitions in a file whose positive-law flag is no, with notes "
     "headed References in Text in the editorial group, in quoted content and in the statutory "
     "group",
+    "definitions-second": "definitions with a condition in each of its places, source words, a "
+    "meaning made under a linked provision, a later sentence, block and continuation, nested "
+    "quotation and footnote numbers",
     "notes-empty-topic": "a note whose topic attribute is empty, and one whose topic is one space",
     "notes-spaced-topics": "topics with two spaces between them, with a line break between them, "
     "and with spaces before, between and after them in a note named by its hash",
@@ -93,6 +96,18 @@ CASES = {
     "release-note-footnote": "a footnote inside the release note of a title, and one in its credit",
     "ref-classes": "a link whose class holds footnoteRef after a no-break space, and a marker "
     "whose class holds it after a tab",
+    "notes-layer-quoted": "statutory notes that set out quoted content, that point to a law, that "
+    "paraphrase one, that quote only in a footnote, that quote in a table cell, and that hold "
+    "an empty quotation",
+    "notes-layer-groups": "notes with quoted content under a chapter, directly in a section, "
+    "before any group, in each of the four groups, in what a cross heading holds after its "
+    "label, and in a group the rules do not know",
+    "notes-layer-topics": "ungrouped notes with quoted content and each of the three topics of "
+    "the editors, one of them second, a topic near one of them, none, and a statutory note "
+    "with one",
+    "notes-layer-headings": "ungrouped notes with quoted content headed by each of the three "
+    "patterns, in other case and white space, with a non-ASCII letter after a word and "
+    "full-width digits, near misses, no heading, and a statutory note headed as a report",
 }
 TWO_FILES = "two-files"
 UNNAMED = "unnamed-appendices"
@@ -133,23 +148,31 @@ class NoteAddresses:
 
     def __init__(self) -> None:
         self.of: dict[str, list[str]] = {}
+        self.notes: dict[str, list[uslm_common.Note]] = {}
 
     def unit(self, unit: uslm_common.Unit) -> None:
         self.of[unit.address] = [note.address for note in unit.notes]
+        self.notes[unit.address] = list(unit.notes)
 
     def container(self, container: uslm_common.Container) -> None:
         self.of[container.address] = [note.address for note in container.notes]
+        self.notes[container.address] = list(container.notes)
 
 
-def notes_of_units(text: str) -> dict[str, list[str]]:
-    """The addresses of the notes of each module of the document `text`, read as `usc99.xml`."""
+def read_notes(text: str) -> NoteAddresses:
+    """The notes of each module of the document `text`, read as `usc99.xml`."""
     with tempfile.TemporaryDirectory(prefix="fidryn-uslm-notes-") as directory:
         path = Path(directory) / MEMBER
         path.write_text(text, encoding="utf-8")
         sink = NoteAddresses()
         source = uslm_common.Source(None, str(path), MEMBER)
         uslm_common.read_member(uslm_common.Job(source, {}, True), sink)
-    return sink.of
+    return sink
+
+
+def notes_of_units(text: str) -> dict[str, list[str]]:
+    """The addresses of the notes of each module of the document `text`, read as `usc99.xml`."""
+    return read_notes(text).of
 
 
 def expected_lines(name: str) -> list[str]:
@@ -308,6 +331,9 @@ class TextFixtures(unittest.TestCase):
     def test_definitions_restated(self) -> None:
         self.check("definitions-restated")
 
+    def test_definitions_second(self) -> None:
+        self.check("definitions-second")
+
     def test_notes_empty_topic(self) -> None:
         self.check("notes-empty-topic")
 
@@ -331,6 +357,95 @@ class TextFixtures(unittest.TestCase):
 
     def test_ref_classes(self) -> None:
         self.check("ref-classes")
+
+    def test_notes_layer_quoted(self) -> None:
+        self.check("notes-layer-quoted")
+
+    def test_notes_layer_groups(self) -> None:
+        self.check("notes-layer-groups")
+
+    def test_notes_layer_topics(self) -> None:
+        self.check("notes-layer-topics")
+
+    def test_notes_layer_headings(self) -> None:
+        self.check("notes-layer-headings")
+
+    def test_the_patterns_of_headings_read_letters_digits_and_word_ends_in_ascii(self) -> None:
+        for heading, matched in (
+            ("Notes of Advisory Committee on Rules", True),
+            ("Note on the Advisory Committee", True),
+            ("NOTES  ON\N{NO-BREAK SPACE}THE\tADVISORY COMMITTEE", True),
+            ("Advisory Committee Notes", True),
+            ("Advisory Committee Note", True),
+            ("Advisory Committee Notes on Rules", False),
+            ("Prior Notes of Advisory Committee", False),
+            ("Committee Notes on Rules—2099", True),
+            ("Report No. 1", True),
+            ("Report Nos. 1 and 2", False),
+            ("Report Noël", True),
+            ("Report No_1", False),
+            ("Areport No. 1", False),
+            ("Senate Report", True),
+            ("Senate Reports", True),
+            ("Senate Reportsx", False),
+            ("Xsenate Report", False),
+            ("Ésenate Report", True),
+            ("House Report 99-1", True),
+            ("Conference Reports.", True),
+            ("Legislative Statements", True),
+            ("Explanatory Statement", True),
+            ("Statement of Managers", True),
+            ("Statement of the Managers", True),
+            ("Notes of Committee on the Judiciary", True),
+            ("Notes of the Committee on the Judiciary", True),
+            ("Notes of Conference Committee", True),
+            ("Revision Amendment", True),
+            ("Revisers' Notes", True),
+            ("Floor Statement", True),
+            ("Floor Statements", True),
+            ("Floor Statementsx", False),
+            ("Afloor Statement", False),
+            ("Historical and Revision Notes", True),
+            ("2099 Act", True),
+            ("2099 Acts", True),
+            ("2099 Acts Amended", False),
+            ("12099 Act", False),
+            # The year in full-width digits, U+FF10 and the digit above it.
+            ("".join(chr(0xFF10 + int(digit)) for digit in "2099") + " Act", False),
+            ("Invented Short Title", False),
+            ("", False),
+        ):
+            with self.subTest(heading=heading):
+                self.assertEqual(uslm_common.is_editors_heading(heading), matched)
+
+    def notes_in_s1(self, notes: str) -> list[uslm_common.Note]:
+        inner = f'<content>Text.</content><notes type="uscNote">{notes}</notes>'
+        return read_notes(document(inner=inner)).notes["/us/usc/t99/s1"]
+
+    def test_quoted_content_only_in_the_label_of_a_cross_heading_does_not_count(self) -> None:
+        # What each cross heading of the statutory group holds after its label is a note of
+        # that group; the label is no part of it.
+        notes = self.notes_in_s1(
+            '<note role="crossHeading" topic="statutoryNotes"><heading>Statutory '
+            "<quotedContent>“Notes”</quotedContent></heading><p>After the label.</p></note>"
+            '<note role="crossHeading" topic="statutoryNotes"><heading>Statutory Notes'
+            "</heading><p>After: <quotedContent>“Quoted.”</quotedContent></p></note>"
+        )
+        self.assertEqual(
+            [(note.group, note.layer) for note in notes],
+            [("statutoryNotes", "editorial"), ("statutoryNotes", "enacted")],
+        )
+
+    def test_a_note_without_a_topic_attribute_has_no_topics(self) -> None:
+        # It quotes and stands in no group, so with no topic of the editors it is enacted;
+        # without its quotation it is editorial.
+        notes = self.notes_in_s1(
+            "<note><p>D: <quotedContent>“D.”</quotedContent></p></note><note><p>E.</p></note>"
+        )
+        self.assertEqual(
+            [(note.group, note.topics, note.layer) for note in notes],
+            [("ungrouped", [], "enacted"), ("ungrouped", [], "editorial")],
+        )
 
     def test_top_elements_without_an_identifier_are_numbered_over_the_release(self) -> None:
         expected = expected_lines(UNNAMED)

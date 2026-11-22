@@ -110,7 +110,7 @@ module "/us/usc/ptVI/rule6006" {
     hash "7f3be9028ede9f4b0621919c1fecfaa9cd1ca3a5561aae6ac2f3b798e27ac87d"
   }
   credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 30, 2007, eff. Dec. 1, 2007; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
-  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1983"
@@ -120,7 +120,7 @@ module "/us/usc/ptVI/rule6006" {
     p "Subdivision (c) provides for the court to set a hearing on a motion made under subdivision (a) or (b). The other party to the contract should be given appropriate notice of the hearing and the court may order that other parties in interest, such as a creditors’ committee, also be given notice."
     hash "3bb3285edce361defa6fb4b241ad6f3a44ce5accdfe26e1781c67f8fa1b5eccc"
   }
-  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1987 Amendment"
@@ -128,7 +128,7 @@ module "/us/usc/ptVI/rule6006" {
     p "Section 1113, governing collective bargaining agreements, was added to the Code in 1984. It sets out requirements that must be met before a collective bargaining agreement may be rejected. The application to reject a collective bargaining agreement referred to in § 1113 shall be made by motion. The motion to reject creates a contested matter under Rule 9014, and service is made pursuant to Rule 7004 on the representative of the employees. The time periods set forth in § 1113(d) govern the scheduling of the hearing and disposition of a motion to reject the agreement."
     hash "4b473a1c1416ec51c8d8940a47472ec2c08fcb72d80916fb8754b4e67a9e8465"
   }
-  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1991 Amendment"
@@ -137,14 +137,14 @@ module "/us/usc/ptVI/rule6006" {
     p "Subdivision (c) is amended to enable the United States trustee to appear and be heard on the issues relating to the assumption or rejection of executory contracts and unexpired leases. See §§ 307, 365, and 1113 of the Code."
     hash "5a1ccd7f3d30092a5ae970ea28f9a129fbdc37bf0ceceac6ad6b3e466674cfcf"
   }
-  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Notes of Advisory Committee on Rules—1993 Amendment"
     p "This rule is amended to delete the requirement for an actual hearing when no request for a hearing is made. See Rule 9014."
     hash "c1e8bac5580086acce43bebd8bfc95f887b3911ba626fa0b25d9ad57aaf860aa"
   }
-  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—1999 Amendment"
@@ -153,7 +153,7 @@ module "/us/usc/ptVI/rule6006" {
     p "GAP Report on Rule 6006. No changes since publication."
     hash "3ae186b0b5acadd8404b02d0eade82ed96e20e0ff7e9b32e9f6a781360ebbe54"
   }
-  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" enacted {
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2007 Amendment"
@@ -164,7 +164,7 @@ module "/us/usc/ptVI/rule6006" {
     p "Changes After Publication. Subdivision (e) of the proposed rule was amended as suggested by the NBC to insert a third category of requests that the trustee may make under an omnibus motion. The list of categories was numbered, and the new category is set out in (e)(2)."
     hash "a5923cd8dd35c10e5b33df2f69ca5f613c97898d74b717d2dc20922cb90bb6be"
   }
-  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2009 Amendment"
@@ -176,7 +176,7 @@ module "/us/usc/ptVI/rule6006" {
     p "• 25-day periods become 28-day periods"
     hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
   }
-  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" editorial {
     group ungrouped
     topic "miscellaneous"
     heading "Committee Notes on Rules—2024 Amendment"
@@ -185,7 +185,7 @@ module "/us/usc/ptVI/rule6006" {
   }
   layers {
     operative "7f3be9028ede9f4b0621919c1fecfaa9cd1ca3a5561aae6ac2f3b798e27ac87d"
-    enacted "6a9efeb4a6f2509c4fe5b30ac7f8dc0a87d54e20f6b9abdb0230554d174afa75"
-    editorial "3b3e8a1e2fb3c8b3c0a195d74326661e86f4208e036d6ff6c954e0d011cc669b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "501b0cac23133255a8101c0269c9dbbc12d177d71a8137bce51f4c468beb958c"
   }
 }
