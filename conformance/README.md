@@ -165,7 +165,12 @@ for each case of the reading rules, in the invented title 99 and the
 invented release `999-1`. Each `<name>.xml` is read as the member
 `usc99.xml`; `two-files/` holds the members `usc99.xml` and `usc99a.xml`,
 which the test packs into one archive. Beside each, `<name>.records.jsonl`
-holds the expected records, written by hand from the reading rules.
+holds the expected records, written by hand from the reading rules, with
+the layer of every note that the rule of
+[Notes and their layers](../docs/law-modules.md#notes-and-their-layers)
+gives it. The records of the four documents `notes-layer-*.xml` are the
+reading's output, checked by eye, their layers set by that rule; those of
+`definitions-second.xml` are the reading's output.
 `test_uslm_text.py` compares the script's output with them and checks
 that the script refuses what the rules refuse. `reissue/` holds two
 documents, `old.xml` of the release `999-1` and `new.xml` of the release
@@ -228,8 +233,12 @@ uv run --locked python -I conformance/usc_profile.py /path/to/release --out prof
 
 `--out FILE` also writes the profile to that file; nothing is written beside
 the input. The exit codes are those of `uslm_text.py`. Each fixture has its
-expected `import` profile beside it, `<name>.profile.json`, written by hand;
-`test_usc_profile.py` compares the script's output with them.
+expected `import` profile beside it, `<name>.profile.json`, written by
+hand, but for those of `definitions-second.xml` and the four
+`notes-layer-*.xml`, which the script wrote, and for the counts of notes and of references by layer where the
+rule of layers moved a note, which the script wrote and which were checked
+against the records; `test_usc_profile.py` compares the script's output
+with them.
 
 `usc_definitions.py` reads the same inputs and extracts the definitions of
 their units by the rules of
@@ -237,8 +246,8 @@ their units by the rules of
 second time on the reading of `uslm_common.py`, sharing no code with the
 importer
 ([A second implementation of the rules](../docs/law-modules.md#a-second-implementation-of-the-rules)).
-It implements the second version of those rules, D1 to D14, each rule in
-the code naming its number. The text the rules read is the text of a
+It implements the rules D1 to D14 of that section and the record of D15,
+each rule in the code naming its number there. The text the rules read is the text of a
 paragraph as D1.1 makes it from the reading: a `ref` of the class
 `footnoteRef` is a footnote marker and gives nothing, and a superscript
 run (`sup` or `xhtml:sup`) made only of the digits `0` to `9` is left

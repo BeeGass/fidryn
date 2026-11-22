@@ -3735,7 +3735,7 @@ version extracted a definition and these rules extract none (49 U.S.C.
 
    | Form | Count | Rule |
    | --- | ---: | --- |
-   | Two terms defined in one sentence ("The term A means X, and the term B means Y") | 123 in the population, 79 remain | D11.1; for a third version |
+   | Two terms defined in one sentence ("The term A means X, and the term B means Y") | 123 in the population, 79 remain | D11.1; this form is not read |
    | A head with no verb before its close ("The term “X”—", completed by the paragraphs below) | 480 chapeaus in the Code, with 1,082 provisions directly below them | D7.8 finds no verb |
    | A condition before the term that is not a condition by D6.3 (a list of lowercase words after commas, `shall`, a sentence, `In any case to which`), or not followed by a comma and the head words | 132 in the population, 20 remain | D7.2 |
    | Other words before the term ("Solely for purposes of", "To the extent provided in regulations", "Wherever the word ... is used", a lowercase continuation) | 183 in the population, 179 remain | D7.2 |
@@ -3754,7 +3754,7 @@ version extracted a definition and these rules extract none (49 U.S.C.
    | A meaning given by regulations, rules or an order, with a link, where D12.4 cannot tell that the meaning is not in the linked provision | 3 paragraphs in the Code (19 U.S.C. 2401(2); 26 U.S.C. 30B(b)(2)(C) and 30B(h)(3)) | D12.4 |
    | An aside that is no condition by D6.5 (`unless otherwise provided`, `except as ...`, `in addition to`, `subject to`, `when used as`, a condition with a list of lowercase words): the record is kept, and the aside is not recorded | 155 records | D6.5 |
    | A condition after the verb form that is not of D6.6: `in addition to` (34), or cut by a list, or followed by more conditions (33): the record is kept, and the words are not recorded | 67 records | D6.6 |
-   | A condition written `, with respect to X,` after the verb form, as in 10 U.S.C. 1074e(c)(2) ("“qualifying Persian Gulf symptom or illness” means, with respect to a member described in subsection (b), a symptom or illness—"): not the form that D6.6 names, and left for a later version; the record is kept, and the words are not recorded | 1,298 records | D6.6 |
+   | A condition written `, with respect to X,` after the verb form, as in 10 U.S.C. 1074e(c)(2), of the form of the invented "“qualifying widget” means, with respect to a member described in subsection (b), a widget—": not the form that D6.6 names, and not read; the record is kept, and the words are not recorded | 1,298 records | D6.6 |
    | A condition of an aside or after the verb, where the definition already has a condition (D9.6) | 5 records | D9.6 |
 
 2. **Records that keep a form as a limit.**
@@ -3778,8 +3778,9 @@ version extracted a definition and these rules extract none (49 U.S.C.
         the District of Columbia Code ("section 1551c(z) of title 47,
         District of Columbia Code"): 4 links in the Code; 1 record carries
         such a target as `borrowed_from` (5 U.S.C. 5516(a));
-      - `ln` (a lowercase L) for `In`: 1 chapeau ("ln this paragraph:", 46
-        U.S.C. 54101(d)(2)(C)), over 3 near misses, which stay out;
+      - `ln` (a lowercase L) for `In`: 1 chapeau (46 U.S.C.
+        54101(d)(2)(C), of the form of the invented "ln this clause:"),
+        over 3 near misses, which stay out;
       - a footnote number marked only as a superscript is not read (D1.1).
         On the whole Code this changes 41 records and adds 21: 32
         `borrowed_words` lose such a number ("section 231(f) 1 of this
@@ -3792,8 +3793,10 @@ version extracted a definition and these rules extract none (49 U.S.C.
         the ninth defines no term, and all 9 hold the digit as a
         superscript), and the paragraphs under chapeaus such as "In this
         title: ¹". Of the 33 `borrowed_words` that a pattern for such
-        numbers found, 31 lose the number and 2 keep "Directive 5101.1",
-        which is no footnote number (10 U.S.C. 392(e)(3), 430b(d)(2));
+        numbers found on release point 119-142 when superscript numbers
+        were still read as text, 31 lose the number and 2 keep a number
+        after a period that is no footnote number (10 U.S.C. 392(e)(3),
+        430b(d)(2), of the form of the invented "Directive 9901.1");
       - a footnote number written as words: those two patterns found none
         in the Code. Such a digit is text by D1.1.4 and is kept as written.
    3. *A superscript number in a term's own spelling.* D1.1 leaves a
@@ -4179,8 +4182,9 @@ stale. Nothing else makes a binding stale:
   footnotes and their markers, is in neither hash, so a change to it makes
   nothing stale. Of the Code, the editorial notes include the editors'
   pointers to provisions set out elsewhere and their paraphrases of them,
-  executive documents and the notes of advisory committees: a change to
-  any of them makes no binding stale.
+  the executive documents of the group `execDoc` and the notes of advisory
+  committees that stand in no group: a change to any of them makes no
+  binding stale.
 - A note set out under a container enters the enacted layer of no unit.
 - The release a binding records is compared with nothing. It is shown in
   the warning beside the release of the dependency, so that a reader sees
@@ -4703,9 +4707,10 @@ set-out text of a law: the editors' own writing, such as the notes of
 amendments, of codification and of history and revision; their pointers to
 provisions set out elsewhere, such as most notes of effective dates, of
 transfers of functions and of changes of name, and their paraphrases of
-provisions; and the documents they set out that are not Acts of Congress:
-executive documents, notes of advisory committees and extracts of reports.
-Each note shows its group and its topics, which tell these apart: an
+provisions; and the documents they set out that are not Acts of Congress,
+when their group or, in no group, their heading shows them: executive
+documents of the group `execDoc`, and notes of advisory committees and
+extracts of reports that stand in no group. Each note shows its group and its topics, which tell these apart: an
 executive order is an editorial note of the group `execDoc`, and a note
 that points to the provision giving an effective date is an editorial
 note of the group `statutoryNotes`.
@@ -5065,8 +5070,9 @@ more.
   point 119-142 has one such record, at `/us/usc/t42/s1396b–1/b`: its
   words are `In this section.`, with no region and the basis
   `unresolved`.
-- `unstated` is given when neither the paragraph nor a chapeau above it
-  states a reach. A reach stated in a sibling provision, such as "In this
+- `unstated` is given when neither the paragraph, nor the reach line its
+  part begins with, nor a chapeau above it states a reach in the forms
+  these rules read. A reach stated in a sibling provision, such as "In this
   section" as subsection (a) with the definitions in subsection (b), is
   not seen.
 - An exception written inside the text of a definition, such as "means a
@@ -5147,8 +5153,13 @@ more.
   among them notes of amendments of court rules that quote the words
   inserted.
 - The notes of advisory committees are the explanatory notes of the body
-  that recommends a rule (28 U.S.C. 2073(d)), not the text of the rule, and
-  they are editorial.
+  that recommends a rule (28 U.S.C. 2073(d)), not the text of the rule. One
+  that stands in no group is editorial by its heading, and one of the group
+  `courtRules` by its group; clause 4 reads the heading of an ungrouped
+  note only, so one of the group `statutoryNotes` that quotes would be
+  enacted. Of the release `119-142`, none is enacted. Executive documents
+  are editorial by the group `execDoc`; one that stood in no group and
+  quoted would be enacted.
 - A workspace imported under the earlier rule of layers, which put every
   note of a group other than `editorialNotes` in the enacted layer, unless
   it was ungrouped and a description of what was removed or a historical

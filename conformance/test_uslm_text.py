@@ -148,23 +148,31 @@ class NoteAddresses:
 
     def __init__(self) -> None:
         self.of: dict[str, list[str]] = {}
+        self.notes: dict[str, list[uslm_common.Note]] = {}
 
     def unit(self, unit: uslm_common.Unit) -> None:
         self.of[unit.address] = [note.address for note in unit.notes]
+        self.notes[unit.address] = list(unit.notes)
 
     def container(self, container: uslm_common.Container) -> None:
         self.of[container.address] = [note.address for note in container.notes]
+        self.notes[container.address] = list(container.notes)
 
 
-def notes_of_units(text: str) -> dict[str, list[str]]:
-    """The addresses of the notes of each module of the document `text`, read as `usc99.xml`."""
+def read_notes(text: str) -> NoteAddresses:
+    """The notes of each module of the document `text`, read as `usc99.xml`."""
     with tempfile.TemporaryDirectory(prefix="fidryn-uslm-notes-") as directory:
         path = Path(directory) / MEMBER
         path.write_text(text, encoding="utf-8")
         sink = NoteAddresses()
         source = uslm_common.Source(None, str(path), MEMBER)
         uslm_common.read_member(uslm_common.Job(source, {}, True), sink)
-    return sink.of
+    return sink
+
+
+def notes_of_units(text: str) -> dict[str, list[str]]:
+    """The addresses of the notes of each module of the document `text`, read as `usc99.xml`."""
+    return read_notes(text).of
 
 
 def expected_lines(name: str) -> list[str]:
@@ -409,6 +417,35 @@ class TextFixtures(unittest.TestCase):
         ):
             with self.subTest(heading=heading):
                 self.assertEqual(uslm_common.is_editors_heading(heading), matched)
+
+    def notes_in_s1(self, notes: str) -> list[uslm_common.Note]:
+        inner = f'<content>Text.</content><notes type="uscNote">{notes}</notes>'
+        return read_notes(document(inner=inner)).notes["/us/usc/t99/s1"]
+
+    def test_quoted_content_only_in_the_label_of_a_cross_heading_does_not_count(self) -> None:
+        # What each cross heading of the statutory group holds after its label is a note of
+        # that group; the label is no part of it.
+        notes = self.notes_in_s1(
+            '<note role="crossHeading" topic="statutoryNotes"><heading>Statutory '
+            "<quotedContent>“Notes”</quotedContent></heading><p>After the label.</p></note>"
+            '<note role="crossHeading" topic="statutoryNotes"><heading>Statutory Notes'
+            "</heading><p>After: <quotedContent>“Quoted.”</quotedContent></p></note>"
+        )
+        self.assertEqual(
+            [(note.group, note.layer) for note in notes],
+            [("statutoryNotes", "editorial"), ("statutoryNotes", "enacted")],
+        )
+
+    def test_a_note_without_a_topic_attribute_has_no_topics(self) -> None:
+        # It quotes and stands in no group, so with no topic of the editors it is enacted;
+        # without its quotation it is editorial.
+        notes = self.notes_in_s1(
+            "<note><p>D: <quotedContent>“D.”</quotedContent></p></note><note><p>E.</p></note>"
+        )
+        self.assertEqual(
+            [(note.group, note.topics, note.layer) for note in notes],
+            [("ungrouped", [], "enacted"), ("ungrouped", [], "editorial")],
+        )
 
     def test_top_elements_without_an_identifier_are_numbered_over_the_release(self) -> None:
         expected = expected_lines(UNNAMED)

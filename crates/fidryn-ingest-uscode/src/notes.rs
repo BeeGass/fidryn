@@ -799,6 +799,53 @@ mod tests {
     }
 
     #[test]
+    fn quoted_content_only_in_the_label_of_a_cross_heading_does_not_count() {
+        // What each cross heading of the statutory group holds after its
+        // label is a note of that group; the label is no part of it.
+        let notes = notes_of(
+            "<note role=\"crossHeading\" topic=\"statutoryNotes\"><heading>Statutory \
+             <quotedContent>“Notes”</quotedContent></heading><p>After the label.</p></note>\
+             <note role=\"crossHeading\" topic=\"statutoryNotes\"><heading>Statutory Notes\
+             </heading><p>After: <quotedContent>“Quoted.”</quotedContent></p></note>",
+        );
+        let read: Vec<(&str, Layer)> = notes
+            .iter()
+            .map(|note| (note.group.as_str(), note.layer))
+            .collect();
+        assert_eq!(
+            read,
+            [("statutoryNotes", Editorial), ("statutoryNotes", Enacted)]
+        );
+    }
+
+    #[test]
+    fn a_note_without_a_topic_attribute_has_no_topics() {
+        // It quotes and stands in no group, so with no topic of the editors
+        // it is enacted; without its quotation it is editorial.
+        let notes = notes_of(
+            "<note><p>D: <quotedContent>“D.”</quotedContent></p></note>\
+             <note><p>E.</p></note>",
+        );
+        let read: Vec<(&str, Vec<&str>, Layer)> = notes
+            .iter()
+            .map(|note| {
+                (
+                    note.group.as_str(),
+                    note.topics.iter().map(String::as_str).collect(),
+                    note.layer,
+                )
+            })
+            .collect();
+        assert_eq!(
+            read,
+            [
+                ("ungrouped", vec![], Enacted),
+                ("ungrouped", vec![], Editorial)
+            ]
+        );
+    }
+
+    #[test]
     fn a_note_with_a_topic_of_the_editors_is_editorial() {
         assert_eq!(
             layers_of("notes-layer-topics"),

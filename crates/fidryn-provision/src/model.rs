@@ -19,7 +19,8 @@ use crate::hash::Hash32;
 use serde::{Deserialize, Serialize};
 
 /// What a text is part of: the operative text of the provisions, the notes
-/// the source marks as enacted, or the editorial matter. Layers are ordered
+/// that set out the text of a law, as the importer of the corpus judges
+/// them by its rule of layers, or the editorial matter. Layers are ordered
 /// as they are declared.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -110,8 +111,10 @@ impl Text {
         self.runs.iter().map(Run::words).collect()
     }
 
-    /// The text that rules over the words of this text read, and where each
-    /// link stands in it: the words of its runs in order, without its
+    /// The text that the rules of definitions read in this text, and that
+    /// the checker's tests of where a definition's words stand compare
+    /// with, and where each link stands in it: the words of its runs in
+    /// order, without its
     /// footnote markers and without its superscript runs made only of the
     /// digits `0` to `9`, at least one, which are footnote numbers marked as
     /// superscripts. With each such run one space goes too: the space just
@@ -165,10 +168,12 @@ impl Text {
     }
 }
 
-/// The text that rules over the words of a [`Text`] read
+/// The text of a [`Text`] that the rules of definitions read
 /// ([`Text::read_text`]), and the place of each of its links.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReadText<'t> {
+    /// The words of the runs in order, without the footnote markers and
+    /// without the superscript runs of digits only, each with its one space.
     pub text: String,
     /// The links of the text, in order.
     pub links: Vec<LinkPlace<'t>>,
