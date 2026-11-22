@@ -2122,14 +2122,21 @@ A document is refused when:
   superscript or a subscript stands inside another, or a footnote marker
   inside one; a footnote marker holds an element; a marker names no
   footnote of its module, or two footnotes of one module have one `id`;
-  or a footnote holds a `signature`, a `subheading` or a `heading`;
+  or a footnote holds a `signature`, a `subheading`, a `heading` or
+  another footnote;
 - normalization composes one character out of characters on both sides of
   the boundary of a link, a superscript, a subscript or a marker;
-- an identifier holds `~`, or gives no [address](#addresses);
+- an identifier holds `~`, or gives no [address](#addresses), as none is
+  given by an identifier of a unit or a container with an empty member,
+  which two spaces in a row or a space at either end make, by an empty
+  identifier, and by an identifier of a provision that begins with a space;
 - a level has a second `num` or a second `heading`;
+- a `note` stands in quoted content anywhere but directly in it or in one
+  of its levels, such as in a paragraph, a text part, a table cell or
+  another note of it;
 - a span of a table cell is not a whole number written in ASCII digits;
-- a `br`, an `img` or a column holds content, or an `img` has an attribute
-  other than `src`;
+- a `br`, an `img` or a column holds content, white space alone included,
+  or an `img` has an attribute other than `src`;
 - a `signature` holds anything but `name` and `role`, a footnote that
   stands directly in it included;
 - a unit or a container has a second source credit, or a source credit
@@ -2180,22 +2187,30 @@ has `"positive_law":null`.
 | Provision inside a unit | any element of the two classes above, and `subsection`, `paragraph`, `subparagraph`, `clause`, `subclause`, `item`, `subitem`, `subsubitem` and `level`, inside a unit. Its kind is its tag |
 | Label | `num` and `heading` of a level |
 | Text part | `chapeau`, `content`, `continuation`, `proviso` |
-| Block | `p` and `xhtml:p`, read alike; `xhtml:table`; `quotedContent`; `img`; in a note, and in quoted content inside one, `signature`; in a note also any `subheading`, any `heading` other than the note's own (the first `heading` that is a child of the note) at any depth inside it, whether or not the note has a heading of its own, and a text part directly in the note; in quoted content also `note`, and a `heading` or `subheading` directly in it |
+| Block | `p` and `xhtml:p`, read alike; `xhtml:table`; `quotedContent`; `img`; in a note, and in quoted content inside one, `signature`; in a note also any `subheading`, any `heading` other than the note's own (the first `heading` that is a child of the note) at any depth inside it, whether or not the note has a heading of its own, and a text part directly in the note; in quoted content also a `note` directly in it or in one of its levels, and a `heading` or `subheading` directly in it |
 | Inline, kept as structure | `ref` with an `href` (a link); `ref` of the class `footnoteRef` (a footnote marker); `sup` and `xhtml:sup`; `sub` and `xhtml:sub` |
 | Inline, words kept and markup dropped | `date`, `i`, `b`, `inline`, `xhtml:span`, `xhtml:b`, `xhtml:i`, `xhtml:a`, `name`, `role`; `br` is one space |
 | Table structure | `xhtml:thead`, `xhtml:tbody`, `xhtml:tfoot`, `xhtml:tr`, `xhtml:th`, `xhtml:td`; `xhtml:colgroup` and `xhtml:col`, which hold no text, are dropped |
 | Note | `notes`, `note`, `sourceCredit` |
 | Not imported, counted | `toc` and everything in it; release notes; the label of a note group |
 
+The class of a `ref` is its `class` attribute split into words at ASCII
+white space, U+0020, U+0009, U+000A, U+000C and U+000D, and at no other
+character; a `ref` is of the class `footnoteRef` when one of those words
+is `footnoteRef`.
+
 The unit of a text is the outermost unit that holds it: a section that
 stands inside another section is a provision of kind `section` of the
 outer one. A footnote (a `note` of the type `footnote`) is taken out of
 the text where it stands, without closing its paragraph, and becomes a
 footnote of its module, numbered in document order; its marker is a run of
-the text that gives no words. An `img` is imported as the source its `src`
-names, normalized, and empty when it has none; the picture is not in the
-archive. Quoted content has the `origin` it names as the source writes it,
-and none when the attribute is absent or empty.
+the text that gives no words. A footnote inside a table of contents or
+inside a release note is not imported. An `img` is imported as the source
+its `src` names, normalized, and empty when it has none; the picture is not
+in the archive. Quoted content has the `origin` it names as the source
+writes it, and none when the attribute is absent or empty. In a level of
+quoted content, its `num` and its `heading` close the paragraph that the
+words before them have open.
 
 A `num` with neither a `value` nor text is absent, and one with a `value`
 and no text keeps the value with an empty shown form; a `heading` with no
@@ -2205,7 +2220,9 @@ marker, with an empty text when it has no other. A text part that stands
 directly in a note, where the publisher sets out a law as loose paragraphs,
 gives its blocks to the note, in their place among the note's other
 blocks, and its role word (`chapeau`, `content`, `continuation` or
-`proviso`) is not kept. Each of these rules decides what a hash holds.
+`proviso`) is not kept. A `continuation` or a `proviso` inside such a
+`content` gives its blocks in its place among them, as it gives a part of
+its own in a level. Each of these rules decides what a hash holds.
 
 ### Notes and their layers
 
@@ -2255,19 +2272,21 @@ either:
 
 1. **A unit or a container with an identifier.** An identifier that holds
    a space is a list: its first member is the identifier used, and the
-   other members are aliases. An identifier whose last segment holds three
-   full stops in a row stands for a range, as `s44...46` does: it is used
-   as it is, and its aliases are its two ends, the identifier cut before
-   the full stops and the identifier with its last segment replaced by
-   that segment's leading lower-case letters followed by what stands after
-   the full stops. When the two ends differ only in a whole number at their
-   end, the second not smaller than the first and at most 999 above it,
-   every number between them gives an alias as well; a member of a range
-   whose number is followed by a letter gets no alias. The address is the
-   identifier, unless a unit or a container before it in the release,
-   taking the members in the order of their names and the elements in
-   document order, already has it; then it is the identifier followed by
-   `~2`, by `~3` for the next, and so on.
+   other members are aliases. A list with an empty member, which two spaces
+   in a row or a space at either end make, and an empty identifier give no
+   address, and the document is refused. An identifier whose last segment
+   holds three full stops in a row stands for a range, as `s44...46` does:
+   it is used as it is, and its aliases are its two ends, the identifier
+   cut before the full stops and the identifier with its last segment
+   replaced by that segment's leading lower-case letters followed by what
+   stands after the full stops. When the two ends differ only in a whole
+   number at their end, the second not smaller than the first and at most
+   999 above it, every number between them gives an alias as well; a
+   member of a range whose number is followed by a letter gets no alias.
+   The address is the identifier, unless a unit or a container before it
+   in the release, taking the members in the order of their names and the
+   elements in document order, already has it; then it is the identifier
+   followed by `~2`, by `~3` for the next, and so on.
 2. **A unit or a container without an identifier.** The address of the
    container it stands in, or the prefix for the top element of a file,
    followed by `~<tag>.<n>`, where `n` counts from 1 the elements of that
@@ -2276,6 +2295,9 @@ either:
    the last segment of its identifier, of its first member if it lists
    several, and by `~2`, `~3` when a sibling before it already has that
    address; without an identifier, followed by `~<tag>.<n>` as in rule 2.
+   An identifier that is empty or begins with a space has an empty first
+   member and gives no address, and the document is refused; a space after
+   the first member changes nothing.
 4. An alias that is the address of a unit, a container or a provision is
    dropped, and so is one the element already has.
 
@@ -2295,8 +2317,8 @@ Some of what a document holds is by rule not imported, and the lock's
 
 | Not imported | Counted as |
 | --- | --- |
-| a table of contents, `toc`, and everything in it | `tables_of_contents`; and the footnotes and links in it, as `footnotes_in_tables_of_contents` and `links_in_tables_of_contents` |
-| a release note: a note directly under a `title` or an `appendix` whose text begins `Current through ` | `release_notes` |
+| a table of contents, `toc`, and everything in it | `tables_of_contents`, each `toc` element once, one inside another included; and the footnotes and links in it, as `footnotes_in_tables_of_contents` and `links_in_tables_of_contents` |
+| a release note: a note directly under a `title` or an `appendix` whose text begins `Current through `, with any footnote in it | `release_notes` |
 | a link that has no words, or white space alone | `links_without_words` |
 | the label of a note group, the heading of a cross heading | `note_group_headings` |
 
@@ -2614,50 +2636,45 @@ more.
 
 ### The ingester and the independent reading
 
-- The ingester and `conformance/uslm_text.py` read nine forms of the
-  publisher's XML differently. No release of 2026 holds any of them.
-  - On five of them one of the two refuses the document, so a release
-    that holds one is refused by that reading:
-    - a `continuation` or a `proviso` inside a `content` that stands
-      directly in a note, which the ingester reads as blocks of the note
-      and the independent reading refuses;
-    - a note inside a paragraph or a text part of quoted content, rather
-      than directly in the quoted content or in one of its levels, which
-      the ingester refuses and the independent reading reads;
-    - white space inside a `br`, an `img` or a column, which the ingester
-      refuses as content and the independent reading takes for none;
-    - an identifier of a unit or a container whose list has an empty
-      member, as two spaces or a space at either end make, and an
-      identifier of a provision that begins with a space, which the
-      ingester refuses as no address and the independent reading reads
-      without the empty member;
-    - a `class` attribute of a `ref` whose words are separated by a
-      white-space character that is not ASCII. The ingester splits the
-      attribute at ASCII white space only, and the independent reading at
-      any, so one of them finds the class `footnoteRef` where the other
-      does not, and one of them refuses the `ref`: as having neither an
-      `href` nor that class, or as having both.
-  - On four of them both read the document, and read it differently:
-    - a `num` or a `heading` among the words of a level of quoted content,
-      where the independent reading ends the open paragraph and the
-      ingester does not;
-    - a footnote inside a footnote, which the ingester counts as a footnote
-      of its own and the independent reading leaves out;
-    - a table of contents inside another, which the ingester counts twice
-      among the tables of contents of the lock and the independent reading
-      once; no text differs;
-    - a footnote inside the release note of a title or an appendix, which
-      the ingester keeps as a footnote of that container and the
-      independent reading leaves out with the note.
+- The ingester and `conformance/uslm_text.py` read by one rule the rare
+  forms of the publisher's XML on which they once differed: a
+  `continuation` or a `proviso` inside a `content` directly in a note; a
+  `note` in quoted content anywhere but directly in it or in one of its
+  levels; white space inside a `br`, an `img` or a column; an identifier
+  with an empty member; the words of the class of a `ref`; a `num` or a
+  `heading` among the words of a level of quoted content; a footnote
+  inside a footnote; a table of contents inside another; and a footnote
+  inside a release note. The rules are those of
+  [What it reads](#what-it-reads),
+  [The classes of elements](#the-classes-of-elements),
+  [How it gives addresses](#how-it-gives-addresses) and
+  [What it does not import](#what-it-does-not-import).
+- They read three other forms differently. No release of 2026 holds any of
+  them.
+  - A comment or a processing instruction inside a `br` or a column: the
+    ingester refuses it as content, and the independent reading, whose
+    parser drops both, does not see it.
+  - A schema location that the two take apart differently, so that one of
+    them refuses the document and the other reads it: the ingester splits
+    it into words at ASCII white space and the independent reading at any
+    white space; the ingester takes the first file named for the
+    publisher's namespace and the independent reading the last; and the
+    independent reading refuses an odd number of words, where the ingester
+    reads the pair it needs.
+  - A note with the role `crossHeading` that stands directly in a title or
+    an appendix and whose text begins `Current through `: the ingester
+    takes it for the release note, which it does not import, and the
+    independent reading reads it as a note of its own, `ungrouped`.
 
-    A release that holds one of these four is imported and checked without
-    a word. The difference shows only when the two readings are compared on
-    that release: what `conformance/uslm_text.py` prints for its archives
-    against what `fidryn text DIR --json` prints for its workspace, and, for
-    a table of contents, the counts of `conformance/usc_profile.py` against
-    the ledger. The check of [the sample](#the-sample) makes both
-    comparisons for the sample; neither an import nor the replay of releases
-    makes them.
+  On the first two, one of the readings refuses the document. The third is
+  read by both and read differently, and shows only when the two readings
+  are compared on that release: what `conformance/uslm_text.py` prints for
+  its archives against what `fidryn text DIR --json` prints for its
+  workspace. That comparison, with the counts of tables of contents of
+  `conformance/usc_profile.py` against the ledger, is what would show any
+  other form the two read differently. The check of [the sample](#the-sample)
+  makes both comparisons for the sample; neither an import nor the replay of
+  releases makes them.
 - The independent reading refuses the nesting the ingester refuses, by the
   same rule, but has no bound on the number of nodes of a document: it
   reads a document the ingester refuses for its size, given the memory,

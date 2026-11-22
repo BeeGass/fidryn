@@ -1,0 +1,2 @@
+{"address":"/us/usc/t99","layer":"operative","kind":"title","status":null,"num":["99","Title 99"],"heading":{"text":"Invented","refs":[],"sup":[],"sub":[]},"aliases":[],"within":null,"members":["/us/usc/t99/s1"]}
+{"address":"/us/usc/t99/s1","layer":"operative","kind":"section","status":null,"num":["1","§ 1."],"heading":{"text":"Contents","refs":[],"sup":[],"sub":[]},"items":[{"part":"content","blocks":[{"p":"Listed.","refs":[],"sup":[],"sub":[]}]}],"aliases":[],"within":"/us/usc/t99","source":"usc99.xml","positive_law":true}

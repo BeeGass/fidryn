@@ -82,16 +82,19 @@ What is counted is what the reading imports, element by element:
   when its group is `editorialNotes`, or when it is ungrouped and one of its
   topics is `removalDescription` or `historicalAndRevision`; every other note is
   enacted. A note's text may hold a text part that stands directly in it, read as
-  the blocks of its own flow, and a `signature`, also inside quoted content. A
+  the blocks of its parts, those of a `continuation` or a `proviso` inside a
+  `content` among them, and a `signature`, also inside quoted content. A
   note's own heading is the first `heading` that is a child of the note. Any
   `subheading` in a note and any other `heading`, at any depth inside the note, is
-  a subheading of its text, whether or not the note has a heading of its own, and
-  a note inside quoted content is read the same way; so is a `heading` or
-  `subheading` that stands directly in quoted content.
+  a subheading of its text, whether or not the note has a heading of its own. A
+  note that stands directly in quoted content or in one of its levels is read the
+  same way, and one anywhere else in quoted content is refused. A `heading` or
+  `subheading` that stands directly in quoted content is a subheading too.
 - **Source credits.** A unit or a container has the credit that is its direct
   child; its links are references of the editorial layer.
 - **Footnotes** are the `note type="footnote"` elements of a unit or a
-  container, wherever they stand in it, outside tables of contents.
+  container, wherever they stand in it, outside tables of contents and
+  release notes; a footnote inside another is refused.
 - **References** are the links (`ref` with an `href`) that the reading keeps,
   each in a layer: operative in a provision and in the number or heading of a
   container; the note's own layer in a note, quoted content included; editorial
@@ -150,7 +153,7 @@ a container more than 64 deep among the containers of its file, are refused.
 | `with_images` | provisions and notes that hold an `img` |
 | `references.<layer>.<outcome>` | references by layer (`operative`, `enacted`, `editorial`) and outcome, all eight outcomes for each layer |
 | `outside_by_body` | references of outcome `outside`, all layers, by their first two segments |
-| `not_imported.tables_of_contents` | `toc` elements |
+| `not_imported.tables_of_contents` | `toc` elements, one inside another counted too |
 | `not_imported.footnotes_in_tables_of_contents` | footnotes inside them |
 | `not_imported.links_in_tables_of_contents` | links inside them |
 | `not_imported.release_notes` | release notes |

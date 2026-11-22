@@ -264,6 +264,17 @@ interchange schema versions are maintained independently of the interpreter.
 - Both readings of the publisher's XML refuse a `ref` that has an `href`
   and the class `footnoteRef`, which would be at once a link and a footnote
   marker, with the element named.
+- Both readings of the publisher's XML refuse, with the element named, a
+  footnote inside a footnote, a `note` in quoted content anywhere but
+  directly in it or in one of its levels, white space inside a `br`, an
+  `img` or a column, an identifier of a unit or a container with an empty
+  member, and an identifier of a provision that is empty or begins with a
+  space. Both read a `continuation` or a `proviso` inside a `content` that
+  stands directly in a note as blocks of the note, split the class of a
+  `ref` into words at ASCII white space alone, close the open paragraph of
+  a level of quoted content at its `num` and at its `heading`, leave a
+  footnote inside a release note out with the note, and count each `toc`
+  element once, one inside another included.
 - A change set pairs like-named notes by their note hashes before it
   compares notes by address: within one unit or container, one layer and
   one family of notes whose addresses differ only in the ordinal that marks

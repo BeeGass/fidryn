@@ -506,10 +506,13 @@ pub(crate) fn build(
             .ok_or_else(|| IngestError::new("an element of the outline is not in the document"))?;
         let within = entry.parent.map(|parent| assigned[parent].address.clone());
         // A unit holds everything inside it; a container holds what is not
-        // one of its members.
-        let is_member = |child: Node<'_, '_>| !entry.unit && class_in_container(child).is_some();
+        // one of its members, and the footnotes of a release note are not
+        // imported with it.
+        let outside = |child: Node<'_, '_>| {
+            !entry.unit && (class_in_container(child).is_some() || notes::is_release_note(child))
+        };
         let mut scope = Scope {
-            footnotes: Footnotes::of_module(node, &is_member)?,
+            footnotes: Footnotes::of_module(node, &outside)?,
             ..Scope::default()
         };
         let module = if entry.unit {
@@ -973,6 +976,53 @@ mod tests {
             "<section identifier=\"/us/usc/t99/s5  /us/usc/t99/s6\"></section>".to_owned(),
         ));
         assert!(error.message().contains("is not an address"), "{error}");
+    }
+
+    #[test]
+    fn an_identifier_whose_list_has_an_empty_member_is_refused() {
+        // Of a unit or a container: two spaces in a row, a space at either end,
+        // and an identifier with no member at all.
+        for identifier in [
+            "/us/usc/t99/s5  /us/usc/t99/s6",
+            " /us/usc/t99/s5",
+            "/us/usc/t99/s5 ",
+            "",
+        ] {
+            for body in [
+                format!("<section identifier=\"{identifier}\"><content>A.</content></section>"),
+                format!(
+                    "<chapter identifier=\"{identifier}\"><section identifier=\"/us/usc/t99/s1\">\
+                     <content>A.</content></section></chapter>"
+                ),
+            ] {
+                let error = refusal(&Document::with_body(body.clone()));
+                assert!(
+                    error
+                        .message()
+                        .starts_with(&format!("the identifier {identifier:?} is not an address")),
+                    "{body}: {error}"
+                );
+            }
+        }
+        // Of a provision, which reads its first member: one that begins with a
+        // space, and one with no member. A space after the first member changes
+        // nothing.
+        for identifier in [" /us/usc/t99/s1/a", ""] {
+            let error = refusal(&Document::with_section(&format!(
+                "<subsection identifier=\"{identifier}\"><content>A.</content></subsection>"
+            )));
+            assert!(
+                error.message().contains("is not an address"),
+                "{identifier:?}: {error}"
+            );
+            assert_eq!(error.element(), Some("subsection"));
+        }
+        let modules = Document::with_section(
+            "<subsection identifier=\"/us/usc/t99/s1/a \"><content>A.</content></subsection>",
+        )
+        .read()
+        .expect("read");
+        assert_eq!(Counts::of(&modules).provisions, 2);
     }
 
     #[test]

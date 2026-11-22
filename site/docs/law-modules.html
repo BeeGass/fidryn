@@ -1994,14 +1994,21 @@ so that it would be at once a link and a footnote marker; a link, a
 superscript or a subscript stands inside another, or a footnote marker
 inside one; a footnote marker holds an element; a marker names no
 footnote of its module, or two footnotes of one module have one <code>id</code>;
-or a footnote holds a <code>signature</code>, a <code>subheading</code> or a <code>heading</code>;</li>
+or a footnote holds a <code>signature</code>, a <code>subheading</code>, a <code>heading</code> or
+another footnote;</li>
 <li>normalization composes one character out of characters on both sides of
 the boundary of a link, a superscript, a subscript or a marker;</li>
-<li>an identifier holds <code>~</code>, or gives no <a href="#addresses">address</a>;</li>
+<li>an identifier holds <code>~</code>, or gives no <a href="#addresses">address</a>, as none is
+given by an identifier of a unit or a container with an empty member,
+which two spaces in a row or a space at either end make, by an empty
+identifier, and by an identifier of a provision that begins with a space;</li>
 <li>a level has a second <code>num</code> or a second <code>heading</code>;</li>
+<li>a <code>note</code> stands in quoted content anywhere but directly in it or in one
+of its levels, such as in a paragraph, a text part, a table cell or
+another note of it;</li>
 <li>a span of a table cell is not a whole number written in ASCII digits;</li>
-<li>a <code>br</code>, an <code>img</code> or a column holds content, or an <code>img</code> has an attribute
-other than <code>src</code>;</li>
+<li>a <code>br</code>, an <code>img</code> or a column holds content, white space alone included,
+or an <code>img</code> has an attribute other than <code>src</code>;</li>
 <li>a <code>signature</code> holds anything but <code>name</code> and <code>role</code>, a footnote that
 stands directly in it included;</li>
 <li>a unit or a container has a second source credit, or a source credit
@@ -2048,7 +2055,7 @@ has <code>"positive_law":null</code>.</p>
 <tr><td>Provision inside a unit</td><td>any element of the two classes above, and <code>subsection</code>, <code>paragraph</code>, <code>subparagraph</code>, <code>clause</code>, <code>subclause</code>, <code>item</code>, <code>subitem</code>, <code>subsubitem</code> and <code>level</code>, inside a unit. Its kind is its tag</td></tr>
 <tr><td>Label</td><td><code>num</code> and <code>heading</code> of a level</td></tr>
 <tr><td>Text part</td><td><code>chapeau</code>, <code>content</code>, <code>continuation</code>, <code>proviso</code></td></tr>
-<tr><td>Block</td><td><code>p</code> and <code>xhtml:p</code>, read alike; <code>xhtml:table</code>; <code>quotedContent</code>; <code>img</code>; in a note, and in quoted content inside one, <code>signature</code>; in a note also any <code>subheading</code>, any <code>heading</code> other than the note's own (the first <code>heading</code> that is a child of the note) at any depth inside it, whether or not the note has a heading of its own, and a text part directly in the note; in quoted content also <code>note</code>, and a <code>heading</code> or <code>subheading</code> directly in it</td></tr>
+<tr><td>Block</td><td><code>p</code> and <code>xhtml:p</code>, read alike; <code>xhtml:table</code>; <code>quotedContent</code>; <code>img</code>; in a note, and in quoted content inside one, <code>signature</code>; in a note also any <code>subheading</code>, any <code>heading</code> other than the note's own (the first <code>heading</code> that is a child of the note) at any depth inside it, whether or not the note has a heading of its own, and a text part directly in the note; in quoted content also a <code>note</code> directly in it or in one of its levels, and a <code>heading</code> or <code>subheading</code> directly in it</td></tr>
 <tr><td>Inline, kept as structure</td><td><code>ref</code> with an <code>href</code> (a link); <code>ref</code> of the class <code>footnoteRef</code> (a footnote marker); <code>sup</code> and <code>xhtml:sup</code>; <code>sub</code> and <code>xhtml:sub</code></td></tr>
 <tr><td>Inline, words kept and markup dropped</td><td><code>date</code>, <code>i</code>, <code>b</code>, <code>inline</code>, <code>xhtml:span</code>, <code>xhtml:b</code>, <code>xhtml:i</code>, <code>xhtml:a</code>, <code>name</code>, <code>role</code>; <code>br</code> is one space</td></tr>
 <tr><td>Table structure</td><td><code>xhtml:thead</code>, <code>xhtml:tbody</code>, <code>xhtml:tfoot</code>, <code>xhtml:tr</code>, <code>xhtml:th</code>, <code>xhtml:td</code>; <code>xhtml:colgroup</code> and <code>xhtml:col</code>, which hold no text, are dropped</td></tr>
@@ -2056,15 +2063,22 @@ has <code>"positive_law":null</code>.</p>
 <tr><td>Not imported, counted</td><td><code>toc</code> and everything in it; release notes; the label of a note group</td></tr>
 </tbody></table>
 </div>
+<p>The class of a <code>ref</code> is its <code>class</code> attribute split into words at ASCII
+white space, U+0020, U+0009, U+000A, U+000C and U+000D, and at no other
+character; a <code>ref</code> is of the class <code>footnoteRef</code> when one of those words
+is <code>footnoteRef</code>.</p>
 <p>The unit of a text is the outermost unit that holds it: a section that
 stands inside another section is a provision of kind <code>section</code> of the
 outer one. A footnote (a <code>note</code> of the type <code>footnote</code>) is taken out of
 the text where it stands, without closing its paragraph, and becomes a
 footnote of its module, numbered in document order; its marker is a run of
-the text that gives no words. An <code>img</code> is imported as the source its <code>src</code>
-names, normalized, and empty when it has none; the picture is not in the
-archive. Quoted content has the <code>origin</code> it names as the source writes it,
-and none when the attribute is absent or empty.</p>
+the text that gives no words. A footnote inside a table of contents or
+inside a release note is not imported. An <code>img</code> is imported as the source
+its <code>src</code> names, normalized, and empty when it has none; the picture is not
+in the archive. Quoted content has the <code>origin</code> it names as the source
+writes it, and none when the attribute is absent or empty. In a level of
+quoted content, its <code>num</code> and its <code>heading</code> close the paragraph that the
+words before them have open.</p>
 <p>A <code>num</code> with neither a <code>value</code> nor text is absent, and one with a <code>value</code>
 and no text keeps the value with an empty shown form; a <code>heading</code> with no
 text is absent, and so is a source credit with no text. A number, a heading
@@ -2073,7 +2087,9 @@ marker, with an empty text when it has no other. A text part that stands
 directly in a note, where the publisher sets out a law as loose paragraphs,
 gives its blocks to the note, in their place among the note's other
 blocks, and its role word (<code>chapeau</code>, <code>content</code>, <code>continuation</code> or
-<code>proviso</code>) is not kept. Each of these rules decides what a hash holds.</p>
+<code>proviso</code>) is not kept. A <code>continuation</code> or a <code>proviso</code> inside such a
+<code>content</code> gives its blocks in its place among them, as it gives a part of
+its own in a level. Each of these rules decides what a hash holds.</p>
 <h3 id="notes-and-their-layers"><span class="hn">4.18.3</span> Notes and their layers <a class="anchor" href="#notes-and-their-layers" aria-label="Link to this section">#</a></h3>
 <p>Each <code>note</code> in a <code>notes</code> element is a note, except a cross heading
 (<code>role="crossHeading"</code>), which opens a group named by its topic and is not
@@ -2119,19 +2135,21 @@ either:</p>
 <ol>
 <li><strong>A unit or a container with an identifier.</strong> An identifier that holds
 a space is a list: its first member is the identifier used, and the
-other members are aliases. An identifier whose last segment holds three
-full stops in a row stands for a range, as <code>s44...46</code> does: it is used
-as it is, and its aliases are its two ends, the identifier cut before
-the full stops and the identifier with its last segment replaced by
-that segment's leading lower-case letters followed by what stands after
-the full stops. When the two ends differ only in a whole number at their
-end, the second not smaller than the first and at most 999 above it,
-every number between them gives an alias as well; a member of a range
-whose number is followed by a letter gets no alias. The address is the
-identifier, unless a unit or a container before it in the release,
-taking the members in the order of their names and the elements in
-document order, already has it; then it is the identifier followed by
-<code>~2</code>, by <code>~3</code> for the next, and so on.</li>
+other members are aliases. A list with an empty member, which two spaces
+in a row or a space at either end make, and an empty identifier give no
+address, and the document is refused. An identifier whose last segment
+holds three full stops in a row stands for a range, as <code>s44...46</code> does:
+it is used as it is, and its aliases are its two ends, the identifier
+cut before the full stops and the identifier with its last segment
+replaced by that segment's leading lower-case letters followed by what
+stands after the full stops. When the two ends differ only in a whole
+number at their end, the second not smaller than the first and at most
+999 above it, every number between them gives an alias as well; a
+member of a range whose number is followed by a letter gets no alias.
+The address is the identifier, unless a unit or a container before it
+in the release, taking the members in the order of their names and the
+elements in document order, already has it; then it is the identifier
+followed by <code>~2</code>, by <code>~3</code> for the next, and so on.</li>
 <li><strong>A unit or a container without an identifier.</strong> The address of the
 container it stands in, or the prefix for the top element of a file,
 followed by <code>~&lt;tag&gt;.&lt;n&gt;</code>, where <code>n</code> counts from 1 the elements of that
@@ -2139,7 +2157,10 @@ tag without an identifier in that place, in document order.</li>
 <li><strong>A provision inside a unit.</strong> The address of its parent followed by
 the last segment of its identifier, of its first member if it lists
 several, and by <code>~2</code>, <code>~3</code> when a sibling before it already has that
-address; without an identifier, followed by <code>~&lt;tag&gt;.&lt;n&gt;</code> as in rule 2.</li>
+address; without an identifier, followed by <code>~&lt;tag&gt;.&lt;n&gt;</code> as in rule 2.
+An identifier that is empty or begins with a space has an empty first
+member and gives no address, and the document is refused; a space after
+the first member changes nothing.</li>
 <li>An alias that is the address of a unit, a container or a provision is
 dropped, and so is one the element already has.</li>
 </ol>
@@ -2155,8 +2176,8 @@ inside such an element is not counted again.</p>
 <p>Some of what a document holds is by rule not imported, and the lock's
 <code>not_imported</code> counts it:</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Not imported</th><th>Counted as</th></tr></thead><tbody>
-<tr><td>a table of contents, <code>toc</code>, and everything in it</td><td><code>tables_of_contents</code>; and the footnotes and links in it, as <code>footnotes_in_tables_of_contents</code> and <code>links_in_tables_of_contents</code></td></tr>
-<tr><td>a release note: a note directly under a <code>title</code> or an <code>appendix</code> whose text begins <code>Current through </code></td><td><code>release_notes</code></td></tr>
+<tr><td>a table of contents, <code>toc</code>, and everything in it</td><td><code>tables_of_contents</code>, each <code>toc</code> element once, one inside another included; and the footnotes and links in it, as <code>footnotes_in_tables_of_contents</code> and <code>links_in_tables_of_contents</code></td></tr>
+<tr><td>a release note: a note directly under a <code>title</code> or an <code>appendix</code> whose text begins <code>Current through </code>, with any footnote in it</td><td><code>release_notes</code></td></tr>
 <tr><td>a link that has no words, or white space alone</td><td><code>links_without_words</code></td></tr>
 <tr><td>the label of a note group, the heading of a cross heading</td><td><code>note_group_headings</code></td></tr>
 </tbody></table>
@@ -2456,68 +2477,64 @@ own.</li>
 </ul>
 <h3 id="the-ingester-and-the-independent-reading"><span class="hn">4.21.6</span> The ingester and the independent reading <a class="anchor" href="#the-ingester-and-the-independent-reading" aria-label="Link to this section">#</a></h3>
 <ul>
-<li>The ingester and <code>conformance/uslm_text.py</code> read nine forms of the
-publisher's XML differently. No release of 2026 holds any of them.
-<ul>
 <li>
-<p>On five of them one of the two refuses the document, so a release
-that holds one is refused by that reading:</p>
-<ul>
-<li>a <code>continuation</code> or a <code>proviso</code> inside a <code>content</code> that stands
-directly in a note, which the ingester reads as blocks of the note
-and the independent reading refuses;</li>
-<li>a note inside a paragraph or a text part of quoted content, rather
-than directly in the quoted content or in one of its levels, which
-the ingester refuses and the independent reading reads;</li>
-<li>white space inside a <code>br</code>, an <code>img</code> or a column, which the ingester
-refuses as content and the independent reading takes for none;</li>
-<li>an identifier of a unit or a container whose list has an empty
-member, as two spaces or a space at either end make, and an
-identifier of a provision that begins with a space, which the
-ingester refuses as no address and the independent reading reads
-without the empty member;</li>
-<li>a <code>class</code> attribute of a <code>ref</code> whose words are separated by a
-white-space character that is not ASCII. The ingester splits the
-attribute at ASCII white space only, and the independent reading at
-any, so one of them finds the class <code>footnoteRef</code> where the other
-does not, and one of them refuses the <code>ref</code>: as having neither an
-<code>href</code> nor that class, or as having both.</li>
-</ul>
+<p>The ingester and <code>conformance/uslm_text.py</code> read by one rule the rare
+forms of the publisher's XML on which they once differed: a
+<code>continuation</code> or a <code>proviso</code> inside a <code>content</code> directly in a note; a
+<code>note</code> in quoted content anywhere but directly in it or in one of its
+levels; white space inside a <code>br</code>, an <code>img</code> or a column; an identifier
+with an empty member; the words of the class of a <code>ref</code>; a <code>num</code> or a
+<code>heading</code> among the words of a level of quoted content; a footnote
+inside a footnote; a table of contents inside another; and a footnote
+inside a release note. The rules are those of
+<a href="#what-it-reads">What it reads</a>,
+<a href="#the-classes-of-elements">The classes of elements</a>,
+<a href="#how-it-gives-addresses">How it gives addresses</a> and
+<a href="#what-it-does-not-import">What it does not import</a>.</p>
 </li>
 <li>
-<p>On four of them both read the document, and read it differently:</p>
+<p>They read three other forms differently. No release of 2026 holds any of
+them.</p>
 <ul>
-<li>a <code>num</code> or a <code>heading</code> among the words of a level of quoted content,
-where the independent reading ends the open paragraph and the
-ingester does not;</li>
-<li>a footnote inside a footnote, which the ingester counts as a footnote
-of its own and the independent reading leaves out;</li>
-<li>a table of contents inside another, which the ingester counts twice
-among the tables of contents of the lock and the independent reading
-once; no text differs;</li>
-<li>a footnote inside the release note of a title or an appendix, which
-the ingester keeps as a footnote of that container and the
-independent reading leaves out with the note.</li>
+<li>A comment or a processing instruction inside a <code>br</code> or a column: the
+ingester refuses it as content, and the independent reading, whose
+parser drops both, does not see it.</li>
+<li>A schema location that the two take apart differently, so that one of
+them refuses the document and the other reads it: the ingester splits
+it into words at ASCII white space and the independent reading at any
+white space; the ingester takes the first file named for the
+publisher's namespace and the independent reading the last; and the
+independent reading refuses an odd number of words, where the ingester
+reads the pair it needs.</li>
+<li>A note with the role <code>crossHeading</code> that stands directly in a title or
+an appendix and whose text begins <code>Current through </code>: the ingester
+takes it for the release note, which it does not import, and the
+independent reading reads it as a note of its own, <code>ungrouped</code>.</li>
 </ul>
-<p>A release that holds one of these four is imported and checked without
-a word. The difference shows only when the two readings are compared on
-that release: what <code>conformance/uslm_text.py</code> prints for its archives
-against what <code>fidryn text DIR --json</code> prints for its workspace, and, for
-a table of contents, the counts of <code>conformance/usc_profile.py</code> against
-the ledger. The check of <a href="#the-sample">the sample</a> makes both
-comparisons for the sample; neither an import nor the replay of releases
-makes them.</p>
+<p>On the first two, one of the readings refuses the document. The third is
+read by both and read differently, and shows only when the two readings
+are compared on that release: what <code>conformance/uslm_text.py</code> prints for
+its archives against what <code>fidryn text DIR --json</code> prints for its
+workspace. That comparison, with the counts of tables of contents of
+<code>conformance/usc_profile.py</code> against the ledger, is what would show any
+other form the two read differently. The check of <a href="#the-sample">the sample</a>
+makes both comparisons for the sample; neither an import nor the replay of
+releases makes them.</p>
 </li>
-</ul>
-</li>
-<li>The independent reading refuses the nesting the ingester refuses, by the
+<li>
+<p>The independent reading refuses the nesting the ingester refuses, by the
 same rule, but has no bound on the number of nodes of a document: it
 reads a document the ingester refuses for its size, given the memory,
-about 3 GB for a member of 64 MiB of empty elements.</li>
-<li>A table of contents is not imported. The lock counts it
-(<a href="#what-it-does-not-import">What it does not import</a>).</li>
-<li>No display citation is derived. The address is the one citation a module
-records, and no form such as "1 U.S.C. § 8(b)" is made from it.</li>
+about 3 GB for a member of 64 MiB of empty elements.</p>
+</li>
+<li>
+<p>A table of contents is not imported. The lock counts it
+(<a href="#what-it-does-not-import">What it does not import</a>).</p>
+</li>
+<li>
+<p>No display citation is derived. The address is the one citation a module
+records, and no form such as "1 U.S.C. § 8(b)" is made from it.</p>
+</li>
 </ul>
 <h3 id="fetching"><span class="hn">4.21.7</span> Fetching <a class="anchor" href="#fetching" aria-label="Link to this section">#</a></h3>
 <ul>
