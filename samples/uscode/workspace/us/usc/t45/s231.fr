@@ -664,6 +664,20 @@ module "/us/usc/t45/s231" {
     region "/us/usc/t45/ch9/schIV"
     basis restated
   }
+  definition "/us/usc/t45/s231/a/2" {
+    term "employer"
+    kind does_not_include
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/b/1" {
+    term "employee"
+    kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
   definition "/us/usc/t45/s231/b/2" {
     term "employee"
     kind does_not_include
@@ -685,9 +699,23 @@ module "/us/usc/t45/s231" {
     region "/us/usc/t45/ch9/schIV"
     basis restated
   }
+  definition "/us/usc/t45/s231/g/2" {
+    term "war service period"
+    kind means
+    words "For purposes of section 231b(i)(2) of this title"
+    region "/us/usc/t45/s231b/i/2"
+    basis restated
+  }
   definition "/us/usc/t45/s231/h/1" {
     term "compensation"
     kind means
+    words "For the purposes of this subchapter"
+    region "/us/usc/t45/ch9/schIV"
+    basis restated
+  }
+  definition "/us/usc/t45/s231/h/6" {
+    term "compensation"
+    kind does_not_include
     words "For the purposes of this subchapter"
     region "/us/usc/t45/ch9/schIV"
     basis restated
@@ -698,6 +726,12 @@ module "/us/usc/t45/s231" {
     words "For the purposes of this subchapter"
     region "/us/usc/t45/ch9/schIV"
     basis restated
+  }
+  definition "/us/usc/t45/s231/h/8" {
+    term "compensation"
+    kind includes
+    words "for the purposes of sections 231b(a)(1), 231c(a)(1), and 231c(f)(1) of this title"
+    basis unresolved
   }
   definition "/us/usc/t45/s231/i" {
     term "Board"

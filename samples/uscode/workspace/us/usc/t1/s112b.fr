@@ -485,6 +485,14 @@ module "/us/usc/t1/s112b" {
     region "/us/usc/t1/s112b"
     basis enacted
   }
+  definition "/us/usc/t1/s112b/k/7/A" {
+    term "text"
+    kind includes
+    words "In this section"
+    condition "with respect to an international agreement or qualifying non-binding instrument"
+    region "/us/usc/t1/s112b"
+    basis enacted
+  }
   layers {
     operative "fe4262fb3d8f7cf6c1df90607195b512b13b063aea62798c87fdf35f704b4faa"
     enacted "49326f01c2f7cb4f3638088cd98df36aea735b5a35e84c3f2c4e569defe77c09"

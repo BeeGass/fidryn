@@ -367,6 +367,9 @@ impl Writer {
             Some(words) => self.line(&format!("words {}", string(words))),
             None => self.line("words unstated"),
         }
+        if let Some(condition) = &definition.condition {
+            self.line(&format!("condition {}", string(condition)));
+        }
         if let Some(region) = &definition.region {
             self.line(&format!("region {}", string(region.as_str())));
         }
@@ -380,6 +383,9 @@ impl Writer {
         ));
         if let Some(borrowed_from) = &definition.borrowed_from {
             self.line(&format!("borrowed_from {}", string(borrowed_from)));
+        }
+        if let Some(borrowed_words) = &definition.borrowed_words {
+            self.line(&format!("borrowed_words {}", string(borrowed_words)));
         }
         if let Some(see_note) = &definition.see_note {
             self.line(&format!("see_note {}", string(see_note.as_str())));
@@ -494,5 +500,48 @@ mod tests {
             let decoded: String = serde_json::from_str(&string(value)).expect("a JSON string");
             assert_eq!(decoded, value);
         }
+    }
+
+    #[test]
+    fn a_definition_writes_its_condition_and_source_words_only_when_present() {
+        let with = Definition {
+            at: Address::parse("/zz/demo/t1/s1/a").expect("an address"),
+            terms: vec!["widget".to_owned()],
+            kind: DefinitionKind::Borrowed,
+            words: Some("In this section".to_owned()),
+            condition: Some("in the case of a gadget".to_owned()),
+            region: Some(Address::parse("/zz/demo/t1/s1").expect("an address")),
+            basis: Basis::Restated,
+            borrowed_from: None,
+            borrowed_words: Some("the Widget Act".to_owned()),
+            see_note: Some(
+                Address::parse("/zz/demo/t1/s1/note/demoNotes/nolaw/x").expect("an address"),
+            ),
+        };
+        let mut out = Writer::default();
+        out.definition(&with);
+        assert_eq!(
+            out.text,
+            "definition \"/zz/demo/t1/s1/a\" {\n  term \"widget\"\n  kind borrowed\n  \
+             words \"In this section\"\n  condition \"in the case of a gadget\"\n  \
+             region \"/zz/demo/t1/s1\"\n  basis restated\n  borrowed_words \"the Widget Act\"\n  \
+             see_note \"/zz/demo/t1/s1/note/demoNotes/nolaw/x\"\n}\n"
+        );
+        let without = Definition {
+            kind: DefinitionKind::Means,
+            words: None,
+            condition: None,
+            region: None,
+            borrowed_words: None,
+            see_note: None,
+            ..with
+        };
+        let mut out = Writer::default();
+        out.definition(&without);
+        assert_eq!(
+            out.text,
+            "definition \"/zz/demo/t1/s1/a\" {\n  term \"widget\"\n  kind means\n  \
+             words unstated\n  basis restated\n}\n"
+        );
     }
 }

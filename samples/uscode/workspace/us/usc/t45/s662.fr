@@ -131,6 +131,13 @@ module "/us/usc/t45/s662" {
     p "Amendment by " ["Pub. L. 95–598" -> "/us/pl/95/598"] " effective Oct. 1, 1979, see " ["section 402(a) of Pub. L. 95–598" -> "/us/pl/95/598/s402/a"] ", set out as an Effective Date note preceding " ["section 101 of Title 11" -> "/us/usc/t11/s101"] ", Bankruptcy."
     hash "1cd3cd5227a5d4bc7ba6b777bb609ca70159ae48a42afcafdfe6384011fb8737"
   }
+  definition "/us/usc/t45/s662/c" {
+    term "restructuring"
+    kind includes
+    words "For purposes of this subsection"
+    region "/us/usc/t45/s662/c"
+    basis restated
+  }
   layers {
     operative "3ccb7b767cc4c0f20e0ee9d5a132f2a29fff7861134f45ab9408343831a7265a"
     enacted "6c16909df1e562b63335cc5f3f66191dae1c6bb8b13bd3debdcc264cc6a50472"

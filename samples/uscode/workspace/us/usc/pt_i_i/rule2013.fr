@@ -79,6 +79,12 @@ module "/us/usc/ptII/rule2013" {
     p "The language of Rule 2013 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
     hash "3ca2f52eb9c996b1488acbe19354ae6b04aaea5fdf87f1663a107eecad8a9f50"
   }
+  definition "/us/usc/ptII/rule2013/a/2" {
+    term "trustee"
+    kind does_not_include
+    words "As used in this rule"
+    basis unresolved
+  }
   layers {
     operative "bc5a58391831bc303668df498a41d7255d71af6539a0ce2737e82c887a351117"
     enacted "38d46ca714748f0b9e333546c0c3b7af10c9b5527047f75a45d1158b2f2075cd"

@@ -210,6 +210,13 @@ module "/us/usc/t45/s231e" {
   footnote 1 "1" {
     p "So in original. Probably should be subdivision “(1)”."
   }
+  definition "/us/usc/t45/s231e/d/2" {
+    term "combined earnings"
+    kind includes
+    words "For purposes of this subsection"
+    region "/us/usc/t45/s231e/d"
+    basis restated
+  }
   layers {
     operative "1e9c41fc8fbc68e24076374d5770afb801f76aa04ea1105b688be91294b31c2e"
     enacted "274c9dab8a7a004ad5407dea354d943262ba83893ee84c24654d9d5fae8072f9"

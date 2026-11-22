@@ -106,6 +106,13 @@ module "/us/usc/t45/s746" {
     p "Application of National Environmental Policy Act to actions of Commission not affected by title VI of " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", see " ["section 619 of Pub. L. 94–210" -> "/us/pl/94/210/s619"] ", set out as a note under " ["section 791 of this title" -> "/us/usc/t45/s791"] "."
     hash "7ce373698c822f6cf7cb1f07e93f5e378a6239d819a9e93ab08ae9f21b104a45"
   }
+  definition "/us/usc/t45/s746/c/4" {
+    term "rail properties"
+    kind includes
+    words "For purposes of this paragraph"
+    region "/us/usc/t45/s746/c/4"
+    basis restated
+  }
   layers {
     operative "0763a090d770911343bb51bb37ccb278e2d7d78ad00a72c68e03f151d09f821d"
     enacted "e42879ee668b650652d5ed34d0a412352cb7254045e9dabd087a3c20e24dceeb"

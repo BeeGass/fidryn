@@ -33,10 +33,10 @@ use fidryn_syntax::e2::{Parse, ast};
 ///   cell with no block and the shown form `""` of a number is the empty
 ///   text; the text of every block normalized; every topic one word (`E710`);
 /// - no empty string where no value may be empty: a term, stated reach
-///   words, `borrowed_from`, `source`, the release of a binding, and the
-///   origin of quoted content (`E710`). The value of a number, the shown
-///   form of a footnote and of a marker, the source of an image and the
-///   target of a link may be empty.
+///   words, a condition, `borrowed_from`, `borrowed_words`, `source`, the
+///   release of a binding, and the origin of quoted content (`E710`). The
+///   value of a number, the shown form of a footnote and of a marker, the
+///   source of an image and the target of a link may be empty.
 pub fn lower(parse: &Parse) -> Result<Lowered, Vec<Diagnostic>> {
     let Some(module) = &parse.module else {
         return Err(parse.diagnostics.clone());
@@ -703,8 +703,14 @@ impl Lowering {
             }
             ast::Words::Unstated(span) => (None, *span),
         };
+        if let Some(condition) = &definition.condition {
+            self.not_empty(condition, "the condition");
+        }
         if let Some(borrowed_from) = &definition.borrowed_from {
             self.not_empty(borrowed_from, "`borrowed_from`");
+        }
+        if let Some(borrowed_words) = &definition.borrowed_words {
+            self.not_empty(borrowed_words, "`borrowed_words`");
         }
         let region = definition
             .region
@@ -714,11 +720,15 @@ impl Lowering {
             .see_note
             .as_ref()
             .map(|see_note| self.address_or_stand_in(see_note));
+        let span_of = |value: Option<&ast::Str>| value.map(|value| value.span);
         self.spans.definitions.push(DefinitionSpans {
             at: definition.at.span,
             terms: definition.terms.iter().map(|term| term.span).collect(),
             words: words_span,
             kind: definition.kind.span,
+            condition: span_of(definition.condition.as_ref()),
+            borrowed_from: span_of(definition.borrowed_from.as_ref()),
+            borrowed_words: span_of(definition.borrowed_words.as_ref()),
         });
         self.spans
             .regions
@@ -735,12 +745,11 @@ impl Lowering {
                 .collect(),
             kind,
             words,
+            condition: value_of(definition.condition.as_ref()),
             region,
             basis,
-            borrowed_from: definition
-                .borrowed_from
-                .as_ref()
-                .map(|borrowed_from| borrowed_from.value.clone()),
+            borrowed_from: value_of(definition.borrowed_from.as_ref()),
+            borrowed_words: value_of(definition.borrowed_words.as_ref()),
             see_note,
         }
     }
@@ -809,6 +818,11 @@ impl Lowering {
             );
         }
     }
+}
+
+/// The value of an optional string.
+fn value_of(value: Option<&ast::Str>) -> Option<String> {
+    value.map(|value| value.value.clone())
 }
 
 /// The byte offset into `plain` of the first character that `normalized`

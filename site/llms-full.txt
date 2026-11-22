@@ -1940,11 +1940,15 @@ footnote marker names its footnote by that number.
 
 A definition records the provision that holds it (`at`), the terms it
 defines, its kind (`means`, `includes`, `does_not_include` or `borrowed`),
-the words that state its reach or none when the text states none, the
-region the reach covers, its basis (`enacted`, `restated` or `unresolved`),
-what a borrowed definition takes its meaning from (`borrowed_from`), and a
-note to read with it (`see_note`). The ingester for the Code extracts them
-by the rules of [Definitions](#definitions).
+the words that state its reach or none when the text states none, its
+condition when it has one (`condition`), the region the reach covers, its
+basis (`enacted`, `restated` or `unresolved`), what a borrowed definition
+takes its meaning from, either the target of a link (`borrowed_from`) or,
+when its source is not linked, the source words (`borrowed_words`), and a
+note to read with it (`see_note`). A definition of kind `borrowed` has
+exactly one of `borrowed_from` and `borrowed_words`, and a definition of
+any other kind has neither. The ingester for the Code extracts them by the
+rules of [Definitions](#definitions).
 
 ### Layers
 
@@ -2077,8 +2081,9 @@ Note        = "note" String ( "enacted" | "editorial" ) "{" "group" Ident { "top
               [ "heading" Text ] { Block } "hash" String "}" ;
 Footnote    = "footnote" Int String "{" { Block } "}" ;
 Definition  = "definition" String "{" "term" String { "term" String } "kind" Ident
-              "words" ( String | "unstated" ) [ "region" String ] "basis" Ident
-              [ "borrowed_from" String ] [ "see_note" String ] "}" ;
+              "words" ( String | "unstated" ) [ "condition" String ] [ "region" String ]
+              "basis" Ident [ "borrowed_from" String | "borrowed_words" String ]
+              [ "see_note" String ] "}" ;
 Layers      = "layers" "{" "operative" String "enacted" String "editorial" String "}" ;
 
 Import      = "import" String ( "as" Ident | "{" Ident { "," Ident } "}" ) ;
@@ -2097,7 +2102,9 @@ its first error, an `E100` at the token it is about:
 
 - Every block has the fields shown, in the order shown. A word that is no
   field of its block is "unknown field `<word>` in `<block>`"; a field that
-  stands out of its order, twice, or not at all is named as such.
+  stands out of its order, twice, or not at all is named as such, and so is
+  a field given with another that takes the same place (`borrowed_from`
+  and `borrowed_words`).
 - A word that begins no declaration is "unknown declaration `<word>`".
 - Text after the closing brace of the module is an error.
 - A source holds at most 64 MiB and 16,777,216 tokens, and its blocks nest
@@ -2139,8 +2146,9 @@ and generated modules are always in it:
   value: the value of a number, the shown form of a footnote and of a
   marker, the source of an image, and the target of a link. Anywhere else
   an empty string is refused: as the words of a run, as a term, as stated
-  reach words, as `borrowed_from`, as `source`, as the release of a
-  binding, as a topic, and as the origin of quoted content.
+  reach words, as a condition, as `borrowed_from`, as `borrowed_words`, as
+  `source`, as the release of a binding, as a topic, and as the origin of
+  quoted content.
 - `span <colspan> <rowspan>` is written only when one of the two is not 1.
 - Every `hash` and the three values of `layers` are computed by the rules
   of [Hashes](#hashes) from what is written above them.
@@ -2239,23 +2247,35 @@ about. `fidryn check` prints each as `FILE: CODE Title: message` and exits
 | The module's address, and every address written in it, is an address | `E700` |
 | The module has one of the three shapes, every declaration belongs to its shape, a declaration that stands once stands once, and a unit or a container has a `source` and `layers` | `E100` |
 | A unit's top provision has the module's address, and a container's address is the module's; every child provision's address is below its parent's; every note's address is below the module's; no address of a provision or a note is declared twice | `E700` |
-| Every run but a footnote marker has words, except in `td ""` and in the shown form `""` of a number ("a run has no words"); the text of every block is normalized ("text is not normalized"); a topic is one word, neither empty nor holding white space; no term, stated reach words, `borrowed_from`, `source`, release of a binding or origin of quoted content is an empty string | `E710` |
+| Every run but a footnote marker has words, except in `td ""` and in the shown form `""` of a number ("a run has no words"); the text of every block is normalized ("text is not normalized"); a topic is one word, neither empty nor holding white space; no term, stated reach words, condition, `borrowed_from`, `borrowed_words`, `source`, release of a binding or origin of quoted content is an empty string | `E710` |
 | Every `hash`, every value of `layers` and both hashes of a binding are 64 lower-case hexadecimal digits | `E710` |
 | Every `hash` and every value of `layers` equals the hash computed from what the module writes | `E710` |
 | The footnotes are numbered from 1, without a gap, in the order they are written; every footnote marker names a footnote of the module | `E710` |
-| A definition names a provision of the unit; each term stands in that provision's text; the reach words, when stated, stand in its text or in the chapeau of one of its ancestors; the kind is `means`, `includes`, `does_not_include` or `borrowed` and the basis `enacted`, `restated` or `unresolved`; a `borrowed` definition has `borrowed_from` | `E710` |
+| A definition names a provision of the unit; each term stands in that provision's text; the reach words, when stated, stand in its text or in the chapeau of one of its ancestors; the condition, when there is one, stands in its text or in the chapeau of one of its ancestors; the kind is `means`, `includes`, `does_not_include` or `borrowed` and the basis `enacted`, `restated` or `unresolved`; a `borrowed` definition has exactly one of `borrowed_from` and `borrowed_words`, and a definition of another kind has neither; `borrowed_words`, when present, stand in the provision's text | `E710` |
 | In a curated module, no name is declared twice, its citations and its bindings sharing one set of names | `E200` |
 
 An address is below another when it lies within it and is not the same
-address. The text of a provision is the plain text of each paragraph and
+address. The text of a provision is the text of each paragraph and
 subheading of its text parts, those in its tables and its quoted content
 included, and none of its children's; a term stands in it when one of
-those texts holds the term. Every text holds the empty string, so an empty
-term or empty reach words would pass the checks of a definition without
-checking anything. The topics of a note and the origin of quoted content
-have rules of their own because the hash of a note joins its topics with
-one space and the hash of quoted content takes an absent origin as an
-empty one: without them, two different modules could have one hash.
+those texts holds the term. Each of those texts is made of its runs in
+order without its footnote markers, which have no words, and without its
+superscript runs made only of the digits `0` to `9`, which are footnote
+numbers marked as superscripts. With each such run one space goes too: the
+space just before it, when just after it there is a space or the end of
+the text; or, when it begins the text, the space just after it. A
+superscript run that holds anything else, and a digit written in any other
+run, is text. So `section 5 of the Gadget Act` stands in a paragraph
+written `"... section 5 " sup "1" " of the Gadget Act."`. The terms, the
+reach words, the condition and `borrowed_words` are all looked for in this
+text, and the chapeaus of the ancestors are read the same way. Every text
+holds the empty string, so an empty term, empty reach words, an empty
+condition or empty `borrowed_words` would pass the checks of a definition
+without checking anything. The topics of a note and the origin of quoted
+content have rules of their own because the hash of a note joins its
+topics with one space and the hash of quoted content takes an absent
+origin as an empty one: without them, two different modules could have
+one hash.
 
 An address or a name declared twice is reported at its later declaration,
 with the earlier one as a related span. A footnote is reported at its
@@ -2956,173 +2976,829 @@ extracts definitions from the
 provisions of every unit it imports, once the unit's provisions and notes
 are read, and writes each in the unit's module as a `definition` block
 ([Syntax](#syntax)): the provision that holds it, its terms, its kind, the
-words that state its reach, the region the reach covers, its basis, and,
-where the rules give them, what it borrows its meaning from and a note to
-read with it. A container has no definitions. The rules read definitions
-written in a closed list of forms and in no other: they do not find every
-definition of the Code, and a provision whose text matches none of the
-forms is imported as a plain provision, with no definition. A definition
-the rules do not find is missing from the module; a definition they find
-records its terms, its kind and its reach words as the text has them.
+words that state its reach, its condition when it has one, the region the
+reach covers, its basis, and, where the rules give them, what a borrowed
+meaning is taken from, the target of a link or the source words, and a
+note to read with it. A container has no definitions. A definition the
+rules do not find is missing from the module; a definition they find
+records its terms, its kind, its reach words and its condition as the text
+has them.
 
-### Where definitions are read
+The rules are closed. A definition is extracted when its paragraph matches
+the forms below, and in no other case. A provision that matches none stays
+a plain provision. Where a rule names a list, the list is given in full,
+and nothing outside it counts.
 
-A definition is extracted from the first block of a `chapeau` or `content`
-part of a provision of a unit, when that block is a paragraph and its text
-matches one of the patterns below, and from nothing else: not from a note,
-not from quoted content, and not from a later block of a part. The text of
-a paragraph is its plain text: the words of its runs, in order, without its
-footnote markers. `Q` is a term in curly quotation marks, `“` and `”`, with
-at least one character and neither mark inside it; the term is recorded
-without the marks. Wherever these rules speak of a quotation mark, they
-mean one of these two characters and no other: a straight `"`, the single
-marks `‘` and `’`, and every other quotation mark are characters like any
-other. Where these rules say "in any case", the letters `A` to
-`Z` are compared as `a` to `z`, and no other character is changed. Where
-they speak of words that a text holds, they mean whole words: a word is
-bounded by the start or the end of the text or by a character that is not
-one of the letters `A` to `Z` and `a` to `z`.
+### D1. Text, terms and words
 
-### Verbs
+1. **Paragraph and its text.** A *paragraph* is a block of a part that is a
+   paragraph (not a table, a list of quoted content or any other block).
+   Its *text*, the text every rule below reads, is made from its runs in
+   order, as the module writes them (`"..."` words, `[... -> ...]` links,
+   `sup`, `sub` and `mark` runs):
+   1. the words of a words run, of a link and of a subscript run are read;
+   2. a footnote marker (`mark`) has no words and gives nothing;
+   3. a superscript run (`sup`) is read, unless its words are only the
+      digits `0` to `9` (at least one): such a run is a footnote number
+      that the publisher marked as a superscript, and gives nothing. With
+      it, one space goes too: the space just before it, when just after it
+      there is a space or the end of the text; or, when it begins the text,
+      the space just after it. The space just before it is the last
+      character kept so far, after any earlier run was left out, and it
+      begins the text when nothing has been kept so far: the runs `a `,
+      superscript `1`, superscript `2` and ` b` read `a b`, and the runs
+      superscript `1`, superscript `2` and ` b` read `b`;
+   4. a digit written in a words run, or in a superscript run that holds
+      anything but digits, is text and is read, even where it shows the
+      number of a footnote (a fault of the source, kept as written).
 
-| Kind | Verb forms |
-| --- | --- |
-| `means` | `means`, `mean`, `shall mean` |
-| `includes` | `includes`, `include`, `shall include` |
-| `does_not_include` | `does not include`, `do not include`, `shall not include` |
-| `borrowed` | `has the meaning given`, `have the meaning given`, `has the meanings given`, `have the meanings given`, `has the same meaning as`, `have the same meaning as`, `shall have the meaning given` |
+   An implementation that reads the publisher's XML takes a `ref` element
+   of the class `footnoteRef` as a footnote marker, and `sup` and
+   `xhtml:sup` elements as superscript runs, as the importer does. A *link*
+   of a paragraph is the place of a link run's words in the text (where
+   they start and where they end) and its target, which may be empty. The
+   terms, the reach words, the condition and the source words are all taken
+   from this text, so none of them holds a footnote number marked as a
+   superscript. A superscript run made only of digits is left out of all
+   the text the definition rules read, not only out of the recorded fields:
+   the heading and the paragraphs of a note that D13.3 reads are this text
+   too, so a paragraph whose runs are `This section`, superscript `1` and
+   `, referred to in subsec. (a), is …` reads
+   `This section, referred to in subsec. (a), is …`. The checker's "stands
+   in" tests (D15.3) use this same text.
+2. **Term.** A term `Q` is a curly opening quotation mark `“` (U+201C), at
+   least one character that is neither `“` nor `”`, and a curly closing
+   mark `”` (U+201D). The term is recorded without the marks, and then as
+   D7.6 and D7.7 say. *Quotation mark*, below, means `“` or `”` only.
+3. **In any case.** Where a rule says "in any case", the letters `A` to `Z`
+   are compared as `a` to `z`, and no other character is changed.
+   Elsewhere text is compared exactly as written.
+4. **Standing as words.** Words *stand* in a text where the character
+   before them, if any, and the character after them, if any, are not
+   letters `A` to `Z` or `a` to `z`. Verb forms (D2), the phrases of D1.9,
+   the words of D1.10 and every other list that a rule calls "words" are
+   looked for only where they stand.
+5. **End of a sentence.** A period, then optionally `”` or `)`, then a
+   space, then a letter `A` to `Z`; except where the word just before the
+   period is one of the abbreviations below or a single capital letter `A`
+   to `Z`. The *word before the period* is the longest run of letters (`A`
+   to `Z`, `a` to `z`) and periods that ends just before the period, starts
+   with a letter, and lies within the 12 characters before the period; when
+   the character just before the period is not a letter or a period, there
+   is no word before it. The abbreviations are: `U.S.C`, `U.S`, `App`,
+   `No`, `Nos`, `Stat`, `Reg`, `Fed`, `Pub`, `Sec`, `Secs`, `Co`, `Inc`,
+   `Corp`, `Ltd`, `Jr`, `Sr`, `St`, `Mt`, `Ft`, `Dr`, `Mr`, `Mrs`, `Ms`,
+   `D.C`, `seq`, `etc`, `e.g`, `i.e`, `Res`, `Cong`, `Sess`, `Doc`, `Rept`,
+   `H.R`, `Ch`, `Art`, `Par`, `Cl`, `Pt`, `Div`, `Vol`, `Supp`, `Ct`, `v`,
+   `Gen`, `Gov`, `Rev`, `Admin`, `Bros`, `Assn`, `Dept`, `Govt`, `Natl`,
+   `Ry`, `R.R`, `C.F.R`, `F.R`, `L`.
+6. **Sentence.** A sentence of a paragraph begins at the start of its text
+   or just after an end of a sentence (after its space), and ends at the
+   period of the next end of a sentence, or at the end of the text. The
+   first sentence begins at the start.
+7. **Close.** A text *ends with a close* when its last character is an em
+   dash `—` (U+2014), a hyphen `-` or a colon `:`. The close, and one space
+   before it if there is one, are no part of what precedes it.
+8. **Openings.** The openings of a reach are, in this order: `As used in`,
+   `In`, `For purposes of`, `For the purposes of`, `For the purpose of`,
+   `For purpose of`, `When used in`. The *lowercase openings* are the same
+   with a lowercase first letter: `as used in`, `in`, `for purposes of`,
+   `for the purposes of`, `for the purpose of`, `for purpose of`,
+   `when used in`.
+9. **The six phrases of a reach.** `as used in`, `when used in`,
+   `for purposes of`, `for the purposes of`, `for the purpose of`,
+   `for purpose of`, looked for in any case.
+10. **Words of a verb phrase.** `shall`, `be`, `is`, `are`, `may`,
+    `deemed`, `construed`, `held`, `considered`, `treated`, `interpreted`,
+    `refer`, `refers`, `applies`, `apply`, `also`, as written.
+11. **Kind words.** `these`, `section`, `sections`, `subsection`,
+    `subsections`, `paragraph`, `paragraphs`, `subparagraph`,
+    `subparagraphs`, `clause`, `clauses`, `subclause`, `subclauses`,
+    `item`, `items`, `chapter`, `chapters`, `subchapter`, `subchapters`,
+    `part`, `parts`, `subpart`, `subparts`, `title`, `titles`, `subtitle`,
+    `subtitles`, `division`, `divisions`, `rule`, `rules`. They are
+    compared in any case.
+12. **Region kinds.** `title`, `subtitle`, `chapter`, `subchapter`, `part`,
+    `subpart`, `division`, `section`, `subsection`, `paragraph`,
+    `subparagraph`, `clause`.
 
-A verb form stands where its words are followed by the end of the text or
-by a character that is not one of the letters `A` to `Z` and `a` to `z`;
-where a rule looks for a verb form inside other text, the character before
-it is not such a letter either.
+### D2. Verb forms
 
-### Patterns
+1. The verb forms, each with the kind it gives:
 
-1. *Sentence form.* The paragraph begins
-   `[Reach ","] ("the"|"The") ("term"|"terms"|"word"|"words"|"phrase") Q { ("," | "and" | "or" | ", and" | ", or") Q } ["," Aside ","] Verb ...`.
-   `Aside` is text with no quotation mark and no verb form of the table in
-   it.
-2. *List form.* The paragraph begins
-   `Q { ("," | "and" | "or" | ", and" | ", or") Q } Verb ...`, and it has
-   an inherited reach (below).
+   | Kind | Verb forms |
+   | --- | --- |
+   | `means` | `means`, `mean`, `shall mean` |
+   | `includes` | `includes`, `include`, `shall include`, `also includes`, `also include`, `shall also include` |
+   | `does_not_include` | `does not include`, `do not include`, `shall not include`, `does not mean`, `do not mean`, `shall not mean` |
+   | `borrowed` | `has the meaning given`, `have the meaning given`, `has the meanings given`, `have the meanings given`, `has the same meaning as`, `have the same meaning as`, `shall have the meaning given`, `has the meaning provided`, `have the meaning provided`, `has the meanings provided`, `have the meanings provided`, `has the meaning set forth`, `have the meaning set forth`, `have the meanings set forth`, `has the meaning prescribed`, `have the meaning prescribed`, `have the meanings prescribed`, `has the meaning stated`, `have the meanings stated`, `has the meaning assigned`, `have the meanings assigned`, `has the meaning described`, `has the meaning ascribed`, `have the meanings ascribed`, `has the meaning indicated`, `has the meaning applicable`, `has the meaning such term has`, `has the meaning that term has`, `has the meaning the term has`, `have the meanings such terms have`, `have the meanings that such terms have`, `has the meaning as in`, `have the meaning as in`, `has the same meanings as`, `have the same meanings as`, `has the same meaning given`, `have the same meaning given`, `have the same meanings given`, `shall have the same meaning as`, `shall have the meanings given` |
 
-One space stands between two parts of a pattern, and a comma stands
-directly after the part before it: `the term “widget”, with respect to a
-gadget, means`, `the terms “widget” and “gadget” mean`. The kind of the
-definition is the kind of its verb form.
+2. A verb form is looked for where it stands (D1.4), written exactly as in
+   the table. Where several forms stand at one place, the longest is taken.
+3. The kind is the verb as written. `includes only` is the form `includes`
+   and gives `includes`. Deeming forms (`shall be deemed to mean`,
+   `is deemed to include` and the like), `may include`, `refers to` and
+   every form not in the table give no definition.
+4. "Holds no verb form" means that no form of the table stands anywhere in
+   the text.
 
-### The reach
+### D3. Where definitions are read
 
-`Reach` is `Opening Object`. `Opening` is one of `As used in`, `In`,
-`For purposes of`, `For the purposes of`, `For the purpose of`,
-`For purpose of` and `When used in`. `Object` is the text from the opening
-to the end of the reach: it is not empty, it holds no quotation mark, and
-it holds none of the words `term`, `terms`, `word`, `words`, `phrase`,
-`phrases`, `definition`, `definitions`, `following`, `meaning` and
-`meanings`, in any case. After `In`, the `Object` must begin with `this` and
-a space, or be a single link; a paragraph that opens with `In` and anything
-else ("In the case of an individual, the term ...") states a condition, not
-a reach. In the sentence form the reach ends at the comma that stands before
-`the term` (or `The`, `terms`, `word`, `words`, `phrase`), and no quotation
-mark stands before that comma. A paragraph whose text before those words is
-anything other than a `Reach` is not extracted.
+1. Definitions are read from the operative provisions of a unit: the
+   unit's root provision and every provision below it. Nothing is read from
+   a note, from quoted content, from a table, from a container, or from a
+   block that is not a paragraph.
+2. A provision's *items* are its parts and its child provisions, in order.
+   A part has a role (`chapeau`, `content`, `continuation`, `proviso`, or
+   another) and blocks. These paragraphs are read, each at a *place*:
+   1. the first block of each `chapeau` or `content` part, when it is a
+      paragraph: an *ordinary place*;
+   2. each later block of a `chapeau` or `content` part that is a
+      paragraph: a *line place* when the part's first block is a paragraph
+      whose text is a reach line (D8), with that line's reach; otherwise a
+      *stated-only place*;
+   3. each block of a `continuation` or `proviso` part that is a paragraph:
+      a stated-only place.
+3. A paragraph is read at the start of its text, and again at the start of
+   each later sentence (D1.6). The first reading may use any form of D7; a
+   later reading is limited by D10.
+4. The provision a paragraph belongs to is its *provision*. The *holder* of
+   a reach is the provision whose text states it: the paragraph's provision
+   for a reach the paragraph states (D7) or a line place's reach (D3.2.2);
+   the ancestor whose chapeau states it for an inherited reach (D9).
 
-A single link is an object whose words are exactly the words of one link
-of the paragraph.
+### D4. Reach
 
-### A reach chapeau
+1. **Form.** A *reach* is `Opening Object`: one of the openings of D1.8, a
+   space, and the Object, which runs to the end of the text being read as a
+   reach. The opening is the first in the order of D1.8 that the text
+   begins with, followed by a space. A *lowercase reach* is the same with a
+   lowercase opening.
+2. **The Object.** The Object is not empty. It holds no quotation mark. It
+   holds none of the words `term`, `terms`, `word`, `words`, `phrase`,
+   `phrases`, `definition`, `definitions`, `following`, `meaning`,
+   `meanings`, in any case, standing as words. It holds no end of a
+   sentence. Whether a text holds an end of a sentence is judged on its own
+   characters, here as for an exception (D5.1) and a condition (D6.3): in
+   `In this section. The term “x” means y.` the Object `this section.`
+   holds none, and the paragraph gives one record, whose words are
+   `In this section.` with its full stop, with no region and the basis
+   `unresolved`.
+3. **After `In`.** After the opening `In` or `in`, the Object must do one of
+   these: begin with `this` and a space, as written; be exactly the words
+   of one link of the paragraph; or begin, compared in any case, with
+   `this`, `these`, `such` or a kind word (D1.11) and a space, while not
+   beginning with `such ` as written. An Object after `In` that does none of
+   these makes the text no reach: "In the case of" begins a condition (D6),
+   not a reach.
+4. **A sense after `When used in`.** After the opening `When used in` or
+   `when used in`, an Object that begins with one of the following, as
+   written, makes the text no reach: `a geographical sense`,
+   `a geographic sense`, `the geographical sense`, `the geographic sense`,
+   `a geographical context`, `a geographic context`, `geographical sense`,
+   `geographic sense`, `their respective geographical`, `connection with `,
+   `relation to `, `reference to `, `the context of `, `the singular form`.
+   These words state a sense in which a term is used, and the text may be a
+   condition (D6.2). They are the *sense words*.
+5. **A condition at the end of the Object.** After D4.4 and before D4.2 and
+   D4.3 are applied, the Object is searched for its first comma that is
+   followed by a space and a lowercase condition start (D6.1). If there is
+   one, and some text stands before that comma, and the words after its
+   space are a condition (D6.3), and the text from the opening to that
+   comma is a reach by D4.1 to D4.4 (and has no condition of its own), then
+   the reach is that shorter reach, and its *condition* is the words after
+   the comma and its space. In any other case the Object is read whole by
+   D4.2 and D4.3, as if this rule did not exist.
+6. **Reach words.** The reach words are the text from the opening to the
+   end of the Object, exactly as written (for D4.5, to the comma before the
+   condition).
+7. **The link of a reach.** A reach has a link when a link of the paragraph
+   has exactly the Object's words. A link has them, here and in D4.3, when
+   its place in the paragraph, its start and its end, is exactly the
+   Object's place; a link elsewhere in the paragraph whose words equal the
+   Object's does not count. `For purposes of this Act, the term “x” means a
+   y of this Act.`, whose last `this Act` is a link to `/us/usc/t99/s9`,
+   gives a record with the basis `unresolved` and no region.
 
-The chapeau of a provision is a *reach chapeau* when it is one paragraph
-whose text is `Reach [[","] LeadIn] Close`, and nothing more. `LeadIn` is
-one of `the term`, `the terms`, `the following definitions apply` and
-`the following definitions shall apply`. `Close` is a dash (U+2014 or `-`)
-or a colon, with at most one space before it. The lead-in and the close are
-no part of the reach. `In this section:`, `As used in this chapter, the
-term—` and `In this section, the following definitions apply:` are reach
-chapeaus; `The following rules apply:`, `Except as otherwise provided, in
-this chapter:` and `In this chapter, the following terms have the following
-meanings:` are not.
+### D5. Exception
 
-### The reach of a paragraph
+1. An *exception* is text that begins with `Except `, `Unless `,
+   `Notwithstanding ` or `Subject to `, and is *clean*: it holds no
+   quotation mark, no verb form, none of the six phrases of a reach (in any
+   case), and no end of a sentence; it does not begin `Except in ` in any
+   case; and each comma in it that is followed by a space and a lowercase
+   letter is followed by a space and the word `and` or `or`.
+2. A *lowercase exception* begins with `except ` or `unless ` and is clean
+   in the same way.
 
-A paragraph of the sentence form that begins with a `Reach` has that reach.
-Any other paragraph looks to the nearest ancestor of its provision that has
-a chapeau. When that chapeau is a reach chapeau, the paragraph has its
-reach, an *inherited* reach. When it is any other chapeau, the paragraph is
-not extracted: such a chapeau may state a reach in words these rules do not
-read. When no ancestor has a chapeau, a paragraph of the sentence form has
-no reach, and a paragraph of the list form is not extracted. The reach
-words are recorded exactly as the text has them, from the opening to the
-end of the object; a definition with no reach has the words `unstated`.
+### D6. Condition
 
-### What is not extracted
+1. **Starts.** A condition begins with one of: `In the case of `,
+   `In any case in which `, `In the context of `, `With respect to `; or
+   `When used in ` followed by one of the sense words of D4.4. A *lowercase
+   condition start* is the same with a lowercase first letter:
+   `in the case of `, `in any case in which `, `in the context of `,
+   `with respect to `, `when used in ` followed by a sense word.
+2. `When used in` with any other words after it begins no condition; it is
+   an opening of a reach (D4.1).
+3. **A condition.** Text is a condition when it begins with a condition
+   start (capital or lowercase, as the rule that reads it says), and the
+   text after the start: is not empty; has no space at its start or end;
+   holds no quotation mark, no verb form, none of the six phrases of a
+   reach (in any case) and no end of a sentence; holds no `shall`; and each
+   comma in it that is followed by a space and a lowercase letter is
+   followed by a space and the word `and` or `or`. `shall` is looked for
+   where it stands, as every word of D1.10 is, so
+   `In the case of Marshall County, the term “x” means y.` gives a record
+   whose reach is unstated and whose condition is
+   `In the case of Marshall County`; and a lowercase letter is one of `a`
+   to `z`, here and in D5.1, as everywhere in these rules, so
+   `In the case of a gadget, élite or common, the term “x” means y.` gives
+   a record with that condition.
+4. The condition is recorded exactly as written, from its start to its
+   end, with the capital or lowercase first letter the text has.
+5. **An aside that is a condition.** An aside (D7.8.2 or D7.8.4) is a
+   condition when it is exactly `in a geographical sense`,
+   `in a geographic sense`, `in the geographical sense` or
+   `in the geographic sense`; or it begins with `when used in ` followed by
+   a sense word (D4.4); or it begins with one of `in the case of `,
+   `in any case in which `, `in the context of `, `in connection with `,
+   `in relation to `, `in reference to `, `in case `, `with respect to `,
+   `when used with respect to `, `used with respect to `,
+   `as used with respect to `, `with regard to `, `with reference to `,
+   `as applied to `, `when applied to `, `when referring to `, `for any `
+   (tried in this order, the first that the aside begins with being its
+   start). In the last two cases the words after the start (after
+   `when used in `, or after the start of the list) must be as D6.3 says.
+   Any other aside (`except as provided in ...`, `unless otherwise
+   provided`, `in addition to ...`, `subject to ...`) is no condition.
+6. **A condition after the verb form.** The text after the verb form is a
+   comma, a space, C, a comma, a space and R, where:
+   1. C is the text from after that first comma and space up to the next
+      comma, which must stand in the same sentence and be followed by a
+      space;
+   2. C begins with `when used in ` followed by a sense word (D4.4), or
+      with `in ` followed by one of `the case of `, `case `,
+      `any case in `, `connection with `, `relation to `, `reference to `,
+      `respect of `, `the context of `, `a geographical sense`,
+      `a geographic sense`, `the geographical sense`,
+      `the geographic sense`, `interstate cases`, `an individual capacity`,
+      `appropriate circumstances` (as written; the list of D11.5 without
+      `addition to `);
+   3. the words of C after `when used in ` or after `in ` are as D6.3
+      says, and C holds no em dash;
+   4. R is the rest of the sentence after the comma that ends C and its
+      space. R does not begin with `or ` or `and `; it does not begin with
+      characters other than spaces and commas that are directly followed by
+      a comma (as in `contract, or other agreement`, where C would cut a
+      list); and it holds none of `in the case of`, `in any case in which`,
+      `in the context of`, `in connection with`, `in relation to`,
+      `in reference to`, `in respect of`, `with respect to`,
+      `when used in`, in any case, standing as words (a second condition,
+      or the rest of the first).
 
-A paragraph that matches a pattern is still not extracted when one of these
-holds:
+   Then C is the condition after the verb form. `, with respect to` after
+   the verb form is not of this form, and stays no condition.
 
-- *It defines a second term.* After the `Verb`, the text holds a `Q` that
-  is followed by a space and a verb form, or by a comma, a space, text with
-  no quotation mark, a comma, a space and a verb form.
-- *Its aside speaks of a reach.* The `Aside` begins with `in` and a space,
-  or holds `as used in`, `when used in`, `for purposes of`,
-  `for the purposes of`, `for the purpose of` or `for purpose of`, in any
-  case.
-- *A reach follows its verb.* The `Verb` is followed by a comma, a space,
-  one of the openings in any case, and a space.
-- *It has no reach, and speaks of one.* It has the words `unstated`, and
-  its text holds one of the six phrases of the second case, in any case.
+### D7. Patterns
 
-A borrowed definition with no link after its verb is not extracted either
-(below).
+A reading of a paragraph begins at a start (D3.3): the start of the text,
+or the start of a later sentence. All positions below are counted from
+that start.
 
-### The region
+1. **The two forms.** A reading has the *list form* when the text at the
+   start begins with `“`, or (D7.5) with an article directly followed by
+   `“`. Otherwise it has the *sentence form*. The article is tried before
+   the head words of D7.3.
+2. **The lead.** In the sentence form, the text before the words that name
+   what it defines is the *lead*. A lead is read by the first of these that
+   applies:
+   1. the whole lead is a reach (D4), perhaps with a condition at the end
+      of its Object (D4.5);
+   2. the lead begins with an exception start of D5.1, and is
+      `Exception ", " LowercaseReach`: for the first comma followed by a
+      space such that the text after it is a lowercase reach (D4) and the
+      text before it is an exception (D5.1), the reach is that lowercase
+      reach. When no comma does this and the whole lead is an exception,
+      the lead has no reach;
+   3. the lead begins with a condition start of D6.1 (with a capital
+      letter), and is `Condition ", " LowercaseReach`: for the first comma
+      followed by a space such that the text after it is a lowercase reach
+      with no condition of its own and the text before it is a condition,
+      the lead has that reach and that condition. When no comma does this
+      and the whole lead is a condition, the lead has that condition and no
+      reach.
 
-When the `Object` is `this`, a space and one of `title`, `subtitle`,
-`chapter`, `subchapter`, `part`, `subpart`, `division`, `section`,
-`subsection`, `paragraph`, `subparagraph`, `clause`, and then either
-nothing more or a comma, a space and text that begins `unless the context`,
-the region is the nearest ancestor whose kind is that word, counted from
-the provision whose text holds the reach (that provision included, then its
-ancestors, then its unit's containers in order, the nearest first). When
-the `Object` is a single link whose target is an address below the prefix
-of the corpus, the region is that target. Otherwise there is no region: a
-link to a public law or to the Statutes at Large names no region of the
-Code, and an object that says more than these forms allow ("this chapter
-and chapter 5", "paragraph (1)") is not resolved.
+   A lead that none of these reads makes the reading match no pattern.
+3. **Head words.** The *head words* are `the` or `The`, a space, one of
+   `term`, `terms`, `word`, `words`, `phrase`, and a space; or
+   `Each of the terms ` or `each of the terms `. In the sentence form the
+   terms are found as follows, by the first case that applies:
+   1. the text at the start is head words: the lead is empty and there is
+      no reach;
+   2. ending before the first quotation mark at or after the start, there
+      is a comma and a space followed by head words of the first kind
+      (`the` or `The` and a noun), or, when there is none, a comma and a
+      space followed by `Each of the terms ` or `each of the terms `: the
+      first such is taken, and the text from the start to that comma is the
+      lead (D7.2);
+   3. before the first quotation mark, a space is followed by head words
+      of the first kind (`the` or `The` and a noun): the first such is
+      taken, and the text from the start to that space is the lead. The
+      lead must then be read by D7.2.1, with a reach, no condition, and no
+      comma in the Object;
+   4. no head words stand before the first quotation mark: the first
+      quotation mark must be `“`, and the text from the start to it must
+      end with a comma, a space, and optionally one of `the `, `a `, `an `;
+      the text from the start to that comma is the lead, and it must give a
+      reach (by D7.2.1, D7.2.2 or D7.2.3). The terms begin at the first
+      quotation mark. Head words of both kinds are looked for here where
+      they stand, with no letter just before them, anywhere from the start
+      of the reading to the mark: so
+      `Except for bathe terms elsewhere, in this section, “x” means y.`
+      gives a record with the words `in this section`.
 
-### The basis
+   Once a case finds head words, a lead that D7.2 does not read (or, in
+   case 3, does not read as that case requires) makes the reading match no
+   pattern; the later cases are not tried.
 
-| Region | Unit | Basis |
-| --- | --- | --- |
-| none | any | `unresolved` |
-| an address | its file declares its title positive law (`positive_law true`) | `enacted` |
-| an address | any other | `restated` |
+   The terms then follow the head words (cases 1 to 3) or begin at the mark
+   (case 4).
+4. **The list form** begins with the terms, at the start.
+5. **An article before the list form.** At the start of the text (not at a
+   later sentence), one of `The `, `the `, `A `, `a `, `An `, `an `
+   directly followed by `“` is skipped, and the terms begin at the mark.
+   The reading has the list form.
+6. **The terms.** The terms are `Q { Sep Q }`, where `Sep` is one of
+   `, and `, `, or `, `, `, ` and `, ` or `, taking as many as follow. A
+   second form is also tried: one or more terms each of whose last
+   character is a comma, each followed by a space, then optionally `and `
+   or `or `, then a term (`“law,” “treaty,” and “rule”`); when it covers
+   more text than the first form, it is taken, and the comma that ends
+   each of its terms is not recorded. Then a term longer than one character
+   whose last character is a comma is recorded without that comma. In both
+   forms the comma is taken off only from a term longer than one
+   character, and only once: `The term “,” “x” means y.` records the terms
+   `,` and `x`, and `The term “a,,” “b” means c.` records `a,` and `b`.
+7. **Stray characters of nested quotation.** Each term is then trimmed:
+   spaces (U+0020) at its start and its end are removed; then, when the
+   term ended with a space, a `’` that now ends it is removed if the term
+   holds no `‘`; then a `‘` that begins it is removed if the term holds no
+   `’`. A term that would become empty is kept as it was.
+8. **After the terms.** After the terms comes one of the following, tried
+   in this order; the first that applies gives the verb form. The verb form
+   must stand (D1.4).
+   1. a space and a verb form;
+   2. a comma, a space, an *aside*, a comma, a space and a verb form, where
+      the aside is the shortest text with no quotation mark that is so
+      followed; this case applies when that aside holds no verb form. It
+      applies in both forms. The aside may be empty:
+      `The term “x”, , means y.` gives a record for `x` of kind `means`,
+      its reach unstated. An aside is not part of the reach; D9.6 may
+      record it as the condition. Then, when the lead gave no reach and the
+      aside begins, in any case, with `as used in ` or `when used in `: if
+      the aside is a lowercase reach with no condition, whose Object holds
+      no word of a verb phrase, and the aside begins with `as used in ` or
+      its Object begins, in any case, with `this`, `these`, `such` or a
+      kind word and a space, then the aside is the reach of the reading and
+      there is no aside;
+   3. when the lead gave no reach: a comma and a space, or a space; then
+      `as used in ` or `when used in ` and the shortest text with no
+      quotation mark; then optionally a comma; then a space and a verb
+      form. The words from `as used in` or `when used in` to the end of
+      that text must be a lowercase reach meeting the conditions of D7.8.2;
+      they are then the reach of the reading;
+   4. a space, then an aside that begins with one of `with respect to `,
+      `when used with respect to `, `used with respect to `,
+      `when applied to `, `as applied to `, `with reference to `,
+      `in the case of `, `for any `, `when referring to `, as written; the
+      aside is the shortest text with no quotation mark that is followed by
+      an optional comma, a space and a verb form. This case applies when
+      that aside holds no verb form, none of the six phrases of a reach (in
+      any case), no comma, none of the words of D11.3, and no word of a
+      verb phrase.
 
-### Borrowed definitions
+   When none applies, the reading matches no pattern.
+9. **The kind** is the kind of the verb form (D2).
 
-A definition of kind `borrowed` records as `borrowed_from` the target of the
-first link that begins at or after the end of its verb form. If there is
-none, the paragraph is not extracted, and so it is when that link has an
-empty target.
+### D8. Reach lines and condition lines
 
-### The note
+1. A text is a *reach line* when it ends with a close and the text before
+   the close is one of the following forms; the first form that applies, in
+   this order, gives the reach. `LeadIn` is one of `the term`, `the terms`,
+   `the following definitions apply`,
+   `the following definitions shall apply` (the *first lead-ins*), or one
+   of `the following terms have the following meanings`,
+   `the following terms shall have the following meanings`,
+   `the following terms mean the following`, `the following terms apply`,
+   `the following words and phrases have these meanings`,
+   `the following definition applies`,
+   `the following definition shall apply`,
+   `the following words or phrases shall have the meaning indicated`,
+   `the following terms shall have the meanings stated below`,
+   `the following terms shall have the meanings ascribed to them below`,
+   `the following terms shall have the meanings respectively ascribed to them below`,
+   `terms have the following meanings`, `the term or terms` (the *later
+   lead-ins*). A lead-in follows the reach after `, ` or a space.
+   1. `Reach [", " | " "] [FirstLeadIn]`: the first of the first lead-ins,
+      in their order, that the text ends with (after `, ` or a space) is
+      taken off, and the rest is a reach (D4, with D4.5).
+   2. The forms below, tried at each of these *ends* in turn, the first end
+      and form that give a reach winning. The ends are made in this order.
+      First the end of the text; then, when the text ends with ` (` and
+      words that begin `except ` or `unless ` (in any case) and hold no
+      parenthesis, and `)`, the place of that ` (`; then, for each end so
+      far, in order, each place of a comma followed by a space and
+      `except ` or `unless ` whose words to that end are a lowercase
+      exception, in the order they stand. Then each end is followed, in
+      order, by the ends made from it by taking off a lead-in that the text
+      to that end ends with: for each lead-in in the order listed (the
+      first lead-ins, then the later ones), first with `, ` before it, then
+      with a space before it; and after each such end, each comma before
+      it, in the order they stand, that is followed by a space and
+      `except ` or `unless ` whose words to that end are a lowercase
+      exception. A *marked end* is any end other than the end of the text
+      and the ends made from the end of the text by taking off a first
+      lead-in. At each end, in turn:
+      1. at a marked end, the text to it is a reach;
+      2. the text to it is `Exception ", " LowercaseReach` (as in D7.2.2,
+         with a reach);
+      3. the text to it is a lowercase reach.
+   3. `("The following definitions" | "In addition to the definitions " Text ", the following definitions" | "In addition to the terms " Text ", the following definitions") [" relating to " Text] [" shall"] " apply " Prep " " Object`,
+      the whole text. `Text` is the shortest text with no quotation mark.
+      `Prep` is `in`, `to`, `for purposes of` or `for the purposes of`. The
+      Object holds no quotation mark, none of the words of D4.2, no end of
+      a sentence, and no space at its start or end. After `in`, the Object
+      begins with `this ` or is the words of one link, or begins, compared
+      in any case, with `this`, `these`, `such` or a kind word and a space.
+      The reach words are `Prep " " Object`; its link is a link whose words
+      are exactly the Object.
+   4. The text has more than one sentence, and its last sentence (from the
+      start of that sentence to the end of the text) is a reach line by
+      forms 1, 2, 3 or 5. The sentences before it are no part of the reach.
+      This form is not applied again to that last sentence.
+   5. The text, with a first lead-in taken off as in form 1, is
+      `Condition ", " LowercaseReach` as in D7.2.3, with a reach: the line
+      has that reach and that condition.
+2. A text is a *condition line* when it ends with a close, it is no reach
+   line, and the text before the close (with no lead-in taken off) is a
+   condition with a capital start (D6) and no reach.
+3. A *reach chapeau* is a chapeau part with exactly one block, a paragraph
+   whose whole text is a reach line. A *condition chapeau* is a chapeau
+   part with exactly one block, a paragraph whose whole text is a condition
+   line.
 
-When the basis is `restated` and the unit has an editorial note whose
-heading is "References in Text", one of whose own paragraphs (not one
-inside a table or quoted content) holds, in any case, the words that name
-the region (`this` and the kind word, or the words of the link) followed by
-`, referred to in`, the definition records the address of the first such
-note in the document, among the notes of the unit and of its provisions,
-as `see_note`.
+### D9. The reach and the condition of a definition
+
+The reach and condition of a reading are found by the first of these that
+applies.
+
+1. The reading's lead or D7.8 gave a reach: that reach, and the lead's
+   condition if any.
+2. The reading is at a line place: the line's reach and the line's
+   condition. If the line has a condition and the lead has one too, nothing
+   is extracted.
+3. The reading is at a stated-only place: nothing is extracted.
+4. Otherwise the ancestors of the paragraph's provision are looked at from
+   the nearest outward, and the first ancestor that has a chapeau part
+   decides:
+   1. a reach chapeau: the reading has its reach, an *inherited* reach
+      (with the reach's condition, if any). If the reach has a condition
+      and the reading already has one, nothing is extracted;
+   2. a condition chapeau: the reading takes its condition, and the search
+      goes on to the next ancestor outward that has a chapeau part, which
+      decides by these same cases. If the reading already has a condition,
+      nothing is extracted;
+   3. any other chapeau: nothing is extracted. Such a chapeau may state a
+      reach in words these rules do not read. A provision with more than
+      one chapeau part has a chapeau, so it decides, and it is neither a
+      reach chapeau nor a condition chapeau (D8.3): with the chapeau
+      `In this section:`, the chapeau `Also:` and a child (1)
+      `“x” means y.`, nothing is extracted through it.
+5. No ancestor (left to look at) has a chapeau part: a reading of the
+   sentence form has no reach, and its reach words are `unstated`; a
+   reading of the list form gives nothing.
+6. **A condition in the aside or after the verb.** When D9.1 to D9.5 give
+   the reading no condition, and its aside is a condition (D6.5), the
+   aside, exactly as written, is its condition; otherwise, when the text
+   after its verb form has a condition (D6.6), that is its condition. When
+   D9.1 to D9.5 give it a condition, that condition stays, and the aside's
+   or the verb's is not recorded; when both the aside and the text after
+   the verb form are conditions, only the aside is recorded.
+
+A definition has at most one condition. Two conditions found by D9.1 to
+D9.5 extract nothing; a condition of D9.6 never adds a second.
+
+### D10. Later sentences
+
+1. At a later sentence (D3.3) the reading must have the sentence form; the
+   list form and D7.5 do not apply there.
+2. When a later reading gives no reach of its own (by its lead or D7.8),
+   nothing is extracted if the reading is at a stated-only place, or if the
+   text before the sentence holds one of the six phrases of a reach (in any
+   case), or holds the characters `in this ` anywhere (in any case, also
+   inside a longer word, as in `within this `).
+3. For a later reading, "the end" in D12 is the end of its sentence.
+
+### D11. What is not extracted
+
+A reading that matches a pattern still gives nothing when one of these
+holds.
+
+1. **A second term.** After the verb form, up to the end of the sentence
+   that holds the verb form (D1.6), there stands a term followed by a space
+   and a verb form, or by a comma, a space, text with no quotation mark, a
+   comma, a space and a verb form; and that term, compared in any case, is
+   not one of the reading's terms. That term is taken as it would be
+   recorded (D7.6, D7.7) before it is compared, and it and what follows
+   it, its verb form included, lie within that sentence:
+   `The term “x” means y, and “x,” means z.` gives a record for `x`, and
+   so does `The term “x” means y or “z”, as defined. A, means w.`
+2. **An aside that speaks of a reach.** The reading has an aside (D7.8.2 or
+   D7.8.4) and the aside holds one of the words of D11.3; or the aside
+   begins with `in` and a space (in any case) or holds one of the six
+   phrases of a reach (in any case), and it speaks of a reach by D11.5.
+3. The words by which an aside speaks of a reach, besides those of D11.5:
+   `as used by`, `used herein`, `where used`, `wherever used`, `purpose`,
+   `purposes`, in any case, standing as words.
+4. **A reach after the verb.** The text after the verb form begins, in any
+   case, with a comma, a space, one of the openings and a space; and the
+   text after that comma and space, up to its next comma (or to the end of
+   the text), with one space added at its end, speaks of a reach by D11.5.
+5. **Speaks of a reach.** Text speaks of a reach when, in any case: it
+   begins with `in ` and the text after that does not begin with one of
+   `the case of `, `case `, `any case in `, `connection with `,
+   `relation to `, `reference to `, `respect of `, `addition to `,
+   `the context of `, `a geographical sense`, `a geographic sense`,
+   `the geographical sense`, `the geographic sense`, `interstate cases`,
+   `an individual capacity`, `appropriate circumstances`; or it holds one
+   of the six phrases of a reach other than `when used in`; or it holds
+   `when used in` not followed by a space and one of the sense words of
+   D4.4.
+6. **No reach, and speaks of one.** The reading has no reach (its words
+   are `unstated`), and the paragraph's whole text holds one of the six
+   phrases of a reach (in any case), other than `when used in` followed by
+   a space and a sense word.
+7. **A reach after the term, under a chapeau.** The reading's reach came
+   from D7.8.2 or D7.8.3, and some ancestor of its provision has a chapeau
+   part, or the reading is at a line place.
+8. **Two conditions** (D9).
+9. **A borrowed meaning whose source is not read** (D12.3, D12.4).
+
+### D12. Borrowed meanings
+
+These apply to a definition of kind `borrowed`. "The end" is the end of the
+text for the first reading of a paragraph, and the end of the sentence for
+a later reading.
+
+1. **The first link.** The first link after the verb form is the link that
+   starts first at or after the end of the verb form and before the end.
+2. **A linked source.** When there is a first link and its target is not
+   empty, and D12.4 does not apply, the record's `borrowed_from` is that
+   target.
+3. **An unlinked source.** When there is no first link, or its target is
+   empty, the record's `borrowed_words` are the *source words* (D12.5).
+   When the text has no source words, nothing is extracted. No section
+   number is resolved to an address.
+4. **What is made under a linked provision.** When there is a first link
+   and its target is not empty, let B be the text from the end of the verb
+   form to the start of the first link, with every term in quotation marks
+   (D1.2) taken out of it. When one of the words `regulation`,
+   `regulations`, `rule`, `rules`, `order`, `orders` stands in B, as
+   written: if B holds one of those words followed, somewhere after it, by
+   `under` or `pursuant to` standing as words, and the text has source
+   words, the record has no `borrowed_from`, and its `borrowed_words` are
+   the source words; otherwise nothing is extracted.
+5. **The source words.** After the end of the verb form, the text must
+   read:
+
+   `[" given" | " provided" | " set forth"] [" to" | " for"] [" " Pointer [" " Terms] [" has" | " have" | " does" | " do"]] [", respectively,"] " " Preposition " "`
+
+   and then a character that is not a space, read as a regular expression
+   at the end of the verb form, whose optional parts and alternatives are
+   tried in the order written (an optional part first with, then without)
+   and whose lists are tried longest first. `Pointer` is one of
+   `each such term`, `such terms`, `such term`, `the terms`, `the term`,
+   `that term`, `those terms`, `these terms`, `this term`, `it`, `them`.
+   `Terms` is the terms of D7.6 (first form). `Preposition` is one of
+   `for the purposes of`, `for purposes of`, `pursuant to`,
+   `when used in`, `as used in`, `as in`, `in`, `by`, `under`. When the
+   verb form ends with ` as in` (`has the meaning as in`,
+   `have the meaning as in`), the text after it must instead be a space and
+   a character that is not a space.
+
+   The source words begin after that, and end at the first of: the end of
+   the sentence that holds them (after its period), the end, and the first
+   place where one of these strings occurs, as characters (not only as
+   words; `, except` also occurs in `, exceptional`): `;`, `—`, `:`,
+   `, except`, ` except `, `, and includes`, ` and includes`,
+   `, and does not include`, ` and does not include`, `, but `, ` but `,
+   `, and shall include`, ` and shall include`, `, and also includes`,
+   ` and also includes`, `, subject to`. Spaces and commas at their end
+   are then taken off, and then a final period, unless the word before it
+   (D1.5) is one of the abbreviations. The text has source words when what
+   is left is not empty and has no space at its start or end. They are
+   recorded exactly as written.
+
+### D13. Region, basis and note
+
+1. **Region.** When the reach's Object is `this`, a space and a region kind
+   (D1.12), and then either nothing more or a comma, a space and text that
+   begins `unless the context`, the region is the nearest of these whose
+   kind is that word: the holder, its ancestors from the nearest outward,
+   then the unit's containers from the nearest outward; when none has that
+   kind, there is no region. Otherwise, when the reach has a link (D4.7)
+   whose target is an address below the prefix of the corpus (`/us/usc/`),
+   the region is that target, whatever the Object's words (`this Act`
+   included). Otherwise there is no region. The first sentence comes before
+   the second: an Object that is `this` and a region kind is resolved by
+   the first sentence alone, also when the Object is the words of a link
+   below the prefix, and also when no ancestor and no container has that
+   kind (then there is no region, and the link is not used). The condition
+   plays no part in the region.
+2. **Basis.** No region: `unresolved`. A region, in a unit whose
+   `positive_law` is true: `enacted`. A region, in any other unit:
+   `restated`.
+3. **The note.** When the basis is `restated` and the unit has an editorial
+   note whose heading is "References in Text", one of whose own paragraphs
+   holds, in any case and standing as words, the words that name the
+   region (`this` and the kind word, or the Object of the reach) followed
+   by `, referred to in`, the record's `see_note` is the address of the
+   first such note in the order the notes stand in the document.
+
+### D14. The order of application
+
+For each paragraph at each place, and for each start (D3.3), in this
+order:
+
+1. Find the form (D7.1), the lead and the terms (D7.2 to D7.7), the verb
+   form and any aside or reach after the terms (D7.8). If none is found,
+   this start gives nothing.
+2. Apply D10.2 to a later reading.
+3. Apply D11.1, D11.2 and D11.4.
+4. Apply D11.7.
+5. Find the reach and condition (D9.1 to D9.5). If D9 extracts nothing,
+   this start gives nothing. Then, when there is no condition, find the
+   condition of the aside or after the verb form (D9.6).
+6. Apply D11.6.
+7. For kind `borrowed`, apply D12 (D12.4 before D12.2 and D12.3).
+8. Find the region, basis and note (D13), and give the record.
+
+Within a rule that tries several readings, the order the rule states
+decides, and the first reading that succeeds is taken. A reading that a
+later step refuses is not tried again in another way.
+
+### D15. The record
+
+1. **Fields.** A definition records:
+
+   | Field | Value | Present |
+   | --- | --- | --- |
+   | `at` | the address of the paragraph's provision | always |
+   | `term` | each term, in order (D7.6, D7.7) | always, one or more |
+   | `kind` | `means`, `includes`, `does_not_include` or `borrowed` | always |
+   | `words` | the reach words (D4.6), or `unstated` (D9.5) | always |
+   | `condition` | the condition (D6.4, D6.5, D6.6) | when the definition has one (D9) |
+   | `region` | the region (D13.1) | when there is one |
+   | `basis` | `enacted`, `restated` or `unresolved` | always |
+   | `borrowed_from` | the target of the first link (D12.2) | kind `borrowed` with a linked source |
+   | `borrowed_words` | the source words (D12.3, D12.4) | kind `borrowed` with an unlinked source |
+   | `see_note` | the address of the note (D13.3) | basis `restated` with such a note |
+
+   A record of kind `borrowed` has exactly one of `borrowed_from` and
+   `borrowed_words`. A record of any other kind has neither. The word
+   `unlinked` is never written as an address.
+2. **Module syntax.** The grammar line of the definition block:
+
+   ```text
+   Definition = "definition" String "{" "term" String { "term" String } "kind" Ident
+                "words" ( String | "unstated" ) [ "condition" String ] [ "region" String ]
+                "basis" Ident [ "borrowed_from" String | "borrowed_words" String ]
+                [ "see_note" String ] "}" ;
+   ```
+
+   The canonical order of the fields is the order of the grammar: the
+   terms, `kind`, `words`, `condition`, `region`, `basis`, `borrowed_from`
+   or `borrowed_words`, `see_note`. An optional field is written only when
+   present.
+3. **What the checker verifies** of each definition, in any module:
+   1. the provision it names is in the module;
+   2. each term stands in that provision's text;
+   3. the reach words, when stated, stand in the provision's text or in the
+      chapeau of one of its ancestors;
+   4. the condition, when present, stands in the provision's text or in the
+      chapeau of one of its ancestors;
+   5. the kind and the basis are of the closed lists;
+   6. a `borrowed` definition has exactly one of `borrowed_from` and
+      `borrowed_words`, and a definition of another kind has neither;
+   7. `borrowed_words`, when present, stand in the provision's text;
+   8. no term, reach words, condition, `borrowed_from` or `borrowed_words`
+      is an empty string.
+
+   Here "stands in" means the string occurs in that text, the text being
+   the one of D1.1 (without footnote markers and without superscript runs
+   of digits only, with the one space of D1.1.3):
+   `section 231(f) of this title` stands in a paragraph whose runs are
+   `"... section 231(f) " sup "1" " of this title."`, and does not stand in
+   its plain text.
+
+### D16. What stays out
+
+Measured on release point 119-142, the whole Code. The *near misses* are
+the 5,940 paragraphs that hold a quoted term near a defining verb and from
+which the first version extracts nothing (the population of the drawing
+tool). "In the population" counts those near misses; "remain" counts those
+these rules still do not extract a record for.
+
+1. **Kept out by a rule of these rules.**
+
+   | Form | Count | Rule |
+   | --- | ---: | --- |
+   | Two terms defined in one sentence ("The term A means X, and the term B means Y") | 123 in the population, 79 remain | D11.1; for a third version |
+   | A head with no verb before its close ("The term “X”—", completed by the paragraphs below) | 480 chapeaus in the Code, with 1,082 provisions directly below them | D7.8 finds no verb |
+   | A condition before the term that is not a condition by D6.3 (a list of lowercase words after commas, `shall`, a sentence, `In any case to which`), or not followed by a comma and the head words | 132 in the population, 20 remain | D7.2 |
+   | Other words before the term ("Solely for purposes of", "To the extent provided in regulations", "Wherever the word ... is used", a lowercase continuation) | 183 in the population, 179 remain | D7.2 |
+   | Other lead-ins in a chapeau ("The words defined in this section shall have the following meanings for purposes of this chapter, to wit:", "Whenever used in this chapter—") | 228 in the population, 158 remain | D8 |
+   | A chapeau that is an operative sentence | 38 in the population, 31 remain | D9.4.3 |
+   | The list form with no chapeau above | 25 in the population, 25 remain | D9.5 |
+   | Exclusions that rightly see a reach (D11.2, D11.4, D11.6) | 61 in the population, 46 remain | D11 |
+   | A definition after other words in a sentence, or in a later sentence with no reach | 126 in the population, 60 remain | D7, D10.2 |
+   | Asides and words before the verb outside D7.8 ("“Promoter” of a company means") | 422 in the population, 248 remain | D7.8 |
+   | Parentheses before the verb; editorial brackets between terms | 54 in the population, 48 remain | D7.6, D7.8 |
+   | Deeming, `may include`, `refer to or mean` and other verbs | 89 in the population, 74 remain | D2.3 |
+   | Table cells | 2 in the population, 2 remain | D3.1 |
+   | Short names ("hereinafter referred to as the “Task Force”") | 46 in the population, 46 remain | D7; a name given is not a meaning |
+   | Other forms (construction rules, "where “X” means" in formulas, enumerators, a run-in heading) | 107 in the population, 101 remain | none of D7 |
+   | A borrowed meaning with no link whose words do not have the form of D12.5 ("is given by", "it—", "when used within", the source in the paragraphs below) | 23 paragraphs in the Code; of the 804 unlinked near misses, 4 remain | D12.3 |
+   | A meaning given by regulations, rules or an order, with a link, where D12.4 cannot tell that the meaning is not in the linked provision | 3 paragraphs in the Code (19 U.S.C. 2401(2); 26 U.S.C. 30B(b)(2)(C) and 30B(h)(3)) | D12.4 |
+   | An aside that is no condition by D6.5 (`unless otherwise provided`, `except as ...`, `in addition to`, `subject to`, `when used as`, a condition with a list of lowercase words): the record is kept, and the aside is not recorded | 155 records | D6.5 |
+   | A condition after the verb form that is not of D6.6: `in addition to` (34), or cut by a list, or followed by more conditions (33): the record is kept, and the words are not recorded | 67 records | D6.6 |
+   | A condition written `, with respect to X,` after the verb form, as in 10 U.S.C. 1074e(c)(2) ("“qualifying Persian Gulf symptom or illness” means, with respect to a member described in subsection (b), a symptom or illness—"): not the form that D6.6 names, and left for a later version; the record is kept, and the words are not recorded | 1,298 records | D6.6 |
+   | A condition of an aside or after the verb, where the definition already has a condition (D9.6) | 5 records | D9.6 |
+
+2. **Records that keep a form as a limit.**
+   1. *A condition in the reach words that D4.5 does not split.* Of the 35
+      present records whose reach words hold `, in the case of `, `, if `,
+      `, with respect to ` or `, in any case `, 29 split cleanly by D4.5
+      (`words` loses the condition, `condition` gains it); 4 change by D1.5
+      and D4.2 instead (the condition-like words stood in an earlier
+      sentence: 26 U.S.C. 3121(c), 3306(d), 430(f)(4)(B)(ii), 29 U.S.C.
+      1083(f)(4)(B)(ii)); and 2 stay as they are, because the condition
+      holds a comma followed by a lowercase word other than `and` or `or`:
+      19 U.S.C. 4033(f)(3)(C) ("in the case of a good that is a yarn,
+      fabric, or fiber") and 42 U.S.C. 300gg–111(a)(3)(C)(ii)(I) ("in the
+      case of a participant, beneficiary, or enrollee ..."). One more
+      present record holds `, if,` (26 U.S.C. 86(d)(3)); `if` begins no
+      condition, and it stays as it is.
+   2. *Faults in the source* are kept as the publisher wrote them; the
+      importer corrects nothing and keeps no list of faults. Observed
+      forms:
+      - a link whose target is a section of the Code, on words that name
+        the District of Columbia Code ("section 1551c(z) of title 47,
+        District of Columbia Code"): 4 links in the Code; 1 record carries
+        such a target as `borrowed_from` (5 U.S.C. 5516(a));
+      - `ln` (a lowercase L) for `In`: 1 chapeau ("ln this paragraph:", 46
+        U.S.C. 54101(d)(2)(C)), over 3 near misses, which stay out;
+      - a footnote number marked only as a superscript is not read (D1.1).
+        On the whole Code this changes 41 records and adds 21: 32
+        `borrowed_words` lose such a number ("section 231(f) 1 of this
+        title" becomes "section 231(f) of this title", "section 5703.1"
+        becomes "section 5703"); the reach words of 9 present records lose
+        one (42 U.S.C. 6422(d)(2)(B); 50 U.S.C. 4612(c)(1) to (8)); and 21
+        definitions are read that a superscript number hid: the 8
+        definitions in which a comma, a digit and the head words follow the
+        lead ("In this title,¹ the term"; the Code has 9 such paragraphs,
+        the ninth defines no term, and all 9 hold the digit as a
+        superscript), and the paragraphs under chapeaus such as "In this
+        title: ¹". Of the 33 `borrowed_words` that a pattern for such
+        numbers found, 31 lose the number and 2 keep "Directive 5101.1",
+        which is no footnote number (10 U.S.C. 392(e)(3), 430b(d)(2));
+      - a footnote number written as words: those two patterns found none
+        in the Code. Such a digit is text by D1.1.4 and is kept as written.
+   3. *A superscript number in a term's own spelling.* D1.1 leaves a
+      superscript run of digits only out of all the text the rules read,
+      terms included. A term whose own spelling holds such a run (a power
+      written as a superscript, say) would be recorded without it. None was
+      observed on 119-142.
+   4. *Stray characters of nested quotation* are taken off by D7.7. On the
+      whole Code it changes three present terms and no other:
+      "Administrator’ " becomes "Administrator" (33 U.S.C. 3507(1)),
+      " ‘New’ Philippine Scouts" becomes "‘New’ Philippine Scouts" (38
+      U.S.C. 3566(b)), "‘nonprofit" becomes "nonprofit" (42 U.S.C.
+      12302(3)).
 
 ### What the values mean
 
-- `unstated`: neither the paragraph nor a chapeau above it states a reach
-  in the forms these rules read. A reach stated somewhere else, for example
-  in another subsection of the same section, is not read, so a definition
-  whose words are `unstated` may still have a reach that the text states
-  elsewhere.
+- `unstated`: neither the paragraph, nor the reach line its part begins
+  with, nor a chapeau above it states a reach in the forms these rules
+  read. A reach stated somewhere else, for example in another subsection of
+  the same section, is not read, so a definition whose words are
+  `unstated` may still have a reach that the text states elsewhere.
+- `condition`: the words that say in what case the definition holds, as
+  the text writes them: before the terms, at the end of the reach's Object,
+  in a chapeau above, in the aside after the terms, or after the verb
+  form. The rules record the words and do not read them; the region does
+  not depend on them.
 - `unresolved`: the rules found no region. That includes reach words that
   name a part of the Code in a form the rules do not resolve, such as "this
   chapter and chapter 5", "subparagraph (A) of this paragraph" or, of a
@@ -3145,6 +3821,11 @@ as `see_note`.
   words that name the region followed by `, referred to in`. Such a note
   often says what the enacted words were; the rules do not check that it
   does.
+- `borrowed_words`: the words that name the source of a borrowed meaning
+  when no link after the verb form names it, or when the meaning is made
+  by regulations, rules or an order under the linked provision, as the
+  text writes them. No section number in them is resolved to an address:
+  they name the source and do not point at it.
 
 An invented example: the chapeau of a section of an invented title that is
 positive law, and the definitions extracted from its paragraphs.
@@ -3177,6 +3858,16 @@ the publisher's XML that `conformance/uslm_text.py` prints
 and shares no code with the importer. It writes the definitions it finds in
 a release, one JSON object to a line, and with `--against DIR` compares
 them with those that the `definition` blocks of a workspace hold.
+
+The tests of both hold them to the same invented texts
+([the README of the definitions fixtures](https://github.com/BeeGass/fidryn/blob/main/conformance/fixtures/definitions/README.md)):
+the test vectors of these rules, each a unit with the records the rules
+give it, which name the rules by their numbers in this section; and the
+records written for the fixture `definitions-second.xml`, which holds one
+paragraph at least for each form of a condition, for source words, for a
+meaning made under a linked provision, for a later sentence, a later
+block and a continuation, for nested quotation and for the two kinds of
+footnote number.
 
 The check of [the sample](#the-sample), which `cargo xtask ci` runs, holds
 the importer's definitions of the sample to it: the two must find the same
@@ -4086,7 +4777,7 @@ nowhere. The keys, in their order:
 | `totals.with_images` | the provisions and the notes that hold an image, whose picture is not in the archive the text was read from | the `image` of each provision and note |
 | `totals.references` | the references of each layer, `operative`, `enacted` and `editorial`, by outcome, each of the eight outcomes for each layer, as the check report counts them | each reference, its outcome looked up in the index |
 | `totals.outside_by_body` | the references of the outcome `outside`, of every layer, by the body of law they name | the same |
-| `totals.definitions` | the definitions extracted, by [basis](#the-basis): `enacted`, `restated` and `unresolved` | the definitions of the interfaces of units |
+| `totals.definitions` | the definitions extracted, by [basis](#d13-region-basis-and-note): `enacted`, `restated` and `unresolved`; a definition with a condition or with source words is counted as any other | the definitions of the interfaces of units |
 | `totals.definitions_by_kind` | the definitions extracted, by kind: `means`, `includes`, `does_not_include`, `borrowed` | the same |
 | `totals.not_imported` | what the importer counted and did not import, by the six names of the lock | the lock's `not_imported`, copied |
 | `by_source` | one row for each source file of a unit or a container, sorted by the bytes of `source`: `source`; `positive_law`, `true`, `false`, or `null` for a file with no flag; and the `units` of the file, their `provisions` and their `definitions` | the `source` and `positive_law` of each interface |
@@ -4283,8 +4974,15 @@ more.
 ### Definitions
 
 - The rules read definitions in a closed list of forms and in no other
-  ([Definitions](#definitions)). They do not find every definition, and
-  the share of the definitions they miss has not been measured.
+  ([Definitions](#definitions)), and they do not find every definition.
+  [D16](#d16-what-stays-out) lists the forms they leave out, with their
+  counts measured on release point 119-142, the whole Code, and the
+  records that keep a form of the source as it is.
+- Whether a text holds an end of a sentence is judged on its own
+  characters (D4.2), so reach words may end with a full stop. Release
+  point 119-142 has one such record, at `/us/usc/t42/s1396b–1/b`: its
+  words are `In this section.`, with no region and the basis
+  `unresolved`.
 - `unstated` is given when neither the paragraph nor a chapeau above it
   states a reach. A reach stated in a sibling provision, such as "In this
   section" as subsection (a) with the definitions in subsection (b), is
@@ -6854,9 +7552,10 @@ words, and in no others.
   that a reader sees how many of them reach their target.
 - **Classified.** What kind of provision it is, is recorded. At this version
   the one kind that is recorded is a definition, and the ledger gives the
-  number of definitions extracted, by basis and by kind. It gives no count
-  of classified provisions, since one provision can hold more than one
-  definition.
+  number of definitions extracted, by basis and by kind; a definition with
+  a condition, or with source words in the place of a link, is counted as
+  any other. It gives no count of classified provisions, since one
+  provision can hold more than one definition.
 
 ## The basis of a definition
 
@@ -6883,8 +7582,10 @@ Each definition extracted has one of three bases:
 
 The rules read definitions written in a closed list of forms
 ([Definitions](https://fidryn.onlygass.dev/docs/law-modules.md#definitions)), and they do not find every
-definition that the text holds. The share of the definitions they miss has
-not been measured for the sample.
+definition that the text holds. The forms they leave out are listed, with
+their counts measured on the whole of release point 119-142, in
+[What stays out](https://fidryn.onlygass.dev/docs/law-modules.md#d16-what-stays-out); the share they miss
+has not been measured for the sample.
 
 ## Counted and not imported
 
@@ -6927,12 +7628,12 @@ the ledger copies the counts:
 | References in enacted notes, by outcome | `totals.references.enacted` | 332 `exact`, 18 `target-status`, 0 `ambiguous`, 14 `unit-only`, 0 `range-form`, 364 `no-unit`, 1,454 `outside`, 0 `malformed` |
 | References in editorial matter, by outcome | `totals.references.editorial` | 275 `exact`, 47 `target-status`, 0 `ambiguous`, 14 `unit-only`, 1 `range-form`, 259 `no-unit`, 4,919 `outside`, 0 `malformed` |
 | References of the outcome `outside`, by the body of law they name | `totals.outside_by_body` | 739 `/us/act`, 3,310 `/us/pl`, 2,516 `/us/stat` |
-| Definitions extracted, by basis | `totals.definitions` | 7 `enacted`, 100 `restated`, 37 `unresolved` |
-| Definitions extracted, by kind | `totals.definitions_by_kind` | 7 `borrowed`, 1 `does_not_include`, 15 `includes`, 121 `means` |
+| Definitions extracted, by basis | `totals.definitions` | 8 `enacted`, 116 `restated`, 66 `unresolved` |
+| Definitions extracted, by kind | `totals.definitions_by_kind` | 7 `borrowed`, 8 `does_not_include`, 31 `includes`, 144 `means` |
 | Counted and not imported | `totals.not_imported` | 19 `tables_of_contents`, 4 `footnotes_in_tables_of_contents`, 341 `links_in_tables_of_contents`, 3 `release_notes`, 0 `links_without_words`, 358 `note_group_headings` |
-| The file `usc01.xml` (positive law) | `by_source.0` | 39 units, 129 provisions, 10 definitions |
-| The file `usc11a.xml` (not positive law) | `by_source.1` | 230 units, 2,362 provisions, 4 definitions |
-| The file `usc45.xml` (not positive law) | `by_source.2` | 294 units, 2,366 provisions, 130 definitions |
+| The file `usc01.xml` (positive law) | `by_source.0` | 39 units, 129 provisions, 11 definitions |
+| The file `usc11a.xml` (not positive law) | `by_source.1` | 230 units, 2,362 provisions, 17 definitions |
+| The file `usc45.xml` (not positive law) | `by_source.2` | 294 units, 2,366 provisions, 162 definitions |
 
 <!-- coverage-table:end -->
 

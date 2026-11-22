@@ -32,8 +32,9 @@ pub use interface::{DeclSpans, Interface, interface_of};
 pub use layout::LayoutError;
 pub use model::{
     Basis, BindTarget, Binding, Block, Cell, Citation, ContainerModule, CuratedModule, Definition,
-    DefinitionKind, Footnote, Import, Item, Layer, Module, Note, Num, PartRole, Provision, Quoted,
-    QuotedItem, QuotedLevel, Row, RowGroup, Run, Table, Text, UnitModule,
+    DefinitionKind, Footnote, Import, Item, Layer, LinkPlace, Module, Note, Num, PartRole,
+    Provision, Quoted, QuotedItem, QuotedLevel, ReadText, Row, RowGroup, Run, Table, Text,
+    UnitModule,
 };
 pub use records::{Coverage, TextRecord};
 pub use reference::{AddressIndex, DeclaredTwice, Outcome};

@@ -1066,14 +1066,16 @@ fn check_definitions(root: &Path, records: &Path) -> Result<usize> {
 }
 
 /// The fields of a definition, in the order of its block and of a record.
-const DEFINITION_FIELDS: [&str; 8] = [
+const DEFINITION_FIELDS: [&str; 10] = [
     "at",
     "terms",
     "kind",
     "words",
+    "condition",
     "region",
     "basis",
     "borrowed_from",
+    "borrowed_words",
     "see_note",
 ];
 
@@ -1492,10 +1494,11 @@ mod tests {
     fn a_record_of_the_script_is_a_definition_in_its_json_form() {
         let dir = scratch("xtask-uscode-sample-", "records");
         let records = dir.join("definitions.jsonl");
-        // A line as the script writes it for the invented title 99.
+        // A record of a definition of the invented title 99 in its JSON form:
+        // its ten fields in their order, `null` for an absent one.
         let line = "{\"at\":\"/us/usc/t99/s1/e\",\"terms\":[\"widget\"],\"kind\":\"borrowed\",\
-                    \"words\":null,\"region\":null,\"basis\":\"unresolved\",\
-                    \"borrowed_from\":\"/us/usc/t99/s2\",\"see_note\":null}";
+                    \"words\":null,\"condition\":null,\"region\":null,\"basis\":\"unresolved\",\
+                    \"borrowed_from\":\"/us/usc/t99/s2\",\"borrowed_words\":null,\"see_note\":null}";
         fs::write(&records, format!("{line}\n")).expect("write the records");
         let read = read_records(&records).unwrap_or_else(|error| panic!("{error:#}"));
         assert_eq!(
@@ -1505,13 +1508,25 @@ mod tests {
                 terms: vec!["widget".to_owned()],
                 kind: DefinitionKind::Borrowed,
                 words: None,
+                condition: None,
                 region: None,
                 basis: Basis::Unresolved,
                 borrowed_from: Some("/us/usc/t99/s2".to_owned()),
+                borrowed_words: None,
                 see_note: None,
             }]
         );
         assert_eq!(record_line(&read[0]), line);
+        // A record without the two keys that are absent from most records
+        // reads the same.
+        let shorter = line
+            .replace("\"condition\":null,", "")
+            .replace("\"borrowed_words\":null,", "");
+        fs::write(&records, format!("{shorter}\n")).expect("write the records");
+        assert_eq!(
+            read_records(&records).unwrap_or_else(|error| panic!("{error:#}")),
+            read
+        );
         // A key the definition does not have is refused, with the line named.
         let other = line.replace("\"see_note\"", "\"note\"");
         fs::write(&records, format!("{line}\n{other}\n")).expect("write the records");
@@ -1542,7 +1557,54 @@ mod tests {
         };
         write_records(&lines);
         let compared = |workspace: &Path| compare_definitions(workspace, &records);
-        assert_eq!(compared(&workspace).expect("the same definitions"), 144);
+        assert_eq!(compared(&workspace).expect("the same definitions"), 190);
+
+        // The condition and the source words are compared as the other
+        // fields are.
+        let s8 = "/us/usc/t1/s8/b";
+        let at = lines
+            .iter()
+            .position(|line| line.starts_with(&format!("{{\"at\":\"{s8}\"")))
+            .expect("the definition with a condition");
+        let held: Definition = serde_json::from_str(&lines[at]).expect("a record");
+        assert!(held.condition.is_some(), "{}", lines[at]);
+        for (changed, field, in_module, in_records) in [
+            (
+                Definition {
+                    condition: Some("with respect to a gadget".to_owned()),
+                    ..held.clone()
+                },
+                "condition",
+                serde_json::to_string(&held.condition).expect("JSON"),
+                "\"with respect to a gadget\"".to_owned(),
+            ),
+            (
+                Definition {
+                    borrowed_words: Some("the Gadget Act".to_owned()),
+                    ..held.clone()
+                },
+                "borrowed_words",
+                "null".to_owned(),
+                "\"the Gadget Act\"".to_owned(),
+            ),
+        ] {
+            let mut other = lines.clone();
+            other[at] = record_line(&changed);
+            write_records(&other);
+            let error = compared(&workspace).expect_err(field);
+            let message = format!("{error:#}");
+            assert!(
+                message.starts_with(&format!(
+                    "samples/uscode/workspace/us/usc/t1/s8.fr: the definition of `{s8}` with the \
+                     terms "
+                )) && message.contains(&format!(
+                    " has the {field} {in_module} in the module and {in_records} in what \
+                     conformance/usc_definitions.py finds in samples/uscode/archives; "
+                )) && message.ends_with("it finds 190 definitions and the workspace holds 190"),
+                "{message}"
+            );
+        }
+        write_records(&lines);
 
         let module = workspace.join("us/usc/t45/s1202.fr");
         let original = read_text(&module);
@@ -1564,7 +1626,7 @@ mod tests {
             ) && message.contains(
                 " has the kind \"includes\" in the module and \"means\" in what \
                  conformance/usc_definitions.py finds in samples/uscode/archives; "
-            ) && message.ends_with("it finds 144 definitions and the workspace holds 144"),
+            ) && message.ends_with("it finds 190 definitions and the workspace holds 190"),
             "{message}"
         );
         // The module lacks the definition.
@@ -1580,7 +1642,7 @@ mod tests {
                 "samples/uscode/workspace/us/usc/t45/s1202.fr: conformance/usc_definitions.py \
                  finds in samples/uscode/archives the definition {\"at\":\"/us/usc/t45/s1202/1\""
             ) && message.contains("and the module holds no such definition; ")
-                && message.ends_with("it finds 144 definitions and the workspace holds 143"),
+                && message.ends_with("it finds 190 definitions and the workspace holds 189"),
             "{message}"
         );
         // The script does not find a definition the module holds.
@@ -1599,7 +1661,7 @@ mod tests {
                  {}, and conformance/usc_definitions.py does not find it in \
                  samples/uscode/archives; ",
                 lines[first]
-            )) && message.ends_with("it finds 143 definitions and the workspace holds 144"),
+            )) && message.ends_with("it finds 189 definitions and the workspace holds 190"),
             "{message}"
         );
         fs::remove_dir_all(&copy).expect("remove scratch dir");
