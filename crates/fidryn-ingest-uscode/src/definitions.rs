@@ -261,9 +261,11 @@ impl<'u> Reading<'u> {
             terms: matched.terms,
             kind: matched.kind,
             words: reach.map(|reach| reach.words),
+            condition: None,
             region: region.map(|(address, _)| address),
             basis,
             borrowed_from,
+            borrowed_words: None,
             see_note,
         })
     }
@@ -694,9 +696,11 @@ mod tests {
             terms: terms.iter().map(|term| (*term).to_owned()).collect(),
             kind,
             words: words.map(str::to_owned),
+            condition: None,
             region: region.map(address),
             basis,
             borrowed_from: None,
+            borrowed_words: None,
             see_note: None,
         }
     }

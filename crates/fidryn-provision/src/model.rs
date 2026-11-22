@@ -271,9 +271,18 @@ pub struct Definition {
     /// The phrase of the text that states the reach; `None` when the text
     /// states none.
     pub words: Option<String>,
+    /// The condition; `None` when the definition has none.
+    pub condition: Option<String>,
     pub region: Option<Address>,
     pub basis: Basis,
+    /// The target of the first link of the source, for a definition of kind
+    /// `borrowed` with a linked source.
     pub borrowed_from: Option<String>,
+    /// The source words, for a definition of kind `borrowed` with an
+    /// unlinked source. A definition of kind `borrowed` has exactly one of
+    /// `borrowed_from` and `borrowed_words`, and one of any other kind has
+    /// neither.
+    pub borrowed_words: Option<String>,
     pub see_note: Option<Address>,
 }
 
@@ -551,6 +560,53 @@ mod tests {
         assert_eq!(
             serde_json::to_string(&DefinitionKind::DoesNotInclude).expect("serialize"),
             r#""does_not_include""#
+        );
+    }
+
+    #[test]
+    fn a_definition_writes_every_field_and_reads_without_its_condition_or_source_words() {
+        let definition = Definition {
+            at: address("/zz/demo/t1/s1/a"),
+            terms: vec!["widget".to_owned()],
+            kind: DefinitionKind::Borrowed,
+            words: Some("In this section".to_owned()),
+            condition: Some("in the case of a gadget".to_owned()),
+            region: Some(address("/zz/demo/t1/s1")),
+            basis: Basis::Enacted,
+            borrowed_from: None,
+            borrowed_words: Some("the Widget Act".to_owned()),
+            see_note: None,
+        };
+        let json = serde_json::to_string(&definition).expect("serialize");
+        assert_eq!(
+            json,
+            r#"{"at":"/zz/demo/t1/s1/a","terms":["widget"],"kind":"borrowed","words":"In this section","condition":"in the case of a gadget","region":"/zz/demo/t1/s1","basis":"enacted","borrowed_from":null,"borrowed_words":"the Widget Act","see_note":null}"#
+        );
+        assert_eq!(
+            serde_json::from_str::<Definition>(&json).expect("read"),
+            definition
+        );
+        // An absent value is written as `null`, and a definition written
+        // without the two keys reads as one that has neither.
+        let without = Definition {
+            kind: DefinitionKind::Means,
+            condition: None,
+            borrowed_words: None,
+            ..definition
+        };
+        let json = serde_json::to_string(&without).expect("serialize");
+        assert!(
+            json.contains(r#""words":"In this section","condition":null,"region""#),
+            "{json}"
+        );
+        assert!(
+            json.contains(r#""borrowed_from":null,"borrowed_words":null,"see_note":null}"#),
+            "{json}"
+        );
+        let older = r#"{"at":"/zz/demo/t1/s1/a","terms":["widget"],"kind":"means","words":"In this section","region":"/zz/demo/t1/s1","basis":"enacted","borrowed_from":null,"see_note":null}"#;
+        assert_eq!(
+            serde_json::from_str::<Definition>(older).expect("read"),
+            without
         );
     }
 }

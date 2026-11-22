@@ -275,6 +275,10 @@ struct DefinitionSpans {
     /// The value of `words`, a phrase or the word `unstated`.
     words: Span,
     kind: Span,
+    /// The values of the optional strings; `None` for one that is absent.
+    condition: Option<Span>,
+    borrowed_from: Option<Span>,
+    borrowed_words: Option<Span>,
 }
 
 /// Read `source` as a module of edition 2 and check it as one module: the

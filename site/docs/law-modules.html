@@ -359,11 +359,15 @@ from 1 in document order; each has the marker it shows and its blocks. A
 footnote marker names its footnote by that number.</p>
 <p>A definition records the provision that holds it (<code>at</code>), the terms it
 defines, its kind (<code>means</code>, <code>includes</code>, <code>does_not_include</code> or <code>borrowed</code>),
-the words that state its reach or none when the text states none, the
-region the reach covers, its basis (<code>enacted</code>, <code>restated</code> or <code>unresolved</code>),
-what a borrowed definition takes its meaning from (<code>borrowed_from</code>), and a
-note to read with it (<code>see_note</code>). The ingester for the Code extracts them
-by the rules of <a href="#definitions">Definitions</a>.</p>
+the words that state its reach or none when the text states none, its
+condition when it has one (<code>condition</code>), the region the reach covers, its
+basis (<code>enacted</code>, <code>restated</code> or <code>unresolved</code>), what a borrowed definition
+takes its meaning from, either the target of a link (<code>borrowed_from</code>) or,
+when its source is not linked, the source words (<code>borrowed_words</code>), and a
+note to read with it (<code>see_note</code>). A definition of kind <code>borrowed</code> has
+exactly one of <code>borrowed_from</code> and <code>borrowed_words</code>, and a definition of
+any other kind has neither. The ingester for the Code extracts them by the
+rules of <a href="#definitions">Definitions</a>.</p>
 <h3 id="layers"><span class="hn">4.5.4</span> Layers <a class="anchor" href="#layers" aria-label="Link to this section">#</a></h3>
 <p>The text of a module falls into three layers:</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Layer</th><th>Holds</th></tr></thead><tbody>
@@ -479,8 +483,9 @@ Note        = &quot;note&quot; String ( &quot;enacted&quot; | &quot;editorial&qu
               [ &quot;heading&quot; Text ] { Block } &quot;hash&quot; String &quot;}&quot; ;
 Footnote    = &quot;footnote&quot; Int String &quot;{&quot; { Block } &quot;}&quot; ;
 Definition  = &quot;definition&quot; String &quot;{&quot; &quot;term&quot; String { &quot;term&quot; String } &quot;kind&quot; Ident
-              &quot;words&quot; ( String | &quot;unstated&quot; ) [ &quot;region&quot; String ] &quot;basis&quot; Ident
-              [ &quot;borrowed_from&quot; String ] [ &quot;see_note&quot; String ] &quot;}&quot; ;
+              &quot;words&quot; ( String | &quot;unstated&quot; ) [ &quot;condition&quot; String ] [ &quot;region&quot; String ]
+              &quot;basis&quot; Ident [ &quot;borrowed_from&quot; String | &quot;borrowed_words&quot; String ]
+              [ &quot;see_note&quot; String ] &quot;}&quot; ;
 Layers      = &quot;layers&quot; &quot;{&quot; &quot;operative&quot; String &quot;enacted&quot; String &quot;editorial&quot; String &quot;}&quot; ;
 
 Import      = &quot;import&quot; String ( &quot;as&quot; Ident | &quot;{&quot; Ident { &quot;,&quot; Ident } &quot;}&quot; ) ;
@@ -496,7 +501,9 @@ its first error, an <code>E100</code> at the token it is about:</p>
 <ul>
 <li>Every block has the fields shown, in the order shown. A word that is no
 field of its block is "unknown field <code>&lt;word&gt;</code> in <code>&lt;block&gt;</code>"; a field that
-stands out of its order, twice, or not at all is named as such.</li>
+stands out of its order, twice, or not at all is named as such, and so is
+a field given with another that takes the same place (<code>borrowed_from</code>
+and <code>borrowed_words</code>).</li>
 <li>A word that begins no declaration is "unknown declaration <code>&lt;word&gt;</code>".</li>
 <li>Text after the closing brace of the module is an error.</li>
 <li>A source holds at most 64 MiB and 16,777,216 tokens, and its blocks nest
@@ -537,8 +544,9 @@ an empty string stands only where the source itself may give an empty
 value: the value of a number, the shown form of a footnote and of a
 marker, the source of an image, and the target of a link. Anywhere else
 an empty string is refused: as the words of a run, as a term, as stated
-reach words, as <code>borrowed_from</code>, as <code>source</code>, as the release of a
-binding, as a topic, and as the origin of quoted content.</li>
+reach words, as a condition, as <code>borrowed_from</code>, as <code>borrowed_words</code>, as
+<code>source</code>, as the release of a binding, as a topic, and as the origin of
+quoted content.</li>
 <li><code>span &lt;colspan&gt; &lt;rowspan&gt;</code> is written only when one of the two is not 1.</li>
 <li>Every <code>hash</code> and the three values of <code>layers</code> are computed by the rules
 of <a href="#hashes">Hashes</a> from what is written above them.</li>
@@ -629,21 +637,32 @@ about. <code>fidryn check</code> prints each as <code>FILE: CODE Title: message<
 <tr><td>The module's address, and every address written in it, is an address</td><td><code>E700</code></td></tr>
 <tr><td>The module has one of the three shapes, every declaration belongs to its shape, a declaration that stands once stands once, and a unit or a container has a <code>source</code> and <code>layers</code></td><td><code>E100</code></td></tr>
 <tr><td>A unit's top provision has the module's address, and a container's address is the module's; every child provision's address is below its parent's; every note's address is below the module's; no address of a provision or a note is declared twice</td><td><code>E700</code></td></tr>
-<tr><td>Every run but a footnote marker has words, except in <code>td ""</code> and in the shown form <code>""</code> of a number ("a run has no words"); the text of every block is normalized ("text is not normalized"); a topic is one word, neither empty nor holding white space; no term, stated reach words, <code>borrowed_from</code>, <code>source</code>, release of a binding or origin of quoted content is an empty string</td><td><code>E710</code></td></tr>
+<tr><td>Every run but a footnote marker has words, except in <code>td ""</code> and in the shown form <code>""</code> of a number ("a run has no words"); the text of every block is normalized ("text is not normalized"); a topic is one word, neither empty nor holding white space; no term, stated reach words, condition, <code>borrowed_from</code>, <code>borrowed_words</code>, <code>source</code>, release of a binding or origin of quoted content is an empty string</td><td><code>E710</code></td></tr>
 <tr><td>Every <code>hash</code>, every value of <code>layers</code> and both hashes of a binding are 64 lower-case hexadecimal digits</td><td><code>E710</code></td></tr>
 <tr><td>Every <code>hash</code> and every value of <code>layers</code> equals the hash computed from what the module writes</td><td><code>E710</code></td></tr>
 <tr><td>The footnotes are numbered from 1, without a gap, in the order they are written; every footnote marker names a footnote of the module</td><td><code>E710</code></td></tr>
-<tr><td>A definition names a provision of the unit; each term stands in that provision's text; the reach words, when stated, stand in its text or in the chapeau of one of its ancestors; the kind is <code>means</code>, <code>includes</code>, <code>does_not_include</code> or <code>borrowed</code> and the basis <code>enacted</code>, <code>restated</code> or <code>unresolved</code>; a <code>borrowed</code> definition has <code>borrowed_from</code></td><td><code>E710</code></td></tr>
+<tr><td>A definition names a provision of the unit; each term stands in that provision's text; the reach words, when stated, stand in its text or in the chapeau of one of its ancestors; the condition, when there is one, stands in its text or in the chapeau of one of its ancestors; the kind is <code>means</code>, <code>includes</code>, <code>does_not_include</code> or <code>borrowed</code> and the basis <code>enacted</code>, <code>restated</code> or <code>unresolved</code>; a <code>borrowed</code> definition has exactly one of <code>borrowed_from</code> and <code>borrowed_words</code>, and a definition of another kind has neither; <code>borrowed_words</code>, when present, stand in the provision's text</td><td><code>E710</code></td></tr>
 <tr><td>In a curated module, no name is declared twice, its citations and its bindings sharing one set of names</td><td><code>E200</code></td></tr>
 </tbody></table>
 </div>
 <p>An address is below another when it lies within it and is not the same
-address. The text of a provision is the plain text of each paragraph and
+address. The text of a provision is the text of each paragraph and
 subheading of its text parts, those in its tables and its quoted content
 included, and none of its children's; a term stands in it when one of
-those texts holds the term. Every text holds the empty string, so an empty
-term or empty reach words would pass the checks of a definition without
-checking anything. The topics of a note and the origin of quoted content
+those texts holds the term. Each of those texts is made of its runs in
+order without its footnote markers, which have no words, and without its
+superscript runs made only of the digits <code>0</code> to <code>9</code>, which are footnote
+numbers marked as superscripts. With each such run one space goes too: the
+space just before it, when just after it there is a space or the end of
+the text; or, when it begins the text, the space just after it. A
+superscript run that holds anything else, and a digit written in any other
+run, is text. So <code>section 5 of the Gadget Act</code> stands in a paragraph
+written <code>"... section 5 " sup "1" " of the Gadget Act."</code>. The terms, the
+reach words, the condition and <code>borrowed_words</code> are all looked for in this
+text, and the chapeaus of the ancestors are read the same way. Every text
+holds the empty string, so an empty term, empty reach words, an empty
+condition or empty <code>borrowed_words</code> would pass the checks of a definition
+without checking anything. The topics of a note and the origin of quoted content
 have rules of their own because the hash of a note joins its topics with
 one space and the hash of quoted content takes an absent origin as an
 empty one: without them, two different modules could have one hash.</p>

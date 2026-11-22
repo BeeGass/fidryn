@@ -44,8 +44,9 @@ module "/zz/demo/t1/s8" {
 const HASH: &str = "0000000000000000000000000000000000000000000000000000000000000000";
 
 /// A container module with every field a container module can hold. The
-/// parser does not judge which declarations a shape may hold, so a definition
-/// with every field of its own stands here too.
+/// parser does not judge which declarations a shape may hold, so two
+/// definitions stand here too, which between them hold every field of a
+/// definition.
 const CONTAINER: &str = r#"edition 2
 // Invented text for a test.
 module "/zz/demo/t1/ch1" {
@@ -81,10 +82,18 @@ module "/zz/demo/t1/ch1" {
     term "gadgets"
     kind borrowed
     words unstated
+    condition "with respect to a sprocket"
     region "/zz/demo/t1"
     basis restated
     borrowed_from "/zz/demo/t2/s5"
     see_note "/zz/demo/t1/ch1/note-codification"
+  }
+  definition "/zz/demo/t1/s2" {
+    term "sprocket"
+    kind borrowed
+    words "In this chapter"
+    basis unresolved
+    borrowed_words "the Sprocket Act"
   }
   layers {
     operative "2222222222222222222222222222222222222222222222222222222222222222"
@@ -463,8 +472,10 @@ fn check_spans(source: &str, module: &Module) {
                 }
             }
             for string in [
+                &definition.condition,
                 &definition.region,
                 &definition.borrowed_from,
+                &definition.borrowed_words,
                 &definition.see_note,
             ]
             .into_iter()
@@ -684,7 +695,9 @@ fn the_example_of_the_specification_parses() {
         Some("/zz/demo/t1/s2")
     );
     assert_eq!(definition.basis.text, "enacted");
+    assert_eq!(definition.condition, None);
     assert_eq!(definition.borrowed_from, None);
+    assert_eq!(definition.borrowed_words, None);
     assert_eq!(definition.see_note, None);
 
     let Some(Decl::Layers(layers)) = module.decls.last() else {
@@ -813,13 +826,39 @@ fn a_container_and_a_curated_module_parse() {
             .map(|value| value.value.as_str()),
         Some("/zz/demo/t1/ch1/note-codification")
     );
-    let Decl::Layers(layers) = &module.decls[10] else {
+    assert_eq!(
+        definition
+            .condition
+            .as_ref()
+            .map(|value| value.value.as_str()),
+        Some("with respect to a sprocket")
+    );
+    assert_eq!(definition.borrowed_words, None);
+    let Decl::Definition(unlinked) = &module.decls[10] else {
+        panic!("a second definition");
+    };
+    assert_eq!(unlinked.at.value, "/zz/demo/t1/s2");
+    assert_eq!(unlinked.kind.text, "borrowed");
+    assert!(matches!(&unlinked.words, Words::Stated(words) if words.value == "In this chapter"));
+    assert_eq!(unlinked.condition, None);
+    assert_eq!(unlinked.region, None);
+    assert_eq!(unlinked.basis.text, "unresolved");
+    assert_eq!(unlinked.borrowed_from, None);
+    assert_eq!(
+        unlinked
+            .borrowed_words
+            .as_ref()
+            .map(|value| value.value.as_str()),
+        Some("the Sprocket Act")
+    );
+    assert_eq!(unlinked.see_note, None);
+    let Decl::Layers(layers) = &module.decls[11] else {
         panic!("layers");
     };
     assert_eq!(layers.operative.value, "2".repeat(64));
     assert_eq!(layers.enacted.value, "3".repeat(64));
     assert_eq!(layers.editorial.value, "4".repeat(64));
-    assert_eq!(module.decls.len(), 11);
+    assert_eq!(module.decls.len(), 12);
 
     let module = parse_ok(CURATED);
     assert_eq!(module.address.value, "/zz/demo/curated");
@@ -1141,6 +1180,156 @@ fn a_field_out_of_order_or_twice_is_an_error() {
     assert_eq!(
         error.message,
         "field `content` is out of order in `provision`"
+    );
+}
+
+/// A definition whose lines are `lines`, in a module.
+fn definition_of(lines: &[&str]) -> String {
+    let body: String = lines.iter().map(|line| format!("    {line}\n")).collect();
+    module(&format!("  definition \"/zz/demo/t1/s1\" {{\n{body}  }}"))
+}
+
+#[test]
+fn a_condition_follows_the_words_and_the_source_words_take_the_place_of_borrowed_from() {
+    // Each new field in its place.
+    let source = definition_of(&[
+        "term \"widget\"",
+        "kind means",
+        "words \"In this section\"",
+        "condition \"in the case of a gadget\"",
+        "region \"/zz/demo/t1/s1\"",
+        "basis enacted",
+    ]);
+    let module = parse_ok(&source);
+    let Decl::Definition(definition) = &module.decls[0] else {
+        panic!("a definition");
+    };
+    let condition = definition.condition.as_ref().expect("a condition");
+    assert_eq!(condition.value, "in the case of a gadget");
+    assert_eq!(condition.span, only(&source, "\"in the case of a gadget\""));
+    assert_eq!(definition.borrowed_words, None);
+
+    let source = definition_of(&[
+        "term \"widget\"",
+        "kind borrowed",
+        "words unstated",
+        "basis unresolved",
+        "borrowed_words \"the Widget Act\"",
+        "see_note \"/zz/demo/t1/s1/note/demoNotes/nolaw/x\"",
+    ]);
+    let module = parse_ok(&source);
+    let Decl::Definition(definition) = &module.decls[0] else {
+        panic!("a definition");
+    };
+    let borrowed_words = definition.borrowed_words.as_ref().expect("source words");
+    assert_eq!(borrowed_words.value, "the Widget Act");
+    assert_eq!(borrowed_words.span, only(&source, "\"the Widget Act\""));
+    assert_eq!(definition.borrowed_from, None);
+    assert_eq!(definition.condition, None);
+
+    // A field out of its place.
+    for (lines, field, message) in [
+        (
+            [
+                "term \"widget\"",
+                "kind means",
+                "words \"In this section\"",
+                "region \"/zz/demo/t1/s1\"",
+                "condition \"in the case of a gadget\"",
+                "basis enacted",
+            ],
+            "condition",
+            "field `condition` is out of order in `definition`",
+        ),
+        (
+            [
+                "term \"widget\"",
+                "kind means",
+                "words \"In this section\"",
+                "basis enacted",
+                "condition \"in the case of a gadget\"",
+                "region \"/zz/demo/t1/s1\"",
+            ],
+            "condition",
+            "field `condition` is out of order in `definition`",
+        ),
+        (
+            [
+                "term \"widget\"",
+                "kind borrowed",
+                "words unstated",
+                "basis unresolved",
+                "see_note \"/zz/demo/t1/s1/note/demoNotes/nolaw/x\"",
+                "borrowed_words \"the Widget Act\"",
+            ],
+            "borrowed_words",
+            "field `borrowed_words` is out of order in `definition`",
+        ),
+        // Written before `basis`, the source words skip that required field.
+        (
+            [
+                "term \"widget\"",
+                "kind borrowed",
+                "words unstated",
+                "region \"/zz/demo/t1/s1\"",
+                "borrowed_words \"the Widget Act\"",
+                "basis unresolved",
+            ],
+            "borrowed_words",
+            "missing field `basis` in `definition`",
+        ),
+    ] {
+        let source = definition_of(&lines);
+        let error = parse_err(&source);
+        assert_eq!(error.message, message, "{source}");
+        assert_eq!(error.primary_span, Some(only(&source, field)), "{source}");
+    }
+
+    // Both borrowed fields in one block, in either order: the later one is
+    // refused.
+    for (first, second) in [
+        (
+            "borrowed_from \"/zz/demo/t2/s5\"",
+            "borrowed_words \"the Widget Act\"",
+        ),
+        (
+            "borrowed_words \"the Widget Act\"",
+            "borrowed_from \"/zz/demo/t2/s5\"",
+        ),
+    ] {
+        let source = definition_of(&[
+            "term \"widget\"",
+            "kind borrowed",
+            "words unstated",
+            "basis unresolved",
+            first,
+            second,
+        ]);
+        let error = parse_err(&source);
+        let (earlier, later) = (
+            first.split(' ').next().expect("a field"),
+            second.split(' ').next().expect("a field"),
+        );
+        assert_eq!(
+            error.message,
+            format!(
+                "field `{later}` is given with `{earlier}` in `definition`, which takes one of them"
+            )
+        );
+        assert_eq!(error.primary_span, Some(only(&source, later)), "{source}");
+    }
+    // One of them given twice is given twice.
+    let source = definition_of(&[
+        "term \"widget\"",
+        "kind borrowed",
+        "words unstated",
+        "basis unresolved",
+        "borrowed_words \"the Widget Act\"",
+        "borrowed_words \"the Gadget Act\"",
+    ]);
+    assert_eq!(
+        parse_err(&source).message,
+        "field `borrowed_words` is given twice in `definition`"
     );
 }
 

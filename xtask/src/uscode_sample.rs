@@ -1066,14 +1066,16 @@ fn check_definitions(root: &Path, records: &Path) -> Result<usize> {
 }
 
 /// The fields of a definition, in the order of its block and of a record.
-const DEFINITION_FIELDS: [&str; 8] = [
+const DEFINITION_FIELDS: [&str; 10] = [
     "at",
     "terms",
     "kind",
     "words",
+    "condition",
     "region",
     "basis",
     "borrowed_from",
+    "borrowed_words",
     "see_note",
 ];
 
@@ -1494,8 +1496,8 @@ mod tests {
         let records = dir.join("definitions.jsonl");
         // A line as the script writes it for the invented title 99.
         let line = "{\"at\":\"/us/usc/t99/s1/e\",\"terms\":[\"widget\"],\"kind\":\"borrowed\",\
-                    \"words\":null,\"region\":null,\"basis\":\"unresolved\",\
-                    \"borrowed_from\":\"/us/usc/t99/s2\",\"see_note\":null}";
+                    \"words\":null,\"condition\":null,\"region\":null,\"basis\":\"unresolved\",\
+                    \"borrowed_from\":\"/us/usc/t99/s2\",\"borrowed_words\":null,\"see_note\":null}";
         fs::write(&records, format!("{line}\n")).expect("write the records");
         let read = read_records(&records).unwrap_or_else(|error| panic!("{error:#}"));
         assert_eq!(
@@ -1505,9 +1507,11 @@ mod tests {
                 terms: vec!["widget".to_owned()],
                 kind: DefinitionKind::Borrowed,
                 words: None,
+                condition: None,
                 region: None,
                 basis: Basis::Unresolved,
                 borrowed_from: Some("/us/usc/t99/s2".to_owned()),
+                borrowed_words: None,
                 see_note: None,
             }]
         );

@@ -1,6 +1,7 @@
 //! Tests of lowering and of the checks of one module. Every module here is
 //! invented, in the invented corpus `/zz/demo`, and so is every text.
 
+use super::module_check::definition_text;
 use super::{Lowered, check_module, check_source, lower};
 use fidryn_core::{Diagnostic, DiagnosticCode, Span};
 use fidryn_provision::hash::{hash_provision, layer_hashes_of_unit, tree_hashes};
@@ -186,9 +187,11 @@ fn golden_unit() -> UnitModule {
             terms: vec!["widget".to_owned()],
             kind: DefinitionKind::Means,
             words: Some("As used in section 2 of this title".to_owned()),
+            condition: None,
             region: Some(address("/zz/demo/t1/s2")),
             basis: Basis::Enacted,
             borrowed_from: None,
+            borrowed_words: None,
             see_note: None,
         }],
     }
@@ -502,6 +505,9 @@ struct Coverage {
     footnotes: bool,
     definitions: bool,
     unstated: bool,
+    conditions: bool,
+    linked_sources: bool,
+    unlinked_sources: bool,
     aliases: bool,
     statuses: bool,
     absent_nums: bool,
@@ -518,10 +524,12 @@ impl Coverage {
                 self.aliases |= !unit.aliases.is_empty();
                 self.footnotes |= !unit.footnotes.is_empty();
                 self.definitions |= !unit.definitions.is_empty();
-                self.unstated |= unit
-                    .definitions
-                    .iter()
-                    .any(|definition| definition.words.is_none());
+                for definition in &unit.definitions {
+                    self.unstated |= definition.words.is_none();
+                    self.conditions |= definition.condition.is_some();
+                    self.linked_sources |= definition.borrowed_from.is_some();
+                    self.unlinked_sources |= definition.borrowed_words.is_some();
+                }
                 self.provision(&unit.root, &mut addresses);
                 self.matter(unit.credit.as_ref(), &unit.notes, &unit.footnotes);
             }
@@ -636,6 +644,9 @@ impl Coverage {
             ("a footnote", self.footnotes),
             ("a definition", self.definitions),
             ("unstated words", self.unstated),
+            ("a condition", self.conditions),
+            ("a linked source", self.linked_sources),
+            ("unlinked source words", self.unlinked_sources),
             ("an alias", self.aliases),
             ("a status", self.statuses),
             ("an absent number", self.absent_nums),
@@ -1143,8 +1154,10 @@ impl Generator {
     }
 
     /// Definitions of provisions of the tree below `root`, each term and
-    /// stated reach taken from the text of its provision or of the chapeau
-    /// of the provision's parent, in the order that `render` writes them.
+    /// source words taken from the text of its provision, and each stated
+    /// reach and condition from that text or the chapeau of the provision's
+    /// parent, in the order that `render` writes them. A borrowed definition
+    /// has a linked or an unlinked source, and one of another kind neither.
     fn definitions(&mut self, root: &Provision) -> Vec<Definition> {
         let placed = placed(root);
         let candidates: Vec<usize> = (0..placed.len())
@@ -1174,18 +1187,30 @@ impl Generator {
                     DefinitionKind::DoesNotInclude,
                     DefinitionKind::Borrowed,
                 ]);
-                let borrowed_from = (kind == DefinitionKind::Borrowed || self.rng.chance(20))
-                    .then(|| (*self.rng.pick(TARGETS)).to_owned());
+                let condition = match self.rng.below(4) {
+                    0 if !chapeau.is_empty() => Some(self.rng.pick(&chapeau).clone()),
+                    1 => Some(self.rng.pick(&own).clone()),
+                    _ => None,
+                };
+                let (borrowed_from, borrowed_words) = match kind {
+                    DefinitionKind::Borrowed if self.rng.chance(50) => {
+                        (Some((*self.rng.pick(TARGETS)).to_owned()), None)
+                    }
+                    DefinitionKind::Borrowed => (None, Some(self.rng.pick(&own).clone())),
+                    _ => (None, None),
+                };
                 let definition = Definition {
                     at: provision.address.clone(),
                     terms: (0..terms).map(|_| self.rng.pick(&own).clone()).collect(),
                     kind,
                     words,
+                    condition,
                     region: self.rng.chance(50).then(|| address("/zz/demo/t1/s2")),
                     basis: *self
                         .rng
                         .pick(&[Basis::Enacted, Basis::Restated, Basis::Unresolved]),
                     borrowed_from,
+                    borrowed_words,
                     see_note: self
                         .rng
                         .chance(30)
@@ -1363,6 +1388,67 @@ fn unit_defects() -> Vec<Defect> {
             "definition \"/zz/demo/t9/s8/a\"",
             DiagnosticCode::E710,
         ),
+        Defect {
+            message: Some(
+                "the condition `in the case of a gadget` stands neither in the text of provision \
+                 `/zz/demo/t1/s8/a` nor in the chapeau of one of its ancestors",
+            ),
+            ..defect(
+                "a definition's condition that is not in the provision's text",
+                "    region \"/zz/demo/t1/s2\"\n",
+                "    condition \"in the case of a gadget\"\n    region \"/zz/demo/t1/s2\"\n",
+                DiagnosticCode::E710,
+            )
+        },
+        Defect {
+            message: Some(
+                "the source words `the Gadget Act` do not stand in the text of provision \
+                 `/zz/demo/t1/s8/a`",
+            ),
+            ..defect(
+                "a definition's source words that are not in the provision's text",
+                "    kind means\n    words \"As used in section 2 of this title\"\n    \
+                 region \"/zz/demo/t1/s2\"\n    basis enacted\n",
+                "    kind borrowed\n    words \"As used in section 2 of this title\"\n    \
+                 region \"/zz/demo/t1/s2\"\n    basis enacted\n    borrowed_words \"the Gadget Act\"\n",
+                DiagnosticCode::E710,
+            )
+        },
+        Defect {
+            message: Some(
+                "a definition of kind `borrowed` has neither `borrowed_from` nor `borrowed_words`",
+            ),
+            ..defect(
+                "a borrowed definition with no source",
+                "    kind means\n",
+                "    kind borrowed\n",
+                DiagnosticCode::E710,
+            )
+        },
+        Defect {
+            message: Some(
+                "a definition of kind `means` has `borrowed_from`, which only a definition of kind \
+                 `borrowed` has",
+            ),
+            ..defect(
+                "a definition of another kind with a linked source",
+                "    basis enacted\n",
+                "    basis enacted\n    borrowed_from \"/zz/demo/t1/s2\"\n",
+                DiagnosticCode::E710,
+            )
+        },
+        Defect {
+            message: Some(
+                "a definition of kind `means` has `borrowed_words`, which only a definition of kind \
+                 `borrowed` has",
+            ),
+            ..defect(
+                "a definition of another kind with unlinked source words",
+                "    basis enacted\n",
+                "    basis enacted\n    borrowed_words \"section 2 of this title\"\n",
+                DiagnosticCode::E710,
+            )
+        },
         defect(
             "an `import` added to the unit",
             "  within \"/zz/demo/t1/ch1\"\n",
@@ -1469,7 +1555,7 @@ fn hash_after(source: &str, needle: &str) -> Span {
 #[test]
 fn each_defect_is_reported_with_its_code_at_its_text() {
     let defects = defects();
-    assert_eq!(defects.len(), 16);
+    assert_eq!(defects.len(), 21);
     for (defect, changed, change, diagnostics) in defects {
         let found = diagnostics.iter().any(|diagnostic| {
             let Some(span) = diagnostic.primary_span else {
@@ -1791,10 +1877,22 @@ fn an_empty_string_stands_only_where_a_value_may_be_empty() {
             "words \"\"",
         ),
         (
+            "a condition",
+            &unit,
+            "    region \"/zz/demo/t1/s2\"\n",
+            "    condition \"\"\n    region \"/zz/demo/t1/s2\"\n",
+        ),
+        (
             "`borrowed_from`",
             &unit,
             "    basis enacted\n",
             "    basis enacted\n    borrowed_from \"\"\n",
+        ),
+        (
+            "`borrowed_words`",
+            &unit,
+            "    basis enacted\n",
+            "    basis enacted\n    borrowed_words \"\"\n",
         ),
         (
             "the source of a unit",
@@ -1915,19 +2013,24 @@ fn citations_and_bindings_share_one_set_of_names() {
 
 /// A unit whose section has a chapeau, whose subsection (a) has a heading
 /// and no chapeau, and whose subsection (b) has a chapeau of its own, with
-/// one definition at `at` whose reach words are `reach`.
+/// one definition at `at` whose reach words are `reach`. The chapeau of (b)
+/// and the text of (a)(1) each hold a condition, and the text of (b)(2)
+/// names the source of a borrowed meaning without a link.
 fn unit_with_chapeaus(at: &str, reach: &str) -> Module {
     let chapeau = |text: &str| Item::Part {
         role: PartRole::Chapeau,
         blocks: vec![para(vec![words(text)])],
     };
-    let paragraph = |at: &str, text: &str| Provision {
-        address: address(at),
-        kind: "paragraph".to_owned(),
-        num: num("1", "(1)"),
-        heading: None,
-        status: None,
-        items: vec![content(vec![para(vec![words(text)])])],
+    let paragraph = |at: &str, text: &str| {
+        let number = at.rsplit('/').next().expect("a number");
+        Provision {
+            address: address(at),
+            kind: "paragraph".to_owned(),
+            num: num(number, &format!("({number})")),
+            heading: None,
+            status: None,
+            items: vec![content(vec![para(vec![words(text)])])],
+        }
     };
     let subsection = |at: &str, letter: &str, heading: Option<Text>, items: Vec<Item>| Provision {
         address: address(at),
@@ -1951,7 +2054,7 @@ fn unit_with_chapeaus(at: &str, reach: &str) -> Module {
                 Some(plain("Widgets")),
                 vec![Item::Child(paragraph(
                     "/zz/demo/t1/s5/a/1",
-                    "The term “widget” means a small device.",
+                    "In the case of a sale, the term “widget” means a small device.",
                 ))],
             )),
             Item::Child(subsection(
@@ -1959,19 +2062,23 @@ fn unit_with_chapeaus(at: &str, reach: &str) -> Module {
                 "b",
                 None,
                 vec![
-                    chapeau("In this subsection—"),
+                    chapeau("In this subsection, with respect to a gadget—"),
                     Item::Child(paragraph(
                         "/zz/demo/t1/s5/b/1",
                         "The term “gadget” means a tool.",
+                    )),
+                    Item::Child(paragraph(
+                        "/zz/demo/t1/s5/b/2",
+                        "The term “sprocket” has the meaning given that term in the Sprocket Act.",
                     )),
                 ],
             )),
         ],
     };
-    let term = if at.contains("/b/") {
-        "gadget"
-    } else {
-        "widget"
+    let term = match at {
+        "/zz/demo/t1/s5/b/1" => "gadget",
+        "/zz/demo/t1/s5/b/2" => "sprocket",
+        _ => "widget",
     };
     Module::Unit(UnitModule {
         address: address("/zz/demo/t1/s5"),
@@ -1988,9 +2095,11 @@ fn unit_with_chapeaus(at: &str, reach: &str) -> Module {
             terms: vec![term.to_owned()],
             kind: DefinitionKind::Means,
             words: Some(reach.to_owned()),
+            condition: None,
             region: Some(address("/zz/demo/t1/s5")),
             basis: Basis::Enacted,
             borrowed_from: None,
+            borrowed_words: None,
             see_note: None,
         }],
     })
@@ -2031,6 +2140,324 @@ fn the_reach_words_may_stand_in_the_chapeau_of_any_ancestor() {
             )
         );
         assert_eq!(text_at(&source, &errors[0]), format!("\"{reach}\""));
+    }
+}
+
+/// The unit of [`unit_with_chapeaus`] with its definition at `at` changed by
+/// `change`.
+fn unit_with_chapeaus_and(at: &str, change: impl FnOnce(&mut Definition)) -> Module {
+    let Module::Unit(mut unit) = unit_with_chapeaus(at, "For the purpose of this section") else {
+        panic!("a unit");
+    };
+    change(&mut unit.definitions[0]);
+    Module::Unit(unit)
+}
+
+/// The definition `definition` with the unlinked source `words`.
+fn unlinked(definition: &mut Definition, words: &str) {
+    definition.kind = DefinitionKind::Borrowed;
+    definition.borrowed_words = Some(words.to_owned());
+}
+
+#[test]
+fn a_condition_may_stand_in_the_chapeau_of_an_ancestor_and_source_words_only_in_the_text() {
+    for (what, module) in [
+        (
+            "a condition in the text of the provision",
+            unit_with_chapeaus_and("/zz/demo/t1/s5/a/1", |definition| {
+                definition.condition = Some("In the case of a sale".to_owned());
+            }),
+        ),
+        (
+            "a condition in the chapeau of the parent",
+            unit_with_chapeaus_and("/zz/demo/t1/s5/b/1", |definition| {
+                definition.condition = Some("with respect to a gadget".to_owned());
+            }),
+        ),
+        (
+            "source words in the text of the provision",
+            unit_with_chapeaus_and("/zz/demo/t1/s5/b/2", |definition| {
+                unlinked(definition, "the Sprocket Act");
+            }),
+        ),
+    ] {
+        let source = render(&module);
+        match check_source(&source) {
+            Ok(lowered) => assert_eq!(lowered.module, module, "{what}"),
+            Err(diagnostics) => panic!("{what}: {diagnostics:#?}\n{source}"),
+        }
+    }
+    for (what, module, value, message) in [
+        (
+            "a condition in the chapeau of a provision that is no ancestor",
+            unit_with_chapeaus_and("/zz/demo/t1/s5/a/1", |definition| {
+                definition.condition = Some("with respect to a gadget".to_owned());
+            }),
+            "with respect to a gadget",
+            "the condition `with respect to a gadget` stands neither in the text of provision \
+             `/zz/demo/t1/s5/a/1` nor in the chapeau of one of its ancestors",
+        ),
+        (
+            "source words in the chapeau of the parent only",
+            unit_with_chapeaus_and("/zz/demo/t1/s5/b/2", |definition| {
+                unlinked(definition, "with respect to a gadget");
+            }),
+            "with respect to a gadget",
+            "the source words `with respect to a gadget` do not stand in the text of provision \
+             `/zz/demo/t1/s5/b/2`",
+        ),
+    ] {
+        let source = render(&module);
+        let errors = check_source(&source).expect_err(what);
+        assert_eq!(errors.len(), 1, "{what}: {errors:#?}");
+        assert_eq!(errors[0].code, DiagnosticCode::E710, "{what}");
+        assert_eq!(errors[0].message, message, "{what}");
+        assert_eq!(
+            text_at(&source, &errors[0]),
+            format!("\"{value}\""),
+            "{what}"
+        );
+    }
+}
+
+#[test]
+fn a_borrowed_definition_has_exactly_one_source_and_one_of_another_kind_none() {
+    let unit = fixture("unit.fr");
+    let borrowed = |source: &str| {
+        unit.replacen("    kind means\n", "    kind borrowed\n", 1)
+            .replacen(
+                "    basis enacted\n",
+                &format!("    basis enacted\n    {source}\n"),
+                1,
+            )
+    };
+    let linked = borrowed("borrowed_from \"/zz/demo/t1/s2\"");
+    let mut lowered = check_source(&linked).expect("a borrowed definition with a linked source");
+    check_source(&borrowed("borrowed_words \"section 2 of this title\""))
+        .expect("a borrowed definition with unlinked source words");
+
+    // Both sources: the parser refuses them in one block, and the check of
+    // the model refuses them too.
+    let Module::Unit(model) = &mut lowered.module else {
+        panic!("a unit");
+    };
+    model.definitions[0].borrowed_words = Some("section 2 of this title".to_owned());
+    let errors = check_module(&lowered);
+    assert_eq!(errors.len(), 1, "{errors:#?}");
+    assert_eq!(errors[0].code, DiagnosticCode::E710);
+    assert_eq!(
+        errors[0].message,
+        "a definition of kind `borrowed` has both `borrowed_from` and `borrowed_words`"
+    );
+    assert_eq!(text_at(&linked, &errors[0]), "borrowed");
+
+    // Another kind with a source of either form, the source named by its
+    // field and the kind by its word.
+    for (kind, field, value) in [
+        ("includes", "borrowed_from", "\"/zz/demo/t1/s2\""),
+        (
+            "does_not_include",
+            "borrowed_words",
+            "\"section 2 of this title\"",
+        ),
+    ] {
+        let source = unit
+            .replacen("    kind means\n", &format!("    kind {kind}\n"), 1)
+            .replacen(
+                "    basis enacted\n",
+                &format!("    basis enacted\n    {field} {value}\n"),
+                1,
+            );
+        let errors = check_source(&source).expect_err(kind);
+        assert_eq!(errors.len(), 1, "{kind}: {errors:#?}");
+        assert_eq!(
+            errors[0].message,
+            format!(
+                "a definition of kind `{kind}` has `{field}`, which only a definition of kind \
+                 `borrowed` has"
+            )
+        );
+        assert_eq!(text_at(&source, &errors[0]), value, "{kind}");
+    }
+}
+
+/// A unit whose section is one paragraph of `runs`, with `definition`.
+fn unit_of_runs(runs: Vec<Run>, definition: Definition) -> Module {
+    Module::Unit(UnitModule {
+        address: address("/zz/demo/t1/s7"),
+        aliases: Vec::new(),
+        within: None,
+        source: "demo01.xml".to_owned(),
+        positive_law: Some(false),
+        root: Provision {
+            address: address("/zz/demo/t1/s7"),
+            kind: "section".to_owned(),
+            num: num("7", "§ 7."),
+            heading: None,
+            status: None,
+            items: vec![content(vec![para(runs)])],
+        },
+        credit: None,
+        notes: Vec::new(),
+        footnotes: Vec::new(),
+        definitions: vec![definition],
+    })
+}
+
+#[test]
+fn a_definition_stands_in_the_text_without_its_superscript_numbers() {
+    let sup = |words: &str| Run::Sup(words.to_owned());
+    // Three footnote numbers marked as superscripts, and one superscript
+    // that is not a number.
+    let runs = vec![
+        words("For purposes of section 5 "),
+        sup("1"),
+        words(" of the Gadget Act, the term “small "),
+        sup("2"),
+        words(" widget” has the meaning given that term in section 9 "),
+        sup("3"),
+        words(" of the Gadget Act with respect to a 5"),
+        sup("th"),
+        words(" gauge."),
+    ];
+    let definition = Definition {
+        at: address("/zz/demo/t1/s7"),
+        terms: vec!["small widget".to_owned()],
+        kind: DefinitionKind::Borrowed,
+        words: Some("For purposes of section 5 of the Gadget Act".to_owned()),
+        condition: Some("with respect to a 5th gauge".to_owned()),
+        region: None,
+        basis: Basis::Unresolved,
+        borrowed_from: None,
+        borrowed_words: Some("section 9 of the Gadget Act".to_owned()),
+        see_note: None,
+    };
+    let module = unit_of_runs(runs.clone(), definition.clone());
+    let source = render(&module);
+    match check_source(&source) {
+        Ok(lowered) => assert_eq!(lowered.module, module),
+        Err(diagnostics) => panic!("{diagnostics:#?}\n{source}"),
+    }
+    let at = "/zz/demo/t1/s7";
+    for (changed, value, message) in [
+        (
+            Definition {
+                terms: vec!["small 2 widget".to_owned()],
+                ..definition.clone()
+            },
+            "small 2 widget",
+            format!("the term `small 2 widget` does not stand in the text of provision `{at}`"),
+        ),
+        (
+            Definition {
+                words: Some("For purposes of section 5 1 of the Gadget Act".to_owned()),
+                ..definition.clone()
+            },
+            "For purposes of section 5 1 of the Gadget Act",
+            format!(
+                "the words `For purposes of section 5 1 of the Gadget Act` stand neither in the \
+                 text of provision `{at}` nor in the chapeau of one of its ancestors"
+            ),
+        ),
+        // The superscript `th` is not a number: it stays in the text.
+        (
+            Definition {
+                condition: Some("with respect to a 5 gauge".to_owned()),
+                ..definition.clone()
+            },
+            "with respect to a 5 gauge",
+            format!(
+                "the condition `with respect to a 5 gauge` stands neither in the text of \
+                 provision `{at}` nor in the chapeau of one of its ancestors"
+            ),
+        ),
+        (
+            Definition {
+                borrowed_words: Some("section 9 3 of the Gadget Act".to_owned()),
+                ..definition.clone()
+            },
+            "section 9 3 of the Gadget Act",
+            format!(
+                "the source words `section 9 3 of the Gadget Act` do not stand in the text of \
+                 provision `{at}`"
+            ),
+        ),
+    ] {
+        let source = render(&unit_of_runs(runs.clone(), changed));
+        let errors = check_source(&source).expect_err(value);
+        assert_eq!(errors.len(), 1, "{value}: {errors:#?}");
+        assert_eq!(errors[0].code, DiagnosticCode::E710, "{value}");
+        assert_eq!(errors[0].message, message, "{value}");
+        assert_eq!(
+            text_at(&source, &errors[0]),
+            format!("\"{value}\""),
+            "{value}"
+        );
+    }
+}
+
+#[test]
+fn the_text_of_a_definition_leaves_out_markers_and_superscript_numbers_with_one_space() {
+    let sup = |words: &str| Run::Sup(words.to_owned());
+    let sub = |words: &str| Run::Sub(words.to_owned());
+    for (runs, read) in [
+        // A space on each side: the space before goes.
+        (
+            vec![words("section 5(a) "), sup("1"), words(" of this title.")],
+            "section 5(a) of this title.",
+        ),
+        (vec![words("The "), sup("2"), words(" term")], "The term"),
+        // No space before: no space goes.
+        (
+            vec![words("In this section,"), sup("1"), words(" the term")],
+            "In this section, the term",
+        ),
+        (
+            vec![words("a list."), sup("1"), words(" For purposes")],
+            "a list. For purposes",
+        ),
+        (
+            vec![words("“widget"), sup("3"), words("” means")],
+            "“widget” means",
+        ),
+        (
+            vec![link("section 5", "/zz/demo/t1/s5"), sup("1"), words(" of")],
+            "section 5 of",
+        ),
+        // A space before and the end of the text after.
+        (
+            vec![words("In this section: "), sup("1")],
+            "In this section:",
+        ),
+        (vec![words("in section 5."), sup("1")], "in section 5."),
+        // A space before and no space after: no space goes.
+        (vec![words("a "), sup("12"), words("b")], "a b"),
+        // At the start of the text, the space after goes.
+        (vec![sup("2"), words(" The term")], "The term"),
+        (vec![sup("2"), mark("1", 1), words(" The term")], "The term"),
+        (vec![sup("1")], ""),
+        // Two numbers together take one space.
+        (vec![words("x "), sup("1"), sup("2"), words(" y")], "x y"),
+        // A superscript that is not only the digits 0 to 9 is read.
+        (
+            vec![words("In this section,"), sup("a"), words(" the term")],
+            "In this section,a the term",
+        ),
+        (
+            vec![words("a 5"), sup("th"), words(" gauge")],
+            "a 5th gauge",
+        ),
+        (vec![words("x"), sup("²")], "x²"),
+        (vec![words("x "), sup("1a"), words(" y")], "x 1a y"),
+        // A marker gives nothing; a digit written as words is text.
+        (
+            vec![words("section 2"), mark("1", 1), words("1 of")],
+            "section 21 of",
+        ),
+        (vec![words("H"), sub("2"), words("O")], "H2O"),
+    ] {
+        let text = text(runs);
+        assert_eq!(definition_text(&text), read, "{text:?}");
     }
 }
 

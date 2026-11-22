@@ -748,7 +748,7 @@
   ],
   "units": [
     {
-      "name": "a unit with two enacted notes, one editorial note, a credit, a footnote and three markers, two of them in notes listed out of address order",
+      "name": "a unit with two enacted notes, one editorial note, a credit, a footnote and three markers, two of them in notes listed out of address order, and two definitions, one with a condition",
       "unit": {
         "address": "/zz/demo/t1/s4",
         "aliases": [
@@ -1014,9 +1014,25 @@
             ],
             "kind": "means",
             "words": null,
+            "condition": null,
             "region": null,
             "basis": "enacted",
             "borrowed_from": null,
+            "borrowed_words": null,
+            "see_note": null
+          },
+          {
+            "at": "/zz/demo/t1/s4/b",
+            "terms": [
+              "record"
+            ],
+            "kind": "includes",
+            "words": null,
+            "condition": "with respect to a gadget",
+            "region": null,
+            "basis": "enacted",
+            "borrowed_from": null,
+            "borrowed_words": null,
             "see_note": null
           }
         ]
@@ -1072,7 +1088,7 @@
       }
     },
     {
-      "name": "a unit with footnote markers in a provision's number, a provision's heading, a table cell, the headings of two notes listed out of address order, quoted content inside a note and a block of a footnote",
+      "name": "a unit with footnote markers in a provision's number, a provision's heading, a table cell, the headings of two notes listed out of address order, quoted content inside a note and a block of a footnote, and a borrowed definition with unlinked source words",
       "unit": {
         "address": "/zz/demo/t1/s6",
         "aliases": [],
@@ -1468,7 +1484,22 @@
             ]
           }
         ],
-        "definitions": []
+        "definitions": [
+          {
+            "at": "/zz/demo/t1/s6/a",
+            "terms": [
+              "gauge"
+            ],
+            "kind": "borrowed",
+            "words": null,
+            "condition": null,
+            "region": null,
+            "basis": "unresolved",
+            "borrowed_from": null,
+            "borrowed_words": "the invented gauge act",
+            "see_note": null
+          }
+        ]
       },
       "layers": {
         "operative": "8a3394f95af3c809738c34890778e72b4dfd789bb3c138f2cb59f644bf27210c",

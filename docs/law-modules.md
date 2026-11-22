@@ -275,11 +275,15 @@ footnote marker names its footnote by that number.
 
 A definition records the provision that holds it (`at`), the terms it
 defines, its kind (`means`, `includes`, `does_not_include` or `borrowed`),
-the words that state its reach or none when the text states none, the
-region the reach covers, its basis (`enacted`, `restated` or `unresolved`),
-what a borrowed definition takes its meaning from (`borrowed_from`), and a
-note to read with it (`see_note`). The ingester for the Code extracts them
-by the rules of [Definitions](#definitions).
+the words that state its reach or none when the text states none, its
+condition when it has one (`condition`), the region the reach covers, its
+basis (`enacted`, `restated` or `unresolved`), what a borrowed definition
+takes its meaning from, either the target of a link (`borrowed_from`) or,
+when its source is not linked, the source words (`borrowed_words`), and a
+note to read with it (`see_note`). A definition of kind `borrowed` has
+exactly one of `borrowed_from` and `borrowed_words`, and a definition of
+any other kind has neither. The ingester for the Code extracts them by the
+rules of [Definitions](#definitions).
 
 ### Layers
 
@@ -412,8 +416,9 @@ Note        = "note" String ( "enacted" | "editorial" ) "{" "group" Ident { "top
               [ "heading" Text ] { Block } "hash" String "}" ;
 Footnote    = "footnote" Int String "{" { Block } "}" ;
 Definition  = "definition" String "{" "term" String { "term" String } "kind" Ident
-              "words" ( String | "unstated" ) [ "region" String ] "basis" Ident
-              [ "borrowed_from" String ] [ "see_note" String ] "}" ;
+              "words" ( String | "unstated" ) [ "condition" String ] [ "region" String ]
+              "basis" Ident [ "borrowed_from" String | "borrowed_words" String ]
+              [ "see_note" String ] "}" ;
 Layers      = "layers" "{" "operative" String "enacted" String "editorial" String "}" ;
 
 Import      = "import" String ( "as" Ident | "{" Ident { "," Ident } "}" ) ;
@@ -432,7 +437,9 @@ its first error, an `E100` at the token it is about:
 
 - Every block has the fields shown, in the order shown. A word that is no
   field of its block is "unknown field `<word>` in `<block>`"; a field that
-  stands out of its order, twice, or not at all is named as such.
+  stands out of its order, twice, or not at all is named as such, and so is
+  a field given with another that takes the same place (`borrowed_from`
+  and `borrowed_words`).
 - A word that begins no declaration is "unknown declaration `<word>`".
 - Text after the closing brace of the module is an error.
 - A source holds at most 64 MiB and 16,777,216 tokens, and its blocks nest
@@ -474,8 +481,9 @@ and generated modules are always in it:
   value: the value of a number, the shown form of a footnote and of a
   marker, the source of an image, and the target of a link. Anywhere else
   an empty string is refused: as the words of a run, as a term, as stated
-  reach words, as `borrowed_from`, as `source`, as the release of a
-  binding, as a topic, and as the origin of quoted content.
+  reach words, as a condition, as `borrowed_from`, as `borrowed_words`, as
+  `source`, as the release of a binding, as a topic, and as the origin of
+  quoted content.
 - `span <colspan> <rowspan>` is written only when one of the two is not 1.
 - Every `hash` and the three values of `layers` are computed by the rules
   of [Hashes](#hashes) from what is written above them.
@@ -574,20 +582,31 @@ about. `fidryn check` prints each as `FILE: CODE Title: message` and exits
 | The module's address, and every address written in it, is an address | `E700` |
 | The module has one of the three shapes, every declaration belongs to its shape, a declaration that stands once stands once, and a unit or a container has a `source` and `layers` | `E100` |
 | A unit's top provision has the module's address, and a container's address is the module's; every child provision's address is below its parent's; every note's address is below the module's; no address of a provision or a note is declared twice | `E700` |
-| Every run but a footnote marker has words, except in `td ""` and in the shown form `""` of a number ("a run has no words"); the text of every block is normalized ("text is not normalized"); a topic is one word, neither empty nor holding white space; no term, stated reach words, `borrowed_from`, `source`, release of a binding or origin of quoted content is an empty string | `E710` |
+| Every run but a footnote marker has words, except in `td ""` and in the shown form `""` of a number ("a run has no words"); the text of every block is normalized ("text is not normalized"); a topic is one word, neither empty nor holding white space; no term, stated reach words, condition, `borrowed_from`, `borrowed_words`, `source`, release of a binding or origin of quoted content is an empty string | `E710` |
 | Every `hash`, every value of `layers` and both hashes of a binding are 64 lower-case hexadecimal digits | `E710` |
 | Every `hash` and every value of `layers` equals the hash computed from what the module writes | `E710` |
 | The footnotes are numbered from 1, without a gap, in the order they are written; every footnote marker names a footnote of the module | `E710` |
-| A definition names a provision of the unit; each term stands in that provision's text; the reach words, when stated, stand in its text or in the chapeau of one of its ancestors; the kind is `means`, `includes`, `does_not_include` or `borrowed` and the basis `enacted`, `restated` or `unresolved`; a `borrowed` definition has `borrowed_from` | `E710` |
+| A definition names a provision of the unit; each term stands in that provision's text; the reach words, when stated, stand in its text or in the chapeau of one of its ancestors; the condition, when there is one, stands in its text or in the chapeau of one of its ancestors; the kind is `means`, `includes`, `does_not_include` or `borrowed` and the basis `enacted`, `restated` or `unresolved`; a `borrowed` definition has exactly one of `borrowed_from` and `borrowed_words`, and a definition of another kind has neither; `borrowed_words`, when present, stand in the provision's text | `E710` |
 | In a curated module, no name is declared twice, its citations and its bindings sharing one set of names | `E200` |
 
 An address is below another when it lies within it and is not the same
-address. The text of a provision is the plain text of each paragraph and
+address. The text of a provision is the text of each paragraph and
 subheading of its text parts, those in its tables and its quoted content
 included, and none of its children's; a term stands in it when one of
-those texts holds the term. Every text holds the empty string, so an empty
-term or empty reach words would pass the checks of a definition without
-checking anything. The topics of a note and the origin of quoted content
+those texts holds the term. Each of those texts is made of its runs in
+order without its footnote markers, which have no words, and without its
+superscript runs made only of the digits `0` to `9`, which are footnote
+numbers marked as superscripts. With each such run one space goes too: the
+space just before it, when just after it there is a space or the end of
+the text; or, when it begins the text, the space just after it. A
+superscript run that holds anything else, and a digit written in any other
+run, is text. So `section 5 of the Gadget Act` stands in a paragraph
+written `"... section 5 " sup "1" " of the Gadget Act."`. The terms, the
+reach words, the condition and `borrowed_words` are all looked for in this
+text, and the chapeaus of the ancestors are read the same way. Every text
+holds the empty string, so an empty term, empty reach words, an empty
+condition or empty `borrowed_words` would pass the checks of a definition
+without checking anything. The topics of a note and the origin of quoted content
 have rules of their own because the hash of a note joins its topics with
 one space and the hash of quoted content takes an absent origin as an
 empty one: without them, two different modules could have one hash.
