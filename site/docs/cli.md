@@ -175,8 +175,10 @@ The cache is outside every workspace unless `--cache-dir` or
 `FIDRYN_CACHE_DIR` names a directory inside one; such a directory is used
 like any other, and what that means is said under
 [The cache](https://fidryn.onlygass.dev/docs/law-modules.md#the-cache). When none of these names a
-directory, the check keeps no cache, as with `--no-cache`, and says so once
-on stderr.
+directory, or `fidryn` in the cache directory of the user is the
+workspace's directory or lies inside it, as when `XDG_CACHE_HOME`, `HOME`
+or `LOCALAPPDATA` names a directory inside the workspace, the check keeps
+no cache, as with `--no-cache`, and says so once on stderr.
 
 `--jobs`, `--cache-dir`, `--no-cache`, `--report` and `--unresolved`
 belong to the check of a workspace; given with a `.fr` file, they are
@@ -227,6 +229,9 @@ the cache hold, cannot be read, the check keeps no cache and says so once,
 as `the cache could not be used, and the check went on without it: ...`;
 so it does when no directory is named for the cache, as
 `the cache could not be used, and the check went on without it: no directory is named for it: ...`,
+when the one in the cache directory of the user lies inside the
+workspace, as
+`the cache could not be used, and the check went on without it: DIR: the directory lies inside the workspace ...`,
 and when the cache's directory is the directory of a dependency of
 the workspace, lies inside it or holds it, since nothing is written inside
 a dependency but through a symbolic link below the cache's directory that
@@ -1019,9 +1024,10 @@ provision.
 The cache is chosen, from the same variables, as by [`check`](#check), and
 every workspace the command reads, the two sides and each `--bindings`
 directory, shares it; nothing is written into any of them unless the
-cache is named inside one. A check trusts its cache, so a cache belongs
-where only people one trusts can write. `--cache-dir` and `--no-cache` are
-not given together.
+cache is named inside one, and `fidryn` in the cache directory of the user
+is not used when it lies inside one of them. A check trusts its cache, so
+a cache belongs where only people one trusts can write. `--cache-dir` and
+`--no-cache` are not given together.
 
 **Example**
 
@@ -1083,9 +1089,11 @@ A workspace that has an error ends the command with its diagnostics, each
 naming its file under the directory given, as `fidryn check` prints them;
 for a curated workspace of `--bindings` these are the diagnostics of its
 module files by themselves. When the command keeps no cache because no
-directory is named for one, or because the identity of the running
-executable cannot be read, it says so after the diagnostics of a failure
-too, as `the cache could not be used, and the check went on without it: ...`;
+directory is named for one, because the one in the cache directory of the
+user lies inside a workspace it reads, or because the identity of the
+running executable cannot be read, it says so after the diagnostics of a
+failure too, as
+`the cache could not be used, and the check went on without it: ...`;
 what the checks of the workspaces it read found of their cache is said
 only when the comparison succeeds.
 

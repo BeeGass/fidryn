@@ -25,9 +25,11 @@
 //!   when its aside speaks of a reach, when a reach follows its verb, or
 //!   when it states no reach and speaks of one.
 //! - The region of a reach is the nearest provision or container of the
-//!   kind its object names after `this`, or the target of its link below
-//!   the prefix of the Code; its basis is `unresolved` without a region,
-//!   `enacted` in a unit that is positive law, and `restated` in any other.
+//!   kind its object names when the object is `this` and a kind, and
+//!   otherwise the target of the one link its object is, when that target
+//!   lies below the prefix of the Code; its basis is `unresolved` without a
+//!   region, `enacted` in a unit that is positive law, and `restated` in any
+//!   other.
 //!   A restated definition points at the first editorial note headed
 //!   "References in Text" that speaks of the words naming its region.
 //!
@@ -623,16 +625,21 @@ fn reach_chapeau(provision: &Provision) -> Option<Reach> {
 /// The region `reach` names and the words that name it, counted along
 /// `chain`: the provision whose text holds the reach, then its ancestors
 /// and the containers of its unit, each at its address and with its kind,
-/// the nearest first.
+/// the nearest first. An object that is `this` and a kind of region, with
+/// nothing more or a comma, a space and `unless the context` after it,
+/// names the nearest of that kind and nothing else; any other object that
+/// is a single link names the link's target when it lies below the prefix.
 fn region<'c>(
     reach: &Reach,
     mut chain: impl Iterator<Item = (&'c Address, &'c str)>,
 ) -> Option<(Address, String)> {
-    if let Some(rest) = reach.object.strip_prefix("this ") {
-        let kind = REGION_KINDS.iter().find(|kind| {
+    let kind = reach.object.strip_prefix("this ").and_then(|rest| {
+        REGION_KINDS.iter().find(|kind| {
             rest.strip_prefix(**kind)
                 .is_some_and(|after| after.is_empty() || after.starts_with(", unless the context"))
-        })?;
+        })
+    });
+    if let Some(kind) = kind {
         let (address, _) = chain.find(|(_, of)| of == kind)?;
         return Some((address.clone(), format!("this {kind}")));
     }
@@ -1123,6 +1130,83 @@ mod tests {
             ),
             // A paragraph of the list form under no chapeau is not extracted.
             (in_content("“widget” means a small device."), none.clone()),
+        ] {
+            assert_eq!(defined(&inner), expected, "{inner}");
+        }
+    }
+
+    #[test]
+    fn a_single_link_below_the_prefix_is_the_region_unless_the_object_is_this_and_a_kind() {
+        let s1 = "/us/usc/t99/s1";
+        let s3 = "/us/usc/t99/s3";
+        // The reach `As used in OBJECT`, its object the words of a link to
+        // `target`, or no link when there is none.
+        let reach = |object: &str, target: Option<&str>| {
+            let object = match target {
+                Some(target) => format!("<ref href=\"{target}\">{object}</ref>"),
+                None => object.to_owned(),
+            };
+            format!("<content>As used in {object}, the term “widget” means a device.</content>")
+        };
+        let widget = |words: &str, region: Option<&str>, basis| {
+            vec![definition(
+                s1,
+                &["widget"],
+                Means,
+                Some(words),
+                region,
+                basis,
+            )]
+        };
+        for (inner, expected) in [
+            // An object that begins with `this ` and is not `this` and a kind
+            // of region: the link's target.
+            (
+                reach("this Act", Some(s3)),
+                widget("As used in this Act", Some(s3), Enacted),
+            ),
+            (
+                reach("this section and section 3", Some(s3)),
+                widget("As used in this section and section 3", Some(s3), Enacted),
+            ),
+            // Not a single link, or not one below the prefix: no region.
+            (
+                reach("this Act", None),
+                widget("As used in this Act", None, Unresolved),
+            ),
+            (
+                reach("this Act", Some("/us/pl/99/1")),
+                widget("As used in this Act", None, Unresolved),
+            ),
+            (
+                reach("this Code", Some("/us/usc")),
+                widget("As used in this Code", None, Unresolved),
+            ),
+            // `this` and a kind, a link or not: the nearest of that kind, and
+            // no region when none is of it, whatever the link names.
+            (
+                reach("this section", Some(s3)),
+                widget("As used in this section", Some(s1), Enacted),
+            ),
+            (
+                reach("this title", Some(s3)),
+                widget("As used in this title", Some("/us/usc/t99"), Enacted),
+            ),
+            (
+                reach(
+                    "this section, unless the context requires otherwise",
+                    Some(s3),
+                ),
+                widget(
+                    "As used in this section, unless the context requires otherwise",
+                    Some(s1),
+                    Enacted,
+                ),
+            ),
+            (
+                reach("this chapter", Some(s3)),
+                widget("As used in this chapter", None, Unresolved),
+            ),
         ] {
             assert_eq!(defined(&inner), expected, "{inner}");
         }

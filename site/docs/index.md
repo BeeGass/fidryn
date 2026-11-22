@@ -36,6 +36,7 @@ statement of any jurisdiction's law.
 | [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md) | Determinate, Suspended, Contingent, and the rest |
 | [Examples](https://fidryn.onlygass.dev/docs/examples.md) | Trust, tax, federal slices, fifty states |
 | [Coverage](https://fidryn.onlygass.dev/docs/coverage.md) | What the sample of the United States Code in the repository holds, in counts |
+| [Roadmap](https://fidryn.onlygass.dev/docs/roadmap.md) | Where the project is going, what exists today and what comes next |
 
 The closed grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf). Wire formats
 are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json),

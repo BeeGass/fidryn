@@ -389,7 +389,7 @@ fn the_text_of_the_workspace_of_a_fixture_is_its_expected_records() {
 }
 
 /// The keys of the ledger's `totals` that the profile of a fixture does not
-/// have: the independent reading extracts no definitions.
+/// have: the profile counts no definitions.
 const LEDGER_ONLY: [&str; 2] = ["definitions", "definitions_by_kind"];
 /// The keys of the profile that stand at the top of the ledger, not in its
 /// `totals`.

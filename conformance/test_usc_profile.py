@@ -207,6 +207,23 @@ class ProfileFixtures(unittest.TestCase):
     def test_quoted_empty_origin(self) -> None:
         self.check("quoted-empty-origin")
 
+    def test_notes_split_content(self) -> None:
+        self.check("notes-split-content")
+
+    def test_quoted_level_labels(self) -> None:
+        self.check("quoted-level-labels")
+
+    def test_toc_nested(self) -> None:
+        # Each table of contents counts once, the one inside the other included.
+        self.check("toc-nested")
+
+    def test_release_note_footnote(self) -> None:
+        # The footnote of the release note is left out with it.
+        self.check("release-note-footnote")
+
+    def test_ref_classes(self) -> None:
+        self.check("ref-classes")
+
     def test_top_elements_without_an_identifier_are_counted_over_the_release(self) -> None:
         expected = json.loads((FIXTURES / f"{UNNAMED}.profile.json").read_text(encoding="utf-8"))
         for jobs in ("1", "2"):

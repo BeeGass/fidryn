@@ -693,6 +693,138 @@ fn a_cache_inside_a_dependency_is_said_once_and_not_used() {
     }
 }
 
+/// The line that says the check keeps no cache because `cache`, the
+/// directory in the cache directory of the user, lies inside the workspace
+/// `workspace`.
+fn default_inside(cache: &Path, workspace: &Path) -> String {
+    format!(
+        "the cache could not be used, and the check went on without it: {}: the directory lies \
+         inside the workspace `{}`, and a cache that neither `--cache-dir` nor \
+         `FIDRYN_CACHE_DIR` names is kept outside every workspace\n",
+        cache.display(),
+        workspace.display()
+    )
+}
+
+#[test]
+fn the_default_cache_inside_the_workspace_is_said_once_and_not_used() {
+    let scratch = Scratch::new("default-in-workspace");
+    let workspace = scratch.path().join("workspace");
+    copy_tree(&demo_workspace(), &workspace);
+    let before = entries_below(&workspace);
+    let inside = workspace.join(".cache");
+    // The cache directory of the user lies inside the workspace, as each
+    // variable that names it may put it there, and with the workspace named
+    // by a relative path too.
+    let cases: Vec<(&str, &Path, PathBuf)> = if cfg!(windows) {
+        vec![("LOCALAPPDATA", inside.as_path(), inside.join("fidryn"))]
+    } else {
+        vec![
+            ("XDG_CACHE_HOME", inside.as_path(), inside.join("fidryn")),
+            ("HOME", workspace.as_path(), inside.join("fidryn")),
+        ]
+    };
+    for (name, value, cache) in cases {
+        let set = [(name, value.as_os_str())];
+        for named in [workspace.as_path(), Path::new("workspace")] {
+            for _ in 0..2 {
+                let checked = check_env_in(scratch.path(), &[named.as_os_str()], &set);
+                assert!(checked.status.success(), "{name}: {}", stderr(&checked));
+                assert_eq!(stdout(&checked), clean(0), "{name}");
+                assert_eq!(stderr(&checked), default_inside(&cache, named), "{name}");
+                assert_eq!(entries_below(&workspace), before, "{name}");
+            }
+        }
+    }
+}
+
+#[test]
+fn the_default_cache_inside_a_dependency_is_said_once_and_not_used() {
+    let scratch = Scratch::new("default-in-dependency");
+    let demo = scratch.path().join("demo");
+    copy_tree(&demo_workspace(), &demo);
+    let notes = scratch.path().join("notes");
+    depending_on_the_demo(&notes, "../demo", &demo);
+    let inside = demo.join(".cache");
+    let set = [
+        ("XDG_CACHE_HOME", inside.as_os_str()),
+        ("LOCALAPPDATA", inside.as_os_str()),
+    ];
+    let before = entries_below(scratch.path());
+    for _ in 0..2 {
+        let checked = check_env_in(scratch.path(), &[notes.as_os_str()], &set);
+        assert!(checked.status.success(), "{}", stderr(&checked));
+        assert_eq!(
+            stdout(&checked),
+            "modules: 1; from cache: 0; errors: 0; warnings: 0\nok\n"
+        );
+        assert_eq!(
+            stderr(&checked),
+            format!(
+                "the cache could not be used, and the check went on without it: {}: the \
+                 directory lies inside the directory of the dependency `demo`, `../demo`, and \
+                 nothing is written inside a dependency\n",
+                inside.join("fidryn").display()
+            )
+        );
+        assert_eq!(entries_below(scratch.path()), before);
+    }
+}
+
+#[test]
+fn the_default_cache_outside_the_workspace_and_its_dependencies_is_used() {
+    let scratch = Scratch::new("default-outside");
+    let demo = scratch.path().join("demo");
+    copy_tree(&demo_workspace(), &demo);
+    let notes = scratch.path().join("notes");
+    depending_on_the_demo(&notes, "../demo", &demo);
+    let user = scratch.path().join("user");
+    let set = [
+        ("XDG_CACHE_HOME", user.as_os_str()),
+        ("LOCALAPPDATA", user.as_os_str()),
+    ];
+    let before = [&demo, &notes].map(|dir| entries_below(dir));
+    for cached in [0, 1] {
+        let checked = check_env_in(scratch.path(), &[notes.as_os_str()], &set);
+        assert!(checked.status.success(), "{}", stderr(&checked));
+        assert_eq!(
+            stdout(&checked),
+            format!("modules: 1; from cache: {cached}; errors: 0; warnings: 0\nok\n")
+        );
+        assert_eq!(stderr(&checked), "");
+        assert_eq!([&demo, &notes].map(|dir| entries_below(dir)), before);
+    }
+    assert!(user.join("fidryn").join("v1").is_dir());
+}
+
+#[test]
+fn a_cache_named_inside_the_workspace_is_used() {
+    let scratch = Scratch::new("named-in-workspace");
+    let workspace = scratch.path().join("workspace");
+    copy_tree(&demo_workspace(), &workspace);
+    // The cache directory of the user lies inside the workspace too; a cache
+    // that is named is used all the same, and the user's is not made.
+    let user = workspace.join(".cache");
+    let named = workspace.join(".fidryn-cache");
+    let user_set = [
+        ("XDG_CACHE_HOME", user.as_os_str()),
+        ("LOCALAPPDATA", user.as_os_str()),
+    ];
+    twice(
+        scratch.path(),
+        &workspace,
+        &[OsStr::new("--cache-dir"), named.as_os_str()],
+        &user_set,
+    );
+    assert!(named.join("v1").is_dir());
+    fs::remove_dir_all(&named).expect("remove the cache");
+    let mut set = user_set.to_vec();
+    set.push(("FIDRYN_CACHE_DIR", named.as_os_str()));
+    twice(scratch.path(), &workspace, &[], &set);
+    assert!(named.join("v1").is_dir());
+    assert!(!user.exists());
+}
+
 #[test]
 fn a_cache_that_holds_a_dependency_is_said_once_and_not_used() {
     // The copy of the demo workspace stands where the cache would write its

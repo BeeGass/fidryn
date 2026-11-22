@@ -433,8 +433,9 @@ pub(crate) struct SetAside {
 }
 
 /// The footnotes of a module: every footnote that stands in it, outside its
-/// tables of contents and, for a container, outside its members, in
-/// document order; the ordinal of each is its place from 1.
+/// tables of contents and, for a container, outside its members and its
+/// release note, in document order; the ordinal of each is its place from 1.
+/// A footnote inside another is refused.
 #[derive(Debug, Default)]
 pub(crate) struct Footnotes {
     pub(crate) nodes: Vec<NodeId>,
@@ -442,26 +443,35 @@ pub(crate) struct Footnotes {
 }
 
 impl Footnotes {
-    /// The footnotes of the module whose element is `node`. `is_member` says
-    /// whether a child of `node` is a module of its own.
+    /// The footnotes of the module whose element is `node`. `outside` says
+    /// whether a child of `node` holds none of them: a member, which is a
+    /// module of its own, or a release note, which is not imported.
     pub(crate) fn of_module(
         node: Node<'_, '_>,
-        is_member: &dyn Fn(Node<'_, '_>) -> bool,
+        outside: &dyn Fn(Node<'_, '_>) -> bool,
     ) -> Result<Footnotes, IngestError> {
         let mut footnotes = Footnotes::default();
-        for child in node.children().filter(|child| !is_member(*child)) {
-            footnotes.collect(child)?;
+        for child in node.children().filter(|child| !outside(*child)) {
+            footnotes.collect(child, false)?;
         }
         Ok(footnotes)
     }
 
     /// Adds the footnotes of `node` and of what stands in it, outside tables
-    /// of contents.
-    fn collect(&mut self, node: Node<'_, '_>) -> Result<(), IngestError> {
+    /// of contents. `in_footnote` says whether `node` stands inside a
+    /// footnote.
+    fn collect(&mut self, node: Node<'_, '_>, in_footnote: bool) -> Result<(), IngestError> {
         if !node.is_element() || is(node, "toc") {
             return Ok(());
         }
-        if is_footnote(node) {
+        let footnote = is_footnote(node);
+        if footnote {
+            if in_footnote {
+                return Err(IngestError::at(
+                    node,
+                    "a footnote inside a footnote; a footnote holds no other",
+                ));
+            }
             let ordinal = u32::try_from(self.nodes.len() + 1)
                 .map_err(|_| IngestError::at(node, "a module holds too many footnotes"))?;
             if let Some(id) = node.attribute("id")
@@ -478,7 +488,7 @@ impl Footnotes {
             self.nodes.push(node.id());
         }
         for child in node.children() {
-            self.collect(child)?;
+            self.collect(child, in_footnote || footnote)?;
         }
         Ok(())
     }
@@ -672,6 +682,8 @@ fn inline_class<'a>(node: Node<'a, '_>) -> Result<Option<Inline<'a>>, IngestErro
     if let Some(name) = uslm_name(node) {
         return Ok(match name {
             "ref" => {
+                // The class is split into words at ASCII white space and at
+                // no other character.
                 let marker = node.attribute("class").is_some_and(|class| {
                     class.split_ascii_whitespace().any(|c| c == "footnoteRef")
                 });
@@ -1055,7 +1067,8 @@ pub(crate) fn text_part(
 
 /// The heading and the blocks of the note `node`: its first `heading` child,
 /// and the flow of everything else in it, where a text part that stands
-/// directly in the note is replaced by the blocks of its own flow. The first
+/// directly in the note is replaced by the blocks of its parts, those of a
+/// `continuation` or a `proviso` inside a `content` among them. The first
 /// `heading` child of a cross heading is the label of its group, which is not
 /// imported: `read_heading` false leaves it unread.
 pub(crate) fn note(
@@ -1165,7 +1178,8 @@ fn quoted(node: Node<'_, '_>, holder: Holder, scope: &mut Scope) -> Result<Quote
 }
 
 /// The level of quoted content `node`, held by `holder`: its kind, number,
-/// heading and items. It has no address.
+/// heading and items. It has no address. Its `num` and its `heading` close
+/// the paragraph its words have open.
 fn quoted_level(
     node: Node<'_, '_>,
     holder: Holder,
@@ -1175,6 +1189,9 @@ fn quoted_level(
     let mut labels = Labels::default();
     let mut items = Items::new(node, holder);
     for child in node.children() {
+        if is(child, "num") || is(child, "heading") {
+            items.blocks.close(scope)?;
+        }
         if !labels.read(child, scope)? && !items.structure(child, scope)? {
             items.blocks.child(child, scope)?;
         }
@@ -1211,8 +1228,10 @@ impl<'a, 'i> Items<'a, 'i> {
     }
 
     /// Reads `child` when it is a text part, a level or a note, and says
-    /// whether it is one. A note inside quoted content is replaced by the
-    /// blocks of its own flow, its heading first as a subheading.
+    /// whether it is one. A note directly in quoted content or in one of its
+    /// levels is replaced by the blocks of its own flow, its heading first as
+    /// a subheading; a note anywhere else in quoted content is refused by the
+    /// flow it stands in.
     fn structure(&mut self, child: Node<'a, 'i>, scope: &mut Scope) -> Result<bool, IngestError> {
         let holder = self.blocks.holder;
         if let Some(role) = text_part_role(child) {
@@ -1861,6 +1880,166 @@ mod tests {
             error.message().contains("not one of the 19 values"),
             "{error}"
         );
+    }
+
+    #[test]
+    fn white_space_inside_a_br_an_img_or_a_column_is_refused_as_content() {
+        let table = |inner: &str| {
+            format!(
+                "<content><table xmlns=\"http://www.w3.org/1999/xhtml\">{inner}<tr><td>A</td></tr>\
+                 </table></content>"
+            )
+        };
+        for (inner, phrase) in [
+            (
+                "<content>A<br> </br>b.</content>".to_owned(),
+                "a br that holds content",
+            ),
+            (
+                "<content><img src=\"file:///a.eps\"> </img></content>".to_owned(),
+                "an img that holds text",
+            ),
+            (
+                table("<colgroup><col> </col></colgroup>"),
+                "a column that holds content",
+            ),
+            (table("<col>\n</col>"), "a column that holds content"),
+        ] {
+            let error = refusal(&Doc::with_section(&inner));
+            assert!(error.message().contains(phrase), "{inner}: {error}");
+            assert_eq!(error.identifier(), Some("/us/usc/t99/s1"), "{inner}");
+        }
+    }
+
+    #[test]
+    fn a_note_inside_a_paragraph_a_text_part_a_cell_or_a_note_of_quoted_content_is_refused() {
+        const NOTE: &str = "<note topic=\"miscellaneous\"><p>A note.</p></note>";
+        for (quoted, phrase) in [
+            (
+                format!("<p>Words.{NOTE}</p>"),
+                "<note> does not stand in <p>",
+            ),
+            (
+                format!("<content>Words.{NOTE}</content>"),
+                "<note> does not stand in <content>",
+            ),
+            (
+                "<table xmlns=\"http://www.w3.org/1999/xhtml\"><tr><td>A<note \
+                 xmlns=\"http://xml.house.gov/schemas/uslm/1.0\" topic=\"miscellaneous\"><p>A \
+                 note.</p></note></td></tr></table>"
+                    .to_owned(),
+                "<note> does not stand in <xhtml:td>",
+            ),
+            (
+                format!("<note topic=\"miscellaneous\"><p>Words.</p>{NOTE}</note>"),
+                "<note> does not stand in <note>",
+            ),
+        ] {
+            let inner =
+                format!("<content>It reads: <quotedContent>{quoted}</quotedContent></content>");
+            let error = refusal(&Doc::with_section(&inner));
+            assert!(error.message().contains(phrase), "{inner}: {error}");
+            assert_eq!(error.element(), Some("note"), "{inner}");
+            assert_eq!(error.identifier(), Some("/us/usc/t99/s1"), "{inner}");
+        }
+        // A note that stands directly in quoted content or in one of its levels
+        // is read.
+        assert_fixture("notes-content");
+        assert_fixture("quoted-operative");
+    }
+
+    #[test]
+    fn the_class_of_a_ref_is_split_at_ascii_white_space_only() {
+        // A link whose class holds `footnoteRef` after a no-break space or an
+        // em space is a link, and a marker whose class holds it after a tab or
+        // a line feed is a marker.
+        assert_fixture("ref-classes");
+        assert_eq!(
+            blocks_of(
+                "<content>See<ref class=\"a\u{2003}footnoteRef\" href=\"/us/usc/t99/s2\">it</ref>\
+                 <ref class=\"a&#10;footnoteRef\" idref=\"f\">1</ref>.<note type=\"footnote\" id=\"f\">\
+                 <num>1</num> X.</note></content>"
+            ),
+            [para(vec![
+                words("See"),
+                Run::Ref {
+                    words: "it".to_owned(),
+                    target: "/us/usc/t99/s2".to_owned(),
+                },
+                mark("1", 1),
+                words("."),
+            ])]
+        );
+        // Without an `href`, such a ref is neither a link nor a marker.
+        for space in ['\u{A0}', '\u{85}', '\u{2003}', '\u{3000}'] {
+            let inner = format!(
+                "<content>Text<ref class=\"other{space}footnoteRef\" idref=\"f\">1</ref><note \
+                 type=\"footnote\" id=\"f\"><num>1</num> X.</note>.</content>"
+            );
+            let error = refusal(&Doc::with_section(&inner));
+            assert!(
+                error
+                    .message()
+                    .contains("a ref that has neither an href nor the class footnoteRef"),
+                "{inner}: {error}"
+            );
+            assert_eq!(error.element(), Some("ref"));
+        }
+    }
+
+    #[test]
+    fn a_number_or_a_heading_among_the_words_of_a_quoted_level_ends_the_open_paragraph() {
+        assert_fixture("quoted-level-labels");
+        let blocks = blocks_of(
+            "<content><quotedContent><subsection>A<num value=\"a\">(a)</num>B<heading>C</heading>\
+             D</subsection></quotedContent></content>",
+        );
+        let [Block::Quoted(quoted)] = blocks.as_slice() else {
+            panic!("{blocks:?}");
+        };
+        let [QuotedItem::Level(level)] = quoted.items.as_slice() else {
+            panic!("{:?}", quoted.items);
+        };
+        assert_eq!(
+            level.items,
+            ["A", "B", "D"].map(|text| QuotedItem::Block(para(vec![words(text)])))
+        );
+        assert_eq!(
+            level.heading,
+            Some(Text {
+                runs: vec![words("C")]
+            })
+        );
+    }
+
+    #[test]
+    fn a_footnote_inside_a_footnote_is_refused() {
+        let inner = "<note type=\"footnote\" id=\"f2\"><num>2</num> Inner.</note>";
+        for body in [
+            format!(
+                "<section identifier=\"/us/usc/t99/s1\"><content>Text<ref class=\"footnoteRef\" \
+                 idref=\"f1\">1</ref>.<note type=\"footnote\" id=\"f1\"><num>1</num> Outer\
+                 {inner}.</note></content></section>"
+            ),
+            format!(
+                "<section identifier=\"/us/usc/t99/s1\"><content>Text.</content><notes \
+                 type=\"uscNote\"><note topic=\"miscellaneous\"><heading>Note</heading><p>Words\
+                 <note type=\"footnote\" id=\"f1\"><num>1</num> Outer <p>deeper{inner}</p></note>.\
+                 </p></note></notes></section>"
+            ),
+            format!(
+                "<chapter identifier=\"/us/usc/t99/ch1\"><heading>Chapter<note type=\"footnote\" \
+                 id=\"f1\"><num>1</num> Outer{inner}</note></heading></chapter>"
+            ),
+        ] {
+            let error = refusal(&Doc::with_body(body.clone()));
+            assert!(
+                error.message().contains("a footnote inside a footnote"),
+                "{body}: {error}"
+            );
+            assert_eq!(error.element(), Some("note"), "{body}");
+            assert!(error.to_string().contains("<note>"), "{error}");
+        }
     }
 
     #[test]

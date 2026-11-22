@@ -128,6 +128,8 @@ WHITE_SPACE = (
 )
 WHITE_SET = frozenset(WHITE_SPACE)
 WHITE_RUN = re.compile("[" + re.escape(WHITE_SPACE) + "]+")
+# ASCII white space, at which the class of a ref is split into its words.
+ASCII_WHITE_RUN = re.compile("[\t\n\f\r ]+")
 SEGMENT = re.compile("[A-Za-z0-9.~\u2013-]+")
 GROUP_WORD = re.compile("[A-Za-z][A-Za-z0-9]*")
 ASCII_NUMBER = re.compile("[0-9]+")
@@ -182,7 +184,7 @@ def is_address(text: str) -> bool:
 
 
 def split_at_spaces(value: str | None) -> list[str]:
-    """The members of an identifier or the topics of a note: split at U+0020 only."""
+    """The topics of a note: split at U+0020 only, the empty members dropped."""
     return [member for member in (value or "").split(" ") if member]
 
 
@@ -205,7 +207,9 @@ def is_footnote(element: Element) -> bool:
 
 
 def is_marker(element: Element) -> bool:
-    return "footnoteRef" in (element.get("class") or "").split()
+    """Whether one of the words of the element's class, split at ASCII white space
+    alone (space, tab, line feed, carriage return, form feed), is `footnoteRef`."""
+    return "footnoteRef" in ASCII_WHITE_RUN.split(element.get("class") or "")
 
 
 def is_blank(text: str | None) -> bool:
@@ -322,6 +326,9 @@ class Footnote:
 
 @dataclass(slots=True)
 class Unit:
+    """A unit and what it holds: its notes, those of its provisions among them, in
+    document order, and its footnotes in ordinal order."""
+
     address: str
     aliases: list[str]
     within: str | None
@@ -545,18 +552,17 @@ class Scope:
 class Context:
     """Where a flow stands: in a note (where a signature, any subheading and any heading
     other than the note's own are blocks, at any depth, whether or not the note has a
-    heading of its own), in quoted content, whether it is the note's own flow (where a
-    text part is read as a block), and whether it is quoted content's own flow (where a
+    heading of its own), whether it is the note's own flow (where a text part is read as
+    the blocks of its parts), and whether it is quoted content's own flow (where a
     heading or subheading is a subheading)."""
 
     in_note: bool = False
-    in_quoted: bool = False
     note_flow: bool = False
     quoted_top: bool = False
 
     def inner(self) -> Context:
         """The context of a flow inside this one."""
-        return Context(self.in_note, self.in_quoted)
+        return Context(self.in_note)
 
 
 @dataclass(slots=True)
@@ -623,8 +629,10 @@ class TextBuilder:
         elif tag in DROPPED_TAGS:
             self.children(element)
         elif tag == "br":
-            if len(element) or not is_blank(element.text):
-                self.reader.refuse("a br that holds text or an element", element)
+            if len(element) or element.text:
+                self.reader.refuse(
+                    "a br that holds text, white space included, or an element", element
+                )
             self.text(" ")
         else:
             self.reader.refuse("an element that does not stand in text", element)
@@ -728,8 +736,13 @@ class Flow:
         tag = tag_of(child)
         if is_footnote(child):
             return
-        if tag in P_TAGS or (tag in TEXT_PARTS and context.note_flow):
+        if tag in P_TAGS:
             self.add(reader.read_flow(child, context.inner(), scope))
+        elif tag in TEXT_PARTS and context.note_flow:
+            # A text part directly in a note gives the blocks of its parts, those of a
+            # continuation or a proviso inside a content among them, and no role.
+            parts = reader.read_parts(child, context.inner(), scope)
+            self.add([block for part in parts for block in part.blocks])
         elif tag == "xhtml:table":
             self.add([reader.read_table(child, context.inner(), scope)])
         elif tag == "quotedContent":
@@ -740,8 +753,6 @@ class Flow:
             self.add(reader.read_signature(child, scope))
         elif tag in ("heading", "subheading") and (context.in_note or context.quoted_top):
             self.add([Subheading(reader.read_text(child, scope))])
-        elif tag == "note" and context.in_quoted:
-            self.add(reader.read_quoted_note(child, context.inner(), scope))
         elif tag in INLINE_TAGS:
             self.builder.element(child)
         else:
@@ -899,17 +910,20 @@ class MemberReader:
             self.refuse(f"the identifier gives {address!r}, which is not an address", element)
         return address
 
-    def identifier_of(self, element: Element) -> list[str]:
-        """The members of an element's identifier; one that holds `~`, the character the
-        reading alone may add to an address, is refused."""
+    def identifier_of(self, element: Element) -> list[str] | None:
+        """The members of an element's identifier, split at U+0020 with every member
+        kept, an empty one too; None when it has none. One that holds `~`, the character
+        the reading alone may add to an address, is refused."""
         raw = element.get("identifier")
-        if raw is not None and "~" in raw:
+        if raw is None:
+            return None
+        if "~" in raw:
             self.refuse(
                 f"the identifier {raw!r} holds ~, the character the reading alone may add "
                 "to an address",
                 element,
             )
-        return split_at_spaces(raw)
+        return raw.split(" ")
 
     # The document and its containers.
 
@@ -983,7 +997,7 @@ class MemberReader:
         self, element: Element, within: str | None, place: Counter[str]
     ) -> tuple[str, list[str]]:
         identifier = self.identifier_of(element)
-        if not identifier:
+        if identifier is None:
             tag = tag_of(element)
             place[tag] += 1
             self.counts.assigned += 1
@@ -991,6 +1005,13 @@ class MemberReader:
                 self.unnamed_tops.append(tag)
             address = f"{within or PREFIX}/~{tag}.{place[tag]}"
             return self.check_address(address, element), []
+        if "" in identifier:
+            # Two spaces in a row, a space at either end, or no character at all.
+            self.refuse(
+                f"the identifier {element.get('identifier')!r} lists an empty member, which "
+                "is not an address",
+                element,
+            )
         used = identifier[0]
         aliases = identifier[1:]
         if "..." in used.rsplit("/", 1)[-1]:
@@ -1027,9 +1048,12 @@ class MemberReader:
         return normalize("".join(element.itertext())).startswith(RELEASE_NOTE_START)
 
     def prepare_footnotes(self, scope: Scope, module: Element, container: bool) -> None:
+        """The footnotes of a module, in document order: those outside its tables of
+        contents and, of a container, outside its members and its release note. A
+        footnote inside another is refused."""
         found: list[Element] = []
 
-        def walk(node: Element) -> None:
+        def walk(node: Element, in_footnote: bool) -> None:
             for child in node:
                 tag = tag_of(child)
                 if tag == "toc":
@@ -1041,11 +1065,12 @@ class MemberReader:
                 ):
                     continue
                 if is_footnote(child):
+                    if in_footnote:
+                        self.refuse("a footnote inside a footnote", child)
                     found.append(child)
-                    continue
-                walk(child)
+                walk(child, in_footnote or is_footnote(child))
 
-        walk(module)
+        walk(module, False)
         for ordinal, footnote in enumerate(found, start=1):
             identifier = footnote.get("id")
             if identifier is None:
@@ -1103,7 +1128,7 @@ class MemberReader:
                 members.append(self.read_module(child, address, place))
             else:
                 self.refuse("an element that does not stand in a container", child)
-        read = self.read_notes(notes, address, scope)
+        read = [note for _, note in self.read_notes(notes, address, scope)]
         self.sink.container(
             Container(
                 address,
@@ -1123,9 +1148,12 @@ class MemberReader:
         )
 
     def count_toc(self, element: Element) -> None:
-        self.counts.tables_of_contents += 1
+        """A table of contents, with the footnotes and links inside it: each `toc`
+        element counts once, one inside another included."""
         for inner in element.iter():
-            if is_footnote(inner):
+            if tag_of(inner) == "toc":
+                self.counts.tables_of_contents += 1
+            elif is_footnote(inner):
                 self.counts.footnotes_in_tables_of_contents += 1
             elif tag_of(inner) == "ref" and inner.get("href") is not None:
                 self.counts.links_in_tables_of_contents += 1
@@ -1148,7 +1176,7 @@ class MemberReader:
                 self.positive_law,
                 root,
                 unit.credit,
-                unit.notes,
+                unit.notes_in_order(),
                 scope.footnotes,
             )
         )
@@ -1179,6 +1207,8 @@ class MemberReader:
         heading: Text | None = None
         items: list[Part | Provision] = []
         notes: list[tuple[Element, str, bool]] = []
+        # The place in the unit, in document order, of each element of `notes`.
+        places: list[int] = []
         siblings: Counter[str] = Counter()
         place: Counter[str] = Counter()
         seen: set[str] = set()
@@ -1203,10 +1233,13 @@ class MemberReader:
                 items.append(self.read_provision(child, child_address, unit))
                 self.at.pop()
             elif tag == "notes":
-                notes += self.notes_of(child)
+                found = self.notes_of(child)
+                notes += found
+                places += [unit.place() for _ in found]
             elif tag == "note":
                 if not is_footnote(child):
                     notes.append((child, "ungrouped", False))
+                    places.append(unit.place())
             elif tag == "sourceCredit":
                 if address != unit.scope.address:
                     self.refuse("a source credit that is not the direct child of its unit", child)
@@ -1215,18 +1248,22 @@ class MemberReader:
                 self.count_toc(child)
             else:
                 self.refuse("an element that does not stand in a level", child)
-        unit.notes += self.read_notes(notes, address, scope)
+        unit.notes += [
+            (places[index], note) for index, note in self.read_notes(notes, address, scope)
+        ]
         return Provision(address, tag_of(element), num, heading, status, items)
 
     def provision_address(
         self, element: Element, parent: str, siblings: Counter[str], place: Counter[str]
     ) -> str:
         identifier = self.identifier_of(element)
-        if not identifier:
+        if identifier is None:
             tag = tag_of(element)
             place[tag] += 1
             self.counts.assigned += 1
             return self.check_address(f"{parent}/~{tag}.{place[tag]}", element)
+        # The last segment of the first member, which is empty when the identifier is
+        # empty or begins with a space, and gives no address then.
         base = f"{parent}/{identifier[0].rsplit('/', 1)[-1]}"
         siblings[base] += 1
         if siblings[base] == 1:
@@ -1286,8 +1323,8 @@ class MemberReader:
     def read_image(self, element: Element) -> Image:
         if set(element.attrib) - {"src"}:
             self.refuse("an img with an attribute other than src", element)
-        if len(element) or not is_blank(element.text):
-            self.refuse("an img that holds text or an element", element)
+        if len(element) or element.text:
+            self.refuse("an img that holds text, white space included, or an element", element)
         return Image(normalize(element.get("src") or ""))
 
     def read_signature(self, element: Element, scope: Scope) -> list[Block]:
@@ -1321,8 +1358,12 @@ class MemberReader:
         return Table(rows)
 
     def check_column(self, element: Element) -> None:
-        if tag_of(element) != "xhtml:col" or len(element) or not is_blank(element.text):
-            self.refuse("a column group that holds more than empty columns", element)
+        """A column, in a column group or directly in a table, holds nothing, white space
+        included; a column group holds columns alone."""
+        if tag_of(element) != "xhtml:col":
+            self.refuse("a column group that holds more than columns", element)
+        if len(element) or element.text:
+            self.refuse("a column that holds text, white space included, or an element", element)
 
     def read_row(self, element: Element, group: str, context: Context, scope: Scope) -> Row:
         if tag_of(element) != "xhtml:tr":
@@ -1355,7 +1396,7 @@ class MemberReader:
     def read_quoted(self, element: Element, context: Context, scope: Scope) -> Quoted:
         """Quoted content: its origin as written, none when it has none or an empty one,
         and its items."""
-        quoted = Context(context.in_note, True, quoted_top=True)
+        quoted = Context(context.in_note, quoted_top=True)
         origin = element.get("origin") or None
         return Quoted(origin, self.read_items(element, quoted, scope, None))
 
@@ -1387,6 +1428,10 @@ class MemberReader:
             elif tag in LEVEL_TAGS:
                 flow.close()
                 items.append(self.read_quoted_level(child, context.inner(), scope))
+            elif tag == "note" and not is_footnote(child):
+                # A note stands in quoted content only here, directly in it or in one
+                # of its levels; anywhere else in it, the flow refuses it.
+                flow.add(self.read_quoted_note(child, scope))
             else:
                 flow.child(child)
             flow.text(child.tail)
@@ -1402,17 +1447,18 @@ class MemberReader:
             raise AssertionError(labels)
         return QuotedLevel(tag_of(element), num, heading, items)
 
-    def read_quoted_note(self, element: Element, context: Context, scope: Scope) -> list[Block]:
-        """A note inside quoted content, wherever the quotation stands: its heading first
-        as a subheading, then the flow of the rest, read as the flow of a note, where a
-        text part that stands directly in it is read as a block."""
+    def read_quoted_note(self, element: Element, scope: Scope) -> list[Block]:
+        """A note directly in quoted content or in one of its levels, wherever the
+        quotation stands: its heading first as a subheading, then the flow of the rest,
+        read as the flow of a note, where a text part that stands directly in it gives the
+        blocks of its parts."""
         heading = next((c for c in element if tag_of(c) == "heading"), None)
         blocks: list[Block] = []
         if heading is not None:
             text = self.read_optional_text(heading, scope)
             if text is not None:
                 blocks.append(Subheading(text))
-        inner = Context(True, context.in_quoted, note_flow=True)
+        inner = Context(True, note_flow=True)
         return blocks + self.read_flow(element, inner, scope, skip=heading)
 
     # Notes.
@@ -1447,7 +1493,7 @@ class MemberReader:
     def after_label(self, element: Element, scope: Scope) -> list[Block]:
         """The blocks a cross heading holds after its first heading child, its label."""
         label = next((c for c in element if tag_of(c) == "heading"), None)
-        context = Context(True, False, note_flow=True)
+        context = Context(True, note_flow=True)
         if label is None:
             return self.read_flow(element, context, scope)
         out: list[QuotedItem] = []
@@ -1468,11 +1514,13 @@ class MemberReader:
 
     def read_notes(
         self, notes: list[tuple[Element, str, bool]], anchor: str, scope: Scope
-    ) -> list[Note]:
-        """The notes of one anchor, each named by its group, law and heading."""
-        read: list[Note] = []
+    ) -> list[tuple[int, Note]]:
+        """The notes of one anchor, each named by its group, law and heading, with the
+        place in `notes` of the element it is read from. A cross heading that holds
+        nothing after its label gives none."""
+        read: list[tuple[int, Note]] = []
         named: Counter[str] = Counter()
-        for element, group, labeled in notes:
+        for index, (element, group, labeled) in enumerate(notes):
             heading: Text | None = None
             if labeled:
                 topics: list[str] = []
@@ -1484,7 +1532,7 @@ class MemberReader:
                 heading_element = next((c for c in element if tag_of(c) == "heading"), None)
                 if heading_element is not None:
                     heading = self.read_optional_text(heading_element, scope)
-                context = Context(True, False, note_flow=True)
+                context = Context(True, note_flow=True)
                 blocks = self.read_flow(element, context, scope, skip=heading_element)
             law = self.law_of(heading, blocks, element, anchor)
             segment = heading_segment(heading.plain) if heading is not None else ""
@@ -1499,7 +1547,7 @@ class MemberReader:
                 group == "ungrouped" and any(topic in EDITORIAL_TOPICS for topic in topics)
             )
             layer = "editorial" if editorial else "enacted"
-            read.append(Note(address, layer, group, topics, heading, blocks))
+            read.append((index, Note(address, layer, group, topics, heading, blocks)))
         return read
 
     def topics_of(self, note: Element) -> list[str]:
@@ -1550,9 +1598,23 @@ class MemberReader:
 
 @dataclass(slots=True)
 class UnitState:
+    """What the provisions of one unit gather as they are read: its credit, and its
+    notes, each with the place in the document of the element it is read from, so that
+    the notes of a provision and of the provisions below it can be put in document
+    order."""
+
     scope: Scope
     credit: Text | None = None
-    notes: list[Note] = field(default_factory=list)
+    notes: list[tuple[int, Note]] = field(default_factory=list)
+    places: int = 0
+
+    def place(self) -> int:
+        """The place of the next note element of the unit, in document order."""
+        self.places += 1
+        return self.places
+
+    def notes_in_order(self) -> list[Note]:
+        return [note for _, note in sorted(self.notes, key=lambda placed: placed[0])]
 
 
 def first_quoted_origin(blocks: Iterable[Block | QuotedItem]) -> str | None:

@@ -3,6 +3,7 @@
 use crate::workspace::{cargo_command, load_metadata, workspace_root};
 use anyhow::{Context, Result, bail, ensure};
 use clap::Args;
+use fidryn_core::ids::hex_encode;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
@@ -573,7 +574,7 @@ fn digest_file(path: &Path) -> Result<FileDigest> {
     }
     Ok(FileDigest {
         size,
-        sha256: format!("{:x}", sha256.finalize()),
+        sha256: hex_encode(&sha256.finalize()),
         blake3: blake3.finalize().to_hex().to_string(),
     })
 }
@@ -1026,7 +1027,7 @@ mod tests {
     #[test]
     fn assets_exclude_ignored_local_files_but_include_visible_development_files() {
         let fixture = Fixture::new();
-        let mut init = Command::new("git");
+        let mut init = crate::test_git::git();
         init.current_dir(&fixture.0).args(["init", "--quiet"]);
         checked_status(&mut init).unwrap();
         fs::write(fixture.0.join(".gitignore"), ".DS_Store\n__pycache__/\n").unwrap();
@@ -1091,7 +1092,7 @@ mod tests {
     ];
 
     fn licensing_source(root: &Path) {
-        let mut init = Command::new("git");
+        let mut init = crate::test_git::git();
         init.current_dir(root).args(["init", "--quiet"]);
         checked_status(&mut init).unwrap();
         for name in LICENSING_FILES {

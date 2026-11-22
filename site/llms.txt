@@ -38,6 +38,8 @@ Source: https://github.com/BeeGass/fidryn
   - HTML: https://fidryn.onlygass.dev/docs/coverage
 - [Contributing](https://fidryn.onlygass.dev/docs/contributing.md): Toolchain, tests, and how to work on the Fidryn reference interpreter.
   - HTML: https://fidryn.onlygass.dev/docs/contributing
+- [Roadmap](https://fidryn.onlygass.dev/docs/roadmap.md): Where Fidryn is going: United States law held as a body of checked programs, what exists today at each depth, and what comes next.
+  - HTML: https://fidryn.onlygass.dev/docs/roadmap
 
 ## Notes for agents
 

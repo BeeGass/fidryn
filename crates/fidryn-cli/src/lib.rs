@@ -576,16 +576,22 @@ const USER_CACHE_NAME: &str = "fidryn";
 /// which the check then runs without.
 const CACHE_UNUSED: &str = "the cache could not be used, and the check went on without it";
 
-/// The directory of the cache of a check of a workspace, outside every
-/// workspace unless `--cache-dir` or `FIDRYN_CACHE_DIR` names one inside:
-/// none with `--no-cache`; otherwise `--cache-dir`, else the directory that
-/// `FIDRYN_CACHE_DIR` names when it is set and not empty, else `fidryn` in
-/// the cache directory of the user ([`user_cache_dir`]). `variable` gives
-/// the value of an environment variable by its name. `Err` with the reason
-/// when none of these names a directory, and there is then no cache.
+/// The directory of the cache of a check of the workspaces in the
+/// directories `workspaces`, outside every workspace unless `--cache-dir` or
+/// `FIDRYN_CACHE_DIR` names one inside: none with `--no-cache`; otherwise
+/// `--cache-dir`, else the directory that `FIDRYN_CACHE_DIR` names when it
+/// is set and not empty, else `fidryn` in the cache directory of the user
+/// ([`user_cache_dir`]). `variable` gives the value of an environment
+/// variable by its name. `Err` with the reason when none of these names a
+/// directory, and when the one in the cache directory of the user is the
+/// directory of one of `workspaces` or lies inside it, as when a variable
+/// that [`user_cache_dir`] reads names a directory inside a workspace; there
+/// is then no cache. The check keeps none either when the directory lies
+/// inside a dependency, whichever named it.
 fn cache_dir(
     flags: &WorkspaceFlags,
     variable: &dyn Fn(&str) -> Option<OsString>,
+    workspaces: &[&Path],
 ) -> Result<Option<PathBuf>, String> {
     if flags.no_cache {
         return Ok(None);
@@ -596,12 +602,24 @@ fn cache_dir(
     if let Some(dir) = variable(CACHE_DIR_VARIABLE).filter(|value| !value.is_empty()) {
         return Ok(Some(PathBuf::from(dir)));
     }
-    match user_cache_dir(variable) {
-        Some(dir) => Ok(Some(dir.join(USER_CACHE_NAME))),
-        None => Err(format!(
+    let Some(user) = user_cache_dir(variable) else {
+        return Err(format!(
             "no directory is named for it: `--cache-dir` is not given, `{CACHE_DIR_VARIABLE}` \
              is not set, and {USER_CACHE_VARIABLES}"
+        ));
+    };
+    let dir = user.join(USER_CACHE_NAME);
+    let inside = workspaces
+        .iter()
+        .find(|workspace| fidryn_driver::workspace::lies_inside(&dir, workspace));
+    match inside {
+        Some(workspace) => Err(format!(
+            "{}: the directory lies inside the workspace `{}`, and a cache that neither \
+             `--cache-dir` nor `{CACHE_DIR_VARIABLE}` names is kept outside every workspace",
+            dir.display(),
+            workspace.display()
         )),
+        None => Ok(Some(dir)),
     }
 }
 
@@ -657,19 +675,21 @@ fn executable_digest() -> Result<String, String> {
         .ok_or_else(|| "the identity of the running executable has no digest".to_owned())
 }
 
-/// The options of a check of a workspace, as `flags` and the environment
-/// give them: `--jobs` threads, by default as many as are available, and the
-/// cache of [`cache_dir`], keyed also by the identity of the running
-/// executable; and why there is no cache, when `cache_dir` names none or
-/// that identity cannot be read, for the command to say once.
+/// The options of a check of the workspaces in the directories
+/// `workspaces`, as `flags` and the environment give them: `--jobs` threads,
+/// by default as many as are available, and the cache of [`cache_dir`],
+/// keyed also by the identity of the running executable; and why there is
+/// no cache, when `cache_dir` names none or that identity cannot be read,
+/// for the command to say once.
 fn check_options(
     flags: &WorkspaceFlags,
+    workspaces: &[&Path],
 ) -> (fidryn_driver::workspace::CheckOptions, Option<String>) {
     let jobs = match flags.jobs {
         Some(jobs) => usize::try_from(jobs).unwrap_or(usize::MAX),
         None => std::thread::available_parallelism().map_or(1, std::num::NonZero::get),
     };
-    let (mut cache, mut unused) = match cache_dir(flags, &environment) {
+    let (mut cache, mut unused) = match cache_dir(flags, &environment, workspaces) {
         Ok(cache) => (cache, None),
         Err(why) => (None, Some(why)),
     };
@@ -702,7 +722,7 @@ fn check_options(
 /// list to `--unresolved` when they are given; then prints `ok` when there
 /// is no error. Exit 1 on an error, and when a file cannot be written.
 fn check_workspace(dir: &Path, flags: &WorkspaceFlags) -> ExitCode {
-    let (options, unused) = check_options(flags);
+    let (options, unused) = check_options(flags, &[dir]);
     let report = fidryn_driver::workspace::check_workspace(dir, &options);
     for diagnostic in &report.diagnostics {
         let mut shown = diagnostic.clone();

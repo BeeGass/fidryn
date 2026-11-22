@@ -489,6 +489,46 @@ fn a_cache_that_cannot_be_used_or_written_is_said_once() {
 }
 
 #[test]
+fn the_default_cache_inside_a_workspace_it_reads_is_said_once_and_not_used() {
+    let scratch = two_versions("default-inside");
+    let (old, new, notes) = (
+        scratch.join("old"),
+        scratch.join("new"),
+        scratch.join("notes"),
+    );
+    let bindings = notes.to_str().expect("a UTF-8 path");
+    let unchanged = stdout(&changes(
+        &old,
+        &new,
+        &["--no-cache", "--bindings", bindings],
+    ));
+    // The cache directory of the user lies inside each of the workspaces the
+    // command reads in turn: no workspace uses it, and none is written.
+    for dir in [&old, &new, &notes] {
+        let inside = dir.join(".cache");
+        let set = [
+            ("XDG_CACHE_HOME", inside.as_os_str()),
+            ("LOCALAPPDATA", inside.as_os_str()),
+        ];
+        let before = [&old, &new, &notes].map(|dir| listing(dir));
+        let checked = changes_with(&old, &new, &["--bindings", bindings], &set);
+        assert_eq!(checked.status.code(), Some(0), "{}", stderr(&checked));
+        assert_eq!(stdout(&checked), unchanged);
+        assert_eq!(
+            stderr(&checked),
+            format!(
+                "the cache could not be used, and the check went on without it: {}: the \
+                 directory lies inside the workspace `{}`, and a cache that neither \
+                 `--cache-dir` nor `FIDRYN_CACHE_DIR` names is kept outside every workspace\n",
+                inside.join("fidryn").display(),
+                dir.display()
+            )
+        );
+        assert_eq!([&old, &new, &notes].map(|dir| listing(dir)), before);
+    }
+}
+
+#[test]
 fn a_cache_that_is_not_kept_is_said_on_a_failure_too() {
     let scratch = two_versions("cache-on-failure");
     let (new, notes) = (scratch.join("new"), scratch.join("notes"));

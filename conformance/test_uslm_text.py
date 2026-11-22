@@ -20,6 +20,7 @@ import zlib
 from pathlib import Path
 
 import blake3
+import uslm_common
 
 HERE = Path(__file__).resolve().parent
 FIXTURES = HERE / "fixtures" / "uslm"
@@ -85,6 +86,13 @@ CASES = {
     "and with spaces before, between and after them in a note named by its hash",
     "quoted-empty-origin": "quoted content whose origin is empty, in operative text and in a note "
     "that cites a law by a link after it",
+    "notes-split-content": "a content directly in a note that holds a continuation and a proviso, "
+    "in a note and in a note of quoted content",
+    "quoted-level-labels": "a number and a heading among the words of a level of quoted content",
+    "toc-nested": "a table of contents inside another, with a footnote in the inner one",
+    "release-note-footnote": "a footnote inside the release note of a title, and one in its credit",
+    "ref-classes": "a link whose class holds footnoteRef after a no-break space, and a marker "
+    "whose class holds it after a tab",
 }
 TWO_FILES = "two-files"
 UNNAMED = "unnamed-appendices"
@@ -118,6 +126,30 @@ def fixture_input(name: str, directory: Path) -> Path:
     target = directory / MEMBER
     shutil.copyfile(FIXTURES / f"{name}.xml", target)
     return target
+
+
+class NoteAddresses:
+    """Keeps the addresses of the notes of each unit and container, in the reading's order."""
+
+    def __init__(self) -> None:
+        self.of: dict[str, list[str]] = {}
+
+    def unit(self, unit: uslm_common.Unit) -> None:
+        self.of[unit.address] = [note.address for note in unit.notes]
+
+    def container(self, container: uslm_common.Container) -> None:
+        self.of[container.address] = [note.address for note in container.notes]
+
+
+def notes_of_units(text: str) -> dict[str, list[str]]:
+    """The addresses of the notes of each module of the document `text`, read as `usc99.xml`."""
+    with tempfile.TemporaryDirectory(prefix="fidryn-uslm-notes-") as directory:
+        path = Path(directory) / MEMBER
+        path.write_text(text, encoding="utf-8")
+        sink = NoteAddresses()
+        source = uslm_common.Source(None, str(path), MEMBER)
+        uslm_common.read_member(uslm_common.Job(source, {}, True), sink)
+    return sink.of
 
 
 def expected_lines(name: str) -> list[str]:
@@ -198,6 +230,36 @@ class TextFixtures(unittest.TestCase):
     def test_notes_anchors(self) -> None:
         self.check("notes-anchors")
 
+    def test_the_notes_of_a_unit_are_in_document_order(self) -> None:
+        # The section's note stands before its paragraphs, and paragraph 2's in it.
+        text = (FIXTURES / "notes-anchors.xml").read_text(encoding="utf-8")
+        s1 = "/us/usc/t99/s1"
+        self.assertEqual(
+            notes_of_units(text)[s1],
+            [
+                f"{s1}/note/ungrouped/pl.999.3/noheading",
+                f"{s1}/2/note/ungrouped/pl.999.4/noheading",
+            ],
+        )
+        # A note in paragraph 1, between them, and one of the section after its paragraphs.
+        kept = "<content>Kept.</content>"
+        between = '<note topic="miscellaneous"><p>[Amended by <ref href="/us/pl/999/5">law</ref>.]</p></note>'
+        after = (
+            '<notes type="uscNote"><note topic="miscellaneous"><p>[Amended by '
+            '<ref href="/us/pl/999/6">law</ref>.]</p></note></notes></section>'
+        )
+        self.assertIn(kept, text)
+        changed = text.replace(kept, kept + between).replace("</section>", after)
+        self.assertEqual(
+            notes_of_units(changed)[s1],
+            [
+                f"{s1}/note/ungrouped/pl.999.3/noheading",
+                f"{s1}/1/note/ungrouped/pl.999.5/noheading",
+                f"{s1}/2/note/ungrouped/pl.999.4/noheading",
+                f"{s1}/note/ungrouped/pl.999.6/noheading",
+            ],
+        )
+
     def test_not_imported(self) -> None:
         self.check("not-imported")
 
@@ -254,6 +316,21 @@ class TextFixtures(unittest.TestCase):
 
     def test_quoted_empty_origin(self) -> None:
         self.check("quoted-empty-origin")
+
+    def test_notes_split_content(self) -> None:
+        self.check("notes-split-content")
+
+    def test_quoted_level_labels(self) -> None:
+        self.check("quoted-level-labels")
+
+    def test_toc_nested(self) -> None:
+        self.check("toc-nested")
+
+    def test_release_note_footnote(self) -> None:
+        self.check("release-note-footnote")
+
+    def test_ref_classes(self) -> None:
+        self.check("ref-classes")
 
     def test_top_elements_without_an_identifier_are_numbered_over_the_release(self) -> None:
         expected = expected_lines(UNNAMED)
@@ -497,6 +574,11 @@ def understated_archive(directory: Path, crc_of_prefix: bool) -> None:
 
 
 COMPOSED = "composes across the boundary"
+# The refusal of a column that holds anything, white space included: the reason, and the
+# column named as the element, whether it stands in a column group or in the table.
+COLUMN_WITH_CONTENT = (
+    "a column that holds text, white space included, or an element (element xhtml:col,"
+)
 # The combining acute accent, which composes with the `e` before it into U+00E9.
 ACUTE = chr(0x0301)
 # A white-space character other than U+0020.
@@ -734,7 +816,14 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
             inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><colgroup>'
             "<col>A</col></colgroup><tr><td>A</td></tr></table></content>"
         ),
-        "column",
+        COLUMN_WITH_CONTENT,
+    ),
+    "column group that holds what is no column": (
+        document(
+            inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><colgroup>'
+            "<p>A</p></colgroup><tr><td>A</td></tr></table></content>"
+        ),
+        "a column group that holds more than columns (element xhtml:p,",
     ),
     "signature that holds something other than name and role": (
         document(
@@ -773,6 +862,111 @@ DOCUMENT_REFUSALS: dict[str, tuple[str, str]] = {
             "<sourceCredit>(One.)</sourceCredit></subsection>"
         ),
         "not the direct child",
+    ),
+    # A note stands in quoted content only directly in it or in one of its levels.
+    "note inside a paragraph of quoted content": (
+        document(
+            inner='<content>It reads: <quotedContent><p>Words.<note topic="miscellaneous">'
+            "<p>A note.</p></note></p></quotedContent></content>"
+        ),
+        "an element that does not stand in a flow",
+    ),
+    "note inside a text part of quoted content": (
+        document(
+            inner='<content>It reads: <quotedContent><content>Words.<note topic="miscellaneous">'
+            "<p>A note.</p></note></content></quotedContent></content>"
+        ),
+        "an element that does not stand in a flow",
+    ),
+    "note inside a table cell of quoted content": (
+        document(
+            inner='<content>It reads: <quotedContent><table xmlns="http://www.w3.org/1999/xhtml">'
+            '<tr><td>A<note xmlns="http://xml.house.gov/schemas/uslm/1.0" topic="miscellaneous">'
+            "<p>A note.</p></note></td></tr></table></quotedContent></content>"
+        ),
+        "an element that does not stand in a flow",
+    ),
+    "note inside a note of quoted content": (
+        document(
+            inner='<content>It reads: <quotedContent><note topic="miscellaneous"><p>Words.</p>'
+            '<note topic="miscellaneous"><p>A note.</p></note></note></quotedContent></content>'
+        ),
+        "an element that does not stand in a flow",
+    ),
+    # White space is content of a br, an img and a column.
+    "br with white space": (
+        document(inner="<content>A<br> </br>b.</content>"),
+        "a br that holds",
+    ),
+    "img with white space": (
+        document(inner='<content><img src="file:///a.eps"> </img></content>'),
+        "an img that holds",
+    ),
+    "column of a column group with white space": (
+        document(
+            inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><colgroup>'
+            "<col> </col></colgroup><tr><td>A</td></tr></table></content>"
+        ),
+        COLUMN_WITH_CONTENT,
+    ),
+    "column of a table with white space": (
+        document(
+            inner='<content><table xmlns="http://www.w3.org/1999/xhtml"><col>\n</col>'
+            "<tr><td>A</td></tr></table></content>"
+        ),
+        COLUMN_WITH_CONTENT,
+    ),
+    # The members of the identifier of a unit or a container are split at U+0020, and
+    # none of them may be empty; a provision reads its first member.
+    **{
+        f"identifier of a unit {kind}": (
+            document(
+                body=SECTION.format(inner="<content>Text.</content>").replace(
+                    '"/us/usc/t99/s1"', f'"{identifier}"'
+                )
+            ),
+            "an empty member",
+        )
+        for kind, identifier in (
+            ("with two spaces in a row", "/us/usc/t99/s1  /us/usc/t99/s2"),
+            ("with a space before it", " /us/usc/t99/s1"),
+            ("with a space after it", "/us/usc/t99/s1 "),
+            ("that is empty", ""),
+        )
+    },
+    "identifier of a container with a space after it": (
+        document(
+            body='<chapter identifier="/us/usc/t99/ch1 ">'
+            + SECTION.format(inner="<content>Text.</content>")
+            + "</chapter>"
+        ),
+        "an empty member",
+    ),
+    "identifier of a provision that begins with a space": (
+        document(
+            inner='<subsection identifier=" /us/usc/t99/s1/a"><content>Text.</content></subsection>'
+        ),
+        "not an address",
+    ),
+    "identifier of a provision that is empty": (
+        document(inner='<subsection identifier=""><content>Text.</content></subsection>'),
+        "not an address",
+    ),
+    # The class of a ref is split at ASCII white space alone.
+    "ref whose class holds footnoteRef after a no-break space": (
+        document(
+            inner=f'<content>Text<ref class="other{NO_BREAK_SPACE}footnoteRef" idref="f1">1</ref>'
+            f"{FOOTNOTE}.</content>"
+        ),
+        "neither an href nor the class footnoteRef",
+    ),
+    "footnote inside a footnote": (
+        document(
+            inner='<content>Text<ref class="footnoteRef" idref="f1">1</ref>.<note type="footnote" '
+            'id="f1"><num>1</num> Outer<note type="footnote" id="f2"><num>2</num> Inner.</note>.'
+            "</note></content>"
+        ),
+        "a footnote inside a footnote",
     ),
 }
 
@@ -831,6 +1025,22 @@ class Refusals(unittest.TestCase):
                     case.mkdir()
                     understated_archive(case, crc_of_prefix)
                     self.refused(case, "bytes, and its header declares")
+
+
+class Identifiers(unittest.TestCase):
+    def test_a_space_after_the_first_member_of_the_identifier_of_a_provision_is_read(
+        self,
+    ) -> None:
+        # A provision reads the first member of its identifier alone; the refusal table
+        # holds the identifiers whose first member is empty.
+        inner = '<subsection identifier="/us/usc/t99/s1/a "><content>A.</content></subsection>'
+        with tempfile.TemporaryDirectory(prefix="fidryn-uslm-identifier-") as name:
+            path = Path(name) / MEMBER
+            path.write_text(document(inner=inner), encoding="utf-8")
+            result = run_script(TEXT_SCRIPT, path)
+        self.assertEqual((result.returncode, result.stderr), (0, ""))
+        addresses = [json.loads(line)["address"] for line in result.stdout.splitlines()]
+        self.assertEqual(addresses, ["/us/usc/t99", "/us/usc/t99/s1", "/us/usc/t99/s1/a"])
 
 
 # The entries of the refusal table that concern the positive-law flag.

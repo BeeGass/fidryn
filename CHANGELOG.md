@@ -5,7 +5,7 @@ interchange schema versions are maintained independently of the interpreter.
 
 ## [Unreleased]
 
-## [0.3.0] - 2026-11-18
+## [0.3.0] - 2026-11-22
 
 ### Changed
 
@@ -87,7 +87,12 @@ interchange schema versions are maintained independently of the interpreter.
   The rules do not find every definition. The one-module check accepts
   reach words that stand in the text of the provision or in the chapeau of
   any of its ancestors. The sample's modules hold the definitions
-  extracted from them.
+  extracted from them. `conformance/usc_definitions.py` implements the
+  rules a second time, on the independent reading of the publisher's XML
+  and sharing no code with the importer: it writes the definitions of a
+  release, one JSON object to a line, and with `--against DIR` compares
+  them with those of a workspace. `cargo xtask uscode-sample` holds the
+  definitions of the sample's modules to it.
 - References and interfaces. The check of a workspace gives every
   reference of every module one of eight outcomes (`exact`,
   `target-status`, `ambiguous`, `unit-only`, `range-form`, `no-unit`,
@@ -221,12 +226,24 @@ interchange schema versions are maintained independently of the interpreter.
 - `tools/replay_uscode.py`, which makes the 27 release points the
   publisher lists for 2026, in its order, the commits of a repository of
   the imported law: each release fetched when it is absent, imported into
-  `uscode.next/` and checked, its change set written to
-  `changes/<release>.json`, `uscode/` replaced, and the text form of the
-  change set committed as the message, read back and held to it byte for
-  byte. A replay that is stopped goes on from the release it was in; it
-  removes only `uscode/`, under stated conditions, and gives each run of
-  `fidryn` a limit on its address space and its time.
+  `uscode.next/` and checked, its two readings compared, its change set
+  written to `changes/<release>.json`, `uscode/` replaced, and the text
+  form of the change set committed as the message, read back and held to
+  it byte for byte. The comparison holds what `fidryn text uscode.next
+  --json` prints to what `conformance/uslm_text.py` prints for the
+  release's archives, line for line, and the tables of contents that
+  `conformance/usc_profile.py` counts to those of the import's ledger; a
+  difference stops the replay before the commit, naming the release and
+  the first line that differs or the two counts, and `--no-readings` skips
+  the comparison and says so; a release kept uncompared by such a run is
+  compared by the next run without the option before its commit. A replay
+  that is stopped goes on from the release it was in; it removes only
+  `uscode/`, under stated conditions. It starts each run of `fidryn` and
+  of the two scripts in a session of its own, with a limit on its time and
+  on the address space of each of its processes, and kills every process
+  of a run that reaches its time; a script with `--jobs N` above 1 runs as
+  N workers, its own process and a small tracker, so that it may take up
+  to N + 2 times `--memory-limit`.
   `tools/draw_definition_samples.py` draws, with a seed and a generator
   written out in the tool, the two samples of 500 that a person reads to
   judge the extracted definitions and to estimate the ones the closed
@@ -234,12 +251,13 @@ interchange schema versions are maintained independently of the interpreter.
 - The cache of `fidryn check DIR` and of `fidryn changes` is, by default,
   `fidryn` in the cache directory of the user, outside every workspace:
   in `XDG_CACHE_HOME`, else in `~/.cache`, and on Windows in
-  `LOCALAPPDATA`; when none of them is set to an absolute path the check
-  keeps no cache and says so once. One cache serves every workspace. A
-  check trusts what its cache holds, so a cache belongs where only people
-  one trusts can write; a cache named inside a workspace with
-  `--cache-dir` or `FIDRYN_CACHE_DIR` is used, and a `.fidryn-cache` that
-  a workspace carries is otherwise not read.
+  `LOCALAPPDATA`; when none of them is set to an absolute path, or the
+  directory there lies inside a workspace that is read or inside one of its
+  dependencies, the check keeps no cache and says so once. One cache serves
+  every workspace. A check trusts what its cache holds, so a cache belongs
+  where only people one trusts can write; a cache named inside a workspace
+  with `--cache-dir` or `FIDRYN_CACHE_DIR` is used, and a `.fidryn-cache`
+  that a workspace carries is otherwise not read.
 - `fidryn ingest uscode --out DIR` writes only over an earlier output of
   itself: before it writes anything it reads the head of every `.fr` file
   of `DIR`, and refuses the directory, naming each, for a file of the first
@@ -264,6 +282,17 @@ interchange schema versions are maintained independently of the interpreter.
 - Both readings of the publisher's XML refuse a `ref` that has an `href`
   and the class `footnoteRef`, which would be at once a link and a footnote
   marker, with the element named.
+- Both readings of the publisher's XML refuse, with the element named, a
+  footnote inside a footnote, a `note` in quoted content anywhere but
+  directly in it or in one of its levels, white space inside a `br`, an
+  `img` or a column, an identifier of a unit or a container with an empty
+  member, and an identifier of a provision that is empty or begins with a
+  space. Both read a `continuation` or a `proviso` inside a `content` that
+  stands directly in a note as blocks of the note, split the class of a
+  `ref` into words at ASCII white space alone, close the open paragraph of
+  a level of quoted content at its `num` and at its `heading`, leave a
+  footnote inside a release note out with the note, and count each `toc`
+  element once, one inside another included.
 - A change set pairs like-named notes by their note hashes before it
   compares notes by address: within one unit or container, one layer and
   one family of notes whose addresses differ only in the ordinal that marks
@@ -291,6 +320,9 @@ interchange schema versions are maintained independently of the interpreter.
   deflated member to the end of its compressed stream as well as to its
   header, and refuse a member whose header declares fewer bytes than it
   holds.
+- A roadmap page, `docs/roadmap.md`, shown on the site as the guide
+  "Roadmap": the destination, what exists today at each depth, and what
+  comes next.
 
 ## [0.2.0] - 2026-11-22
 

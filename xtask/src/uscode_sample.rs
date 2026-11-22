@@ -1,4 +1,4 @@
-//! Checks the pinned sample of the Code under `samples/uscode/`, eight
+//! Checks the pinned sample of the Code under `samples/uscode/`, nine
 //! things in this order, and fails with a message that names the first
 //! difference when one of them does not hold:
 //!
@@ -21,7 +21,12 @@
 //!    in both, the keys that only one of them has being named here;
 //! 6. what `conformance/uslm_text.py` prints for the archives is, line for
 //!    line, what `fidryn text samples/uscode/workspace --json` prints;
-//! 7. the check of the curated sample, `samples/uscode/curated`, which
+//! 7. `conformance/usc_definitions.py`, a second implementation of the
+//!    definition rules, exits 0 on the archives, and the definitions it
+//!    writes are, field for field and as many times each, those that the
+//!    modules of the committed workspace hold, as the check reads them; the
+//!    step names the module of the first definition that differs;
+//! 8. the check of the curated sample, `samples/uscode/curated`, which
 //!    depends on the generated one at a pinned release, finds no error and
 //!    no warning, a stale binding (`W750`) among the warnings, counts at
 //!    least one citation, and gives every one of its citations the outcome
@@ -29,15 +34,16 @@
 //!    `--update` writes, after the workspace, the release and the lock
 //!    digest of that dependency and the toolchain of the curated manifest,
 //!    and nothing else of it;
-//! 8. the table of `docs/coverage.md` between its two markers is the one
+//! 9. the table of `docs/coverage.md` between its two markers is the one
 //!    that the committed `coverage.json` gives; `--update` writes it, and
 //!    nothing else of the page.
 //!
 //! The `fidryn` commands run in this process, through `fidryn_cli`, as the
 //! binary runs them, and the check of the curated sample through the check
 //! of a workspace that `fidryn check` runs, so that its diagnostics can be
-//! named. Their temporary directories are made under the system's directory
-//! for temporary files and removed whether the step passes or fails, and the
+//! named. Their temporary directories, and the file the script of step 7
+//! writes its definitions to, are made under the system's directory for
+//! temporary files and removed whether the step passes or fails, and the
 //! checks keep no cache, so the step leaves the repository as it found it;
 //! only `--update` writes, and only the committed workspace, those three
 //! values of the curated manifest and the table of the page.
@@ -46,10 +52,11 @@ use crate::workspace::workspace_root;
 use anyhow::{Context, Result, anyhow, bail};
 use clap::Parser as _;
 use fidryn_core::DiagnosticCode;
+use fidryn_core::ids::hex_encode;
 use fidryn_driver::workspace::{CheckOptions, check_workspace};
 use fidryn_provision::layout::module_path;
 use fidryn_provision::workspace::{Lock, Manifest, RetrievalRecord};
-use fidryn_provision::{Hash32, Outcome};
+use fidryn_provision::{Address, Definition, Hash32, Module, Outcome};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -72,6 +79,9 @@ pub const PROFILE_SCRIPT: &str = "conformance/usc_profile.py";
 pub const WORKSPACE: &str = "samples/uscode/workspace";
 /// The script that prints the text records of the archives, independently.
 pub const TEXT_SCRIPT: &str = "conformance/uslm_text.py";
+/// The script that finds the definitions of the archives by a second
+/// implementation of the rules, and compares them with a workspace's.
+pub const DEFINITIONS_SCRIPT: &str = "conformance/usc_definitions.py";
 
 /// The curated sample, which depends on the generated sample.
 pub const CURATED: &str = "samples/uscode/curated";
@@ -97,7 +107,8 @@ const TABLE_BEGIN: &str = "<!-- coverage-table:begin -->";
 const TABLE_END: &str = "<!-- coverage-table:end -->";
 
 /// The keys of the ledger's `totals` that the profile's `import` does not
-/// have: the independent reading extracts no definitions.
+/// have: the profile counts no definitions, which step 7 compares one by
+/// one.
 const LEDGER_ONLY: [&str; 2] = ["definitions", "definitions_by_kind"];
 /// The keys of the profile's `import` that the ledger's `totals` does not
 /// have: the ledger has them at its top, where they are compared.
@@ -114,7 +125,7 @@ pub fn run(args: UscodeSampleArgs) -> Result<()> {
     check(&workspace_root(), args.update)
 }
 
-/// Runs the eight steps on the sample under `root`; with `update`, step 2
+/// Runs the nine steps on the sample under `root`; with `update`, step 2
 /// first writes the committed workspace, and then the pin and the toolchain
 /// of the curated manifest and the table of the page.
 pub fn check(root: &Path, update: bool) -> Result<()> {
@@ -212,6 +223,8 @@ pub fn check(root: &Path, update: bool) -> Result<()> {
     }
     let records = text.iter().filter(|&&byte| byte == b'\n').count();
 
+    let definitions = check_definitions(root, &scratch.join("definitions.jsonl"))?;
+
     let citations = check_curated(root)?;
 
     let page = fs::read_to_string(root.join(PAGE)).with_context(|| format!("read {PAGE}"))?;
@@ -225,9 +238,10 @@ pub fn check(root: &Path, update: bool) -> Result<()> {
         "{ARCHIVES} matches {RECORD}; {WORKSPACE} is what the ingester writes from it, on one \
          worker and on eight, checks with no error, and holds the ledger `fidryn coverage` \
          prints; {PROFILE} is current and counts the references the check counts and what the \
-         ledger counts; the text of its {records} records is what {TEXT_SCRIPT} prints; \
-         {CURATED} checks against it with no error and no warning, each of its {citations} \
-         citations `exact`; and the table of {PAGE} is what the ledger gives"
+         ledger counts; the text of its {records} records is what {TEXT_SCRIPT} prints; its \
+         {definitions} definitions are those {DEFINITIONS_SCRIPT} finds; {CURATED} checks \
+         against it with no error and no warning, each of its {citations} citations `exact`; \
+         and the table of {PAGE} is what the ledger gives"
     );
     Ok(())
 }
@@ -656,7 +670,7 @@ fn counted(count: usize, noun: &str) -> String {
     }
 }
 
-/// Step 7: the check of the curated sample under `root`, in this process
+/// Step 8: the check of the curated sample under `root`, in this process
 /// and with no cache, as `fidryn check samples/uscode/curated --no-cache`
 /// runs it. It gives the number of the sample's citations, and fails,
 /// naming the file and the first thing that is wrong, on an error, on a
@@ -708,7 +722,7 @@ fn check_curated(root: &Path) -> Result<u64> {
     Ok(citations)
 }
 
-/// How step 7 checks the curated sample: as `--no-cache` does, with no
+/// How step 8 checks the curated sample: as `--no-cache` does, with no
 /// cache, on as many workers as are available.
 fn curated_options() -> CheckOptions {
     CheckOptions {
@@ -974,7 +988,7 @@ fn archive_problems(dir: &Path) -> Result<Vec<String>> {
                 archive.bytes
             ));
         }
-        let sha256 = format!("{:x}", Sha256::digest(&bytes));
+        let sha256 = hex_encode(&Sha256::digest(&bytes));
         if sha256 != archive.sha256 {
             problems.push(format!(
                 "{name}: sha256 is {sha256}, the record gives {}",
@@ -1017,6 +1031,246 @@ fn profile_command(root: &Path) -> Command {
 /// The command that prints the text records of the archives.
 fn text_command(root: &Path) -> Command {
     script_command(root, TEXT_SCRIPT)
+}
+
+/// The command that writes the definitions of the archives to `records`.
+fn definitions_command(root: &Path, records: &Path) -> Command {
+    let mut cmd = script_command(root, DEFINITIONS_SCRIPT);
+    cmd.arg("--records").arg(records);
+    cmd
+}
+
+/// Step 7: the script, run on the archives under `root`, writes its
+/// definitions to `records` and exits 0, and they are those that the
+/// modules of the committed workspace hold ([`compare_definitions`]). It
+/// gives their number. It fails when the script exits with any other
+/// status (1 when a reading rule refuses the archives, 2 when it cannot read
+/// them or write the records), as the script printed above, and, naming the
+/// module, when the two differ.
+fn check_definitions(root: &Path, records: &Path) -> Result<usize> {
+    let mut command = definitions_command(root, records);
+    let shown: Vec<String> = std::iter::once(command.get_program())
+        .chain(command.get_args())
+        .map(|part| part.to_string_lossy().into_owned())
+        .collect();
+    eprintln!("+ {}", shown.join(" "));
+    let status = command
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .status()
+        .with_context(|| format!("failed to spawn uv in {}", root.display()))?;
+    if !status.success() {
+        bail!("{DEFINITIONS_SCRIPT} failed on {ARCHIVES} ({status}), as it printed above");
+    }
+    compare_definitions(&root.join(WORKSPACE), records)
+}
+
+/// The fields of a definition, in the order of its block and of a record.
+const DEFINITION_FIELDS: [&str; 8] = [
+    "at",
+    "terms",
+    "kind",
+    "words",
+    "region",
+    "basis",
+    "borrowed_from",
+    "see_note",
+];
+
+/// The definitions of the records the script wrote to `records`, one JSON
+/// object to a line, each in the JSON form of a definition: its fields and
+/// no other key. An error names the line that is not one.
+fn read_records(records: &Path) -> Result<Vec<Definition>> {
+    let text =
+        fs::read_to_string(records).with_context(|| format!("read {}", records.display()))?;
+    let name = records
+        .file_name()
+        .map_or_else(String::new, |name| name.to_string_lossy().into_owned());
+    text.lines()
+        .enumerate()
+        .map(|(index, line)| {
+            serde_json::from_str(line)
+                .with_context(|| format!("{name}:{}: no record of a definition", index + 1))
+        })
+        .collect()
+}
+
+/// `definition` as one line of the records.
+fn record_line(definition: &Definition) -> String {
+    serde_json::to_string(definition).expect("a definition is JSON")
+}
+
+/// What the modules of a workspace hold, as the check reads them: each unit
+/// at its address, with the path of its module file relative to the
+/// workspace, and each definition with the path of its unit's module file.
+struct Held {
+    units: Vec<(Address, String)>,
+    definitions: Vec<(String, Definition)>,
+}
+
+impl Held {
+    /// The path of the module file of the unit that holds the provision
+    /// `at`: of the units whose addresses `at` is or lies within, the one
+    /// with the longest address.
+    fn module_of(&self, at: &Address) -> Option<&str> {
+        self.units
+            .iter()
+            .filter(|(unit, _)| at.is_within(unit))
+            .max_by_key(|(unit, _)| unit.as_str().len())
+            .map(|(_, file)| file.as_str())
+    }
+}
+
+/// The units and definitions of the modules of `workspace`.
+fn held_definitions(workspace: &Path) -> Result<Held> {
+    let jobs = std::thread::available_parallelism().map_or(1, std::num::NonZero::get);
+    let modules = fidryn_driver::workspace::read_modules(workspace, jobs).map_err(|found| {
+        let first = found.first().map_or_else(String::new, ToString::to_string);
+        anyhow!("the modules of {WORKSPACE} cannot be read: {first}")
+    })?;
+    let mut held = Held {
+        units: Vec::new(),
+        definitions: Vec::new(),
+    };
+    for module in &modules {
+        if let Module::Unit(unit) = module {
+            let file = module_path(&unit.address);
+            for definition in &unit.definitions {
+                held.definitions.push((file.clone(), definition.clone()));
+            }
+            held.units.push((unit.address.clone(), file));
+        }
+    }
+    Ok(held)
+}
+
+/// The order of the records: by the bytes of the provision's address, then
+/// by those of the record.
+fn definition_order(definition: &Definition) -> (Vec<u8>, Vec<u8>) {
+    (
+        definition.at.as_str().as_bytes().to_vec(),
+        record_line(definition).into_bytes(),
+    )
+}
+
+/// Step 7's comparison: the number of the definitions of `records`, which
+/// the script wrote, when they are those that the modules of `workspace`
+/// hold, as many times each. Otherwise an error that names the module of
+/// the first definition, in the order of the records, that one side has
+/// and the other does not, and gives both counts; when the other side has a
+/// definition of the same provision and terms, it names the first field in
+/// which the two differ.
+fn compare_definitions(workspace: &Path, records: &Path) -> Result<usize> {
+    let found = read_records(records)?;
+    let held = held_definitions(workspace)?;
+    let mut by_script: Vec<&Definition> = found.iter().collect();
+    by_script.sort_by_cached_key(|definition| definition_order(definition));
+    let mut by_module: Vec<&(String, Definition)> = held.definitions.iter().collect();
+    by_module.sort_by_cached_key(|(_, definition)| definition_order(definition));
+    // What one side has and the other does not, as many times as it has
+    // it more often, each in the order of the records.
+    let (mut only_found, mut only_held) = (Vec::new(), Vec::new());
+    let (mut i, mut j) = (0, 0);
+    while i < by_script.len() || j < by_module.len() {
+        let script = by_script
+            .get(i)
+            .map(|definition| definition_order(definition));
+        let module = by_module
+            .get(j)
+            .map(|(_, definition)| definition_order(definition));
+        match (script, module) {
+            (Some(a), Some(b)) if a == b => {
+                i += 1;
+                j += 1;
+            }
+            (Some(a), Some(b)) if a < b => {
+                only_found.push(by_script[i]);
+                i += 1;
+            }
+            (Some(_), None) => {
+                only_found.push(by_script[i]);
+                i += 1;
+            }
+            _ => {
+                only_held.push(by_module[j]);
+                j += 1;
+            }
+        }
+    }
+    let counts = format!(
+        "it finds {} definitions and the workspace holds {}",
+        found.len(),
+        held.definitions.len()
+    );
+    let from_script = match (only_found.first(), only_held.first()) {
+        (None, None) => return Ok(found.len()),
+        (Some(one), Some((_, other))) => definition_order(one) <= definition_order(other),
+        (first, _) => first.is_some(),
+    };
+    let finds = format!("{DEFINITIONS_SCRIPT} finds in {ARCHIVES}");
+    if from_script {
+        let first = only_found[0];
+        let module = held.module_of(&first.at);
+        let shown = module.map_or_else(
+            || WORKSPACE.to_owned(),
+            |file| format!("{WORKSPACE}/{file}"),
+        );
+        if let Some((_, other)) = only_held
+            .iter()
+            .find(|(_, other)| other.at == first.at && other.terms == first.terms)
+        {
+            bail!(
+                "{shown}: {}; {counts}",
+                field_difference(other, first, &finds)
+            );
+        }
+        let holder = if module.is_some() {
+            "the module holds no such definition"
+        } else {
+            "no module of the workspace holds its provision"
+        };
+        bail!(
+            "{shown}: {finds} the definition {}, and {holder}; {counts}",
+            record_line(first)
+        );
+    }
+    let (file, first) = only_held[0];
+    if let Some(other) = only_found
+        .iter()
+        .find(|other| other.at == first.at && other.terms == first.terms)
+    {
+        bail!(
+            "{WORKSPACE}/{file}: {}; {counts}",
+            field_difference(first, other, &finds)
+        );
+    }
+    bail!(
+        "{WORKSPACE}/{file}: the module holds the definition {}, and {DEFINITIONS_SCRIPT} does \
+         not find it in {ARCHIVES}; {counts}",
+        record_line(first)
+    )
+}
+
+/// The sentence that names the first field in which `held`, a definition of
+/// the module, and `found`, one the script finds (`finds` says where), of
+/// the same provision and terms, differ, with the value of each.
+fn field_difference(held: &Definition, found: &Definition, finds: &str) -> String {
+    let (held_value, found_value) = (
+        serde_json::to_value(held).expect("a definition is JSON"),
+        serde_json::to_value(found).expect("a definition is JSON"),
+    );
+    let field = DEFINITION_FIELDS
+        .iter()
+        .find(|field| held_value[**field] != found_value[**field])
+        .unwrap_or(&"at");
+    format!(
+        "the definition of `{}` with the terms {} has the {field} {} in the module and {} in \
+         what {finds}",
+        held.at,
+        serde_json::Value::from(held.terms.clone()),
+        held_value[*field],
+        found_value[*field]
+    )
 }
 
 /// What `command`, which runs `script` on the archives, prints to stdout;
@@ -1062,6 +1316,7 @@ mod tests {
     use super::*;
     use crate::test_support::scratch;
     use fidryn_provision::workspace::RetrievedArchive;
+    use fidryn_provision::{Basis, DefinitionKind};
 
     const FIRST: &[u8] = b"Invented archive bytes for the tests of the sample step.\n";
     const SECOND: &[u8] = b"Other invented archive bytes for the tests of the sample step.\n";
@@ -1072,7 +1327,7 @@ mod tests {
             url: format!("https://example.invalid/releases/42/7/{file}"),
             retrieved_at: "2026-11-16T22:14:03Z".to_owned(),
             bytes: bytes.len() as u64,
-            sha256: format!("{:x}", Sha256::digest(bytes)),
+            sha256: hex_encode(&Sha256::digest(bytes)),
             blake3: Hash32(*blake3::hash(bytes).as_bytes()),
         }
     }
@@ -1209,6 +1464,145 @@ mod tests {
             assert_eq!(args, want);
             assert_eq!(cmd.get_current_dir(), Some(root));
         }
+    }
+
+    #[test]
+    fn the_definitions_are_found_by_isolated_python() {
+        let root = Path::new("/repo");
+        let records = Path::new("/scratch/definitions.jsonl");
+        let cmd = definitions_command(root, records);
+        assert_eq!(cmd.get_program(), "uv");
+        let args: Vec<&OsStr> = cmd.get_args().collect();
+        let words = [
+            "run",
+            "--locked",
+            "python",
+            "-I",
+            "conformance/usc_definitions.py",
+            "samples/uscode/archives",
+            "--records",
+            "/scratch/definitions.jsonl",
+        ];
+        let want: Vec<&OsStr> = words.iter().map(OsStr::new).collect();
+        assert_eq!(args, want);
+        assert_eq!(cmd.get_current_dir(), Some(root));
+    }
+
+    #[test]
+    fn a_record_of_the_script_is_a_definition_in_its_json_form() {
+        let dir = scratch("xtask-uscode-sample-", "records");
+        let records = dir.join("definitions.jsonl");
+        // A line as the script writes it for the invented title 99.
+        let line = "{\"at\":\"/us/usc/t99/s1/e\",\"terms\":[\"widget\"],\"kind\":\"borrowed\",\
+                    \"words\":null,\"region\":null,\"basis\":\"unresolved\",\
+                    \"borrowed_from\":\"/us/usc/t99/s2\",\"see_note\":null}";
+        fs::write(&records, format!("{line}\n")).expect("write the records");
+        let read = read_records(&records).unwrap_or_else(|error| panic!("{error:#}"));
+        assert_eq!(
+            read,
+            [Definition {
+                at: Address::parse("/us/usc/t99/s1/e").expect("an address"),
+                terms: vec!["widget".to_owned()],
+                kind: DefinitionKind::Borrowed,
+                words: None,
+                region: None,
+                basis: Basis::Unresolved,
+                borrowed_from: Some("/us/usc/t99/s2".to_owned()),
+                see_note: None,
+            }]
+        );
+        assert_eq!(record_line(&read[0]), line);
+        // A key the definition does not have is refused, with the line named.
+        let other = line.replace("\"see_note\"", "\"note\"");
+        fs::write(&records, format!("{line}\n{other}\n")).expect("write the records");
+        let error = read_records(&records).expect_err("an unknown key");
+        assert!(
+            format!("{error:#}").contains("definitions.jsonl:2: "),
+            "{error:#}"
+        );
+        fs::remove_dir_all(&dir).expect("remove scratch dir");
+    }
+
+    #[test]
+    fn a_definition_the_two_implementations_differ_on_fails_the_step_and_names_the_module() {
+        let copy = copy_of_the_samples("definitions-differ");
+        let workspace = copy.join(WORKSPACE);
+        // What the script writes for the committed archives: the committed
+        // workspace's definitions, one line each.
+        let records = copy.join("definitions.jsonl");
+        let held = held_definitions(&workspace).unwrap_or_else(|error| panic!("{error:#}"));
+        let lines: Vec<String> = held
+            .definitions
+            .iter()
+            .map(|(_, definition)| record_line(definition))
+            .collect();
+        let write_records = |lines: &[String]| {
+            let text: String = lines.iter().map(|line| format!("{line}\n")).collect();
+            fs::write(&records, text).expect("write the records");
+        };
+        write_records(&lines);
+        let compared = |workspace: &Path| compare_definitions(workspace, &records);
+        assert_eq!(compared(&workspace).expect("the same definitions"), 144);
+
+        let module = workspace.join("us/usc/t45/s1202.fr");
+        let original = read_text(&module);
+        let fails = |what: &str| {
+            let error = compared(&workspace).expect_err(what);
+            format!("{error:#}")
+        };
+        // A field of the first definition of the module differs.
+        fs::write(
+            &module,
+            original.replacen("    kind means\n", "    kind includes\n", 1),
+        )
+        .expect("change the module");
+        let message = fails("a field that differs");
+        assert!(
+            message.starts_with(
+                "samples/uscode/workspace/us/usc/t45/s1202.fr: the definition of \
+                 `/us/usc/t45/s1202/1` with the terms "
+            ) && message.contains(
+                " has the kind \"includes\" in the module and \"means\" in what \
+                 conformance/usc_definitions.py finds in samples/uscode/archives; "
+            ) && message.ends_with("it finds 144 definitions and the workspace holds 144"),
+            "{message}"
+        );
+        // The module lacks the definition.
+        let start = original
+            .find("  definition \"/us/usc/t45/s1202/1\" {\n")
+            .expect("the module holds the definition");
+        let end = start + original[start..].find("  }\n").expect("its end") + 4;
+        let removed = format!("{}{}", &original[..start], &original[end..]);
+        fs::write(&module, removed).expect("change the module");
+        let message = fails("a definition the module lacks");
+        assert!(
+            message.starts_with(
+                "samples/uscode/workspace/us/usc/t45/s1202.fr: conformance/usc_definitions.py \
+                 finds in samples/uscode/archives the definition {\"at\":\"/us/usc/t45/s1202/1\""
+            ) && message.contains("and the module holds no such definition; ")
+                && message.ends_with("it finds 144 definitions and the workspace holds 143"),
+            "{message}"
+        );
+        // The script does not find a definition the module holds.
+        fs::write(&module, &original).expect("restore the module");
+        let first = lines
+            .iter()
+            .position(|line| line.starts_with("{\"at\":\"/us/usc/t45/s1202/1\""))
+            .expect("the line of the definition");
+        let mut fewer = lines.clone();
+        fewer.remove(first);
+        write_records(&fewer);
+        let message = fails("a definition the script does not find");
+        assert!(
+            message.starts_with(&format!(
+                "samples/uscode/workspace/us/usc/t45/s1202.fr: the module holds the definition \
+                 {}, and conformance/usc_definitions.py does not find it in \
+                 samples/uscode/archives; ",
+                lines[first]
+            )) && message.ends_with("it finds 143 definitions and the workspace holds 144"),
+            "{message}"
+        );
+        fs::remove_dir_all(&copy).expect("remove scratch dir");
     }
 
     #[test]

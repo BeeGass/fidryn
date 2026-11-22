@@ -4,15 +4,16 @@
 //! The notes of a module are the `note` children of its `notes` elements and
 //! the notes that stand directly in its levels, footnotes left out. A note
 //! that stands directly in a `title` or an `appendix` and whose text begins
-//! `Current through ` is a release note: it is counted and not imported. A
-//! `note` of a `notes` element with the role `crossHeading` is no note: it
-//! opens the group named by its topic, one word of ASCII letters and digits
-//! that begins with a letter, and its label is counted and not imported;
-//! what it holds after its label is a note of that group, with no heading
-//! and no topics. A note that follows no cross heading, and one that stands
-//! directly in a level, is `ungrouped`. The topics of a note are its `topic`
-//! attribute split at U+0020, the empty members dropped; a topic that holds
-//! any other white-space character is refused.
+//! `Current through ` is a release note: it is counted and not imported, and
+//! nor is a footnote inside it. A `note` of a `notes` element with the role
+//! `crossHeading` is no note: it opens the group named by its topic, one
+//! word of ASCII letters and digits that begins with a letter, and its label
+//! is counted and not imported; what it holds after its label is a note of
+//! that group, with no heading and no topics. A note that follows no cross
+//! heading, and one that stands directly in a level, is `ungrouped`. The
+//! topics of a note are its `topic` attribute split at U+0020, the empty
+//! members dropped; a topic that holds any other white-space character is
+//! refused.
 //!
 //! A note is editorial when its group is `editorialNotes`, or when it is
 //! ungrouped and one of its topics is `removalDescription` or
@@ -203,11 +204,15 @@ fn topics(node: Node<'_, '_>) -> Result<Vec<String>, IngestError> {
     Ok(topics)
 }
 
-/// Whether the note `node` is a release note: it stands directly in a
-/// `title` or an `appendix`, and its text begins `Current through `.
-fn is_release_note(node: Node<'_, '_>) -> bool {
-    node.parent()
-        .is_some_and(|parent| uslm::is(parent, "title") || uslm::is(parent, "appendix"))
+/// Whether `node` is a release note: a `note` that is no footnote, stands
+/// directly in a `title` or an `appendix`, and whose text begins `Current
+/// through `. It is not imported, and nor is a footnote inside it.
+pub(crate) fn is_release_note(node: Node<'_, '_>) -> bool {
+    uslm::is(node, "note")
+        && !uslm::is_footnote(node)
+        && node
+            .parent()
+            .is_some_and(|parent| uslm::is(parent, "title") || uslm::is(parent, "appendix"))
         && normalize(&uslm::text_content(node)).starts_with("Current through ")
 }
 
@@ -1042,6 +1047,78 @@ mod tests {
              idref=\"t\">1</ref>.</content>",
         ));
         assert!(error.message().contains("names no footnote"), "{error}");
+    }
+
+    #[test]
+    fn a_table_of_contents_inside_another_counts_each_toc_once() {
+        assert_fixture("toc-nested");
+        let (_, counted) =
+            crate::ingest_xml(MEMBER, &crate::testing::fixture("toc-nested"), RELEASE)
+                .expect("read");
+        assert_eq!(
+            crate::testing::not_imported_counts(&counted),
+            [2, 1, 1, 0, 0, 0]
+        );
+    }
+
+    #[test]
+    fn a_footnote_inside_the_release_note_is_left_out_with_the_note() {
+        assert_fixture("release-note-footnote");
+        let (modules, counted) = crate::ingest_xml(
+            MEMBER,
+            &crate::testing::fixture("release-note-footnote"),
+            RELEASE,
+        )
+        .expect("read");
+        assert_eq!(counted.release_notes, 1);
+        // The footnote of the credit is the title's first, and its marker
+        // names it.
+        let title = container_at(&modules, "/us/usc/t99");
+        let footnotes: Vec<(u32, &str)> = title
+            .footnotes
+            .iter()
+            .map(|footnote| (footnote.ordinal, footnote.shown.as_str()))
+            .collect();
+        assert_eq!(footnotes, [(1, "2")]);
+        assert_eq!(
+            title.credit,
+            Some(Text {
+                runs: vec![words("(Invented."), mark("2", 1), words(")")]
+            })
+        );
+        // A marker outside the release note that points at its footnote names
+        // no footnote of the module.
+        let error = refusal(&Document::with_body(
+            "<note topic=\"miscellaneous\"><p>Current through 999-1<note type=\"footnote\" \
+             id=\"r\"><num>1</num> X.</note></p></note><sourceCredit>(A<ref \
+             class=\"footnoteRef\" idref=\"r\">1</ref>.)</sourceCredit>"
+                .to_owned(),
+        ));
+        assert!(error.message().contains("names no footnote"), "{error}");
+    }
+
+    #[test]
+    fn a_content_directly_in_a_note_gives_the_blocks_of_its_parts() {
+        assert_fixture("notes-split-content");
+        let modules = read_fixture("notes-split-content");
+        let note = unit_at(&modules, "/us/usc/t99/s1")
+            .notes
+            .iter()
+            .find(|note| note.address.as_str().ends_with("/split-content"))
+            .expect("the note");
+        // The continuation and the proviso inside the content give their
+        // blocks in their place, and no role word is kept.
+        assert_eq!(
+            note.blocks,
+            [
+                "“(1) a widget;",
+                "and a gadget;",
+                "both small",
+                "Provided, That the widget is red.”",
+                "Closing words.",
+            ]
+            .map(|text| para(vec![words(text)]))
+        );
     }
 
     #[test]

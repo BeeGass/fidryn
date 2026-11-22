@@ -88,6 +88,12 @@
     </ol>
   </div>
   <div class="group">
+    <p class="label">Ahead</p>
+    <ol>
+      <li><a href="/docs/roadmap"><span class="n">&sect;11</span><span class="t">Roadmap</span><span class="d">Destination, today, next</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
     <p class="label">Implementers</p>
     <ol>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
@@ -228,8 +234,10 @@ cache belongs where only people one trusts can write.</p>
 <code>FIDRYN_CACHE_DIR</code> names a directory inside one; such a directory is used
 like any other, and what that means is said under
 <a href="/docs/law-modules#the-cache">The cache</a>. When none of these names a
-directory, the check keeps no cache, as with <code>--no-cache</code>, and says so once
-on stderr.</p>
+directory, or <code>fidryn</code> in the cache directory of the user is the
+workspace's directory or lies inside it, as when <code>XDG_CACHE_HOME</code>, <code>HOME</code>
+or <code>LOCALAPPDATA</code> names a directory inside the workspace, the check keeps
+no cache, as with <code>--no-cache</code>, and says so once on stderr.</p>
 <p><code>--jobs</code>, <code>--cache-dir</code>, <code>--no-cache</code>, <code>--report</code> and <code>--unresolved</code>
 belong to the check of a workspace; given with a <code>.fr</code> file, they are
 refused with exit 1. <code>--cache-dir</code> and <code>--no-cache</code> are not given
@@ -265,6 +273,9 @@ the cache hold, cannot be read, the check keeps no cache and says so once,
 as <code>the cache could not be used, and the check went on without it: ...</code>;
 so it does when no directory is named for the cache, as
 <code>the cache could not be used, and the check went on without it: no directory is named for it: ...</code>,
+when the one in the cache directory of the user lies inside the
+workspace, as
+<code>the cache could not be used, and the check went on without it: DIR: the directory lies inside the workspace ...</code>,
 and when the cache's directory is the directory of a dependency of
 the workspace, lies inside it or holds it, since nothing is written inside
 a dependency but through a symbolic link below the cache's directory that
@@ -862,9 +873,10 @@ provision.</p>
 <p>The cache is chosen, from the same variables, as by <a href="#check"><code>check</code></a>, and
 every workspace the command reads, the two sides and each <code>--bindings</code>
 directory, shares it; nothing is written into any of them unless the
-cache is named inside one. A check trusts its cache, so a cache belongs
-where only people one trusts can write. <code>--cache-dir</code> and <code>--no-cache</code> are
-not given together.</p>
+cache is named inside one, and <code>fidryn</code> in the cache directory of the user
+is not used when it lies inside one of them. A check trusts its cache, so
+a cache belongs where only people one trusts can write. <code>--cache-dir</code> and
+<code>--no-cache</code> are not given together.</p>
 <p><strong>Example</strong></p>
 <p>Each of these compares a workspace with itself, with <code>--no-cache</code>, so that
 no cache is written; each prints a change set in which nothing changed:</p>
@@ -907,9 +919,11 @@ as no workspace:</p>
 naming its file under the directory given, as <code>fidryn check</code> prints them;
 for a curated workspace of <code>--bindings</code> these are the diagnostics of its
 module files by themselves. When the command keeps no cache because no
-directory is named for one, or because the identity of the running
-executable cannot be read, it says so after the diagnostics of a failure
-too, as <code>the cache could not be used, and the check went on without it: ...</code>;
+directory is named for one, because the one in the cache directory of the
+user lies inside a workspace it reads, or because the identity of the
+running executable cannot be read, it says so after the diagnostics of a
+failure too, as
+<code>the cache could not be used, and the check went on without it: ...</code>;
 what the checks of the workspaces it read found of their cache is said
 only when the comparison succeeds.</p>
 <h2 id="see-also"><span class="hn">5.20</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>

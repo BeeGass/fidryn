@@ -88,6 +88,12 @@
     </ol>
   </div>
   <div class="group">
+    <p class="label">Ahead</p>
+    <ol>
+      <li><a href="/docs/roadmap"><span class="n">&sect;11</span><span class="t">Roadmap</span><span class="d">Destination, today, next</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
     <p class="label">Implementers</p>
     <ol>
       <li><a href="https://github.com/BeeGass/fidryn/blob/main/docs/ARCHITECTURE.md"><span class="n" aria-hidden="true">&#8599;</span><span class="t">Architecture</span><span class="d">Pipeline and crate contract</span></a></li>
@@ -99,7 +105,7 @@
   <article class="doc" aria-labelledby="doc-title">
     <p class="kicker">&sect; 4 &middot; Write</p>
     <h1 id="doc-title">Law modules</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#editions"><span class="n">4.1</span> Editions</a></li><li class="lvl-2"><a href="#addresses"><span class="n">4.2</span> Addresses</a></li><li class="lvl-2"><a href="#file-paths"><span class="n">4.3</span> File paths</a></li><li class="lvl-2"><a href="#normalization"><span class="n">4.4</span> Normalization</a></li><li class="lvl-2"><a href="#provisions-notes-and-layers"><span class="n">4.5</span> Provisions, notes and layers</a></li><li class="lvl-3"><a href="#provisions"><span class="n">4.5.1</span> Provisions</a></li><li class="lvl-3"><a href="#texts-and-blocks"><span class="n">4.5.2</span> Texts and blocks</a></li><li class="lvl-3"><a href="#notes-footnotes-and-definitions"><span class="n">4.5.3</span> Notes, footnotes and definitions</a></li><li class="lvl-3"><a href="#layers"><span class="n">4.5.4</span> Layers</a></li><li class="lvl-3"><a href="#in-json"><span class="n">4.5.5</span> In JSON</a></li><li class="lvl-2"><a href="#hashes"><span class="n">4.6</span> Hashes</a></li><li class="lvl-2"><a href="#syntax"><span class="n">4.7</span> Syntax</a></li><li class="lvl-2"><a href="#what-the-checker-verifies-in-one-module"><span class="n">4.8</span> What the checker verifies in one module</a></li><li class="lvl-2"><a href="#workspaces"><span class="n">4.9</span> Workspaces</a></li><li class="lvl-3"><a href="#writing-a-generated-workspace"><span class="n">4.9.1</span> Writing a generated workspace</a></li><li class="lvl-3"><a href="#what-the-checker-verifies-in-a-workspace"><span class="n">4.9.2</span> What the checker verifies in a workspace</a></li><li class="lvl-2"><a href="#how-a-workspace-is-checked"><span class="n">4.10</span> How a workspace is checked</a></li><li class="lvl-3"><a href="#interfaces"><span class="n">4.10.1</span> Interfaces</a></li><li class="lvl-3"><a href="#the-check-report-and-the-unresolved-list"><span class="n">4.10.2</span> The check report and the unresolved list</a></li><li class="lvl-2"><a href="#references"><span class="n">4.11</span> References</a></li><li class="lvl-2"><a href="#the-cache"><span class="n">4.12</span> The cache</a></li><li class="lvl-2"><a href="#definitions"><span class="n">4.13</span> Definitions</a></li><li class="lvl-3"><a href="#where-definitions-are-read"><span class="n">4.13.1</span> Where definitions are read</a></li><li class="lvl-3"><a href="#verbs"><span class="n">4.13.2</span> Verbs</a></li><li class="lvl-3"><a href="#patterns"><span class="n">4.13.3</span> Patterns</a></li><li class="lvl-3"><a href="#the-reach"><span class="n">4.13.4</span> The reach</a></li><li class="lvl-3"><a href="#a-reach-chapeau"><span class="n">4.13.5</span> A reach chapeau</a></li><li class="lvl-3"><a href="#the-reach-of-a-paragraph"><span class="n">4.13.6</span> The reach of a paragraph</a></li><li class="lvl-3"><a href="#what-is-not-extracted"><span class="n">4.13.7</span> What is not extracted</a></li><li class="lvl-3"><a href="#the-region"><span class="n">4.13.8</span> The region</a></li><li class="lvl-3"><a href="#the-basis"><span class="n">4.13.9</span> The basis</a></li><li class="lvl-3"><a href="#borrowed-definitions"><span class="n">4.13.10</span> Borrowed definitions</a></li><li class="lvl-3"><a href="#the-note"><span class="n">4.13.11</span> The note</a></li><li class="lvl-3"><a href="#what-the-values-mean"><span class="n">4.13.12</span> What the values mean</a></li><li class="lvl-2"><a href="#curated-modules-imports-citations-and-names"><span class="n">4.14</span> Curated modules: imports, citations and names</a></li><li class="lvl-2"><a href="#depending-on-another-workspace"><span class="n">4.15</span> Depending on another workspace</a></li><li class="lvl-2"><a href="#bindings"><span class="n">4.16</span> Bindings</a></li><li class="lvl-2"><a href="#change-sets"><span class="n">4.17</span> Change sets</a></li><li class="lvl-3"><a href="#the-lists"><span class="n">4.17.1</span> The lists</a></li><li class="lvl-3"><a href="#moved-provisions-and-notes"><span class="n">4.17.2</span> Moved provisions and notes</a></li><li class="lvl-3"><a href="#stale-bindings"><span class="n">4.17.3</span> Stale bindings</a></li><li class="lvl-3"><a href="#the-two-forms"><span class="n">4.17.4</span> The two forms</a></li><li class="lvl-2"><a href="#the-ingester-for-the-united-states-code"><span class="n">4.18</span> The ingester for the United States Code</a></li><li class="lvl-3"><a href="#what-it-reads"><span class="n">4.18.1</span> What it reads</a></li><li class="lvl-3"><a href="#the-classes-of-elements"><span class="n">4.18.2</span> The classes of elements</a></li><li class="lvl-3"><a href="#notes-and-their-layers"><span class="n">4.18.3</span> Notes and their layers</a></li><li class="lvl-3"><a href="#how-it-gives-addresses"><span class="n">4.18.4</span> How it gives addresses</a></li><li class="lvl-3"><a href="#what-it-does-not-import"><span class="n">4.18.5</span> What it does not import</a></li><li class="lvl-3"><a href="#what-the-command-writes"><span class="n">4.18.6</span> What the command writes</a></li><li class="lvl-2"><a href="#the-coverage-ledger"><span class="n">4.19</span> The coverage ledger</a></li><li class="lvl-2"><a href="#the-sample"><span class="n">4.20</span> The sample</a></li><li class="lvl-2"><a href="#limits"><span class="n">4.21</span> Limits</a></li><li class="lvl-3"><a href="#workspaces-and-the-cache"><span class="n">4.21.1</span> Workspaces and the cache</a></li><li class="lvl-3"><a href="#diagnostics"><span class="n">4.21.2</span> Diagnostics</a></li><li class="lvl-3"><a href="#modules-written-by-hand"><span class="n">4.21.3</span> Modules written by hand</a></li><li class="lvl-3"><a href="#definitions-1"><span class="n">4.21.4</span> Definitions</a></li><li class="lvl-3"><a href="#change-sets-1"><span class="n">4.21.5</span> Change sets</a></li><li class="lvl-3"><a href="#the-ingester-and-the-independent-reading"><span class="n">4.21.6</span> The ingester and the independent reading</a></li><li class="lvl-3"><a href="#fetching"><span class="n">4.21.7</span> Fetching</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#editions"><span class="n">4.1</span> Editions</a></li><li class="lvl-2"><a href="#addresses"><span class="n">4.2</span> Addresses</a></li><li class="lvl-2"><a href="#file-paths"><span class="n">4.3</span> File paths</a></li><li class="lvl-2"><a href="#normalization"><span class="n">4.4</span> Normalization</a></li><li class="lvl-2"><a href="#provisions-notes-and-layers"><span class="n">4.5</span> Provisions, notes and layers</a></li><li class="lvl-3"><a href="#provisions"><span class="n">4.5.1</span> Provisions</a></li><li class="lvl-3"><a href="#texts-and-blocks"><span class="n">4.5.2</span> Texts and blocks</a></li><li class="lvl-3"><a href="#notes-footnotes-and-definitions"><span class="n">4.5.3</span> Notes, footnotes and definitions</a></li><li class="lvl-3"><a href="#layers"><span class="n">4.5.4</span> Layers</a></li><li class="lvl-3"><a href="#in-json"><span class="n">4.5.5</span> In JSON</a></li><li class="lvl-2"><a href="#hashes"><span class="n">4.6</span> Hashes</a></li><li class="lvl-2"><a href="#syntax"><span class="n">4.7</span> Syntax</a></li><li class="lvl-2"><a href="#what-the-checker-verifies-in-one-module"><span class="n">4.8</span> What the checker verifies in one module</a></li><li class="lvl-2"><a href="#workspaces"><span class="n">4.9</span> Workspaces</a></li><li class="lvl-3"><a href="#writing-a-generated-workspace"><span class="n">4.9.1</span> Writing a generated workspace</a></li><li class="lvl-3"><a href="#what-the-checker-verifies-in-a-workspace"><span class="n">4.9.2</span> What the checker verifies in a workspace</a></li><li class="lvl-2"><a href="#how-a-workspace-is-checked"><span class="n">4.10</span> How a workspace is checked</a></li><li class="lvl-3"><a href="#interfaces"><span class="n">4.10.1</span> Interfaces</a></li><li class="lvl-3"><a href="#the-check-report-and-the-unresolved-list"><span class="n">4.10.2</span> The check report and the unresolved list</a></li><li class="lvl-2"><a href="#references"><span class="n">4.11</span> References</a></li><li class="lvl-2"><a href="#the-cache"><span class="n">4.12</span> The cache</a></li><li class="lvl-2"><a href="#definitions"><span class="n">4.13</span> Definitions</a></li><li class="lvl-3"><a href="#where-definitions-are-read"><span class="n">4.13.1</span> Where definitions are read</a></li><li class="lvl-3"><a href="#verbs"><span class="n">4.13.2</span> Verbs</a></li><li class="lvl-3"><a href="#patterns"><span class="n">4.13.3</span> Patterns</a></li><li class="lvl-3"><a href="#the-reach"><span class="n">4.13.4</span> The reach</a></li><li class="lvl-3"><a href="#a-reach-chapeau"><span class="n">4.13.5</span> A reach chapeau</a></li><li class="lvl-3"><a href="#the-reach-of-a-paragraph"><span class="n">4.13.6</span> The reach of a paragraph</a></li><li class="lvl-3"><a href="#what-is-not-extracted"><span class="n">4.13.7</span> What is not extracted</a></li><li class="lvl-3"><a href="#the-region"><span class="n">4.13.8</span> The region</a></li><li class="lvl-3"><a href="#the-basis"><span class="n">4.13.9</span> The basis</a></li><li class="lvl-3"><a href="#borrowed-definitions"><span class="n">4.13.10</span> Borrowed definitions</a></li><li class="lvl-3"><a href="#the-note"><span class="n">4.13.11</span> The note</a></li><li class="lvl-3"><a href="#what-the-values-mean"><span class="n">4.13.12</span> What the values mean</a></li><li class="lvl-3"><a href="#a-second-implementation-of-the-rules"><span class="n">4.13.13</span> A second implementation of the rules</a></li><li class="lvl-2"><a href="#curated-modules-imports-citations-and-names"><span class="n">4.14</span> Curated modules: imports, citations and names</a></li><li class="lvl-2"><a href="#depending-on-another-workspace"><span class="n">4.15</span> Depending on another workspace</a></li><li class="lvl-2"><a href="#bindings"><span class="n">4.16</span> Bindings</a></li><li class="lvl-2"><a href="#change-sets"><span class="n">4.17</span> Change sets</a></li><li class="lvl-3"><a href="#the-lists"><span class="n">4.17.1</span> The lists</a></li><li class="lvl-3"><a href="#moved-provisions-and-notes"><span class="n">4.17.2</span> Moved provisions and notes</a></li><li class="lvl-3"><a href="#stale-bindings"><span class="n">4.17.3</span> Stale bindings</a></li><li class="lvl-3"><a href="#the-two-forms"><span class="n">4.17.4</span> The two forms</a></li><li class="lvl-2"><a href="#the-ingester-for-the-united-states-code"><span class="n">4.18</span> The ingester for the United States Code</a></li><li class="lvl-3"><a href="#what-it-reads"><span class="n">4.18.1</span> What it reads</a></li><li class="lvl-3"><a href="#the-classes-of-elements"><span class="n">4.18.2</span> The classes of elements</a></li><li class="lvl-3"><a href="#notes-and-their-layers"><span class="n">4.18.3</span> Notes and their layers</a></li><li class="lvl-3"><a href="#how-it-gives-addresses"><span class="n">4.18.4</span> How it gives addresses</a></li><li class="lvl-3"><a href="#what-it-does-not-import"><span class="n">4.18.5</span> What it does not import</a></li><li class="lvl-3"><a href="#what-the-command-writes"><span class="n">4.18.6</span> What the command writes</a></li><li class="lvl-2"><a href="#the-coverage-ledger"><span class="n">4.19</span> The coverage ledger</a></li><li class="lvl-2"><a href="#the-sample"><span class="n">4.20</span> The sample</a></li><li class="lvl-2"><a href="#limits"><span class="n">4.21</span> Limits</a></li><li class="lvl-3"><a href="#workspaces-and-the-cache"><span class="n">4.21.1</span> Workspaces and the cache</a></li><li class="lvl-3"><a href="#diagnostics"><span class="n">4.21.2</span> Diagnostics</a></li><li class="lvl-3"><a href="#modules-written-by-hand"><span class="n">4.21.3</span> Modules written by hand</a></li><li class="lvl-3"><a href="#definitions-1"><span class="n">4.21.4</span> Definitions</a></li><li class="lvl-3"><a href="#change-sets-1"><span class="n">4.21.5</span> Change sets</a></li><li class="lvl-3"><a href="#the-ingester-and-the-independent-reading"><span class="n">4.21.6</span> The ingester and the independent reading</a></li><li class="lvl-3"><a href="#fetching"><span class="n">4.21.7</span> Fetching</a></li></ol></details>
     <div class="prose">
 <p>A law module is a file of edition 2. It holds provisions of law as data,
 with their notes and what the source says of them, each named by an
@@ -1192,14 +1198,19 @@ else the one the environment variable <code>FIDRYN_CACHE_DIR</code> names, when 
 set and not empty; else <code>fidryn</code> in the cache directory of the user,
 outside every workspace: on Windows the directory <code>LOCALAPPDATA</code> names,
 and on other systems the one <code>XDG_CACHE_HOME</code> names, else <code>.cache</code> in
-<code>HOME</code>, each taken only when it is an absolute path. When none of them
-names a directory, the check keeps no cache, as with <code>--no-cache</code>, and
-<code>fidryn check</code> says so once on stderr. <code>--no-cache</code> keeps no cache: the
-check then reads and checks every module file and writes no entry. Unless
-the cache is named inside it, the check writes nothing into the workspace,
-and it reads nothing there but the workspace's own files: a
-<code>.fidryn-cache</code> or any other entry whose name begins with a dot is not
-read, and a symbolic link of any name is not followed.</p>
+<code>HOME</code>, each taken only when it is an absolute path. That directory is not
+used when it is the directory of the workspace under check or lies inside
+it, as it does when one of these variables names a directory inside the
+workspace; the two are compared with every link and every <code>..</code> resolved,
+as far as each exists. When none of them names a directory, or the one
+they name lies inside the workspace, the check keeps no cache, as with
+<code>--no-cache</code>, and <code>fidryn check</code> says so once on stderr, with the reason.
+<code>--no-cache</code> keeps no cache: the check then reads and checks every module
+file and writes no entry. Unless the cache is named inside it, the check
+writes nothing into the workspace, and it reads nothing there but the
+workspace's own files: a <code>.fidryn-cache</code> or any other entry whose name
+begins with a dot is not read, and a symbolic link of any name is not
+followed.</p>
 <p>One cache serves every workspace of a user. An entry is the result of the
 bytes of one file, whatever workspace holds the file, so the workspaces
 that hold a file of the same bytes share its entry, and the first check of
@@ -1398,7 +1409,8 @@ heading is "References in Text", one of whose own paragraphs (not one
 inside a table or quoted content) holds, in any case, the words that name
 the region (<code>this</code> and the kind word, or the words of the link) followed by
 <code>, referred to in</code>, the definition records the address of the first such
-note as <code>see_note</code>.</p>
+note in the document, among the notes of the unit and of its provisions,
+as <code>see_note</code>.</p>
 <h3 id="what-the-values-mean"><span class="hn">4.13.12</span> What the values mean <a class="anchor" href="#what-the-values-mean" aria-label="Link to this section">#</a></h3>
 <ul>
 <li><code>unstated</code>: neither the paragraph nor a chapeau above it states a reach
@@ -1412,9 +1424,12 @@ chapter and chapter 5", "subparagraph (A) of this paragraph" or, of a
 court rule, "this Rule 3021", a reach
 that names a law outside the Code, such as "this Act" or a link to a
 public law, and a reach whose kind word names neither the provision that
-states the reach nor any provision or container above it. For an
-inherited reach, the provision that states it is the provision of the
-chapeau.</li>
+states the reach nor any provision or container above it, whatever its
+words link to. Reach words of the first two kinds that are the words of
+one link to an address below the prefix are resolved: the region is the
+link's target, so "this Act" written as a link to a section of the Code
+has that section as its region. For an inherited reach, the provision
+that states it is the provision of the chapeau.</li>
 <li><code>restated</code>: the file does not declare its title positive law (its flag is
 <code>no</code>, or it has none), so the words of the provision are those of the
 editors of the Code, and the reach the law enacted may differ from the
@@ -1443,6 +1458,23 @@ in the order of their provisions and then of their first term, two of one
 provision with one first term keep the order of their parts. The checker
 holds each to the rules of
 <a href="#what-the-checker-verifies-in-one-module">What the checker verifies in one module</a>.</p>
+<h3 id="a-second-implementation-of-the-rules"><span class="hn">4.13.13</span> A second implementation of the rules <a class="anchor" href="#a-second-implementation-of-the-rules" aria-label="Link to this section">#</a></h3>
+<p><code>conformance/usc_definitions.py</code> implements the rules of this section a
+second time. It is written from their text, on the independent reading of
+the publisher's XML that <code>conformance/uslm_text.py</code> prints
+(<a href="https://github.com/BeeGass/fidryn/blob/main/conformance/README.md#the-official-xml-of-the-code">The official XML of the Code</a>),
+and shares no code with the importer. It writes the definitions it finds in
+a release, one JSON object to a line, and with <code>--against DIR</code> compares
+them with those that the <code>definition</code> blocks of a workspace hold.</p>
+<p>The check of <a href="#the-sample">the sample</a>, which <code>cargo xtask ci</code> runs, holds
+the importer's definitions of the sample to it: the two must find the same
+definitions in the sample's archives, field for field. That shows that two
+implementations of the rules, written apart, read them alike on that text:
+a definition that one of them finds, misses or records otherwise by a
+mistake of its own fails the check. It does not show that the rules find
+every definition the text holds. Both follow the same closed list of
+forms, so a definition written in another form is missed by both, and the
+comparison cannot see it.</p>
 <h2 id="curated-modules-imports-citations-and-names"><span class="hn">4.14</span> Curated modules: imports, citations and names <a class="anchor" href="#curated-modules-imports-citations-and-names" aria-label="Link to this section">#</a></h2>
 <p>A curated module is written by a person. It gives names to addresses,
 binds names to provisions, and imports other modules to use the names they
@@ -1994,14 +2026,21 @@ so that it would be at once a link and a footnote marker; a link, a
 superscript or a subscript stands inside another, or a footnote marker
 inside one; a footnote marker holds an element; a marker names no
 footnote of its module, or two footnotes of one module have one <code>id</code>;
-or a footnote holds a <code>signature</code>, a <code>subheading</code> or a <code>heading</code>;</li>
+or a footnote holds a <code>signature</code>, a <code>subheading</code>, a <code>heading</code> or
+another footnote;</li>
 <li>normalization composes one character out of characters on both sides of
 the boundary of a link, a superscript, a subscript or a marker;</li>
-<li>an identifier holds <code>~</code>, or gives no <a href="#addresses">address</a>;</li>
+<li>an identifier holds <code>~</code>, or gives no <a href="#addresses">address</a>, as none is
+given by an identifier of a unit or a container with an empty member,
+which two spaces in a row or a space at either end make, by an empty
+identifier, and by an identifier of a provision that begins with a space;</li>
 <li>a level has a second <code>num</code> or a second <code>heading</code>;</li>
+<li>a <code>note</code> stands in quoted content anywhere but directly in it or in one
+of its levels, such as in a paragraph, a text part, a table cell or
+another note of it;</li>
 <li>a span of a table cell is not a whole number written in ASCII digits;</li>
-<li>a <code>br</code>, an <code>img</code> or a column holds content, or an <code>img</code> has an attribute
-other than <code>src</code>;</li>
+<li>a <code>br</code>, an <code>img</code> or a column holds content, white space alone included,
+or an <code>img</code> has an attribute other than <code>src</code>;</li>
 <li>a <code>signature</code> holds anything but <code>name</code> and <code>role</code>, a footnote that
 stands directly in it included;</li>
 <li>a unit or a container has a second source credit, or a source credit
@@ -2048,7 +2087,7 @@ has <code>"positive_law":null</code>.</p>
 <tr><td>Provision inside a unit</td><td>any element of the two classes above, and <code>subsection</code>, <code>paragraph</code>, <code>subparagraph</code>, <code>clause</code>, <code>subclause</code>, <code>item</code>, <code>subitem</code>, <code>subsubitem</code> and <code>level</code>, inside a unit. Its kind is its tag</td></tr>
 <tr><td>Label</td><td><code>num</code> and <code>heading</code> of a level</td></tr>
 <tr><td>Text part</td><td><code>chapeau</code>, <code>content</code>, <code>continuation</code>, <code>proviso</code></td></tr>
-<tr><td>Block</td><td><code>p</code> and <code>xhtml:p</code>, read alike; <code>xhtml:table</code>; <code>quotedContent</code>; <code>img</code>; in a note, and in quoted content inside one, <code>signature</code>; in a note also any <code>subheading</code>, any <code>heading</code> other than the note's own (the first <code>heading</code> that is a child of the note) at any depth inside it, whether or not the note has a heading of its own, and a text part directly in the note; in quoted content also <code>note</code>, and a <code>heading</code> or <code>subheading</code> directly in it</td></tr>
+<tr><td>Block</td><td><code>p</code> and <code>xhtml:p</code>, read alike; <code>xhtml:table</code>; <code>quotedContent</code>; <code>img</code>; in a note, and in quoted content inside one, <code>signature</code>; in a note also any <code>subheading</code>, any <code>heading</code> other than the note's own (the first <code>heading</code> that is a child of the note) at any depth inside it, whether or not the note has a heading of its own, and a text part directly in the note; in quoted content also a <code>note</code> directly in it or in one of its levels, and a <code>heading</code> or <code>subheading</code> directly in it</td></tr>
 <tr><td>Inline, kept as structure</td><td><code>ref</code> with an <code>href</code> (a link); <code>ref</code> of the class <code>footnoteRef</code> (a footnote marker); <code>sup</code> and <code>xhtml:sup</code>; <code>sub</code> and <code>xhtml:sub</code></td></tr>
 <tr><td>Inline, words kept and markup dropped</td><td><code>date</code>, <code>i</code>, <code>b</code>, <code>inline</code>, <code>xhtml:span</code>, <code>xhtml:b</code>, <code>xhtml:i</code>, <code>xhtml:a</code>, <code>name</code>, <code>role</code>; <code>br</code> is one space</td></tr>
 <tr><td>Table structure</td><td><code>xhtml:thead</code>, <code>xhtml:tbody</code>, <code>xhtml:tfoot</code>, <code>xhtml:tr</code>, <code>xhtml:th</code>, <code>xhtml:td</code>; <code>xhtml:colgroup</code> and <code>xhtml:col</code>, which hold no text, are dropped</td></tr>
@@ -2056,15 +2095,22 @@ has <code>"positive_law":null</code>.</p>
 <tr><td>Not imported, counted</td><td><code>toc</code> and everything in it; release notes; the label of a note group</td></tr>
 </tbody></table>
 </div>
+<p>The class of a <code>ref</code> is its <code>class</code> attribute split into words at ASCII
+white space, U+0020, U+0009, U+000A, U+000C and U+000D, and at no other
+character; a <code>ref</code> is of the class <code>footnoteRef</code> when one of those words
+is <code>footnoteRef</code>.</p>
 <p>The unit of a text is the outermost unit that holds it: a section that
 stands inside another section is a provision of kind <code>section</code> of the
 outer one. A footnote (a <code>note</code> of the type <code>footnote</code>) is taken out of
 the text where it stands, without closing its paragraph, and becomes a
 footnote of its module, numbered in document order; its marker is a run of
-the text that gives no words. An <code>img</code> is imported as the source its <code>src</code>
-names, normalized, and empty when it has none; the picture is not in the
-archive. Quoted content has the <code>origin</code> it names as the source writes it,
-and none when the attribute is absent or empty.</p>
+the text that gives no words. A footnote inside a table of contents or
+inside a release note is not imported. An <code>img</code> is imported as the source
+its <code>src</code> names, normalized, and empty when it has none; the picture is not
+in the archive. Quoted content has the <code>origin</code> it names as the source
+writes it, and none when the attribute is absent or empty. In a level of
+quoted content, its <code>num</code> and its <code>heading</code> close the paragraph that the
+words before them have open.</p>
 <p>A <code>num</code> with neither a <code>value</code> nor text is absent, and one with a <code>value</code>
 and no text keeps the value with an empty shown form; a <code>heading</code> with no
 text is absent, and so is a source credit with no text. A number, a heading
@@ -2073,7 +2119,9 @@ marker, with an empty text when it has no other. A text part that stands
 directly in a note, where the publisher sets out a law as loose paragraphs,
 gives its blocks to the note, in their place among the note's other
 blocks, and its role word (<code>chapeau</code>, <code>content</code>, <code>continuation</code> or
-<code>proviso</code>) is not kept. Each of these rules decides what a hash holds.</p>
+<code>proviso</code>) is not kept. A <code>continuation</code> or a <code>proviso</code> inside such a
+<code>content</code> gives its blocks in its place among them, as it gives a part of
+its own in a level. Each of these rules decides what a hash holds.</p>
 <h3 id="notes-and-their-layers"><span class="hn">4.18.3</span> Notes and their layers <a class="anchor" href="#notes-and-their-layers" aria-label="Link to this section">#</a></h3>
 <p>Each <code>note</code> in a <code>notes</code> element is a note, except a cross heading
 (<code>role="crossHeading"</code>), which opens a group named by its topic and is not
@@ -2119,19 +2167,21 @@ either:</p>
 <ol>
 <li><strong>A unit or a container with an identifier.</strong> An identifier that holds
 a space is a list: its first member is the identifier used, and the
-other members are aliases. An identifier whose last segment holds three
-full stops in a row stands for a range, as <code>s44...46</code> does: it is used
-as it is, and its aliases are its two ends, the identifier cut before
-the full stops and the identifier with its last segment replaced by
-that segment's leading lower-case letters followed by what stands after
-the full stops. When the two ends differ only in a whole number at their
-end, the second not smaller than the first and at most 999 above it,
-every number between them gives an alias as well; a member of a range
-whose number is followed by a letter gets no alias. The address is the
-identifier, unless a unit or a container before it in the release,
-taking the members in the order of their names and the elements in
-document order, already has it; then it is the identifier followed by
-<code>~2</code>, by <code>~3</code> for the next, and so on.</li>
+other members are aliases. A list with an empty member, which two spaces
+in a row or a space at either end make, and an empty identifier give no
+address, and the document is refused. An identifier whose last segment
+holds three full stops in a row stands for a range, as <code>s44...46</code> does:
+it is used as it is, and its aliases are its two ends, the identifier
+cut before the full stops and the identifier with its last segment
+replaced by that segment's leading lower-case letters followed by what
+stands after the full stops. When the two ends differ only in a whole
+number at their end, the second not smaller than the first and at most
+999 above it, every number between them gives an alias as well; a
+member of a range whose number is followed by a letter gets no alias.
+The address is the identifier, unless a unit or a container before it
+in the release, taking the members in the order of their names and the
+elements in document order, already has it; then it is the identifier
+followed by <code>~2</code>, by <code>~3</code> for the next, and so on.</li>
 <li><strong>A unit or a container without an identifier.</strong> The address of the
 container it stands in, or the prefix for the top element of a file,
 followed by <code>~&lt;tag&gt;.&lt;n&gt;</code>, where <code>n</code> counts from 1 the elements of that
@@ -2139,7 +2189,10 @@ tag without an identifier in that place, in document order.</li>
 <li><strong>A provision inside a unit.</strong> The address of its parent followed by
 the last segment of its identifier, of its first member if it lists
 several, and by <code>~2</code>, <code>~3</code> when a sibling before it already has that
-address; without an identifier, followed by <code>~&lt;tag&gt;.&lt;n&gt;</code> as in rule 2.</li>
+address; without an identifier, followed by <code>~&lt;tag&gt;.&lt;n&gt;</code> as in rule 2.
+An identifier that is empty or begins with a space has an empty first
+member and gives no address, and the document is refused; a space after
+the first member changes nothing.</li>
 <li>An alias that is the address of a unit, a container or a provision is
 dropped, and so is one the element already has.</li>
 </ol>
@@ -2155,8 +2208,8 @@ inside such an element is not counted again.</p>
 <p>Some of what a document holds is by rule not imported, and the lock's
 <code>not_imported</code> counts it:</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Not imported</th><th>Counted as</th></tr></thead><tbody>
-<tr><td>a table of contents, <code>toc</code>, and everything in it</td><td><code>tables_of_contents</code>; and the footnotes and links in it, as <code>footnotes_in_tables_of_contents</code> and <code>links_in_tables_of_contents</code></td></tr>
-<tr><td>a release note: a note directly under a <code>title</code> or an <code>appendix</code> whose text begins <code>Current through </code></td><td><code>release_notes</code></td></tr>
+<tr><td>a table of contents, <code>toc</code>, and everything in it</td><td><code>tables_of_contents</code>, each <code>toc</code> element once, one inside another included; and the footnotes and links in it, as <code>footnotes_in_tables_of_contents</code> and <code>links_in_tables_of_contents</code></td></tr>
+<tr><td>a release note: a note directly under a <code>title</code> or an <code>appendix</code> whose text begins <code>Current through </code>, with any footnote in it</td><td><code>release_notes</code></td></tr>
 <tr><td>a link that has no words, or white space alone</td><td><code>links_without_words</code></td></tr>
 <tr><td>the label of a note group, the heading of a cross heading</td><td><code>note_group_headings</code></td></tr>
 </tbody></table>
@@ -2276,7 +2329,7 @@ text of the Code. <code>fidryn check samples/uscode/curated --no-cache</code> ch
 it with its dependency.</li>
 </ul>
 <p><code>cargo xtask uscode-sample</code>, which <code>cargo xtask ci</code> runs, holds the sample
-to eight things, in this order, and fails with a message that names the
+to nine things, in this order, and fails with a message that names the
 first difference when one of them does not hold:</p>
 <ol>
 <li>every archive has the size, the SHA-256 and the BLAKE3 that its record
@@ -2295,14 +2348,20 @@ are those of the check report; and every count that the profile's
 <code>import</code> and the ledger's <code>totals</code> both hold is the same in both, from
 the units and the provisions to the notes, the images and what was not
 imported. Only the ledger counts definitions, <code>definitions</code> and
-<code>definitions_by_kind</code>, since the script extracts none, and the profile's
-<code>prefix</code> and <code>release</code> stand at the top of the ledger, where they are
-compared;</li>
+<code>definitions_by_kind</code>, since that script extracts none, and the
+profile's <code>prefix</code> and <code>release</code> stand at the top of the ledger, where
+they are compared;</li>
 <li>the text of every provision, container, note, source credit and
 footnote that <code>fidryn text samples/uscode/workspace --json</code> reads back
 from the modules equals, line for line, what <code>conformance/uslm_text.py</code>
 reads from the publisher's XML by the <a href="#the-ingester-for-the-united-states-code">rules of the reading</a>,
 which it implements on its own, sharing no code with the ingester;</li>
+<li>the definitions that <code>conformance/usc_definitions.py</code> finds in the
+archives, by its own implementation of the <a href="#definitions">rules</a>, are
+those that the modules of the committed workspace hold, as the check
+reads them, field for field
+(<a href="#a-second-implementation-of-the-rules">A second implementation of the rules</a>);
+the step names the module of the first definition that differs;</li>
 <li>the check of <code>curated/</code> with its dependency finds no error and no
 warning, a pin that is no longer the lock's (<code>E740</code>) among the errors
 and a stale binding (<code>W750</code>) among the warnings, counts at least one
@@ -2456,68 +2515,70 @@ own.</li>
 </ul>
 <h3 id="the-ingester-and-the-independent-reading"><span class="hn">4.21.6</span> The ingester and the independent reading <a class="anchor" href="#the-ingester-and-the-independent-reading" aria-label="Link to this section">#</a></h3>
 <ul>
-<li>The ingester and <code>conformance/uslm_text.py</code> read nine forms of the
-publisher's XML differently. No release of 2026 holds any of them.
-<ul>
 <li>
-<p>On five of them one of the two refuses the document, so a release
-that holds one is refused by that reading:</p>
-<ul>
-<li>a <code>continuation</code> or a <code>proviso</code> inside a <code>content</code> that stands
-directly in a note, which the ingester reads as blocks of the note
-and the independent reading refuses;</li>
-<li>a note inside a paragraph or a text part of quoted content, rather
-than directly in the quoted content or in one of its levels, which
-the ingester refuses and the independent reading reads;</li>
-<li>white space inside a <code>br</code>, an <code>img</code> or a column, which the ingester
-refuses as content and the independent reading takes for none;</li>
-<li>an identifier of a unit or a container whose list has an empty
-member, as two spaces or a space at either end make, and an
-identifier of a provision that begins with a space, which the
-ingester refuses as no address and the independent reading reads
-without the empty member;</li>
-<li>a <code>class</code> attribute of a <code>ref</code> whose words are separated by a
-white-space character that is not ASCII. The ingester splits the
-attribute at ASCII white space only, and the independent reading at
-any, so one of them finds the class <code>footnoteRef</code> where the other
-does not, and one of them refuses the <code>ref</code>: as having neither an
-<code>href</code> nor that class, or as having both.</li>
-</ul>
+<p>The ingester and <code>conformance/uslm_text.py</code> read these rare forms of the
+publisher's XML by one rule: a <code>continuation</code> or a <code>proviso</code> inside a
+<code>content</code> directly in a note; a
+<code>note</code> in quoted content anywhere but directly in it or in one of its
+levels; white space inside a <code>br</code>, an <code>img</code> or a column; an identifier
+with an empty member; the words of the class of a <code>ref</code>; a <code>num</code> or a
+<code>heading</code> among the words of a level of quoted content; a footnote
+inside a footnote; a table of contents inside another; and a footnote
+inside a release note. The rules are those of
+<a href="#what-it-reads">What it reads</a>,
+<a href="#the-classes-of-elements">The classes of elements</a>,
+<a href="#how-it-gives-addresses">How it gives addresses</a> and
+<a href="#what-it-does-not-import">What it does not import</a>.</p>
 </li>
 <li>
-<p>On four of them both read the document, and read it differently:</p>
+<p>They read three other forms differently. No release of 2026 holds any of
+them.</p>
 <ul>
-<li>a <code>num</code> or a <code>heading</code> among the words of a level of quoted content,
-where the independent reading ends the open paragraph and the
-ingester does not;</li>
-<li>a footnote inside a footnote, which the ingester counts as a footnote
-of its own and the independent reading leaves out;</li>
-<li>a table of contents inside another, which the ingester counts twice
-among the tables of contents of the lock and the independent reading
-once; no text differs;</li>
-<li>a footnote inside the release note of a title or an appendix, which
-the ingester keeps as a footnote of that container and the
-independent reading leaves out with the note.</li>
+<li>A comment or a processing instruction inside a <code>br</code> or a column: the
+ingester refuses it as content, and the independent reading, whose
+parser drops both, does not see it.</li>
+<li>A schema location that the two take apart differently, so that one of
+them refuses the document and the other reads it: the ingester splits
+it into words at ASCII white space and the independent reading at any
+white space; the ingester takes the first file named for the
+publisher's namespace and the independent reading the last; and the
+independent reading refuses an odd number of words, where the ingester
+reads the pair it needs.</li>
+<li>A note with the role <code>crossHeading</code> that stands directly in a title or
+an appendix and whose text begins <code>Current through </code>: the ingester
+takes it for the release note, which it does not import, and the
+independent reading reads it as a note of its own, <code>ungrouped</code>.</li>
 </ul>
-<p>A release that holds one of these four is imported and checked without
-a word. The difference shows only when the two readings are compared on
-that release: what <code>conformance/uslm_text.py</code> prints for its archives
-against what <code>fidryn text DIR --json</code> prints for its workspace, and, for
-a table of contents, the counts of <code>conformance/usc_profile.py</code> against
-the ledger. The check of <a href="#the-sample">the sample</a> makes both
-comparisons for the sample; neither an import nor the replay of releases
-makes them.</p>
+<p>On the first two, one of the readings refuses the document. The third is
+read by both and read differently, and shows only when the two readings
+are compared on that release: what <code>conformance/uslm_text.py</code> prints for
+its archives against what <code>fidryn text DIR --json</code> prints for its
+workspace. <code>tools/replay_uscode.py</code> makes that comparison for each
+release it replays, before it commits the release, unless it is given
+<code>--no-readings</code>, and compares the count of tables of contents of
+<code>conformance/usc_profile.py</code> with the ledger's; an import makes neither.
+Another form that the two read differently shows there when it changes
+a text record or that count. One that changes only another count of
+what is not imported, the footnotes or the links in tables of contents,
+the release notes, the links without words or the labels of note
+groups, shows in neither: the check of <a href="#the-sample">the sample</a>
+compares every count that the profile and the ledger both hold, and
+does so for the sample alone.</p>
 </li>
-</ul>
-</li>
-<li>The independent reading refuses the nesting the ingester refuses, by the
+<li>
+<p>The independent reading refuses the nesting the ingester refuses, by the
 same rule, but has no bound on the number of nodes of a document: it
 reads a document the ingester refuses for its size, given the memory,
-about 3 GB for a member of 64 MiB of empty elements.</li>
-<li>A table of contents is not imported. The lock counts it
-(<a href="#what-it-does-not-import">What it does not import</a>).</li>
-<li>No display citation is derived. The address is the one citation a module
-records, and no form such as "1 U.S.C. § 8(b)" is made from it.</li>
+about 3 GB for a member of 64 MiB of empty elements.</p>
+</li>
+<li>
+<p>A table of contents is not imported. The lock counts it
+(<a href="#what-it-does-not-import">What it does not import</a>).</p>
+</li>
+<li>
+<p>No display citation is derived. The address is the one citation a module
+records, and no form such as "1 U.S.C. § 8(b)" is made from it.</p>
+</li>
 </ul>
 <h3 id="fetching"><span class="hn">4.21.7</span> Fetching <a class="anchor" href="#fetching" aria-label="Link to this section">#</a></h3>
 <ul>
@@ -2536,7 +2597,7 @@ refuses a larger response as soon as it has read one byte more.</li>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/law-modules.md">Edit this page on GitHub</a><a href="/docs/law-modules.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#editions"><span class="n">4.1</span> Editions</a></li><li class="lvl-2"><a href="#addresses"><span class="n">4.2</span> Addresses</a></li><li class="lvl-2"><a href="#file-paths"><span class="n">4.3</span> File paths</a></li><li class="lvl-2"><a href="#normalization"><span class="n">4.4</span> Normalization</a></li><li class="lvl-2"><a href="#provisions-notes-and-layers"><span class="n">4.5</span> Provisions, notes and layers</a></li><li class="lvl-3"><a href="#provisions"><span class="n">4.5.1</span> Provisions</a></li><li class="lvl-3"><a href="#texts-and-blocks"><span class="n">4.5.2</span> Texts and blocks</a></li><li class="lvl-3"><a href="#notes-footnotes-and-definitions"><span class="n">4.5.3</span> Notes, footnotes and definitions</a></li><li class="lvl-3"><a href="#layers"><span class="n">4.5.4</span> Layers</a></li><li class="lvl-3"><a href="#in-json"><span class="n">4.5.5</span> In JSON</a></li><li class="lvl-2"><a href="#hashes"><span class="n">4.6</span> Hashes</a></li><li class="lvl-2"><a href="#syntax"><span class="n">4.7</span> Syntax</a></li><li class="lvl-2"><a href="#what-the-checker-verifies-in-one-module"><span class="n">4.8</span> What the checker verifies in one module</a></li><li class="lvl-2"><a href="#workspaces"><span class="n">4.9</span> Workspaces</a></li><li class="lvl-3"><a href="#writing-a-generated-workspace"><span class="n">4.9.1</span> Writing a generated workspace</a></li><li class="lvl-3"><a href="#what-the-checker-verifies-in-a-workspace"><span class="n">4.9.2</span> What the checker verifies in a workspace</a></li><li class="lvl-2"><a href="#how-a-workspace-is-checked"><span class="n">4.10</span> How a workspace is checked</a></li><li class="lvl-3"><a href="#interfaces"><span class="n">4.10.1</span> Interfaces</a></li><li class="lvl-3"><a href="#the-check-report-and-the-unresolved-list"><span class="n">4.10.2</span> The check report and the unresolved list</a></li><li class="lvl-2"><a href="#references"><span class="n">4.11</span> References</a></li><li class="lvl-2"><a href="#the-cache"><span class="n">4.12</span> The cache</a></li><li class="lvl-2"><a href="#definitions"><span class="n">4.13</span> Definitions</a></li><li class="lvl-3"><a href="#where-definitions-are-read"><span class="n">4.13.1</span> Where definitions are read</a></li><li class="lvl-3"><a href="#verbs"><span class="n">4.13.2</span> Verbs</a></li><li class="lvl-3"><a href="#patterns"><span class="n">4.13.3</span> Patterns</a></li><li class="lvl-3"><a href="#the-reach"><span class="n">4.13.4</span> The reach</a></li><li class="lvl-3"><a href="#a-reach-chapeau"><span class="n">4.13.5</span> A reach chapeau</a></li><li class="lvl-3"><a href="#the-reach-of-a-paragraph"><span class="n">4.13.6</span> The reach of a paragraph</a></li><li class="lvl-3"><a href="#what-is-not-extracted"><span class="n">4.13.7</span> What is not extracted</a></li><li class="lvl-3"><a href="#the-region"><span class="n">4.13.8</span> The region</a></li><li class="lvl-3"><a href="#the-basis"><span class="n">4.13.9</span> The basis</a></li><li class="lvl-3"><a href="#borrowed-definitions"><span class="n">4.13.10</span> Borrowed definitions</a></li><li class="lvl-3"><a href="#the-note"><span class="n">4.13.11</span> The note</a></li><li class="lvl-3"><a href="#what-the-values-mean"><span class="n">4.13.12</span> What the values mean</a></li><li class="lvl-2"><a href="#curated-modules-imports-citations-and-names"><span class="n">4.14</span> Curated modules: imports, citations and names</a></li><li class="lvl-2"><a href="#depending-on-another-workspace"><span class="n">4.15</span> Depending on another workspace</a></li><li class="lvl-2"><a href="#bindings"><span class="n">4.16</span> Bindings</a></li><li class="lvl-2"><a href="#change-sets"><span class="n">4.17</span> Change sets</a></li><li class="lvl-3"><a href="#the-lists"><span class="n">4.17.1</span> The lists</a></li><li class="lvl-3"><a href="#moved-provisions-and-notes"><span class="n">4.17.2</span> Moved provisions and notes</a></li><li class="lvl-3"><a href="#stale-bindings"><span class="n">4.17.3</span> Stale bindings</a></li><li class="lvl-3"><a href="#the-two-forms"><span class="n">4.17.4</span> The two forms</a></li><li class="lvl-2"><a href="#the-ingester-for-the-united-states-code"><span class="n">4.18</span> The ingester for the United States Code</a></li><li class="lvl-3"><a href="#what-it-reads"><span class="n">4.18.1</span> What it reads</a></li><li class="lvl-3"><a href="#the-classes-of-elements"><span class="n">4.18.2</span> The classes of elements</a></li><li class="lvl-3"><a href="#notes-and-their-layers"><span class="n">4.18.3</span> Notes and their layers</a></li><li class="lvl-3"><a href="#how-it-gives-addresses"><span class="n">4.18.4</span> How it gives addresses</a></li><li class="lvl-3"><a href="#what-it-does-not-import"><span class="n">4.18.5</span> What it does not import</a></li><li class="lvl-3"><a href="#what-the-command-writes"><span class="n">4.18.6</span> What the command writes</a></li><li class="lvl-2"><a href="#the-coverage-ledger"><span class="n">4.19</span> The coverage ledger</a></li><li class="lvl-2"><a href="#the-sample"><span class="n">4.20</span> The sample</a></li><li class="lvl-2"><a href="#limits"><span class="n">4.21</span> Limits</a></li><li class="lvl-3"><a href="#workspaces-and-the-cache"><span class="n">4.21.1</span> Workspaces and the cache</a></li><li class="lvl-3"><a href="#diagnostics"><span class="n">4.21.2</span> Diagnostics</a></li><li class="lvl-3"><a href="#modules-written-by-hand"><span class="n">4.21.3</span> Modules written by hand</a></li><li class="lvl-3"><a href="#definitions-1"><span class="n">4.21.4</span> Definitions</a></li><li class="lvl-3"><a href="#change-sets-1"><span class="n">4.21.5</span> Change sets</a></li><li class="lvl-3"><a href="#the-ingester-and-the-independent-reading"><span class="n">4.21.6</span> The ingester and the independent reading</a></li><li class="lvl-3"><a href="#fetching"><span class="n">4.21.7</span> Fetching</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#editions"><span class="n">4.1</span> Editions</a></li><li class="lvl-2"><a href="#addresses"><span class="n">4.2</span> Addresses</a></li><li class="lvl-2"><a href="#file-paths"><span class="n">4.3</span> File paths</a></li><li class="lvl-2"><a href="#normalization"><span class="n">4.4</span> Normalization</a></li><li class="lvl-2"><a href="#provisions-notes-and-layers"><span class="n">4.5</span> Provisions, notes and layers</a></li><li class="lvl-3"><a href="#provisions"><span class="n">4.5.1</span> Provisions</a></li><li class="lvl-3"><a href="#texts-and-blocks"><span class="n">4.5.2</span> Texts and blocks</a></li><li class="lvl-3"><a href="#notes-footnotes-and-definitions"><span class="n">4.5.3</span> Notes, footnotes and definitions</a></li><li class="lvl-3"><a href="#layers"><span class="n">4.5.4</span> Layers</a></li><li class="lvl-3"><a href="#in-json"><span class="n">4.5.5</span> In JSON</a></li><li class="lvl-2"><a href="#hashes"><span class="n">4.6</span> Hashes</a></li><li class="lvl-2"><a href="#syntax"><span class="n">4.7</span> Syntax</a></li><li class="lvl-2"><a href="#what-the-checker-verifies-in-one-module"><span class="n">4.8</span> What the checker verifies in one module</a></li><li class="lvl-2"><a href="#workspaces"><span class="n">4.9</span> Workspaces</a></li><li class="lvl-3"><a href="#writing-a-generated-workspace"><span class="n">4.9.1</span> Writing a generated workspace</a></li><li class="lvl-3"><a href="#what-the-checker-verifies-in-a-workspace"><span class="n">4.9.2</span> What the checker verifies in a workspace</a></li><li class="lvl-2"><a href="#how-a-workspace-is-checked"><span class="n">4.10</span> How a workspace is checked</a></li><li class="lvl-3"><a href="#interfaces"><span class="n">4.10.1</span> Interfaces</a></li><li class="lvl-3"><a href="#the-check-report-and-the-unresolved-list"><span class="n">4.10.2</span> The check report and the unresolved list</a></li><li class="lvl-2"><a href="#references"><span class="n">4.11</span> References</a></li><li class="lvl-2"><a href="#the-cache"><span class="n">4.12</span> The cache</a></li><li class="lvl-2"><a href="#definitions"><span class="n">4.13</span> Definitions</a></li><li class="lvl-3"><a href="#where-definitions-are-read"><span class="n">4.13.1</span> Where definitions are read</a></li><li class="lvl-3"><a href="#verbs"><span class="n">4.13.2</span> Verbs</a></li><li class="lvl-3"><a href="#patterns"><span class="n">4.13.3</span> Patterns</a></li><li class="lvl-3"><a href="#the-reach"><span class="n">4.13.4</span> The reach</a></li><li class="lvl-3"><a href="#a-reach-chapeau"><span class="n">4.13.5</span> A reach chapeau</a></li><li class="lvl-3"><a href="#the-reach-of-a-paragraph"><span class="n">4.13.6</span> The reach of a paragraph</a></li><li class="lvl-3"><a href="#what-is-not-extracted"><span class="n">4.13.7</span> What is not extracted</a></li><li class="lvl-3"><a href="#the-region"><span class="n">4.13.8</span> The region</a></li><li class="lvl-3"><a href="#the-basis"><span class="n">4.13.9</span> The basis</a></li><li class="lvl-3"><a href="#borrowed-definitions"><span class="n">4.13.10</span> Borrowed definitions</a></li><li class="lvl-3"><a href="#the-note"><span class="n">4.13.11</span> The note</a></li><li class="lvl-3"><a href="#what-the-values-mean"><span class="n">4.13.12</span> What the values mean</a></li><li class="lvl-3"><a href="#a-second-implementation-of-the-rules"><span class="n">4.13.13</span> A second implementation of the rules</a></li><li class="lvl-2"><a href="#curated-modules-imports-citations-and-names"><span class="n">4.14</span> Curated modules: imports, citations and names</a></li><li class="lvl-2"><a href="#depending-on-another-workspace"><span class="n">4.15</span> Depending on another workspace</a></li><li class="lvl-2"><a href="#bindings"><span class="n">4.16</span> Bindings</a></li><li class="lvl-2"><a href="#change-sets"><span class="n">4.17</span> Change sets</a></li><li class="lvl-3"><a href="#the-lists"><span class="n">4.17.1</span> The lists</a></li><li class="lvl-3"><a href="#moved-provisions-and-notes"><span class="n">4.17.2</span> Moved provisions and notes</a></li><li class="lvl-3"><a href="#stale-bindings"><span class="n">4.17.3</span> Stale bindings</a></li><li class="lvl-3"><a href="#the-two-forms"><span class="n">4.17.4</span> The two forms</a></li><li class="lvl-2"><a href="#the-ingester-for-the-united-states-code"><span class="n">4.18</span> The ingester for the United States Code</a></li><li class="lvl-3"><a href="#what-it-reads"><span class="n">4.18.1</span> What it reads</a></li><li class="lvl-3"><a href="#the-classes-of-elements"><span class="n">4.18.2</span> The classes of elements</a></li><li class="lvl-3"><a href="#notes-and-their-layers"><span class="n">4.18.3</span> Notes and their layers</a></li><li class="lvl-3"><a href="#how-it-gives-addresses"><span class="n">4.18.4</span> How it gives addresses</a></li><li class="lvl-3"><a href="#what-it-does-not-import"><span class="n">4.18.5</span> What it does not import</a></li><li class="lvl-3"><a href="#what-the-command-writes"><span class="n">4.18.6</span> What the command writes</a></li><li class="lvl-2"><a href="#the-coverage-ledger"><span class="n">4.19</span> The coverage ledger</a></li><li class="lvl-2"><a href="#the-sample"><span class="n">4.20</span> The sample</a></li><li class="lvl-2"><a href="#limits"><span class="n">4.21</span> Limits</a></li><li class="lvl-3"><a href="#workspaces-and-the-cache"><span class="n">4.21.1</span> Workspaces and the cache</a></li><li class="lvl-3"><a href="#diagnostics"><span class="n">4.21.2</span> Diagnostics</a></li><li class="lvl-3"><a href="#modules-written-by-hand"><span class="n">4.21.3</span> Modules written by hand</a></li><li class="lvl-3"><a href="#definitions-1"><span class="n">4.21.4</span> Definitions</a></li><li class="lvl-3"><a href="#change-sets-1"><span class="n">4.21.5</span> Change sets</a></li><li class="lvl-3"><a href="#the-ingester-and-the-independent-reading"><span class="n">4.21.6</span> The ingester and the independent reading</a></li><li class="lvl-3"><a href="#fetching"><span class="n">4.21.7</span> Fetching</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>

@@ -49,7 +49,8 @@ Each definition extracted has one of three bases:
   law outside the Code, such as a public law; its reach words are in a form
   the rules do not resolve, whatever they name: a part of the Code, as "this
   chapter and chapter 5" and, of a court rule, "this Rule 3021" do, or a law
-  outside it, as "this Act" does; or
+  outside it, as "this Act" does, unless those words are those of one link
+  to an address of the Code, whose target is then the region; or
   its reach is in a form they resolve, "this" and the name of a kind of
   provision or container, but neither the provision that states the reach
   nor any provision or container above it is of that kind, as with "As

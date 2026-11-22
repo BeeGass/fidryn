@@ -40,6 +40,7 @@ Requires Rust 1.98+. Local mill: `fidryn ui --no-open` (loopback only, default `
 - [Examples](https://fidryn.onlygass.dev/docs/examples) · [examples.md](https://fidryn.onlygass.dev/docs/examples.md)
 - [Coverage](https://fidryn.onlygass.dev/docs/coverage) · [coverage.md](https://fidryn.onlygass.dev/docs/coverage.md)
 - [Contributing](https://fidryn.onlygass.dev/docs/contributing) · [contributing.md](https://fidryn.onlygass.dev/docs/contributing.md)
+- [Roadmap](https://fidryn.onlygass.dev/docs/roadmap) · [roadmap.md](https://fidryn.onlygass.dev/docs/roadmap.md)
 
 ## Agent maps
 

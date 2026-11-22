@@ -94,7 +94,7 @@ listed:
 fidryn check samples/uscode/curated --no-cache
 ```
 
-`cargo xtask uscode-sample`, which `cargo xtask ci` runs, checks eight
+`cargo xtask uscode-sample`, which `cargo xtask ci` runs, checks nine
 things, in this order, and fails with a message that names the first
 difference:
 
@@ -120,14 +120,18 @@ difference:
    an independent reading of the publisher's XML, is not, line for line,
    what `fidryn text samples/uscode/workspace --json` prints, and names the
    first line that differs;
-7. it checks `curated/` with its dependency, and fails, naming the file and
+7. it fails when the definitions that `conformance/usc_definitions.py`, a
+   second implementation of the definition rules, finds in the archives are
+   not, field for field, those that the modules of `workspace/` hold, and
+   names the module of the first definition that differs;
+8. it checks `curated/` with its dependency, and fails, naming the file and
    the first thing that is wrong, on an error, such as a pin that is no
    longer the lock's (`E740`), on a warning, such as a binding whose
    provision changed in a regeneration (`W750`), and on a citation whose
    outcome is not `exact`, such as one that stops resolving after a
    regeneration; and it fails, naming `curated/`, when the check counts no
    citation at all;
-8. it fails when the table of `docs/coverage.md` is not the one the
+9. it fails when the table of `docs/coverage.md` is not the one the
    committed ledger gives.
 
 The step writes nothing in the repository, a cache included; with
