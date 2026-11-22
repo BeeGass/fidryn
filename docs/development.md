@@ -127,6 +127,37 @@ each job when the check fails, what the drift job reports for each exit
 status of the script, and the actions it uses, which are those of `ci.yml`
 at the same commits.
 
+### A new release of the Code
+
+`tools/replay_uscode.py` makes each release point of the Code that it
+lists one commit of a law repository
+([Replaying releases](../conformance/README.md#replaying-releases)).
+Whoever keeps such a repository takes a new release point in three steps:
+
+1. The release is added to `RELEASES` in `tools/replay_uscode.py`, at its
+   place in the publisher's order, and to the list in
+   `conformance/test_replay_order.py`, which holds the tool to that order.
+2. The replay is run on the repository with a release build of the
+   commit, `cargo build --release -p fidryn-cli --locked`:
+
+   ```text
+   uv run --locked python -I tools/replay_uscode.py --archives ARCHIVES --repository LAW --fidryn target/release/fidryn --cache-dir CACHE
+   ```
+
+   It goes on after the last release the branch commits. It fetches the
+   new release when its archive is absent, imports it and checks it, and
+   compares its two readings: what `fidryn text` reads back from the
+   modules of the import against what `conformance/uslm_text.py` reads from
+   the publisher's XML, line for line, and the tables of contents that
+   `conformance/usc_profile.py` counts against those of the import's
+   ledger. The comparison is part of the replay: a release whose two
+   readings differ is not committed, and the replay stops before its
+   commit and names the difference. When they agree, it writes the change
+   set and commits the release. `--no-readings` leaves the comparison out,
+   and is for a replay of releases whose readings were compared before.
+3. `tools/check-law-repository.sh LAW` checks every workspace of the
+   repository, as above.
+
 ## Promote through GitHub
 
 1. Push changes to `dev` or merge an independently reviewed contribution into it.

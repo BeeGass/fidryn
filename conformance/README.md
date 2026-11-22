@@ -290,16 +290,33 @@ lists for 2026, in the publisher's order, one commit of a repository of
 the imported law. For each release it fetches the archive of every title
 with `fetch_uscode.py` when it is absent; imports it with
 `fidryn ingest uscode` into `uscode.next/` and checks it, which must find
-no error and no warning; for every release after the first writes the
-change set of `fidryn changes uscode uscode.next` as JSON to
-`changes/<release>.json`; replaces `uscode/` with `uscode.next/`; and
-commits, with the text form of the change set as the message given to git
-as it is (`/us/usc: release 119-73not60` for the first), then reads the
-message back from the commit and stops unless it is the text form byte
-for byte.
+no error and no warning; compares its two readings; for every release
+after the first writes the change set of `fidryn changes uscode
+uscode.next` as JSON to `changes/<release>.json`; replaces `uscode/` with
+`uscode.next/`; and commits, with the text form of the change set as the
+message given to git as it is (`/us/usc: release 119-73not60` for the
+first), then reads the message back from the commit and stops unless it
+is the text form byte for byte.
+
+The comparison of the two readings holds what `fidryn text uscode.next
+--json` prints to what `uslm_text.py` prints for the archives of the
+release, line for line, and the tables of contents that `usc_profile.py`
+counts in them to those that the ledger of the import,
+`uscode.next/coverage.json`, counts. The two scripts run with the Python
+that runs the tool, with `-I`. The two texts are held in two temporary
+files without a name, in the system's directory for temporary files, and
+compared one line of each at a time; each is as large as the text of the
+release, 652,907,379 bytes for release 119-142. A difference stops the
+replay before the change set, the replacement and the commit, as a check
+that fails does, naming the release and either the line, the address of
+its record, the beginnings of both lines and where they first differ, or
+the two counts. `--no-readings` leaves the comparison out, for a replay
+of releases whose readings were compared before, and the tool prints one
+line that says so.
 
 ```sh
 uv run --locked python -I tools/replay_uscode.py --archives DIR --repository DIR --fidryn PATH --cache-dir DIR
+uv run --locked python -I tools/replay_uscode.py --archives DIR --repository DIR --fidryn PATH --cache-dir DIR --no-readings
 ```
 
 The commits of the branch that is checked out, from its root, say where
@@ -319,21 +336,28 @@ name, which a run that was stopped left, is removed first, and a link, a
 directory or anything else of that name stops it and is left alone. Anything
 else stops it with what it found. The cache may not be the repository nor
 lie inside it, with links resolved on both sides. Each run of `fidryn`
-has a limit of its own on its address space and its time
-(`--memory-limit`, `--time-limit`). Exit `0` when every release is
+and of the two scripts has a limit of its own on its address space and
+its time (`--memory-limit`, `--time-limit`). Exit `0` when every release is
 committed, `1` when the replay stops at what it found, `2` when a command
 or a file cannot be run, read or written. `test_replay_order.py` holds
 the list to the publisher's, the reading of a history to the commits it
 names, and the replacement to its conditions, with no network and no
 binary. `test_replay_repository.py` replays three invented releases into
 a repository made with `git init` in a temporary directory, whose own
-configuration needs no signing key, with a stand-in for `fidryn`. Every
-git command it starts, and every one the tool runs, has neither the
-variables by which git finds a repository or its configuration nor the
-user's or the machine's configuration, so that inside a hook of git,
-where `GIT_DIR` names the calling repository, nothing is written there. It
-holds a
-complete replay; replays stopped by a failure, of the stand-in, of a hook
+configuration needs no signing key, with a stand-in for `fidryn`; the
+archive of each release holds one invented document, which the two
+scripts of the independent reading read, and the stand-in prints its text
+records. Every git command it starts, and every one the tool runs, has
+neither the variables by which git finds a repository or its
+configuration nor the user's or the machine's configuration, so that
+inside a hook of git, where `GIT_DIR` names the calling repository,
+nothing is written there. It holds a complete replay; releases whose two
+readings agree, which are committed; a release whose texts differ, and
+one whose counts of tables of contents differ, which is not committed,
+the repository left as a check that fails leaves it, and which the replay
+commits when it is started again with readings that agree; a replay with
+`--no-readings`, which compares nothing, commits every release and says
+so in one line; replays stopped by a failure, of the stand-in, of a hook
 or of one call of the tool, before the replacement, before the commit,
 between the removal of the manifest and of the directory, and after the
 commit, and started again; a workspace changed after its commit; a path

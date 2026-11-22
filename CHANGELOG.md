@@ -221,12 +221,19 @@ interchange schema versions are maintained independently of the interpreter.
 - `tools/replay_uscode.py`, which makes the 27 release points the
   publisher lists for 2026, in its order, the commits of a repository of
   the imported law: each release fetched when it is absent, imported into
-  `uscode.next/` and checked, its change set written to
-  `changes/<release>.json`, `uscode/` replaced, and the text form of the
-  change set committed as the message, read back and held to it byte for
-  byte. A replay that is stopped goes on from the release it was in; it
-  removes only `uscode/`, under stated conditions, and gives each run of
-  `fidryn` a limit on its address space and its time.
+  `uscode.next/` and checked, its two readings compared, its change set
+  written to `changes/<release>.json`, `uscode/` replaced, and the text
+  form of the change set committed as the message, read back and held to
+  it byte for byte. The comparison holds what `fidryn text uscode.next
+  --json` prints to what `conformance/uslm_text.py` prints for the
+  release's archives, line for line, and the tables of contents that
+  `conformance/usc_profile.py` counts to those of the import's ledger; a
+  difference stops the replay before the commit, naming the release and
+  the first line that differs or the two counts, and `--no-readings` skips
+  the comparison and says so. A replay that is stopped goes on from the
+  release it was in; it removes only `uscode/`, under stated conditions,
+  and gives each run of `fidryn` and of the two scripts a limit on its
+  address space and its time.
   `tools/draw_definition_samples.py` draws, with a seed and a generator
   written out in the tool, the two samples of 500 that a person reads to
   judge the extracted definitions and to estimate the ones the closed

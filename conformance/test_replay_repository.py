@@ -9,12 +9,14 @@ hook of git, among them), with an empty file of the test as the global configura
 and none of the system, so that neither the repository the tests are run from nor the
 user's or the machine's configuration is read or written. It replays three invented releases, whose archives are in place with
 their retrieval records, so that nothing is fetched; a call that would open a connection
-fails the test. The stand-in for `fidryn` is a shell script that reads no law: `ingest`
-writes a workspace of the invented title 99 for the release its archive directory is
-named for, `check` prints a summary that finds nothing, and `changes` prints a change set
-from the release of each of the two workspaces it is given. A replay is stopped at a
-point by making something fail there, the stand-in, a hook of the repository or one call
-of the tool, never by a signal, and is started again.
+fails the test. Each archive holds one invented document of the title 99, which the
+independent reading reads into the two records `TEXT_RECORDS`. The stand-in for `fidryn`
+is a shell script that reads no law: `ingest` writes a workspace of the invented title 99
+for the release its archive directory is named for, with a ledger that counts no table of
+contents, `check` prints a summary that finds nothing, `text` prints `TEXT_RECORDS`, and
+`changes` prints a change set from the release of each of the two workspaces it is
+given. A replay is stopped at a point by making something fail there, the stand-in, a
+hook of the repository or one call of the tool, never by a signal, and is started again.
 """
 
 from __future__ import annotations
@@ -42,8 +44,23 @@ import replay_uscode
 RELEASES = ("42-5not3", "42-5", "42-7")
 TEXT_FORM = "/us/usc: {old} to {new}\n\nInvented: the text form of a change set.\n"
 
-# `@SH@`, `@LOG@` and `@FAIL@` are filled in by `Replays.setUp`. A command fails when a
-# file named for it and its release stands in the directory `@FAIL@`.
+# The text records that `conformance/uslm_text.py` prints for the document of each
+# invented archive, and that the stand-in prints as `fidryn text`.
+TEXT_RECORDS = (
+    '{"address":"/us/usc/t99","layer":"operative","kind":"title","status":null,'
+    '"num":["99","Title 99"],"heading":{"text":"Invented","refs":[],"sup":[],"sub":[]},'
+    '"aliases":[],"within":null,"members":["/us/usc/t99/s1"]}',
+    '{"address":"/us/usc/t99/s1","layer":"operative","kind":"section","status":null,'
+    '"num":["1","1."],"heading":{"text":"Invented","refs":[],"sup":[],"sub":[]},'
+    '"items":[{"part":"content","blocks":[{"p":"Invented text.","refs":[],"sup":[],"sub":[]}]}],'
+    '"aliases":[],"within":"/us/usc/t99","source":"usc99.xml","positive_law":true}',
+)
+
+# `@SH@`, `@LOG@`, `@FAIL@`, `@FIRST@` and `@SECOND@` are filled in by `Replays.setUp`.
+# A command fails when a file named for it and its release stands in the directory
+# `@FAIL@`. When `@FAIL@/text-<release>` stands there, `text` prints another word in
+# the second record; when `@FAIL@/toc-<release>` does, the ledger of the import counts
+# one table of contents.
 STAND_IN = """#!@SH@
 # Invented: a stand-in for fidryn in the tests of the replay. It reads no law.
 set -eu
@@ -62,12 +79,24 @@ case $1 in
             "$release" > "$5/workspace.json"
         printf '{"schema": "fidryn.law-lock/v0.1", "prefix": "/us/usc", "release": "%s"}\\n' \\
             "$release" > "$5/law.lock.json"
+        tables=0
+        [ ! -e "@FAIL@/toc-$release" ] || tables=1
+        printf '{"schema": "fidryn.coverage/v0.1", "totals": {"not_imported": {"tables_of_contents": %s}}}\\n' \\
+            "$tables" > "$5/coverage.json"
         printf 'ingested: 1 unit, 0 containers from 1 archive (release %s)\\n' "$release"
         ;;
     check)
         release=$(release_of "$2")
         [ ! -e "@FAIL@/check-$release" ] || exit 1
         printf 'modules: 1; from cache: 0; errors: 0; warnings: 0\\nok\\n'
+        ;;
+    text)
+        release=$(release_of "$2")
+        second='@SECOND@'
+        if [ -e "@FAIL@/text-$release" ]; then
+            second=$(printf '%s' "$second" | sed 's/Invented text\\./Other text./')
+        fi
+        printf '%s\\n%s\\n' '@FIRST@' "$second"
         ;;
     changes)
         old=$(release_of "$2")
@@ -122,11 +151,23 @@ def isolated(environment: dict[str, str], config: Path) -> dict[str, str]:
 
 
 def invented_archive(release: str) -> bytes:
+    """An archive of one invented document of the title 99, which names `release`."""
+    document = (
+        f"<!-- Invented for the tests of the replay: {release}. -->\n"
+        '<uscDoc xmlns="http://xml.house.gov/schemas/uslm/1.0" '
+        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+        'xsi:schemaLocation="http://xml.house.gov/schemas/uslm/1.0 USLM-1.0.15.xsd">\n'
+        f"<meta><docPublicationName>Online@{release}</docPublicationName>"
+        '<property role="is-positive-law">yes</property></meta>\n'
+        '<main><title identifier="/us/usc/t99"><num value="99">Title 99</num>'
+        "<heading>Invented</heading>\n"
+        '<section identifier="/us/usc/t99/s1"><num value="1">1.</num><heading>Invented</heading>'
+        "<content>Invented text.</content></section>\n"
+        "</title></main>\n</uscDoc>\n"
+    )
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
-        archive.writestr(
-            "usc99.xml", f"<!-- Invented for the tests of the replay: {release}. -->\n<p/>\n"
-        )
+        archive.writestr("usc99.xml", document)
     return buffer.getvalue()
 
 
@@ -162,7 +203,9 @@ class Replays(unittest.TestCase):
             path.write_text(
                 text.replace("@SH@", sh)
                 .replace("@LOG@", str(self.log))
-                .replace("@FAIL@", str(self.failing)),
+                .replace("@FAIL@", str(self.failing))
+                .replace("@FIRST@", TEXT_RECORDS[0])
+                .replace("@SECOND@", TEXT_RECORDS[1]),
                 encoding="utf-8",
             )
             path.chmod(0o755)
@@ -213,11 +256,11 @@ class Replays(unittest.TestCase):
             self.git("config", "--local", key, value, at=directory)
 
     def replay(
-        self, repository: Path | None = None, cache: Path | None = None
+        self, repository: Path | None = None, cache: Path | None = None, *options: str
     ) -> tuple[int, str, str]:
-        """Runs the tool on the invented releases, and gives its exit status, that of a
-        refusal of its arguments too, and what it printed; the opening of a connection
-        fails the test."""
+        """Runs the tool on the invented releases, with `options` after its other
+        arguments, and gives its exit status, that of a refusal of its arguments too, and
+        what it printed; the opening of a connection fails the test."""
         stdout, stderr = io.StringIO(), io.StringIO()
         given = [
             "--archives",
@@ -234,6 +277,7 @@ class Replays(unittest.TestCase):
             str(2 << 30),
             "--time-limit",
             "60",
+            *options,
         ]
         connection = AssertionError("the replay opened a connection")
         with (
@@ -281,6 +325,7 @@ class Replays(unittest.TestCase):
                     ".gitattributes",
                     ".gitignore",
                     *changes,
+                    "uscode/coverage.json",
                     "uscode/law.lock.json",
                     "uscode/us/usc/t99.fr",
                     "uscode/workspace.json",
@@ -330,10 +375,10 @@ class Complete(Replays):
             self.git("show", "HEAD:.gitattributes") + self.git("show", "HEAD:.gitignore"),
             "* -text\n.fidryn-cache/\nuscode.next/\n",
         )
-        # Each release is imported, checked and compared once.
+        # Each release is imported, checked, read back and compared once.
         self.assertEqual(
             [line.split()[0] for line in self.commands()],
-            ["ingest", "check"] + ["ingest", "check", "changes", "changes"] * 2,
+            ["ingest", "check", "text"] + ["ingest", "check", "text", "changes", "changes"] * 2,
         )
         # Run again, it finds every release committed and makes no commit.
         status, stdout, stderr = self.replay()
@@ -450,6 +495,80 @@ class Resumed(Replays):
         self.assertEqual((status, stderr), (0, ""))
         self.assertIn("42-7: the text form was kept: the replacement is finished\n", stdout)
         self.assertEqual(self.assert_complete(), self.uninterrupted())
+
+
+class Readings(Replays):
+    def test_a_release_whose_two_readings_agree_is_committed(self) -> None:
+        status, stdout, stderr = self.replay()
+        self.assertEqual((status, stderr), (0, ""))
+        self.assert_complete()
+        for release in RELEASES:
+            self.assertIn(
+                f"{release}: the two readings agree: 2 records, 0 tables of contents\n", stdout
+            )
+        # Each import is read back once, before the replacement and the commit.
+        self.assertEqual(
+            [line for line in self.commands() if line.startswith("text ")],
+            ["text uscode.next --json"] * len(RELEASES),
+        )
+
+    def stopped_by_a_difference(self, failing: str, *words: str) -> None:
+        """Makes the readings of 42-5 differ with the file `failing`, and holds the
+        replay to stop before the commit of 42-5, with `words` in what it says, and to
+        leave the repository as a stop before the replacement leaves it; then starts it
+        again with readings that agree."""
+        (self.failing / failing).touch()
+        status, _, stderr = self.replay()
+        self.assertEqual(status, 1, stderr)
+        self.assertTrue(stderr.startswith("stopped: "), stderr)
+        for word in words:
+            self.assertIn(word, stderr)
+        # As after the stop of a check: the release before is committed, the import of
+        # 42-5 stands in `uscode.next`, and neither a text form nor a change set of it is
+        # kept.
+        self.assertEqual(len(self.history()), 1)
+        self.assertFalse(self.state().exists())
+        self.assertFalse((self.repository / "changes").exists())
+        manifest = json.loads((self.repository / "uscode" / "workspace.json").read_text("utf-8"))
+        self.assertEqual(manifest["release"], RELEASES[0])
+        manifest = json.loads(
+            (self.repository / "uscode.next" / "workspace.json").read_text("utf-8")
+        )
+        self.assertEqual(manifest["release"], "42-5")
+        (self.failing / failing).unlink()
+        status, stdout, stderr = self.replay()
+        self.assertEqual((status, stderr), (0, ""))
+        self.assertTrue(stdout.startswith("1 of 3 releases are committed\n"), stdout)
+        self.assertEqual(self.assert_complete(), self.uninterrupted())
+
+    def test_a_release_whose_two_texts_differ_is_not_committed(self) -> None:
+        self.stopped_by_a_difference(
+            "text-42-5",
+            "the two readings of 42-5 differ at line 2, the record of /us/usc/t99/s1",
+            '`fidryn text uscode.next --json` prints `{"address":"/us/usc/t99/s1",',
+            '`uslm_text.py` prints `{"address":"/us/usc/t99/s1",',
+            "Other text.",
+            "Invented text.",
+        )
+
+    def test_a_release_whose_counts_of_tables_of_contents_differ_is_not_committed(self) -> None:
+        self.stopped_by_a_difference(
+            "toc-42-5",
+            "the tables of contents of 42-5 are counted 0 by `usc_profile.py` and 1 in the "
+            "ledger of the import",
+        )
+
+    def test_no_readings_commits_without_the_comparison_and_says_so(self) -> None:
+        # Readings that differ are not compared, and do not stop the replay.
+        (self.failing / "text-42-5").touch()
+        (self.failing / "toc-42-7").touch()
+        status, stdout, stderr = self.replay(None, None, "--no-readings")
+        self.assertEqual((status, stderr), (0, ""))
+        self.assert_complete()
+        line = "the two readings of the releases are not compared (--no-readings)\n"
+        self.assertEqual(stdout.count(line), 1, stdout)
+        self.assertNotIn("the two readings agree", stdout)
+        self.assertNotIn("text", [command.split()[0] for command in self.commands()])
 
 
 class Refusals(Replays):

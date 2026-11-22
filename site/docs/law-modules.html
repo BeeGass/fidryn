@@ -2478,9 +2478,9 @@ own.</li>
 <h3 id="the-ingester-and-the-independent-reading"><span class="hn">4.21.6</span> The ingester and the independent reading <a class="anchor" href="#the-ingester-and-the-independent-reading" aria-label="Link to this section">#</a></h3>
 <ul>
 <li>
-<p>The ingester and <code>conformance/uslm_text.py</code> read by one rule the rare
-forms of the publisher's XML on which they once differed: a
-<code>continuation</code> or a <code>proviso</code> inside a <code>content</code> directly in a note; a
+<p>The ingester and <code>conformance/uslm_text.py</code> read these rare forms of the
+publisher's XML by one rule: a <code>continuation</code> or a <code>proviso</code> inside a
+<code>content</code> directly in a note; a
 <code>note</code> in quoted content anywhere but directly in it or in one of its
 levels; white space inside a <code>br</code>, an <code>img</code> or a column; an identifier
 with an empty member; the words of the class of a <code>ref</code>; a <code>num</code> or a
@@ -2518,8 +2518,9 @@ its archives against what <code>fidryn text DIR --json</code> prints for its
 workspace. That comparison, with the counts of tables of contents of
 <code>conformance/usc_profile.py</code> against the ledger, is what would show any
 other form the two read differently. The check of <a href="#the-sample">the sample</a>
-makes both comparisons for the sample; neither an import nor the replay of
-releases makes them.</p>
+makes both comparisons for the sample, and <code>tools/replay_uscode.py</code> makes
+them for each release it replays, before it commits the release, unless
+it is given <code>--no-readings</code>; an import makes neither.</p>
 </li>
 <li>
 <p>The independent reading refuses the nesting the ingester refuses, by the

@@ -2636,9 +2636,9 @@ more.
 
 ### The ingester and the independent reading
 
-- The ingester and `conformance/uslm_text.py` read by one rule the rare
-  forms of the publisher's XML on which they once differed: a
-  `continuation` or a `proviso` inside a `content` directly in a note; a
+- The ingester and `conformance/uslm_text.py` read these rare forms of the
+  publisher's XML by one rule: a `continuation` or a `proviso` inside a
+  `content` directly in a note; a
   `note` in quoted content anywhere but directly in it or in one of its
   levels; white space inside a `br`, an `img` or a column; an identifier
   with an empty member; the words of the class of a `ref`; a `num` or a
@@ -2673,8 +2673,9 @@ more.
   workspace. That comparison, with the counts of tables of contents of
   `conformance/usc_profile.py` against the ledger, is what would show any
   other form the two read differently. The check of [the sample](#the-sample)
-  makes both comparisons for the sample; neither an import nor the replay of
-  releases makes them.
+  makes both comparisons for the sample, and `tools/replay_uscode.py` makes
+  them for each release it replays, before it commits the release, unless
+  it is given `--no-readings`; an import makes neither.
 - The independent reading refuses the nesting the ingester refuses, by the
   same rule, but has no bound on the number of nodes of a document: it
   reads a document the ingester refuses for its size, given the memory,
