@@ -292,7 +292,7 @@ interchange schema versions are maintained independently of the interpreter.
   header, and refuse a member whose header declares fewer bytes than it
   holds.
 
-## [0.2.0] - 2026-11-16
+## [0.2.0] - 2026-11-22
 
 ### Changed
 
