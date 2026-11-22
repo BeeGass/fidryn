@@ -1,0 +1,79 @@
+edition 2
+module "/us/usc/ptIX/rule9002" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9002" courtRule {
+    num "9002" "Rule 9002."
+    heading "Meaning of Words in the Federal Rules of Civil Procedure"
+    chapeau "Unless they are inconsistent with the context, the following words and phrases in the Federal Rules of Civil Procedure—when made applicable by these rules—have these meanings:"
+    provision "/us/usc/ptIX/rule9002/a" subsection {
+      num "a" "(a)"
+      chapeau "“Action” or “civil action” means an adversary proceeding or, when appropriate:"
+      provision "/us/usc/ptIX/rule9002/a/1" paragraph {
+        num "1" "(1)"
+        content "a contested petition;"
+        hash "3e40c2b096d241ca1d100ca8b7cac17e0d9542944c9abb45c8e6bd9a39d8f459"
+      }
+      provision "/us/usc/ptIX/rule9002/a/2" paragraph {
+        num "2" "(2)"
+        content "a proceeding to vacate an order for relief; or"
+        hash "8c6643ef92796bbbc4a4937f478344d0e55296a035b7b3cd5663fb42f255058b"
+      }
+      provision "/us/usc/ptIX/rule9002/a/3" paragraph {
+        num "3" "(3)"
+        content "a proceeding to determine any other contested matter."
+        hash "5453a389210237762936350c4cc2b5d4e26a3f29bb2002073bb5e2a23f463814"
+      }
+      hash "e3875397c144b4c9fc286d6fba02c31e4c5f806d9128607afb3f17b3a8667b45"
+    }
+    provision "/us/usc/ptIX/rule9002/b" subsection {
+      num "b" "(b)"
+      content "“Appeal” means an appeal under 28 U.S.C. § 158."
+      hash "ca76bfbf5009f50f64065b141c3e6543dbcc41a66ec5bdd293260c0bb26a26ee"
+    }
+    provision "/us/usc/ptIX/rule9002/c" subsection {
+      num "c" "(c)"
+      content "“Clerk” or “clerk of the district court” means the officer responsible for maintaining the district’s bankruptcy records."
+      hash "d9deb5be7133c2699fc7d378b8d05a526c79555236badc3a476c24889c216331"
+    }
+    provision "/us/usc/ptIX/rule9002/d" subsection {
+      num "d" "(d)"
+      content "“District court,” “trial court,” “court,” “district judge,” or “judge” means bankruptcy judge if the case or proceeding is pending before a bankruptcy judge."
+      hash "ee712589f875068f26cc1e8864e7de942f5295de6ad3a8eba99ea06fce7bd066"
+    }
+    provision "/us/usc/ptIX/rule9002/e" subsection {
+      num "e" "(e)"
+      content "“Judgment” includes any appealable order."
+      hash "e3a3184ea2105ee2ad372daefc82e8ace2faae5fb532f156b19c084d58f0b0aa"
+    }
+    hash "d237d7d299279562e8915565310aafc861a7190434b1be5ad16a66b1c2dda1e9"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "This rule is revised to include the words “district judge” in anticipation of amendments to the Federal Rules of Civil Procedure."
+    hash "e48cf2d8ee2476d0fe309ab4df871d26262e79adb79abc4d240a8e45201c613d"
+  }
+  note "/us/usc/ptIX/rule9002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9002 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "1274f21662e37f8f263fd3075efa98ba5f6b1e1c1df1c8423726805bfa296668"
+  }
+  note "/us/usc/ptIX/rule9002/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "d237d7d299279562e8915565310aafc861a7190434b1be5ad16a66b1c2dda1e9"
+    enacted "cdad0dcbb5d5c31a9d0660125abefde6293cef86d45803e0f588b34cb2332b4a"
+    editorial "c734d1ab7ce48a94b19d6058bb8b3b3122f6f8f94e75380cea8c8c2354529f4c"
+  }
+}

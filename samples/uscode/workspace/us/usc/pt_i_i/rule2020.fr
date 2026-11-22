@@ -1,0 +1,33 @@
+edition 2
+module "/us/usc/ptII/rule2020" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2020" courtRule {
+    num "2020" "Rule 2020."
+    heading "Reviewing an Act by a United States Trustee"
+    content "A proceeding to contest any act or failure to act by a United States trustee is governed by Rule 9014."
+    hash "9e08ee71de28f94bfd68f3aa45035a9a88f8a0e17c5bbfa110f6035f6dae0b95"
+  }
+  credit "(Added Apr. 30, 1991, eff. Aug. 1, 1991; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2020/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991"
+    p "The United States trustee performs administrative functions, such as the convening of the meeting of creditors and the appointment of trustees and committees. Most of the acts of the United States trustee are not controversial and will go unchallenged. However, the United States trustee is not a judicial officer and does not resolve disputes regarding the propriety of its own actions. This rule, which is new, provides a procedure for judicial review of the United States trustee’s acts or failure to act in connection with the administration of the case. For example, if the United States trustee schedules a § 341 meeting to be held 90 days after the petition is filed, and a party in interest wishes to challenge the propriety of that act in view of § 341(a) of the Code and Rule 2003 which requires that the meeting be held not more than 40 days after the order for relief, this rule permits the party to do so by motion."
+    p "This rule provides for review of acts already committed by the United States trustee, but does not provide for advisory opinions in advance of the act. This rule is not intended to limit the discretion of the United States trustee, provided that the United States trustee’s act is authorized by, and in compliance with, the Code, title 28, these rules, and other applicable law."
+    hash "f985d6a3cd2b0bedcbf586faa4ad74ac55ee11541805fbf1c35f864a03078364"
+  }
+  note "/us/usc/ptII/rule2020/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2020 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "52d1b4ccd4a40c5d5b6dfd590de3becb3d180a5653c4ffe45da519c8a5992558"
+  }
+  layers {
+    operative "9e08ee71de28f94bfd68f3aa45035a9a88f8a0e17c5bbfa110f6035f6dae0b95"
+    enacted "72e27c71ceb7d1ce372327aac4c2ce4f9d3f48f1ee2a07e5f6f91b423ecd43e0"
+    editorial "6e221db452d28524b07181ff93d05672627360650a5762869a1fa53bda8724d3"
+  }
+}

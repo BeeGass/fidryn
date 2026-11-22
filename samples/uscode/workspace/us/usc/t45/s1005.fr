@@ -1,0 +1,108 @@
+edition 2
+module "/us/usc/t45/s1005" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1005" section {
+    num "1005" "§ 1005."
+    heading "Employee protection agreement"
+    provision "/us/usc/t45/s1005/a" subsection {
+      num "a" "(a)"
+      heading "Authorization; time for agreement; use of funds"
+      chapeau "The Secretary and the representatives of the various classes and crafts of employees of the Rock Island Railroad shall, not later than 90 days after January 14, 1983, enter into an agreement providing protection for employees of the Rock Island Railroad who are adversely affected as a result of a reduction in service by such Railroad. Such agreement may provide for the use of funds described in subsection (c) of this section for the following purposes:"
+      provision "/us/usc/t45/s1005/a/1" paragraph {
+        num "1" "(1)"
+        content "Subsistence allowances to employees."
+        hash "0cc88b90af4288d57ccec89f7b4cd7ac04ccbd5ad62884a458729f5bba421898"
+      }
+      provision "/us/usc/t45/s1005/a/2" paragraph {
+        num "2" "(2)"
+        content "Moving expenses for employees who must make a change in residence."
+        hash "77b0ca6eb825807cd7f631d4f12b38d7e2b1d6b3e69babebb02a9cc473f5785c"
+      }
+      provision "/us/usc/t45/s1005/a/3" paragraph {
+        num "3" "(3)"
+        content "Retraining expenses for employees who are seeking employment in new areas."
+        hash "eb0af1b72098a798140597316fb6d18cac44424ff159026c7b7544c5b28785e7"
+      }
+      provision "/us/usc/t45/s1005/a/4" paragraph {
+        num "4" "(4)"
+        content "Separation allowances for employees."
+        hash "986050e5941fbdafdd02d836b3fb378cb8b08e7414d000b40aa25827719f63bc"
+      }
+      provision "/us/usc/t45/s1005/a/5" paragraph {
+        num "5" "(5)"
+        content "Health and welfare insurance premiums."
+        hash "9aded96af8938ce186136acd4c5dc9177d70aa624e35611743dfe0811f8b26c0"
+      }
+      provision "/us/usc/t45/s1005/a/6" paragraph {
+        num "6" "(6)"
+        content "Such other purposes as may be agreed upon by the parties."
+        hash "7b6994a4737515f36d65e32aa2ba7944a792f72e1de043eb518b1d3084b89bc1"
+      }
+      hash "af4e6ba4bef0b9b417346da4c1b99c5d2ac2297a07f7eda6945faf87c5eba0a8"
+    }
+    provision "/us/usc/t45/s1005/b" subsection {
+      num "b" "(b)"
+      heading "Failure to reach agreement; benefit schedule"
+      content "If the parties are unable to reach agreement within the time period specified in subsection (a) of this section, the Secretary shall, within 30 days after the expiration of such time period, prescribe a schedule of benefits for employee protection not inconsistent with the provisions of this chapter."
+      hash "c079ac7aaee18204aff56b8ad2bea5f7a3d19617de884e9b9d7eaf4dbb1bccd1"
+    }
+    provision "/us/usc/t45/s1005/c" subsection {
+      num "c" "(c)"
+      heading "Limitations on funds"
+      content "Any agreement entered into under subsection (a) of this section, and any benefit schedule prescribed under subsection (b) of this section, shall not require the expenditure of funds in excess of amounts authorized to be appropriated under " ["section 727(f)(1)(C) of this title" -> "/us/usc/t45/s727/f/1/C"] ", nor shall any individual employee receive benefits in excess of $20,000 under such agreement or benefit schedule. No benefits or assistance may be provided under any agreement entered into or benefit schedule prescribed under this section after April 1, 1984."
+      hash "ae53e9a4eace8068038479fce66ce2270a223c988d4593a105e5d423df27e54f"
+    }
+    provision "/us/usc/t45/s1005/d" subsection {
+      num "d" "(d)"
+      heading "Administration of funds; promulgation of regulations"
+      content "The Board shall, in such manner as it shall prescribe by regulation, administer the distribution of funds under any agreement entered into or benefit schedule prescribed under this section, and shall determine the amount for which each employee is eligible under such agreement or benefit schedule. Such regulation shall include procedures to resolve by final and binding arbitration any dispute over an employee’s eligibility or claim."
+      hash "58418cbe5c416b94bd5bb7a7425dd6a3592011392c81f05124f8cd81ba756621"
+    }
+    hash "a6968b43148dc85021a1c4b0f58b4c87a99de48347343a66e0fdec3a1617b5a0"
+  }
+  credit "(" ["Pub. L. 96–254, title I, § 106" -> "/us/pl/96/254/tI/s106"] ", May 30, 1980, " ["94 Stat. 401" -> "/us/stat/94/401"] "; " ["Pub. L. 96–448, title VII, § 701(b)(1)" -> "/us/pl/96/448/tVII/s701/b/1"] ", Oct. 14, 1980, " ["94 Stat. 1959" -> "/us/stat/94/1959"] "; " ["Pub. L. 97–468, title II, § 231" -> "/us/pl/97/468/tII/s231"] ", Jan. 14, 1983, " ["96 Stat. 2546" -> "/us/stat/96/2546"] ".)"
+  note "/us/usc/t45/s1005/note/editorialNotes/pl.96.254/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This chapter, referred to in subsec. (b), was in the original “this Act”, which probably was meant to be a reference to “this title”, meaning title I (§ 101 et seq.) of " ["Pub. L. 96–254" -> "/us/pl/96/254"] ", May 30, 1980, " ["94 Stat. 399" -> "/us/stat/94/399"] ", as amended, known as the Rock Island Railroad Transition and Employee Assistance Act, which is classified principally to this chapter. For complete classification of title I to the Code, see Short Title note set out under " ["section 1001 of this title" -> "/us/usc/t45/s1001"] " and Tables."
+    hash "d884f7dddd44cb0519053f2a16b1ff655be1dabb46787456459c5fbc34e32618"
+  }
+  note "/us/usc/t45/s1005/note/editorialNotes/pl.96.254/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Prior to the general amendment of " ["section 106 of Pub. L. 96–254" -> "/us/pl/96/254/s106"] " by " ["Pub. L. 97–468" -> "/us/pl/97/468"] ", section was comprised of subsecs. (a) to (e) of " ["section 106 of Pub. L. 96–254" -> "/us/pl/96/254/s106"] ", and subsec. (f) of section 106 amended " ["section 231f(b)(7) of this title" -> "/us/usc/t45/s231f/b/7"] "."
+    hash "61e16724fb669c23fc4bb6501a929c1f2bd82f1c2de44abbe8a28677f6eaf6c3"
+  }
+  note "/us/usc/t45/s1005/note/editorialNotes/pl.97.468/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1983—Subsec. (a). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " substituted provisions relating to an agreement between the Secretary and the employees for provisions relating to an agreement between the Rock Island Railroad and the employees."
+    p "Subsec. (b). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " substituted provisions relating to the prescription of benefits by the Secretary if no agreement is reached with the employees, for provisions relating to imposition of agreement by the Interstate Commerce Commission if none was reached between the Rock Island Railroad and the employees."
+    p "Subsec. (c). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " added subsec. (c). Former subsec. (c), which related to direction to the bankruptcy trustee to carry out the agreement between the Rock Island Railroad and the employees, was struck out."
+    p "Subsec. (d). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " added subsec. (d). Former subsec. (d), which prescribed conditions for appeals from orders of the Commission or bankruptcy court, limiting them to the Seventh Circuit Court of Appeals, was struck out."
+    p "Subsec. (e). " ["Pub. L. 97–468" -> "/us/pl/97/468"] " struck out subsec. (e) which related to prescription of regulations by the Board for the filing and payment of benefits and allowances."
+    p "1980—Subsec. (a). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " substituted “5 days after October 14, 1980” for “10 days after May 30, 1980”."
+    p "Subsec. (b). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " substituted “5 days after October 14, 1980” for “10 days after May 30, 1980” and “15 days after October 14, 1980” for “30 days after May 30, 1980”."
+    p "Subsec. (c). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " reenacted subsec. (c) without change."
+    p "Subsec. (d). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " substituted provision that any order of the Commission or bankruptcy court be appealed only to the United States Court of Appeals for the Seventh Circuit for provision that an order of the Commission not be stayed by the Commission or any other court, an order by the bankruptcy court not be stayed by any other court, appeals of Commission or bankruptcy court orders only be made to the court of appeals of the United States having jurisdiction to review decisions and orders of the bankruptcy court, and no determinations of the court of appeals be review in any other court."
+    p "Subsec. (e). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " reenacted subsec. (e) without change."
+    hash "9c70cc83bb20b67a15186e9bb9208efbde60199643ee991d32127c83c5a95037"
+  }
+  note "/us/usc/t45/s1005/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1980 Amendment"
+    p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 14, 1980, see " ["section 710(d) of Pub. L. 96–448" -> "/us/pl/96/448/s710/d"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
+    hash "5bd57dc238e4804a5a01c5250e2074da2589039fa458d2c6ff972282781779c6"
+  }
+  layers {
+    operative "a6968b43148dc85021a1c4b0f58b4c87a99de48347343a66e0fdec3a1617b5a0"
+    enacted "3b9398a342378f4f88fcf453153aedb475e8ceb6856e97688d6ff08ac0096b4a"
+    editorial "a311843409abaca2423ddc497e3ae74f6d96dc8860ff65ec22fd5144816b9c99"
+  }
+}

@@ -1,0 +1,64 @@
+edition 2
+module "/zz/demo/t1/s8" {
+  within "/zz/demo/t1/ch1"
+  source "demo01.xml"
+  positive_law true
+  provision "/zz/demo/t1/s8" section {
+    num "8" "§ 8."
+    heading "Words that include a widget"
+    provision "/zz/demo/t1/s8/a" subsection {
+      num "a" "(a)"
+      content "As used in " ["section 2 of this title" -> "/zz/demo/t1/s2"] ", the term “widget” means a small device."
+      hash "ec085e67853dd9ced4dafa9836e747dc158ae35ed76f628d9b1eacbd6937be77"
+    }
+    provision "/zz/demo/t1/s8/b" subsection {
+      num "b" "(b)"
+      heading "Sizes"
+      content {
+        p "A widget comes in the sizes of this table." mark "1" 1
+        table {
+          head {
+            th "Size"
+            th "Width"
+          }
+          body {
+            td "small"
+            td "1 inch"
+          }
+          body {
+            td "large"
+            td ""
+          }
+          foot {
+            td span 2 1 "Every width is invented."
+          }
+        }
+      }
+      hash "f36533507953a8ee2c81864d9db0cda382347b2322c0df95de608eef5c5c62a3"
+    }
+    hash "699c00e650aa1e79b5d4fa480684eb557f327ebdb41a043553535a12ab189a31"
+  }
+  credit "(Added by an invented act.)"
+  note "/zz/demo/t1/s8/note/editorialNotes/nolaw/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "This invented section was enacted as part of an invented code."
+    hash "c3b231e97013f057f0ca7072b0aec4cde6432fa8567fe131b4065c60eefb864e"
+  }
+  footnote 1 "1" {
+    p "So in the invented original."
+  }
+  definition "/zz/demo/t1/s8/a" {
+    term "widget"
+    kind means
+    words "As used in section 2 of this title"
+    region "/zz/demo/t1/s2"
+    basis enacted
+  }
+  layers {
+    operative "699c00e650aa1e79b5d4fa480684eb557f327ebdb41a043553535a12ab189a31"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "ddcc1297ec38d082f41d0dc581020c81cbb1c1ede2e221dd58b8000528b4cc40"
+  }
+}

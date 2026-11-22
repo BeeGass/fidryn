@@ -1,0 +1,131 @@
+edition 2
+module "/us/usc/ptII/rule2007.1" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2007.1" courtRule {
+    num "2007.1" "Rule 2007.1."
+    heading "Appointing a Trustee or Examiner in a Chapter 11 Case"
+    provision "/us/usc/ptII/rule2007.1/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content "In a Chapter 11 case, a motion to appoint a trustee or examiner under § 1104(a) or (c) must be made in accordance with Rule 9014."
+      hash "93090e1ed4d19e08afbba8433dd0558d185975c9f33e59dba8366ef3923c5002"
+    }
+    provision "/us/usc/ptII/rule2007.1/b" subsection {
+      num "b" "(b)"
+      heading "Requesting the United States Trustee to Convene a Meeting of Creditors to Elect a Trustee."
+      provision "/us/usc/ptII/rule2007.1/b/1" paragraph {
+        num "1" "(1)"
+        content "In General. A request to the United States trustee to convene a meeting of creditors to elect a trustee must be filed and sent to the United States trustee in accordance with Rule 5005 and within the time prescribed by § 1104(b). Pending court approval of the person elected, any person appointed by the United States trustee under § 1104(d) and approved under (c) below must serve as trustee."
+        hash "af076ef2d8b6c4822d0b05c02b11af83bbf72e4685d3636dfcb9da21a8be7e91"
+      }
+      provision "/us/usc/ptII/rule2007.1/b/2" paragraph {
+        num "2" "(2)"
+        content "Notice and Manner of Conducting the Election. A trustee’s election under § 1104(b) must be conducted as Rules 2003(b)(3) and 2006 provide, and notice of the meeting of creditors must be given as Rule 2002 provides. The United States trustee must preside at the meeting. A proxy to vote in the election may be solicited only by a creditors’ committee appointed under § 1102 or by another party entitled to solicit a proxy under Rule 2006."
+        hash "37b8ab441c433fee1479e5933156033f2bfc44f54bc12606f31c5091d6d4b114"
+      }
+      provision "/us/usc/ptII/rule2007.1/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Reporting Election Results; Resolving Disputes."
+        provision "/us/usc/ptII/rule2007.1/b/3/A" subparagraph {
+          num "A" "(A)"
+          content {
+            p "Undisputed Election. If the election is undisputed, the United States trustee must promptly file a report certifying the election, including the name and address of the person elected and a statement that the election is undisputed. The report must be accompanied by a verified statement of the person elected setting forth that person’s connections with:"
+            p "• the debtor;"
+            p "• creditors;"
+            p "• any other party in interest;"
+            p "• their respective attorneys and accountants;"
+            p "• the United States trustee; or"
+            p "• any person employed in the United States trustee’s office."
+          }
+          hash "07442a984a68d72dcb5bce090e554aab451253c1efe5b2a7feb6bbcc598be61d"
+        }
+        provision "/us/usc/ptII/rule2007.1/b/3/B" subparagraph {
+          num "B" "(B)"
+          chapeau "Disputed Election. If the election is disputed, the United States trustee must promptly file a report stating that the election is disputed, informing the court of the nature of the dispute and listing the name and address of any candidate elected under any alternative presented by the dispute. The report must be accompanied by a verified statement by each candidate, setting forth the candidate’s connections with any entity listed in (A)(i)–(vi)." mark "1" 1 " No later than the date on which the report is filed, the United States trustee must mail a copy and each verified statement to:"
+          provision "/us/usc/ptII/rule2007.1/b/3/B/i" clause {
+            num "i" "(i)"
+            content "any party in interest that has made a request to convene a meeting under § 1104(b) or to receive a copy of the report; and"
+            hash "74022f2cb2dcb7872d576d10e515e84c0eef7c7b233b732eceaf0373a036bd87"
+          }
+          provision "/us/usc/ptII/rule2007.1/b/3/B/ii" clause {
+            num "ii" "(ii)"
+            content "any committee appointed under § 1102."
+            hash "df534d5739a804a076a10fc7ad22ce59c06186efc0980f79d5a4a1343327c0e0"
+          }
+          hash "a3b3d8debb4d88efe700f9452dd65594b949468ee069b36d3496b879fa319b84"
+        }
+        hash "4fd21173dcf8c420d909dc4f4ed56059d52a1ec24edba67fbe644a153049557d"
+      }
+      hash "298c103c2f00a92792a46c25a05db32260e20ebf8b65452e7b55d0c52c2ffd38"
+    }
+    provision "/us/usc/ptII/rule2007.1/c" subsection {
+      num "c" "(c)"
+      heading "Approving an Appointment."
+      chapeau "On application of the United States trustee, the court may approve a trustee’s or examiner’s appointment under § 1104(d). The application must:"
+      provision "/us/usc/ptII/rule2007.1/c/1" paragraph {
+        num "1" "(1)"
+        content "name the person appointed and state, to the best of the applicant’s knowledge, all that person’s connections with any entity listed in (b)(3)(A)(i)–(vi); " sup "1"
+        hash "979b8ebcc6daab4f830cf7fc16f74d809a537453082eed55fe3ab8df8616dc6e"
+      }
+      provision "/us/usc/ptII/rule2007.1/c/2" paragraph {
+        num "2" "(2)"
+        content "state the names of the parties in interest with whom the United States trustee consulted about the appointment; and"
+        hash "5bd9efd50e5cdefc9c4dfa6723d0cd1901615bc0ec12845802244c0d7e08a57e"
+      }
+      provision "/us/usc/ptII/rule2007.1/c/3" paragraph {
+        num "3" "(3)"
+        content "be accompanied by a verified statement of the person appointed setting forth that person’s connections with any entity listed in (b)(3)(A)(i)–(vi)." sup "1"
+        hash "ae49604e7a11956a56a1a93d09aa4edcea06d725d582df1851ffcc851bfab398"
+      }
+      hash "c6a0f8db72ac2d748ea54d5be65d8569bccdaf8dc99aea109893c9ef5ae396c1"
+    }
+    hash "f106591d587b90a01fa179f3cd03083b31d0ebc6bd1351c2719e47ced2c57b0a"
+  }
+  credit "(Added Apr. 30, 1991, eff. Aug. 1, 1991; amended Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991"
+    p "This rule is added to implement the 1986 amendments to § 1104 of the Code regarding the appointment of a trustee or examiner in a chapter 11 case. A motion for an order to appoint a trustee or examiner is a contested matter. Although the court decides whether the appointment is warranted under the particular facts of the case, it is the United States trustee who makes the appointment pursuant to § 1104(c) [now 1104(d)] of the Code. The appointment is subject to approval of the court, however, which may be obtained by application of the United States trustee. Section 1104(c) [now 1104(d)] of the Code requires that the appointment be made after consultation with parties in interest and that the person appointed be disinterested."
+    p "The requirement that connections with the United States trustee or persons employed in the United States trustee’s office be revealed is not intended to enlarge the definition of “disinterested person” in § 101(13) [now 101(14)] of the Code, to supersede executive regulations or other laws relating to appointments by United States trustees, or to otherwise restrict the United States trustee’s discretion in making appointments. This information is required, however, in the interest of full disclosure and confidence in the appointment process and to give the court all information that may be relevant to the exercise of judicial discretion in approving the appointment of a trustee or examiner in a chapter 11 case."
+    hash "c162d2a479b8b328a1ca1765b1c51aabfc15e7e4d4c9d3f658388c4abf7b810b"
+  }
+  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997 Amendment"
+    p "This rule is amended to implement the 1994 amendments to § 1104 of the Code regarding the election of a trustee in a chapter 11 case."
+    p "Eligibility for voting in an election for a chapter 11 trustee is determined in accordance with Rule 2003(b)(3). Creditors whose claims are deemed filed under § 1111(a) are treated for voting purposes as creditors who have filed proofs of claim."
+    p "Proxies for the purpose of voting in the election may be solicited only by a creditors’ committee appointed under § 1102 or by any other party entitled to solicit proxies pursuant to Rule 2006. Therefore, a trustee or examiner who has served in the case, or a committee of equity security holders appointed under § 1102, may not solicit proxies."
+    p "The procedures for reporting disputes to the court derive from similar provisions in Rule 2003(d) applicable to chapter 7 cases. An election may be disputed by a party in interest or by the United States trustee. For example, if the United States trustee believes that the person elected is ineligible to serve as trustee because the person is not “disinterested,” the United States trustee should file a report disputing the election."
+    p "The word “only” is deleted from subdivision (b), redesignated as subdivision (c), to avoid any negative inference with respect to the availability of procedures for obtaining review of the United States trustee’s acts or failure to act pursuant to Rule 2020."
+    p "GAP Report on Rule 2017.1. The published draft of proposed new subdivision (b)(3) of Rule 2017.1 [2007.1], and the Committee Note, was substantially revised to implement Mr. Patchan’s recommendations (described above), to clarify how a disputed election will be reported, and to make stylistic improvements."
+    hash "fc7ef3b8d14f14c5d0d2f46627f9a96e1c7e57777873fa1c4068a29319c549e1"
+  }
+  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Under § 1104(b)(2) of the Code, as amended in 2005, if an eligible, disinterested person is elected to serve as trustee in a chapter 11 case, the United States trustee is directed to file a report certifying the election. The person elected does not have to be appointed to the position. Rather, the filing of the report certifying the election itself constitutes the appointment. The section further provides that in the event of a dispute in the election of a trustee, the court must resolve the matter. The rule is amended to be consistent with § 1104(b)(2)."
+    p "When the United States trustee files a report certifying the election of a trustee, the person elected must provide a verified statement, similar to the statement required of professional persons under Rule 2014, disclosing connections with parties in interest and certain other persons connected with the case. Although court approval of the person elected is not required, the disclosure of the person’s connections will enable parties in interest to determine whether the person is disinterested."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "be49339e095460747679895c573d5ca370d27dd3a60249219ad08a689fa30ee9"
+  }
+  note "/us/usc/ptII/rule2007.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2007.1 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "dbc8f0a8750b542131180ffa32731e8328a5fb694d29e189ab50084238f7ae4a"
+  }
+  footnote 1 "1" {
+    p "So in House Document 118–124. Subd. (b)(3)(A) does not contain numbered clauses."
+  }
+  layers {
+    operative "f106591d587b90a01fa179f3cd03083b31d0ebc6bd1351c2719e47ced2c57b0a"
+    enacted "daa04d841fad1e6e37314e8d2f5a00fbce10180f830e3b576514b941ea0dc448"
+    editorial "bdd2606e702c16436d472c0e139abb1f5a7b39598539aace7c93fcf55786a6dc"
+  }
+}

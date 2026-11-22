@@ -6,7 +6,7 @@ or `prelude/` does not mean the interpreter implements the feature.
 A feature counts as implemented only when syntax, name resolution, checking,
 evaluation, uncertainty, provenance, and tests agree.
 
-This page says what the 0.2 interpreter does today. Each statement below
+This page says what the 0.3 interpreter does today. Each statement below
 cites a test or a code location in this version. Tests are in
 `tests/integration/known_limits.rs` unless another file is named. The review
 records from earlier passes are listed in the
@@ -370,3 +370,85 @@ error `fuel exhausted`.
   `crates/fidryn-eval/src/trace.rs:40`).
 - `verify` stops after 65,536 steps, a domain of 4,096 values or a depth of
   128, and reports `unknown` (`crates/fidryn-verify/src/property.rs:18`).
+
+## Law modules of edition 2
+
+A file whose first two significant tokens are `edition 2` is a law module
+of edition 2, which holds provisions of law as data. Its reference is
+[Law modules](law-modules.md). The tables above are about files of the
+first edition; this section is about files of edition 2.
+
+- Parsed. `fidryn_syntax::edition::edition_of` tells the edition of a
+  file, and the parser of edition 2 reads the grammar of the reference
+  whole and stops at its first error, an `E100`
+  (`crates/fidryn-syntax/src/edition.rs:24`,
+  `crates/fidryn-syntax/src/e2/parser.rs:16`; in
+  `crates/fidryn-syntax/src/edition.rs`, test
+  `edition_of_follows_the_table`; in `crates/fidryn-syntax/src/e2/tests.rs`,
+  tests `the_example_of_the_specification_parses`,
+  `an_unknown_field_is_an_error_at_its_word`, `limits_are_enforced` and
+  `no_input_makes_the_parser_panic`).
+- Checked, one module. A module is lowered into the model of
+  `fidryn-provision` and checked: its shape, its addresses, the
+  normalization of its text, its hashes, its footnote markers, its
+  definitions, and that no name of a curated module is declared twice
+  (`crates/fidryn-check/src/e2/mod.rs:282`; in
+  `crates/fidryn-check/src/e2/tests.rs`, tests
+  `each_defect_is_reported_with_its_code_at_its_text`,
+  `rendering_then_reading_gives_the_model_back` and
+  `render_of_the_golden_models_is_the_golden_text`, which holds the three
+  modules under `crates/fidryn-check/tests/fixtures/e2/` to what `render`
+  writes).
+- Checked, a workspace. `fidryn check DIR` checks the manifest, the lock
+  of a generated workspace, every module and what holds across them, gives
+  every reference and every citation an outcome, checks the dependencies of
+  a curated workspace, and judges every binding
+  (`crates/fidryn-driver/src/workspace/check.rs:169`; in
+  `crates/fidryn-driver/src/workspace/tests.rs`, tests
+  `a_workspace_from_the_writer_checks_clean`,
+  `phase_two_is_a_function_of_interfaces`,
+  `an_unresolved_reference_is_never_a_diagnostic` and
+  `a_curated_workspace_cites_its_dependency_and_checks_clean`; in
+  `crates/fidryn-driver/src/workspace/tests/staleness.rs`, test
+  `a_binding_to_a_changed_provision_is_stale`).
+- Imported and compared. `fidryn ingest uscode` writes a generated
+  workspace from the archives of one release of the Code, and
+  `fidryn changes` lists what changed between two (in
+  `crates/fidryn-cli/tests/ingest.rs`, test
+  `ingest_writes_a_workspace_that_checks`; in
+  `crates/fidryn-driver/src/workspace/tests/change_sets.rs`, test
+  `a_footnote_marker_added_to_a_provision_changes_only_its_footnotes`).
+  `cargo xtask uscode-sample` holds the committed sample of the Code to
+  what the importer writes and to an independent reading of the
+  publisher's XML ([The sample](law-modules.md#the-sample)).
+- Not evaluated. Nothing in a module of edition 2 is evaluated: no rule,
+  query or other evaluation reads what a provision says. `fmt`, `inputs`,
+  `run`, `explore`, `explain`, `verify`, `diff`, `render`, `review` and
+  `file` refuse such a file with `E100`, and so do
+  `fidryn_cli::compile_source` and `compile_module`
+  (`crates/fidryn-cli/src/lib.rs:442`; in
+  `crates/fidryn-cli/tests/edition_2.rs`, test
+  `check_accepts_an_edition_2_file_and_refuses_to_run_one`).
+
+Limits:
+
+- A dependency of a curated workspace must be a generated workspace with a
+  lock (`E740`), named by a relative path (`E730`) (in
+  `crates/fidryn-driver/src/workspace/tests.rs`, tests
+  `a_missing_directory_and_a_dependency_without_a_lock_are_E740` and
+  `overlapping_prefixes_and_an_absolute_path_are_E730`).
+- Tables of contents are not imported; the lock counts them
+  (`crates/fidryn-ingest-uscode/src/uslm.rs:500`; in
+  `crates/fidryn-ingest-uscode/src/notes.rs`, test
+  `the_release_note_and_the_tables_of_contents_are_counted_and_not_imported`).
+- No display citation, such as "1 U.S.C. § 8(b)", is derived. An address
+  holds its text and nothing else, and it is the one citation a module
+  records (`crates/fidryn-provision/src/address.rs:14`).
+- Definitions are extracted by the closed patterns of the reference only,
+  and a definition written in another form is not extracted
+  (`crates/fidryn-ingest-uscode/src/definitions.rs:144`; in that file, test
+  `paragraphs_outside_the_patterns_define_nothing`).
+
+[Limits](law-modules.md#limits) in the reference states the others: of the
+cache, the diagnostics, definitions, change sets, the two readings of the
+publisher's XML and the fetching of a release.

@@ -2,6 +2,7 @@
 
 mod engine;
 pub mod inputs;
+pub mod law;
 pub mod opinion;
 pub mod review;
 pub mod ui;
@@ -18,6 +19,8 @@ use fidryn_core::{
 };
 use fidryn_hir::elaborate;
 use fidryn_render::{module_values, render_values};
+use fidryn_syntax::e2::E2_MAX_SOURCE_BYTES;
+use fidryn_syntax::edition::{Edition, edition_of};
 use fidryn_syntax::{format_module, parse_file};
 #[cfg(test)]
 use fidryn_trace::render_report;
@@ -26,6 +29,7 @@ use fidryn_verify::verify_property;
 use serde::Serialize;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
+use std::ffi::OsString;
 use std::fmt;
 use std::fs;
 use std::io::Read;
@@ -51,8 +55,84 @@ pub enum Command {
     Fmt {
         path: PathBuf,
     },
+    /// Check a module of either edition, or the workspace of edition 2 modules in a
+    /// directory.
     Check {
+        /// A `.fr` file of either edition, or the directory of a workspace.
         path: PathBuf,
+        /// Worker threads of the check of a workspace (default: the number available).
+        #[arg(long, value_name = "N", value_parser = clap::value_parser!(u32).range(1..))]
+        jobs: Option<u32>,
+        /// The cache of the check of a workspace (default: `$FIDRYN_CACHE_DIR`, else `fidryn`
+        /// in the cache directory of the user: `$XDG_CACHE_HOME`, `$HOME/.cache` or
+        /// `%LOCALAPPDATA%`).
+        #[arg(long, value_name = "DIR")]
+        cache_dir: Option<PathBuf>,
+        /// Keep no cache: check every module of a workspace, and write no entry.
+        #[arg(long, conflicts_with = "cache_dir")]
+        no_cache: bool,
+        /// Write the check report of a workspace (`fidryn.check-report/v0.1`) to FILE.
+        #[arg(long, value_name = "FILE")]
+        report: Option<PathBuf>,
+        /// Write every reference and every citation of a workspace whose outcome is not
+        /// `exact` to FILE, one JSON object to a line.
+        #[arg(long, value_name = "FILE")]
+        unresolved: Option<PathBuf>,
+    },
+    /// Write a generated workspace of law modules from the archives of one release.
+    Ingest {
+        #[command(subcommand)]
+        corpus: law::Corpus,
+    },
+    /// Print the text of the provisions and notes of a workspace, or of one address and what
+    /// lies below it.
+    Text {
+        /// The directory of the workspace.
+        dir: PathBuf,
+        /// The address of a provision, a container or a note of the workspace: print it and
+        /// what lies below it alone.
+        address: Option<String>,
+        /// Print one text record (`fidryn.text-record/v0.1`) to a line, in the byte order of
+        /// their addresses.
+        #[arg(long)]
+        json: bool,
+        /// Print the two lines a binding to ADDRESS records, `provision_hash` and
+        /// `notes_hash`: the tree hash of the provision at ADDRESS, or of the unit it is an
+        /// alias of, and the enacted-layer hash of its unit.
+        #[arg(long, requires = "address", conflicts_with = "json")]
+        hashes: bool,
+    },
+    /// Print the coverage ledger of a generated workspace (`fidryn.coverage/v0.1`), counted
+    /// from its modules as they stand, its manifest and its lock.
+    Coverage {
+        /// The directory of the generated workspace.
+        dir: PathBuf,
+    },
+    /// Print what changed between two generated workspaces of one prefix, and the bindings
+    /// of curated workspaces that are stale against the newer one.
+    Changes {
+        /// The directory of the older generated workspace.
+        old_dir: PathBuf,
+        /// The directory of the newer generated workspace.
+        new_dir: PathBuf,
+        /// A curated workspace whose bindings are judged against NEW_DIR; may be given more
+        /// than once.
+        #[arg(long = "bindings", value_name = "DIR")]
+        bindings: Vec<PathBuf>,
+        /// Print the change set (`fidryn.change-set/v0.1`) as JSON.
+        #[arg(long)]
+        json: bool,
+        /// Worker threads (default: the number available).
+        #[arg(long, value_name = "N", value_parser = clap::value_parser!(u32).range(1..))]
+        jobs: Option<u32>,
+        /// The cache of the check of every workspace read (default: `$FIDRYN_CACHE_DIR`, else
+        /// `fidryn` in the cache directory of the user: `$XDG_CACHE_HOME`, `$HOME/.cache` or
+        /// `%LOCALAPPDATA%`).
+        #[arg(long, value_name = "DIR")]
+        cache_dir: Option<PathBuf>,
+        /// Keep no cache: check every module, and write no entry.
+        #[arg(long, conflicts_with = "cache_dir")]
+        no_cache: bool,
     },
     /// Describe typed query arguments, evidence schemas and external review requests.
     Inputs {
@@ -165,10 +245,62 @@ pub enum Command {
 
 /// Dispatch a parsed CLI invocation.
 pub fn run(cli: Cli) -> ExitCode {
+    if let Some(refused) = refuse_edition_2(&cli.command) {
+        return refused;
+    }
     let source_root = cli.source_root.as_deref();
     match cli.command {
         Command::Fmt { path } => cmd_fmt(&path),
-        Command::Check { path } => cmd_check(&path, source_root),
+        Command::Check {
+            path,
+            jobs,
+            cache_dir,
+            no_cache,
+            report,
+            unresolved,
+        } => cmd_check(
+            &path,
+            source_root,
+            &WorkspaceFlags {
+                jobs,
+                cache_dir,
+                no_cache,
+                report,
+                unresolved,
+            },
+        ),
+        Command::Ingest { corpus } => law::run(corpus),
+        Command::Text {
+            dir,
+            address,
+            json,
+            hashes,
+        } => match address.as_deref() {
+            Some(address) if hashes => law::hashes(&dir, address),
+            address => law::text(&dir, address, json),
+        },
+        Command::Coverage { dir } => law::coverage(&dir),
+        Command::Changes {
+            old_dir,
+            new_dir,
+            bindings,
+            json,
+            jobs,
+            cache_dir,
+            no_cache,
+        } => law::changes(
+            &old_dir,
+            &new_dir,
+            &bindings,
+            json,
+            &WorkspaceFlags {
+                jobs,
+                cache_dir,
+                no_cache,
+                report: None,
+                unresolved: None,
+            },
+        ),
         Command::Inputs { path, query } => {
             match compile_module_with_root(&path, source_root)
                 .map_err(|diagnostics| diagnostics_text(&diagnostics))
@@ -274,6 +406,358 @@ pub fn run(cli: Cli) -> ExitCode {
     }
 }
 
+/// The files a command reads as its input. `check` chooses its front end by
+/// what it is given, a workspace's directory or a file of either edition,
+/// `ingest` reads archives, `text`, `coverage` and `changes` the modules of
+/// edition 2 of workspaces, and `ui` reads none.
+fn inputs_of(command: &Command) -> Vec<PathBuf> {
+    match command {
+        Command::Check { .. }
+        | Command::Ingest { .. }
+        | Command::Text { .. }
+        | Command::Coverage { .. }
+        | Command::Changes { .. }
+        | Command::Ui { .. } => Vec::new(),
+        Command::Fmt { path }
+        | Command::Inputs { path, .. }
+        | Command::Run { path, .. }
+        | Command::Explore { path, .. }
+        | Command::Verify { path, .. }
+        | Command::Render { path, .. }
+        | Command::Review { path, .. } => vec![path.clone()],
+        Command::Explain { trace_id, .. } => {
+            let as_path = PathBuf::from(trace_id);
+            if as_path.exists() {
+                vec![as_path]
+            } else {
+                vec![PathBuf::from(format!("{trace_id}.json"))]
+            }
+        }
+        Command::Diff {
+            old_snapshot,
+            new_snapshot,
+            ..
+        } => vec![old_snapshot.clone(), new_snapshot.clone()],
+        Command::File { packet, .. } => vec![packet.clone()],
+    }
+}
+
+/// Exit 1 when a file `command` reads is a module of edition 2, or carries a
+/// marker that names no edition: only `fidryn check` reads edition 2. Only a
+/// regular file is looked at ([`read_head`]).
+fn refuse_edition_2(command: &Command) -> Option<ExitCode> {
+    for path in inputs_of(command) {
+        if let Err(diagnostic) = first_edition_file(&path) {
+            eprintln!("{diagnostic}");
+            return Some(ExitCode::from(1));
+        }
+    }
+    None
+}
+
+/// `Err` with the `E100` that refuses `source` when it is a module of
+/// edition 2, or carries a marker that names no edition.
+fn first_edition(source: &str) -> Result<(), Diagnostic> {
+    match edition_of(source)? {
+        Edition::One => Ok(()),
+        Edition::Two => Err(fidryn_check::e2::not_compiled_for_evaluation()),
+    }
+}
+
+/// As [`first_edition`], of the file at `path`, naming the file. A file that
+/// cannot be read passes, so that the command reports why, and so does an
+/// input that is no regular file, which the command reads as a file of the
+/// first edition ([`read_head`]).
+fn first_edition_file(path: &Path) -> Result<(), Diagnostic> {
+    let Some(head) = read_head(path) else {
+        return Ok(());
+    };
+    first_edition(utf8_prefix(&head))
+        .map_err(|diagnostic| diagnostic.with_source(path.display().to_string()))
+}
+
+/// The bytes of the regular file at `path`, up to one more than the largest
+/// source of edition 2; `None` when it cannot be read, and when it is no
+/// regular file. An input such as a pipe, `/dev/stdin` or a terminal is not
+/// read here, since what is read of it could not be read again: the command
+/// reads it whole, as a file of the first edition. A module of edition 2 is
+/// read from a regular file.
+fn read_head(path: &Path) -> Option<Vec<u8>> {
+    if !fs::metadata(path).ok()?.is_file() {
+        return None;
+    }
+    let mut bytes = Vec::new();
+    fs::File::open(path)
+        .ok()?
+        .take((E2_MAX_SOURCE_BYTES + 1) as u64)
+        .read_to_end(&mut bytes)
+        .ok()?;
+    Some(bytes)
+}
+
+/// The longest prefix of `bytes` that is UTF-8.
+fn utf8_prefix(bytes: &[u8]) -> &str {
+    match std::str::from_utf8(bytes) {
+        Ok(text) => text,
+        Err(error) => std::str::from_utf8(&bytes[..error.valid_up_to()]).unwrap_or_default(),
+    }
+}
+
+/// `fidryn check` of a module of edition 2: the checks of one module, then
+/// `ok`. `None` when the file at `path` is no module of edition 2, cannot be
+/// read or is no regular file ([`read_head`]); the check of the first
+/// edition then reads it.
+fn check_edition_2(path: &Path) -> Option<ExitCode> {
+    let head = read_head(path)?;
+    if !matches!(edition_of(utf8_prefix(&head)), Ok(Edition::Two)) {
+        return None;
+    }
+    let name = path.display().to_string();
+    let source = if head.len() > E2_MAX_SOURCE_BYTES {
+        String::from_utf8_lossy(&head).into_owned()
+    } else {
+        match String::from_utf8(head) {
+            Ok(source) => source,
+            Err(error) => {
+                eprintln!(
+                    "{}",
+                    Diagnostic::new(
+                        fidryn_core::DiagnosticCode::E100,
+                        format!("cannot read {name}: {error}"),
+                    )
+                );
+                return Some(ExitCode::from(1));
+            }
+        }
+    };
+    match fidryn_check::e2::check_source(&source) {
+        Ok(_) => {
+            println!("ok");
+            Some(ExitCode::SUCCESS)
+        }
+        Err(diagnostics) => {
+            for diagnostic in diagnostics {
+                eprintln!("{}", diagnostic.with_source(name.clone()));
+            }
+            Some(ExitCode::from(1))
+        }
+    }
+}
+
+/// The flags of `fidryn check` that only the check of a workspace takes.
+struct WorkspaceFlags {
+    jobs: Option<u32>,
+    cache_dir: Option<PathBuf>,
+    no_cache: bool,
+    report: Option<PathBuf>,
+    unresolved: Option<PathBuf>,
+}
+
+impl WorkspaceFlags {
+    fn any(&self) -> bool {
+        self.jobs.is_some()
+            || self.cache_dir.is_some()
+            || self.no_cache
+            || self.report.is_some()
+            || self.unresolved.is_some()
+    }
+}
+
+/// The environment variable that names the directory of the cache of a
+/// workspace check when `--cache-dir` does not.
+const CACHE_DIR_VARIABLE: &str = "FIDRYN_CACHE_DIR";
+
+/// The name of the directory of the cache in the cache directory of the
+/// user ([`user_cache_dir`]), when neither `--cache-dir` nor
+/// `FIDRYN_CACHE_DIR` names one.
+const USER_CACHE_NAME: &str = "fidryn";
+
+/// The first words of the line that says the cache of a check is not used,
+/// which the check then runs without.
+const CACHE_UNUSED: &str = "the cache could not be used, and the check went on without it";
+
+/// The directory of the cache of a check of the workspaces in the
+/// directories `workspaces`, outside every workspace unless `--cache-dir` or
+/// `FIDRYN_CACHE_DIR` names one inside: none with `--no-cache`; otherwise
+/// `--cache-dir`, else the directory that `FIDRYN_CACHE_DIR` names when it
+/// is set and not empty, else `fidryn` in the cache directory of the user
+/// ([`user_cache_dir`]). `variable` gives the value of an environment
+/// variable by its name. `Err` with the reason when none of these names a
+/// directory, and when the one in the cache directory of the user is the
+/// directory of one of `workspaces` or lies inside it, as when a variable
+/// that [`user_cache_dir`] reads names a directory inside a workspace; there
+/// is then no cache. The check keeps none either when the directory lies
+/// inside a dependency, whichever named it.
+fn cache_dir(
+    flags: &WorkspaceFlags,
+    variable: &dyn Fn(&str) -> Option<OsString>,
+    workspaces: &[&Path],
+) -> Result<Option<PathBuf>, String> {
+    if flags.no_cache {
+        return Ok(None);
+    }
+    if let Some(dir) = &flags.cache_dir {
+        return Ok(Some(dir.clone()));
+    }
+    if let Some(dir) = variable(CACHE_DIR_VARIABLE).filter(|value| !value.is_empty()) {
+        return Ok(Some(PathBuf::from(dir)));
+    }
+    let Some(user) = user_cache_dir(variable) else {
+        return Err(format!(
+            "no directory is named for it: `--cache-dir` is not given, `{CACHE_DIR_VARIABLE}` \
+             is not set, and {USER_CACHE_VARIABLES}"
+        ));
+    };
+    let dir = user.join(USER_CACHE_NAME);
+    let inside = workspaces
+        .iter()
+        .find(|workspace| fidryn_driver::workspace::lies_inside(&dir, workspace));
+    match inside {
+        Some(workspace) => Err(format!(
+            "{}: the directory lies inside the workspace `{}`, and a cache that neither \
+             `--cache-dir` nor `{CACHE_DIR_VARIABLE}` names is kept outside every workspace",
+            dir.display(),
+            workspace.display()
+        )),
+        None => Ok(Some(dir)),
+    }
+}
+
+/// What [`user_cache_dir`] reads, as the end of the sentence that says it
+/// found nothing.
+#[cfg(not(windows))]
+const USER_CACHE_VARIABLES: &str = "neither `XDG_CACHE_HOME` nor `HOME` is an absolute path";
+
+/// What [`user_cache_dir`] reads, as the end of the sentence that says it
+/// found nothing.
+#[cfg(windows)]
+const USER_CACHE_VARIABLES: &str = "`LOCALAPPDATA` is not an absolute path";
+
+/// The cache directory of the user, as the environment that `variable`
+/// gives names it: `XDG_CACHE_HOME` when it is an absolute path, else
+/// `.cache` in `HOME` when that is an absolute path. A relative path is not
+/// taken, so that the cache is never found relative to the directory the
+/// command runs in. `None` when neither is.
+#[cfg(not(windows))]
+fn user_cache_dir(variable: &dyn Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
+    let absolute = |name: &str| {
+        variable(name)
+            .map(PathBuf::from)
+            .filter(|dir| dir.is_absolute())
+    };
+    absolute("XDG_CACHE_HOME").or_else(|| absolute("HOME").map(|home| home.join(".cache")))
+}
+
+/// The cache directory of the user, as the environment that `variable`
+/// gives names it: `LOCALAPPDATA` when it is an absolute path. A relative
+/// path is not taken, so that the cache is never found relative to the
+/// directory the command runs in. `None` when it is not.
+#[cfg(windows)]
+fn user_cache_dir(variable: &dyn Fn(&str) -> Option<OsString>) -> Option<PathBuf> {
+    variable("LOCALAPPDATA")
+        .map(PathBuf::from)
+        .filter(|dir| dir.is_absolute())
+}
+
+/// The value of the environment variable `name`, as [`cache_dir`] reads it.
+fn environment(name: &str) -> Option<OsString> {
+    std::env::var_os(name)
+}
+
+/// The identity of the running executable that the keys of the cache hold:
+/// the BLAKE3 of its file, which [`engine::executable_identity`] computes
+/// once for the process.
+fn executable_digest() -> Result<String, String> {
+    let identity = engine::executable_identity()?;
+    identity["digest"]
+        .as_str()
+        .map(str::to_owned)
+        .ok_or_else(|| "the identity of the running executable has no digest".to_owned())
+}
+
+/// The options of a check of the workspaces in the directories
+/// `workspaces`, as `flags` and the environment give them: `--jobs` threads,
+/// by default as many as are available, and the cache of [`cache_dir`],
+/// keyed also by the identity of the running executable; and why there is
+/// no cache, when `cache_dir` names none or that identity cannot be read,
+/// for the command to say once.
+fn check_options(
+    flags: &WorkspaceFlags,
+    workspaces: &[&Path],
+) -> (fidryn_driver::workspace::CheckOptions, Option<String>) {
+    let jobs = match flags.jobs {
+        Some(jobs) => usize::try_from(jobs).unwrap_or(usize::MAX),
+        None => std::thread::available_parallelism().map_or(1, std::num::NonZero::get),
+    };
+    let (mut cache, mut unused) = match cache_dir(flags, &environment, workspaces) {
+        Ok(cache) => (cache, None),
+        Err(why) => (None, Some(why)),
+    };
+    let mut executable = String::new();
+    if cache.is_some() {
+        match executable_digest() {
+            Ok(digest) => executable = digest,
+            Err(error) => {
+                cache = None;
+                unused = Some(error);
+            }
+        }
+    }
+    let options = fidryn_driver::workspace::CheckOptions {
+        jobs,
+        cache_dir: cache,
+        toolchain: env!("CARGO_PKG_VERSION").to_owned(),
+        executable,
+    };
+    (options, unused)
+}
+
+/// `fidryn check DIR`: the check of the workspace in the directory `dir`,
+/// with the options of [`check_options`]. When the cache's directory is the
+/// directory of a dependency of the workspace, lies inside it or holds it,
+/// the check keeps no cache either.
+/// Prints each diagnostic, naming its file under `dir`, then says once when
+/// the cache could not be used or written, which fails nothing; then prints the
+/// summary line; writes the check report to `--report` and the unresolved
+/// list to `--unresolved` when they are given; then prints `ok` when there
+/// is no error. Exit 1 on an error, and when a file cannot be written.
+fn check_workspace(dir: &Path, flags: &WorkspaceFlags) -> ExitCode {
+    let (options, unused) = check_options(flags, &[dir]);
+    let report = fidryn_driver::workspace::check_workspace(dir, &options);
+    for diagnostic in &report.diagnostics {
+        let mut shown = diagnostic.clone();
+        shown.source_file = diagnostic
+            .source_file
+            .as_ref()
+            .map(|file| dir.join(file).display().to_string());
+        eprintln!("{shown}");
+    }
+    if let Some(error) = unused.as_ref().or(report.cache_unused.as_ref()) {
+        eprintln!("{CACHE_UNUSED}: {error}");
+    }
+    if let Some(failure) = &report.cache_failure {
+        eprintln!("the cache could not be written, and the check went on without it: {failure}");
+    }
+    println!("{}", report.summary());
+    let written = [
+        (&flags.report, report.to_json()),
+        (&flags.unresolved, report.unresolved_lines()),
+    ];
+    for (file, text) in written {
+        if let Some(file) = file
+            && let Err(error) = fs::write(file, text)
+        {
+            return fail(format!("cannot write {}: {error}", file.display()));
+        }
+    }
+    if report.errors() == 0 {
+        println!("ok");
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::from(1)
+    }
+}
+
 /// Parse an ISO 8601 / RFC 3339 timestamp.
 ///
 /// `Instant::parse` uses `time::Rfc3339`. Both a `Z` suffix and a numeric
@@ -321,8 +805,10 @@ pub fn apply_run_args(case: &mut CaseRecord, args: &[String]) -> Result<(), Stri
     Ok(())
 }
 
-/// Parse, elaborate, and check a module from source text.
+/// Parse, elaborate, and check a module from source text. A module of
+/// edition 2 is refused with `E100`.
 pub fn compile_source(src: &str, manifest: &SourceManifest) -> Result<CoreModule, Vec<Diagnostic>> {
+    first_edition(src).map_err(|diagnostic| vec![diagnostic])?;
     let parsed = parse_file(src);
     if parsed.has_errors() {
         return Err(parsed.diagnostics);
@@ -333,7 +819,8 @@ pub fn compile_source(src: &str, manifest: &SourceManifest) -> Result<CoreModule
 
 /// Compile a `.fr` path, loading the declared `source_manifest` or a
 /// `sources/` fallback. A declared path that is missing or malformed is a
-/// diagnostic. Modules that omit a manifest get an empty default.
+/// diagnostic. Modules that omit a manifest get an empty default. A module of
+/// edition 2 is refused with `E100`.
 pub fn compile_module(path: &Path) -> Result<(CoreModule, SourceManifest), Vec<Diagnostic>> {
     compile_module_with_root(path, None)
 }
@@ -342,6 +829,7 @@ fn compile_artifact(
     path: &Path,
     source_root: Option<&Path>,
 ) -> Result<(fidryn_driver::CompilationArtifact, SourceManifest), Vec<Diagnostic>> {
+    first_edition_file(path).map_err(|diagnostic| vec![diagnostic])?;
     DRIVER.with(|driver| match source_root {
         Some(root) => driver
             .borrow_mut()
@@ -667,7 +1155,20 @@ fn cmd_fmt(path: &Path) -> ExitCode {
     }
 }
 
-fn cmd_check(path: &Path, source_root: Option<&Path>) -> ExitCode {
+fn cmd_check(path: &Path, source_root: Option<&Path>, flags: &WorkspaceFlags) -> ExitCode {
+    if path.is_dir() {
+        return check_workspace(path, flags);
+    }
+    if flags.any() {
+        return fail(format!(
+            "`--jobs`, `--cache-dir`, `--no-cache`, `--report` and `--unresolved` belong to the \
+             check of a workspace, and {} is no directory",
+            path.display()
+        ));
+    }
+    if let Some(checked) = check_edition_2(path) {
+        return checked;
+    }
     match compile_or_exit(path, source_root) {
         Ok(_) => {
             println!("ok");

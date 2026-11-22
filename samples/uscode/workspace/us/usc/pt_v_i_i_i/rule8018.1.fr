@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/ptVIII/rule8018.1" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8018.1" courtRule {
+    num "8018.1" "Rule 8018.1."
+    heading "Reviewing a Judgment That the Bankruptcy Court Lacked Authority to Enter"
+    content "If, on appeal, a district court determines that the bankruptcy court did not have authority under Article III of the Constitution to enter the judgment, order, or decree being appealed, the district court may treat it as proposed findings of fact and conclusions of law."
+    hash "c9ddd9652694d4e93fbf182555a36e9d6fff4221527d6fa54d84b4b183dea383"
+  }
+  credit "(Added Apr. 26, 2018, eff. Dec. 1, 2018; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8018.1/note/ungrouped/nolaw/committee-notes-on-rules-2018" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018"
+    p "This rule is new. It is added to prevent a district court from having to remand an appeal whenever it determines that the bankruptcy court lacked constitutional authority to enter the judgment, order, or decree appealed from. Consistent with the Supreme Court’s decision in Executive Benefits Ins. Agency v. Arkison, 134 S. Ct. 2165 (2014), the district court in that situation may treat the bankruptcy court’s judgment as proposed findings of fact and conclusions of law. Upon making the determination to proceed in that manner, the district court may choose to allow the parties to file written objections to specific proposed findings and conclusions and to respond to another party’s objections, see Rule 9033; treat the parties’ briefs as objections and responses; or prescribe other procedures for the review of the proposed findings of fact and conclusions of law."
+    hash "565924428fe3c51d88f250ac2656e8bc7e8c452e7cc50b76043987a5cac3ada4"
+  }
+  note "/us/usc/ptVIII/rule8018.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8018.1 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "96557079e0c4b9810349893b45e5278f8e0b8bf3ff1baecad28fdd08e121f96e"
+  }
+  layers {
+    operative "c9ddd9652694d4e93fbf182555a36e9d6fff4221527d6fa54d84b4b183dea383"
+    enacted "3a874ecfae0517d4ec540075a21cd33ef813a9c7a936d9722d58747f48324acf"
+    editorial "c0b5b970aa624d2f277034aab46fcb4348c826092f74e5cc960384e2a66c7b27"
+  }
+}

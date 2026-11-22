@@ -1,0 +1,68 @@
+edition 2
+module "/us/usc/ptIII/rule3004" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3004" courtRule {
+    num "3004" "Rule 3004."
+    heading "Proof of Claim Filed by the Debtor or Trustee for a Creditor"
+    provision "/us/usc/ptIII/rule3004/a" subsection {
+      num "a" "(a)"
+      heading "Filing by the Debtor or Trustee."
+      content "If a creditor does not file a proof of claim within the time prescribed by Rule 3002(c) or Rule 3003(c), the debtor or trustee may do so within 30 days after the creditor’s time to file expires."
+      hash "c5d73bd5194bc67473ce84db83fb209e1e5e5dabfb75f2aba752e890a74064cc"
+    }
+    provision "/us/usc/ptIII/rule3004/b" subsection {
+      num "b" "(b)"
+      heading "Notice by the Clerk."
+      content {
+        p "The clerk must promptly give notice of the filing to:"
+        p "• the creditor;"
+        p "• the debtor; and"
+        p "• the trustee."
+      }
+      hash "5e3952d2c1e3d289d74672ba218a4ae4fa3cd2cf46e82afc4539c3fe64f42035"
+    }
+    hash "b16b2b400204905b3ea7d8226c7aa2e94088718ebad2ecd061b4538e191a4ad7"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Bankruptcy Rule 303 but conforms with the changes made by § 501(c) of the Code. Rule 303 permitted only the filing of tax and wage claims by the debtor. Section 501(c) of the Code, however, permits the filing by the debtor or trustee on behalf of any creditor."
+    p "It is the policy of the Code that debtors’ estates should be administered for the benefit of creditors without regard to the dischargeability of their claims. After their estates have been closed, however, discharged debtors may find themselves saddled with liabilities, particularly for taxes, which remain unpaid because of the failure of creditors holding nondischargeable claims to file proofs of claim and receive distributions thereon. The result is that the debtor is deprived of an important benefit of the Code without any fault or omission on the debtor’s part and without any objective of the Code being served thereby."
+    p "Section 501(c) of the Code authorizes a debtor or trustee to file a proof of claim for any holder of a claim. Although all claims may not be nondischargeable, it may be difficult to determine, in particular, whether tax claims survive discharge. See Plumb, Federal Tax Liens and Priorities in Bankruptcy, 43 Ref. J. 37, 43–44 (1969); 1 Collier, Bankruptcy ¶17.14 (14th ed. 1967); 3 id. ¶ 523.06 (15th ed. 1979). To eliminate the necessity of the resolution of this troublesome issue, the option accorded the debtor by the Code does not depend on the nondischargeability of the claim. No serious administrative problems and no unfairness to creditors seemed to develop from adoption of Rule 303, the forerunner to § 501(c). The authority to file is conditioned on the creditor’s failure to file the proof of claim on or before the first date set for the meeting of creditors, which is the date a claim must ordinarily be filed in order to be voted in a chapter 7 case. Notice to the creditor is provided to enable him to file a proof of claim pursuant to Rule 3002, which proof, when filed, would supersede the proof filed by the debtor or trustee. Notice to the trustee would serve to alert the trustee to the special character of the proof and the possible need for supplementary evidence of the validity and amount of the claim. If the trustee does not qualify until after a proof of claim is filed by the debtor pursuant to this rule, he should be notified as soon as practicable thereafter."
+    p "To the extent the claim is allowed and dividends paid thereon, it will be reduced or perhaps paid in full. If the claim is also filed pursuant to Rule 3005, only one distribution thereon may be made. As expressly required by Rule 3005 and by the purpose of this rule such distribution must diminish the claim."
+    hash "89a4218a7890042f59f944dded7f5ee43975e9432919e3763a1fed9f9cbd7024"
+  }
+  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Under the rule as amended, the debtor or trustee in a chapter 7 or 13 case has 120 days from the first date set for the meeting of creditors to file a claim for the creditor. During the first 90 days of that period the creditor in a chapter 7 or 13 case may file a claim as provided by Rule 3002(c). If the creditor fails to file a claim, the debtor or trustee shall have an additional 30 days thereafter to file the claim. A proof of claim filed by a creditor supersedes a claim filed by the debtor or trustee only if it is timely filed within the 90 days allowed under Rule 3002(c)."
+    hash "85f2c6d769b67d4b0f910caa7068d56427f3ce9536572b2b646847e54917783a"
+  }
+  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2005 Amendment"
+    p "The rule is amended to conform to § 501(c) of the Code. Under that provision, the debtor or trustee may file proof of a claim if the creditor fails to do so in a timely fashion. The rule previously authorized the debtor and the trustee to file a claim as early as the day after the first date set for the meeting of creditors under § 341(a). Under the amended rule, the debtor and trustee must wait until the creditor’s opportunity to file a claim has expired. Providing the debtor and the trustee with the opportunity to file a claim ensures that the claim will participate in any distribution in the case. This is particularly important for claims that are nondischargeable."
+    p "Since the debtor and trustee cannot file a proof of claim until after the creditor’s time to file has expired, the rule no longer permits the creditor to file a proof of claim that will supersede the claim filed by the debtor or trustee. The rule leaves to the courts the issue of whether to permit subsequent amendment of such proof of claim."
+    p "Other changes are stylistic."
+    p "Changes Made After Publication and Comment. No changes were made after publication. The Advisory Committee concluded that Mr. Van Allsburg’s suggestion goes beyond the scope of the published proposal. Consequently, the Committee declined to adopt the suggestion but may consider it in greater detail at a future meeting."
+    hash "361814cf14fb9b10b81cc74711a1a7aef3258e6ee646f9becfb39a1c875e7461"
+  }
+  note "/us/usc/ptIII/rule3004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3004 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "31712cb0000ee1bd0cd07d7621f280ddbcf117daf389ec6ac15fa6e925351faf"
+  }
+  layers {
+    operative "b16b2b400204905b3ea7d8226c7aa2e94088718ebad2ecd061b4538e191a4ad7"
+    enacted "404ec448765f53a1074945f3d4068e5f58c71e1dd1bc809b87ffa4e00a626fc2"
+    editorial "739867b966a62bda4f5b6c2193e1c9c9f44d250f5ebd8e7d6c407c0cff749695"
+  }
+}

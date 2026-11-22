@@ -1,0 +1,46 @@
+edition 2
+module "/us/usc/t45/s1324" {
+  within "/us/usc/t45/ch22/schII/ptB"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1324" section {
+    num "1324" "§ 1324."
+    heading "Certain enforcement relief"
+    provision "/us/usc/t45/s1324/a" subsection {
+      num "a" "(a)"
+      heading "Enforcement actions"
+      content "The Secretary of Transportation, with respect to any provision of section 1321 or 1322 of this title, and any person who suffers direct and substantial economic injury as a result of an alleged violation by the Corporation, with respect to the provisions of section 1321(a)(1) and (2)" mark "1" 1 " of this title, and " ["section 1322 of this title" -> "/us/usc/t45/s1322"] ", may bring an action to require compliance with such provision."
+      hash "81798251180589ba1b6d1becc9dda42de4189b840d663767424fb09358da8131"
+    }
+    provision "/us/usc/t45/s1324/b" subsection {
+      num "b" "(b)"
+      heading "Special court"
+      content "Any action brought under this subchapter shall be brought before the special court established under " ["section 719 of this title" -> "/us/usc/t45/s719"] ". Such special court may limit the enforcement of a restriction under " ["section 1321 of this title" -> "/us/usc/t45/s1321"] ", if the effect of such restriction would be to substantially impair the continued viability of the Corporation."
+      hash "4f44276dd24ec9e85ef568c6182f8a00c195b06e41c62f43c2f1e18fec6a9e5f"
+    }
+    hash "2ff8b8cee5d5023863fa9cb908658807318315ec7d98bfadafe88663e22133e8"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4025" -> "/us/pl/99/509/tIV/s4025"] ", Oct. 21, 1986, " ["100 Stat. 1905" -> "/us/stat/100/1905"] ".)"
+  note "/us/usc/t45/s1324/note/editorialNotes/pl.101.213/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p ["Section 1321(a)(2) of this title" -> "/us/usc/t45/s1321/a/2"] ", referred to in subsec. (a), was repealed by " ["Pub. L. 101–213, § 2(b)(3)" -> "/us/pl/101/213/s2/b/3"] ", Dec. 11, 1989, " ["103 Stat. 1843" -> "/us/stat/103/1843"] "."
+    hash "97492827bfa9e1f693480f114827be0b92544b8b63f5c2987112005097a0b78a"
+  }
+  note "/us/usc/t45/s1324/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
+    p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
+    hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "2ff8b8cee5d5023863fa9cb908658807318315ec7d98bfadafe88663e22133e8"
+    enacted "d6b3f8494e27656c40777c0ff29ed0d5280f754dae1804112c31a19a882cf552"
+    editorial "13031b868a2d5c8c9d3297725a062c58c418b1b7fe4e1f9890aacff6d7669cfc"
+  }
+}

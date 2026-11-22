@@ -1,4 +1,4 @@
-//! Known limits of the 0.2 interpreter, pinned as executable facts.
+//! Known limits of the 0.3 interpreter, pinned as executable facts.
 //!
 //! Each test states what the implementation does today, not what it should
 //! do. `docs/implementation-status.md` cites these tests by name. When a

@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/ptVII/rule7003" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7003" courtRule {
+    num "7003" "Rule 7003."
+    heading "Commencing an Adversary Proceeding"
+    content "Fed. R. Civ. P. 3 applies in an adversary proceeding."
+    hash "277c74a1f8309dcfcbc4cb827fdcc1e6a92574c1e71eb2ad877a1ca641a3d284"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Rule 5005(a) requires that a complaint commencing an adversary proceeding be filed with the court in which the case under the Code is pending unless [former] 28 U.S.C. § 1473 authorizes the filing of the complaint in another district."
+    hash "7b3283805bb1f2f416dfcc06bf50839c96248cfe63a049694ec5141cf96d6aad"
+  }
+  note "/us/usc/ptVII/rule7003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7003 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "3fbdc146d0aefecc2dc75518e7e464917f36c3872d126c623019a2026b9793ff"
+  }
+  note "/us/usc/ptVII/rule7003/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "277c74a1f8309dcfcbc4cb827fdcc1e6a92574c1e71eb2ad877a1ca641a3d284"
+    enacted "cf3f1c91264afdab71d4e782de0cdd586e232446a98cde3ba54cf8db86cc5000"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

@@ -1,0 +1,70 @@
+edition 2
+module "/us/usc/t45/s231v" {
+  within "/us/usc/t45/ch9/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s231v" section {
+    num "231v" "§ 231v."
+    heading "Computation and certification of account benefit ratios"
+    provision "/us/usc/t45/s231v/a" subsection {
+      num "a" "(a)"
+      heading "Initial computation and certification"
+      chapeau "On or before November 1, 2003, the Railroad Retirement Board shall—"
+      provision "/us/usc/t45/s231v/a/1" paragraph {
+        num "1" "(1)"
+        content "compute the account benefits ratios for each of the most recent 10 preceding fiscal years, and"
+        hash "4fa4d5bf54443ff25d49cba4e9560f4a529f71f7f5be86e24190b54245dd527a"
+      }
+      provision "/us/usc/t45/s231v/a/2" paragraph {
+        num "2" "(2)"
+        content "certify the account benefits ratios for each such fiscal year to the Secretary of the Treasury."
+        hash "31f04031511c48c631444456b86c4cfa7cc7825e1952832c6d8c787fffa373e6"
+      }
+      hash "bfb26d3935865a62e20fb2a0b08190bdd15ffa12a3585f2b93bd511388453823"
+    }
+    provision "/us/usc/t45/s231v/b" subsection {
+      num "b" "(b)"
+      heading "Computations and certifications after 2003"
+      chapeau "On or before November 1 of each year after 2003, the Railroad Retirement Board shall—"
+      provision "/us/usc/t45/s231v/b/1" paragraph {
+        num "1" "(1)"
+        content "compute the account benefits ratio for the fiscal year ending in such year, and"
+        hash "99880278abd0e3bafdd984f48a13f3846241ea97c56e8f4efb619ae97a94abea"
+      }
+      provision "/us/usc/t45/s231v/b/2" paragraph {
+        num "2" "(2)"
+        content "certify the account benefits ratio for such fiscal year to the Secretary of the Treasury."
+        hash "b5a5e65a4e4967e5c90e0118a3b9f30b0741d3201c830d752ddd73758dd84485"
+      }
+      hash "783ff50e706900e8b5eb74e91351f6849108d4ce9cc0003618b07a58f8a6135f"
+    }
+    provision "/us/usc/t45/s231v/c" subsection {
+      num "c" "(c)"
+      heading "Definition"
+      content "As used in this section, the term “account benefits ratio” has the meaning given that term in section 3241(c) of the Internal Revenue Code of 1986 [" ["26 U.S.C. 3241(c)" -> "/us/usc/t26/s3241/c"] "]."
+      hash "5eb513885479edc3d9a179ab20103f4797e4bc52019759f2ebaeb31ed42e8801"
+    }
+    hash "18f63723de311c01998e4ce793cf737da9152a56756aeed20befcfc80be93ddc"
+  }
+  credit "(" ["Aug. 29, 1935, ch. 812, § 23" -> "/us/act/1935-08-29/ch812/s23"] ", as added " ["Pub. L. 107–90, title I, § 108(b)" -> "/us/pl/107/90/tI/s108/b"] ", Dec. 21, 2001, " ["115 Stat. 890" -> "/us/stat/115/890"] ".)"
+  note "/us/usc/t45/s231v/note/editorialNotes/act.1935-08-29.ch812/prior-provisions" editorial {
+    group editorialNotes
+    topic "priorProvisions"
+    heading "Prior Provisions"
+    p "A prior section 231v, " ["act Aug. 29, 1935, ch. 812, § 23" -> "/us/act/1935-08-29/ch812/s23"] ", as added Aug. 12, 1983, " ["Pub. L. 98–76, title IV, § 418" -> "/us/pl/98/76/tIV/s418"] ", " ["97 Stat. 438" -> "/us/stat/97/438"] ", provided that for purposes of Inspector General Act of 1978, the Railroad Retirement Board is an “establishment” and the Chairman of such Board the “head of the establishment”, prior to repeal by " ["Pub. L. 100–504, title I" -> "/us/pl/100/504/tI"] ", §§ 102(e)(3), 113, Oct. 18, 1988, " ["102 Stat. 2517" -> "/us/stat/102/2517"] ", 2530, effective 180 days after Oct. 18, 1988."
+    hash "afb533f5215123faf484266672dabe5b7b5cb1d70de3c7604c845512820f7f20"
+  }
+  definition "/us/usc/t45/s231v/c" {
+    term "account benefits ratio"
+    kind borrowed
+    words "As used in this section"
+    region "/us/usc/t45/s231v"
+    basis restated
+    borrowed_from "/us/usc/t26/s3241/c"
+  }
+  layers {
+    operative "18f63723de311c01998e4ce793cf737da9152a56756aeed20befcfc80be93ddc"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a3fa4e89149b141219d707f735ca86e26d5aba8951ae4fdca3e42a33527b8b69"
+  }
+}

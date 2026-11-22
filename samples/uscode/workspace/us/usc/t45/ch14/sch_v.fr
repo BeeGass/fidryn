@@ -1,0 +1,17 @@
+edition 2
+module "/us/usc/t45/ch14/schV" {
+  within "/us/usc/t45/ch14"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch14/schV" subchapter {
+    num "V" "SUBCHAPTER V—"
+    heading "AMTRAK COMMUTER SERVICES"
+    member "/us/usc/t45/s581...591"
+    hash "64ac9c0f32a665be714d6fdb0de8983ebff5dded6ee775f7a2b934e0e0d1f6d3"
+  }
+  layers {
+    operative "64ac9c0f32a665be714d6fdb0de8983ebff5dded6ee775f7a2b934e0e0d1f6d3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

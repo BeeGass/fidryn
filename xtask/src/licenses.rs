@@ -3,6 +3,7 @@
 use crate::workspace::{cargo_bin, workspace_root};
 use anyhow::{Context, Result, bail, ensure};
 use cargo_metadata::{CargoOpt, Metadata, MetadataCommand};
+use fidryn_core::ids::hex_encode;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -490,7 +491,7 @@ fn collect_fallback(input: CrateInput, fallback: &Path, limits: &mut Limits) -> 
         );
         let bytes = read_document(&root, &relative, limits)?;
         ensure!(
-            format!("{:x}", Sha256::digest(&bytes)) == expected_hash,
+            hex_encode(&Sha256::digest(&bytes)) == expected_hash,
             "fallback notice hash does not match: {path}"
         );
         documents.push(Document {
@@ -632,7 +633,7 @@ mod tests {
             let bytes = b"upstream permission and copyright\r\n";
             self.write("fallback/notice-fixture-1.2.3/LICENSE-MIT", bytes);
             let commit = "a".repeat(40);
-            let value = json!({"crate":"notice-fixture","version":"1.2.3","cargoSource":"registry+https://example.test/index","sourceRepository":"https://example.test/project","sourceCommit":commit,"files":[{"path":"LICENSE-MIT","sourceUrl":format!("https://example.test/project/{commit}/LICENSE-MIT"),"sha256":format!("{:x}",Sha256::digest(bytes))}]});
+            let value = json!({"crate":"notice-fixture","version":"1.2.3","cargoSource":"registry+https://example.test/index","sourceRepository":"https://example.test/project","sourceCommit":commit,"files":[{"path":"LICENSE-MIT","sourceUrl":format!("https://example.test/project/{commit}/LICENSE-MIT"),"sha256":hex_encode(&Sha256::digest(bytes))}]});
             self.write(
                 "fallback/notice-fixture-1.2.3/provenance.json",
                 &serde_json::to_vec(&value).unwrap(),
@@ -774,7 +775,7 @@ mod tests {
         provenance["files"].as_array_mut().unwrap().push(json!({
             "path":"README.md",
             "sourceUrl":format!("https://example.test/project/{commit}/README.md"),
-            "sha256":format!("{:x}", Sha256::digest(attribution)),
+            "sha256":hex_encode(&Sha256::digest(attribution)),
         }));
         fs::write(&path, serde_json::to_vec(&provenance).unwrap()).unwrap();
         fixture.write("fallback/notice-fixture-1.2.3/README.md", attribution);

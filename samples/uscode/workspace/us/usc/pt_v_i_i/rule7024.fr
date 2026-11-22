@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/ptVII/rule7024" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7024" courtRule {
+    num "7024" "Rule 7024."
+    heading "Intervention"
+    content "Fed. R. Civ. P. 24 applies in an adversary proceeding."
+    hash "cc47f29aa2be3af5003013ed4857a1a5b40473e225812a10117a4cd2bef1ee00"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7024/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "A person may seek to intervene in the case under the Code or in an adversary proceeding relating to the case under the Code. Intervention in a case under the Code is governed by Rule 2018 and intervention in an adversary proceeding is governed by this rule. Intervention in a case and intervention in an adversary proceeding must be sought separately."
+    hash "25b26e088e574e95e93017a2b93c92561d753cf8594f9161ced5392ac41aab9d"
+  }
+  note "/us/usc/ptVII/rule7024/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7024 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "3f0229e9defa3a3eae994e68456c375e3a9f2f3cc4c8547773b09aa8425d6409"
+  }
+  note "/us/usc/ptVII/rule7024/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "cc47f29aa2be3af5003013ed4857a1a5b40473e225812a10117a4cd2bef1ee00"
+    enacted "27e634e84ecca8dde7b90367a49aad22796ffdf167e6a2f4729955074280cfe1"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

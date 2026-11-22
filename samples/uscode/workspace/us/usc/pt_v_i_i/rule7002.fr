@@ -1,0 +1,40 @@
+edition 2
+module "/us/usc/ptVII/rule7002" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7002" courtRule {
+    num "7002" "Rule 7002."
+    heading "References to the Federal Rules of Civil Procedure"
+    content "When a Federal Rule of Civil Procedure applicable to an adversary proceeding refers to another civil rule, that reference is to the civil rule as modified by this Part VII."
+    hash "a3e2a7ff5d3dd5d32eff29cf81c5b94077cc915e3ee591bfab58e8ce03d0abfe"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Rules 5, 12, 13, 14, 25, 27, 30, 41 and 52 F.R.Civ.P. are made applicable to adversary proceedings by Part VII. Each of those rules contains a cross reference to another Federal Rule; however, the Part VII rule which incorporates the cross-referenced Federal Rule modifies the Federal Rule in some way. Under this Rule 7002 the cross reference is to the Federal Rule as modified by Part VII. For example, Rule 5 F.R.Civ.P., which is made applicable to adversary proceedings by Rule 7005, contains a reference to Rule 4 F.R.Civ.P. Under this Rule 7002, the cross reference is to Rule 4 F.R.Civ.P. as modified by Rule 7004."
+    p "Rules 7, 10, 12, 13, 14, 19, 22, 23.2, 24–37, 41, 45, 49, 50, 52, 55, 59, 60, 62 F.R.Civ.P. are made applicable to adversary proceedings by Part VII or generally to cases under the Code by Part IX. Each of those Federal Rules contains a cross reference to another Federal Rule which is not modified by the Part VII or Part IX rule which makes the cross-referenced Federal Rule applicable. Since the cross-referenced rule is not modified by a Part VII rule this Rule 7002 does not apply."
+    hash "102e81291bff256b8ba42a4be8ea88a645cba1785b5ebdccc67a1d603862c1ef"
+  }
+  note "/us/usc/ptVII/rule7002/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7002 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "3b33e2785897597d55ba9f44c9da270944f575b3601087a4061136343c0229f9"
+  }
+  note "/us/usc/ptVII/rule7002/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "a3e2a7ff5d3dd5d32eff29cf81c5b94077cc915e3ee591bfab58e8ce03d0abfe"
+    enacted "2c6784335fc59b70e952146901f4001a0b571c3e3b1710a5604b8f58ea2dc377"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

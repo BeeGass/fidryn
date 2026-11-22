@@ -1,6 +1,6 @@
 # Contributing to Fidryn
 
-This file is for people building the 0.2 reference interpreter. It is
+This file is for people building the 0.3 reference interpreter. It is
 not a language tutorial and not legal advice. Product usage lives in
 the [README](../README.md) and the [documentation hub](README.md).
 
@@ -34,16 +34,34 @@ cargo clippy --workspace --all-targets --all-features --locked --offline -- -D w
 cargo test --workspace --all-features --locked --offline
 ```
 
-`cargo xtask ci --fmt` runs formatting, the complete Rust tests and Clippy,
-Rustdoc with warnings denied, executable schema probes, Python lint/format/types
-and probe controls, required JavaScript tests, generated-site consistency, the
-example status and documentation checks described below, and benchmark
-compilation. Node and [uv](https://docs.astral.sh/uv/) are required for
-qualification. `uv run --locked` uses `.python-version` and `uv.lock`.
+`cargo xtask ci --fmt` runs, in this order, formatting, the complete Rust
+tests and Clippy, Rustdoc with warnings denied, executable schema probes,
+Python lint/format/types, the conformance tests of `conformance/` (given the
+built binary in `FIDRYN_BINARY`, since the comparison of two releases and the
+check of a law repository there run it), the sample check
+(`cargo xtask uscode-sample`: the committed archives of the Code against
+their retrieval record, the committed workspace against what the importer
+writes from them on one worker and on eight, its check and its coverage
+ledger, the committed profile and its counts against the script that counts
+the archives, the check and the ledger, the text of every provision and note
+against what an independent script reads from the publisher's XML, the
+definitions of the workspace against what a second implementation of the
+definition rules finds in the archives, the
+curated sample, checked with the generated one as its dependency, every
+citation of it `exact` and its binding not stale, and the table of the
+coverage page against the ledger), generated-site consistency, the example
+status and documentation checks described below, required JavaScript tests,
+and benchmark compilation. Node, [uv](https://docs.astral.sh/uv/) and the
+commands `git`, `bash`, `jq`, `sha256sum` and `tar`, which the tests run, are
+required for qualification.
+`uv run --locked` uses `.python-version` and `uv.lock`.
 
 GitHub runs this gate for pushes and PRs to `dev` and `main`, plus separate
 Linux/macOS/Windows tests, dependency auditing, secret scanning, workflow linting
-and CodeQL. Development and native branch protections are described in
+and CodeQL. The workflow `Law integration`, which checks a law repository
+with the toolchain of a commit, runs only when it is started by hand
+([Checking a law repository](development.md#checking-a-law-repository)).
+Development and native branch protections are described in
 [Development and promotion](development.md). Generated environments and build
 outputs are not committed.
 
@@ -86,11 +104,13 @@ because the site is generated from the guides it rewrites.
 
 `cargo xtask docs` reads the Markdown in `README.md`, `LICENSING.md`,
 `CHANGELOG.md`, `SECURITY.md`, `docs/`, `examples/`, `packages/`,
-`conformance/` and `site/README.md`. It checks that every relative link
-resolves, that every untagged or `fidryn`-tagged code block that starts
-with `module` passes the checker, and that the `fidryn` commands in
-blocks tagged `sh` behave as the tag says. `--skip-commands` leaves out
-the commands.
+`conformance/`, `samples/` and `site/README.md`. It checks that every
+relative link resolves, that every untagged or `fidryn`-tagged code block
+that starts with `module` passes the checker, that every such block whose
+first line that is not blank is `edition 2` passes the checks of one law
+module ([Law modules](law-modules.md#editions)), and that the `fidryn`
+commands in blocks tagged `sh` behave as the tag says. `--skip-commands`
+leaves out the commands.
 
 A code block that shows a `fidryn` command takes one of these tags:
 
@@ -141,17 +161,19 @@ Workspace members are listed in [`Cargo.toml`](../Cargo.toml).
 fidryn-syntax          lossless CST, parser, formatter
 fidryn-core            IR, types, Outcome, LegalState, diagnostics
 fidryn-hir             names, imports, elaboration  (syntax + core)
-fidryn-check           types, effects, authority, time, strata (hir + core)
+fidryn-check           types, effects, authority, time, strata (hir + core); edition 2 lowering and one-module check (syntax + provision)
 fidryn-eval            worklist evaluator (core)
 fidryn-handlers        CaseFile, Scenario, Explore, Skeptical (core + eval)
 fidryn-verify          bounded explorer and invariants (eval + handlers)
 fidryn-kernel          covering-check boundary (accept/reject; no proof gen)
-fidryn-driver          incremental check/run memo
+fidryn-driver          incremental check/run memo; workspace check, writer and change sets (provision)
 fidryn-trace           DAG, canonical JSON, source maps (core)
 fidryn-render          constrained templates (missing keys fail closed)
 fidryn-adapt           capability-gated filing adapters
 fidryn-solve           bounded DPLL over declared finite domains
-fidryn-cli             fidryn binary and localhost mill
+fidryn-provision       law-module model and the rules over it (no workspace crate)
+fidryn-ingest-uscode   official XML release point into law modules (provision)
+fidryn-cli             fidryn binary and localhost mill; ingest, text, coverage and changes commands (driver + provision + ingest-uscode)
 ```
 
 ## Tests
@@ -181,7 +203,7 @@ crates into one commit.
 ## Grammar
 
 The grammar is [`grammar.ebnf`](../grammar.ebnf) at the repository root.
-It is closed, but the 0.2 parser enforces closed field sets only in
+It is closed, but the 0.3 parser enforces closed field sets only in
 `source` blocks, rule bodies and judgment request blocks. In most other
 declarations an unknown field is skipped without a diagnostic; see
 [implementation status](implementation-status.md).
@@ -192,7 +214,7 @@ These files are crate contracts and evidence. They are not user
 tutorials.
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) — Frozen crate graph, public APIs, and the pipeline of total functions over trees.
-- [implementation-status.md](implementation-status.md) — What the 0.2 interpreter does and does not do, each statement backed by a test or a code location. A `.fr` file is not an executable specification.
+- [implementation-status.md](implementation-status.md) — What the 0.3 interpreter does and does not do, each statement backed by a test or a code location. A `.fr` file is not an executable specification.
 
 The internal working ledgers are indexed in
 [internal/README.md](internal/README.md). They are not reader

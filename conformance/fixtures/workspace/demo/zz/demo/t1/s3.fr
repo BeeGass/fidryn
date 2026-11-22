@@ -1,0 +1,17 @@
+edition 2
+module "/zz/demo/t1/s3" {
+  within "/zz/demo/t1/ch1"
+  source "demo01.xml"
+  positive_law true
+  provision "/zz/demo/t1/s3" section {
+    num "3" "§ 3."
+    heading "Colors"
+    content "A widget may be of any color."
+    hash "8d93f2e94f4da97542283a7f52f0b8d9af6d7ae449b8c579823e236b6124d81e"
+  }
+  layers {
+    operative "8d93f2e94f4da97542283a7f52f0b8d9af6d7ae449b8c579823e236b6124d81e"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

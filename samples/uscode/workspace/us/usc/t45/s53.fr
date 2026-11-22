@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s53" {
+  within "/us/usc/t45/ch2"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s53" section {
+    num "53" "§ 53."
+    heading "Contributory negligence; diminution of damages"
+    content "In all actions on and after April 22, 1908 brought against any such common carrier by railroad under or by virtue of any of the provisions of this chapter to recover damages for personal injuries to an employee, or where such injuries have resulted in his death, the fact that the employee may have been guilty of contributory negligence shall not bar a recovery, but the damages shall be diminished by the jury in proportion to the amount of negligence attributable to such employee: Provided, That no such employee who may be injured or killed shall be held to have been guilty of contributory negligence in any case where the violation by such common carrier of any statute enacted for the safety of employees contributed to the injury or death of such employee."
+    hash "f6b16a4b94c3c82de8c1ebd6286a79e8ac78beda16ae51f337c46b62a3cd57d4"
+  }
+  credit "(" ["Apr. 22, 1908, ch. 149, § 3" -> "/us/act/1908-04-22/ch149/s3"] ", " ["35 Stat. 66" -> "/us/stat/35/66"] ".)"
+  layers {
+    operative "f6b16a4b94c3c82de8c1ebd6286a79e8ac78beda16ae51f337c46b62a3cd57d4"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d4a8456685319c919f1c79103c8b37daf34301efae1e605232ff046a11394f90"
+  }
+}

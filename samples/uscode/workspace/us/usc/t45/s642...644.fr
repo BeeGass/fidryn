@@ -1,0 +1,38 @@
+edition 2
+module "/us/usc/t45/s642...644" {
+  alias "/us/usc/t45/s642"
+  alias "/us/usc/t45/s643"
+  alias "/us/usc/t45/s644"
+  within "/us/usc/t45/ch14/schVIII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s642...644" section {
+    num "642 to 644" "§§ 642 to 644."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "cd79c23a4b746248aab30e3f2633ca431b6b35591e113a48e48e7326647f6b8b"
+  }
+  note "/us/usc/t45/s642...644/note/ungrouped/pl.91.518/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 642, " ["Pub. L. 91–518, title VIII, § 802" -> "/us/pl/91/518/tVIII/s802"] ", Oct. 30, 1970, " ["84 Stat. 1340" -> "/us/stat/84/1340"] ", prohibited discontinuance of intercity rail passenger service other than in accordance with provisions of this chapter. See " ["section 24705 of Title 49" -> "/us/usc/t49/s24705"] ", Transportation."
+    hash "99323ac5dfd2a74437e04bdb8b136ca9e9d54eda656f1147e4d744202ff23a71"
+  }
+  note "/us/usc/t45/s642...644/note/ungrouped/pl.91.518/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 643, " ["Pub. L. 91–518, title VIII, § 803" -> "/us/pl/91/518/tVIII/s803"] ", Oct. 30, 1970, " ["84 Stat. 1340" -> "/us/stat/84/1340"] ", related to separability of provisions of this chapter."
+    hash "5ad9c96eb38248f3caf68cb89eeb71b58f70380083a2be0dc16202a92dc867d9"
+  }
+  note "/us/usc/t45/s642...644/note/ungrouped/pl.91.518/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 644, " ["Pub. L. 91–518, title VIII, § 805" -> "/us/pl/91/518/tVIII/s805"] ", Oct. 30, 1970, " ["84 Stat. 1340" -> "/us/stat/84/1340"] "; " ["Pub. L. 92–316, § 11" -> "/us/pl/92/316/s11"] ", June 22, 1972, " ["86 Stat. 233" -> "/us/stat/86/233"] "; " ["Pub. L. 93–496, § 11" -> "/us/pl/93/496/s11"] ", Oct. 28, 1974, " ["88 Stat. 1531" -> "/us/stat/88/1531"] "; " ["Pub. L. 99–272, title IV, § 4007(a)" -> "/us/pl/99/272/tIV/s4007/a"] ", Apr. 7, 1986, " ["100 Stat. 108" -> "/us/stat/100/108"] ", related to records and audit of National Railroad Passenger Corporation and certain railroads. See " ["section 24315 of Title 49" -> "/us/usc/t49/s24315"] ", Transportation."
+    hash "818918be683f390110ebd5ddfc022441a0aba728af91f51ba76b7fd2d5cf0322"
+  }
+  layers {
+    operative "cd79c23a4b746248aab30e3f2633ca431b6b35591e113a48e48e7326647f6b8b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "a9bc3cdff804974e8c09c95a0d03de7ad71139a207fad8022f2925eb179e8a6e"
+  }
+}

@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/ptVII/rule7071" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7071" courtRule {
+    num "7071" "Rule 7071."
+    heading "Enforcing Relief for or Against a Nonparty"
+    content "Fed. R. Civ. P. 71 applies in an adversary proceeding."
+    hash "8af5abd73cf8bd2368fde4ec3644e202ae8d53fc93774f28220654ac50b635af"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7071/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7071 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "5d535d6452d712e8585a6b811f7c808ccdc144dd49f255de70daa5366cd302ff"
+  }
+  note "/us/usc/ptVII/rule7071/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "8af5abd73cf8bd2368fde4ec3644e202ae8d53fc93774f28220654ac50b635af"
+    enacted "2a896700f19de817c670efc04d7eff7bea56f531db77a8d35e264d04bfa627fe"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

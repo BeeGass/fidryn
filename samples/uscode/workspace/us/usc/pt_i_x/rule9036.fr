@@ -1,0 +1,110 @@
+edition 2
+module "/us/usc/ptIX/rule9036" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9036" courtRule {
+    num "9036" "Rule 9036."
+    heading "Electronic Notice and Service"
+    provision "/us/usc/ptIX/rule9036/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content "This rule applies whenever these rules require or permit sending a notice or serving a document by mail or other means."
+      hash "d228c5644897e1394e5661efe153c9a75d07636e5e992d70d10ade0888f7903c"
+    }
+    provision "/us/usc/ptIX/rule9036/b" subsection {
+      num "b" "(b)"
+      heading "Notices from and Service by the Court."
+      provision "/us/usc/ptIX/rule9036/b/1" paragraph {
+        num "1" "(1)"
+        content "To Registered Users. The clerk may send notice to or serve a registered user by filing the notice or document with the court’s electronic-filing system."
+        hash "06b3d7cad1a8839f6eb37e6ea963afebd500a1e061987a3d4403657d1fffc73f"
+      }
+      provision "/us/usc/ptIX/rule9036/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "To All Recipients. For any recipient, the clerk may send notice or serve a document by electronic means that the recipient consented to in writing, including by designating an electronic address for receiving notices. But these exceptions apply:"
+        provision "/us/usc/ptIX/rule9036/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "if the recipient has registered an electronic address with the Administrative Office of the United States Courts’ bankruptcy-noticing program, the clerk must use that address; and"
+          hash "88ed2481cc42290dc31a23e266f69ba21d3e8b0c2a86260c7a55a43863afd146"
+        }
+        provision "/us/usc/ptIX/rule9036/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "if an entity has been designated by the Director of the Administrative Office of the United States Courts as a high-volume paper-notice recipient, the clerk may send the notice to or serve the document electronically at an address designated by the Director, unless the entity has designated an address under § 342(e) or (f)."
+          hash "f53fee8c7688501b2f2fa0b2d67febcd0b80d6c5200e5e21fbc474af18df6e8c"
+        }
+        hash "f0c38a393f5a7b6394e68dec712067b78efcd8bb4a0a8e2625c338590a418fe1"
+      }
+      hash "99e7467695e855352dded3f1123b2dae4337532b8d5bc50960af55130d750f8c"
+    }
+    provision "/us/usc/ptIX/rule9036/c" subsection {
+      num "c" "(c)"
+      heading "Notices from and Service by an Entity."
+      content "An entity may send notice or serve a document in the same manner that the clerk does under (b), excluding (b)(2)(A) and (B)."
+      hash "171151c8164441cb3fa6da16b52fd3eb6e545465ad7bb6d9ba08ecb43b4e0de7"
+    }
+    provision "/us/usc/ptIX/rule9036/d" subsection {
+      num "d" "(d)"
+      heading "When Notice or Service Is Complete; Keeping an Address Current."
+      content "Electronic notice or service is complete upon filing or sending but is not effective if the filer or sender receives notice that it did not reach the person to be notified or served. The recipient must keep its electronic address current with the clerk."
+      hash "b316e929a7c53aae261f40e27528761e4ee9650cf15de0d66afe0970f05cb2e9"
+    }
+    provision "/us/usc/ptIX/rule9036/e" subsection {
+      num "e" "(e)"
+      heading "Inapplicability."
+      content "This rule does not apply to any document required to be served in accordance with Rule 7004."
+      hash "edc008716fc26c178e225c2151f9b156587c52263c52ae74a1bf55694f4572d3"
+    }
+    hash "0f37c69e8d0853a211c41e4bd9e83f3ce796fc95714c6609a495938445187d28"
+  }
+  credit "(Added Apr. 22, 1993, eff. Aug. 1, 1993; amended Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 25, 2019, eff. Dec. 1, 2019; Apr. 14, 2021, eff. Dec. 1, 2021; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993"
+    p "This rule is added to provide flexibility for banks, credit card companies, taxing authorities, and other entities that ordinarily receive notices by mail in a large volume of bankruptcy cases, to arrange to receive by electronic transmission all or part of the information required to be contained in such notices."
+    p "The use of electronic technology instead of mail to send information to creditors and interested parties will be more convenient and less costly for the sender and the receiver. For example, a bank that receives by mail, at different locations, notices of meetings of creditors pursuant to Rule 2002(a) in thousands of cases each year may prefer to receive only the vital information ordinarily contained in such notices by electronic transmission to one computer terminal."
+    p "The specific means of transmission must be compatible with technology available to the sender and the receiver. Therefore, electronic transmission of notices is permitted only upon request of the entity entitled to receive the notice, specifying the type of electronic transmission, and only if approved by the court."
+    p "Electronic transmission pursuant to this rule completes the notice requirements. The creditor or interested party is not thereafter entitled to receive the relevant notice by mail."
+    hash "f955d2e4c18beb937bbc33f621d3844b06b32210cbb764924e58f4370c5935bc"
+  }
+  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2005 Amendment"
+    p "The rule is amended to delete the requirement that the sender of an electronic notice must obtain electronic confirmation that the notice was received. The amendment provides that notice is complete upon transmission. When the rule was first promulgated, confirmation of receipt of electronic notices was commonplace. In the current electronic environment, very few internet service providers offer the confirmation of receipt service. Consequently, compliance with the rule may be impossible, and the rule could discourage the use of electronic noticing."
+    p "Confidence in the delivery of email text messages now rivals or exceeds confidence in the delivery of printed materials. Therefore, there is no need for confirmation of receipt of electronic messages just as there is no such requirement for paper notices."
+    p "Changes Made After Publication and Comment. No changes since publication."
+    hash "2c6402092b0ad7668d275cab99d7b76fd3f5adea985b5e7ec16dd38c65f15fb1"
+  }
+  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2019-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2019 Amendment"
+    p "The rule is amended to permit both notice and service by electronic means. The use and reliability of electronic delivery have increased since the rule was first adopted. The amendments recognize the increased utility of electronic delivery, with appropriate safeguards for parties not filing an appearance in the case through the court’s electronic-filing system."
+    p "The amended rule permits electronic notice or service on a registered user who has appeared in the case by filing with the court’s electronic-filing system. A court may choose to allow registration only with the court’s permission. But a party who registers will be subject to service by filing with the court’s system unless the court provides otherwise. The rule does not make the court responsible for notifying a person who filed a paper with the court’s electronic-filing system that an attempted transmission by the court’s system failed. But a filer who receives notice that the transmission failed is responsible for making effective service."
+    p "With the consent of the person served, electronic service also may be made by means that do not use the court’s system. Consent can be limited to service at a prescribed address or in a specified form, and it may be limited by other conditions."
+    hash "7a47fb2e32802ff7ce52c6b8037c0cd9bcf9bc997b5283113213bc9e1f1c7f97"
+  }
+  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2021 Amendment"
+    p "The rule is amended to take account of the Administrative Office of the United States Courts’ program for providing notice to high-volume paper-notice recipients. Under this program, when the Bankruptcy Noticing Center (BNC) has sent by mail more than a designated number of notices in a calendar month (initially set at 100) from bankruptcy courts to an entity, the Director of the Administrative Office will notify the entity that it is a high-volume paper-notice recipient. As such, this “threshold notice” will inform the entity that it must register an electronic address with the BNC. If, within a time specified in the threshold notice, a notified entity enrolls in Electronic Bankruptcy Noticing with the BNC, it will be sent notices electronically at the address maintained by the BNC upon a start date determined by the Director. If a notified entity does not timely enroll in Electronic Bankruptcy Noticing, it will be informed that court-generated notices will be sent to an electronic address designated by the Director. Any designation by the Director, however, is subject to the entity’s right under § 342(e) and (f) of the Code to designate an address at which it wishes to receive notices in chapter 7 and chapter 13 cases, including at its own electronic address that it registers with the BNC."
+    p "The rule is also reorganized to separate methods of electronic noticing and service available to courts from those available to parties. Both courts and parties may serve or provide notice to registered users of the court’s electronic-filing system by filing documents with that system. Both courts and parties also may serve and provide notice to any entity by electronic means consented to in writing by the recipient. Only courts may serve or give notice to an entity at an electronic address registered with the BNC as part of the Electronic Bankruptcy Noticing program."
+    p "The title of the rule is revised to more accurately reflect the rule’s applicability to methods of electronic noticing and service. Rule 9036 does not preclude noticing and service by physical means otherwise authorized by the court or these rules."
+    hash "915b9518a97ae0b265693a6c3d9648ffcd9b1a32399784d08861d7d54a55c813"
+  }
+  note "/us/usc/ptIX/rule9036/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9036 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "9b69f259af5c678309e93c46963cf4e385f03b33c08b7ee46928b80a53c680cd"
+  }
+  layers {
+    operative "0f37c69e8d0853a211c41e4bd9e83f3ce796fc95714c6609a495938445187d28"
+    enacted "b4c21eb0c5c98366b2e2b42d03d0738396c727871b8a97f8c2b5c3201fdb0e80"
+    editorial "56720362641f743f063f4d879f4851332776688b1f715d418ad4200fe3d5528a"
+  }
+}

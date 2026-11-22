@@ -1,0 +1,825 @@
+edition 2
+module "/us/usc/ptII/rule2002" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2002" courtRule {
+    num "2002" "Rule 2002."
+    heading "Notices"
+    provision "/us/usc/ptII/rule2002/a" subsection {
+      num "a" "(a)"
+      chapeau "21-Day Notices to the Debtor, Trustee, Creditors, and Indenture Trustees. Except as (h), (i), (l), (p), and (q) provide otherwise, the clerk or the court’s designee must give the debtor, the trustee, all creditors, and all indenture trustees at least 21 days’ notice by mail of:"
+      provision "/us/usc/ptII/rule2002/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "the meeting of creditors under § 341 or § 1104(b), which notice—unless the court orders otherwise—must include the debtor’s:"
+        provision "/us/usc/ptII/rule2002/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "employer-identification number;"
+          hash "6a03f5addcc5901e062abbf8bea64a606e76c551b9f547fd939d2d51e74c8ba9"
+        }
+        provision "/us/usc/ptII/rule2002/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "social-security number; and"
+          hash "9c779cdd30b6bc8285c23470a8ad0ff5a7c7ff7ea318c3eb3f6e9b2baf3c218b"
+        }
+        provision "/us/usc/ptII/rule2002/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "any other federal taxpayer-identification number;"
+          hash "c32e9517d8fde4f364d03cd0e1de31d9e3eea8af5206839411c39f48c046d7ac"
+        }
+        hash "1662c5c40f896d21e5680b685306b2c5aa42da2eee495ff9065ee94ca8956e13"
+      }
+      provision "/us/usc/ptII/rule2002/a/2" paragraph {
+        num "2" "(2)"
+        content "a proposal to use, sell, or lease property of the estate other than in the ordinary course of business—unless the court, for cause, shortens the time or orders another method of giving notice;"
+        hash "73fb2248f9e29641905736874dfd6dc67b4c14301d3ad0dd8dd7c77347c1bfc2"
+      }
+      provision "/us/usc/ptII/rule2002/a/3" paragraph {
+        num "3" "(3)"
+        content "a hearing to approve a compromise or settlement other than an agreement under Rule 4001(d)—unless the court, for cause, orders that notice not be given;"
+        hash "59bc805d1b2c8b977e3eeb57b3ead22d052b80a533440810e1741298d9e3ae63"
+      }
+      provision "/us/usc/ptII/rule2002/a/4" paragraph {
+        num "4" "(4)"
+        content "a hearing on a motion to dismiss a Chapter 7, 11, or 12 case or to convert it to another chapter—unless the hearing is under § 707(a)(3) or § 707(b) or is on a motion to dismiss the case for failure to pay the filing fee;"
+        hash "99e6db7d9df8be8ab7aba3e530a69274d50c72a42b404004043e8ffeff472fdc"
+      }
+      provision "/us/usc/ptII/rule2002/a/5" paragraph {
+        num "5" "(5)"
+        content "the time to accept or reject a proposed modification to a plan;"
+        hash "378b8693d25e195656bf6fa873f21089c84ec9126d404ef0ebeecf70d75282b2"
+      }
+      provision "/us/usc/ptII/rule2002/a/6" paragraph {
+        num "6" "(6)"
+        content "a hearing on a request for compensation or for reimbursement of expenses, if the request exceeds $1,000;"
+        hash "bc2ffa286b7d4ed8708623b7966e1ca639e9ce0aa8e2fa513864d2357fdd506b"
+      }
+      provision "/us/usc/ptII/rule2002/a/7" paragraph {
+        num "7" "(7)"
+        content "the time to file a proof of claim under Rule 3003(c);"
+        hash "345069d667440a065ea880f12e546d6c7707e78e28a0098a6bd2d12ccdcba997"
+      }
+      provision "/us/usc/ptII/rule2002/a/8" paragraph {
+        num "8" "(8)"
+        content "the time to file an objection to—and the time of the hearing to consider whether to confirm—a Chapter 12 plan; and"
+        hash "1e416d2b1ffd086b00754728107732763f301087726d084268b7c7c5b70dc535"
+      }
+      provision "/us/usc/ptII/rule2002/a/9" paragraph {
+        num "9" "(9)"
+        content "the time to object to confirming a Chapter 13 plan."
+        hash "f784231e9c0057b0d7ad317a8cdae519dd591764dc672919a4d5cbd88427060b"
+      }
+      hash "0417e71da8c80db5be140008a30cdb77ca1ad0cc979bd024983a536daf7dc17b"
+    }
+    provision "/us/usc/ptII/rule2002/b" subsection {
+      num "b" "(b)"
+      chapeau "28-Day Notices to the Debtor, Trustee, Creditors, and Indenture Trustees. Except as (l) provides otherwise, the clerk or the court’s designee must give the debtor, trustee, all creditors, and all indenture trustees at least 28 days’ notice by mail of:"
+      provision "/us/usc/ptII/rule2002/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "the time to file an objection and the time of the hearing to:"
+        provision "/us/usc/ptII/rule2002/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "consider approving a disclosure statement; or"
+          hash "c53897d203d3cb333c4727fe9460d206057401933ff5bd9710c9c321606d897c"
+        }
+        provision "/us/usc/ptII/rule2002/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "determine under § 1125(f) whether a plan includes adequate information to make a separate disclosure statement unnecessary;"
+          hash "00dd242841c8bb03ad0a6a9d2391250250b0a763b443c068bcd11c6aca6f31a1"
+        }
+        hash "b670104d51cf7460f110c4c61fe3fbdc75d2ed30d1df056cea1756833b48271b"
+      }
+      provision "/us/usc/ptII/rule2002/b/2" paragraph {
+        num "2" "(2)"
+        content "the time to file an objection to—and the time of the hearing to consider whether to confirm—a Chapter 9 or 11 plan; and"
+        hash "dd63ace80f99d223cc91f9d86d6cd93b019ef333102ea466b4bbebeac1b1c971"
+      }
+      provision "/us/usc/ptII/rule2002/b/3" paragraph {
+        num "3" "(3)"
+        content "the time of the hearing to consider whether to confirm a Chapter 13 plan."
+        hash "e4d72c110537ddfd433d139f85297d4fdf8b0e103288856eba38a910924169f9"
+      }
+      hash "ed04259711a90877ed62399e9a471c36c63978aeae5c9a399beb0352f1d65c46"
+    }
+    provision "/us/usc/ptII/rule2002/c" subsection {
+      num "c" "(c)"
+      heading "Content of a Notice."
+      provision "/us/usc/ptII/rule2002/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "Proposed Use, Sale, or Lease of Property. Subject to Rule 6004, a notice of a proposed use, sale, or lease of property under (a)(2) must include:"
+        provision "/us/usc/ptII/rule2002/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "a general description of the property;"
+          hash "161dc88df98b0c153d536e83d5280a18ae81ea90f76a36f4446b333fcfe4bed4"
+        }
+        provision "/us/usc/ptII/rule2002/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "the time and place of any public sale;"
+          hash "466abb1c6d323fb84c2cb0829d3247eae0764af30683d1c0760303740182a6f3"
+        }
+        provision "/us/usc/ptII/rule2002/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "the terms and conditions of any private sale;"
+          hash "7531dcf02d019f2af0a0bc8deca4dc09d5a5633c53c0368e0b6939074b2ce318"
+        }
+        provision "/us/usc/ptII/rule2002/c/1/D" subparagraph {
+          num "D" "(D)"
+          content "the time to file objections; and"
+          hash "044aeecd61ca2b803614a02cb43f412e9f53bb8609152433330ecc941c7d4014"
+        }
+        provision "/us/usc/ptII/rule2002/c/1/E" subparagraph {
+          num "E" "(E)"
+          content "for a proposed sale or lease of personally identifiable information under § 363(b)(1), a statement whether the sale is consistent with any policy that prohibits transferring the information."
+          hash "bdab50db9d1016ac7cafd2ae95f4ff2b725ca28400de24d41521373753190855"
+        }
+        hash "af4f948b49cf4543f16478932232eb458cf51afce3e9b9bbf41ff781987234ed"
+      }
+      provision "/us/usc/ptII/rule2002/c/2" paragraph {
+        num "2" "(2)"
+        content "Hearing on an Application for Compensation or Reimbursement. A notice under (a)(6) of a hearing on a request for compensation or for reimbursement of expenses must identify the applicant and the amounts requested."
+        hash "8395652c4d1be93a32dee30ec26f01f0dcc74c96e77ae9a39ff55c4ad620999d"
+      }
+      provision "/us/usc/ptII/rule2002/c/3" paragraph {
+        num "3" "(3)"
+        chapeau "Hearing on Confirming a Plan That Proposes an Injunction. If a plan proposes an injunction against conduct not otherwise enjoined under the Code, the notice under (b)(2) must:"
+        provision "/us/usc/ptII/rule2002/c/3/A" subparagraph {
+          num "A" "(A)"
+          content "state in conspicuous language (bold, italic, or underlined text) that the plan proposes an injunction;"
+          hash "b59fe4c88674aa2c8c8e2e530976387cde820bebd8191f60a44aa44affa5c4b8"
+        }
+        provision "/us/usc/ptII/rule2002/c/3/B" subparagraph {
+          num "B" "(B)"
+          content "describe briefly the nature of the injunction; and"
+          hash "e7197df0e7a1c9642736a4c68291602277a0109b6c60dee824bac02e60b3fcd1"
+        }
+        provision "/us/usc/ptII/rule2002/c/3/C" subparagraph {
+          num "C" "(C)"
+          content "identify the entities that would be subject to it."
+          hash "81aa0e2426bae53b8cddcced624f1c69cbdc845b2f11798e488fe782fcdf3c6b"
+        }
+        hash "fe0c6c53a9a9f0ced4d040a3cbb2a8fd3c102036d693c1124530f0fab0134421"
+      }
+      hash "52ed0fb49d7319f343746c06ffab060a6eff0e6e9ff83ebd13f713a0e94a3726"
+    }
+    provision "/us/usc/ptII/rule2002/d" subsection {
+      num "d" "(d)"
+      heading "Notice to Equity Security Holders in a Chapter 11 Case."
+      chapeau "Unless the court orders otherwise, in a Chapter 11 case the clerk or the court’s designee must give notice as the court orders to the equity security holders of:"
+      provision "/us/usc/ptII/rule2002/d/1" paragraph {
+        num "1" "(1)"
+        content "the order for relief;"
+        hash "1c5cbfdfea24829501c89bc5ad4423d1bea5ca2dca9771eabbd555918a6c3b64"
+      }
+      provision "/us/usc/ptII/rule2002/d/2" paragraph {
+        num "2" "(2)"
+        content "a meeting of equity security holders under § 341;"
+        hash "f8f4614455e796e0eb6e51e9038de26306edcbd7a8823c8b8136a3e7cd0ca888"
+      }
+      provision "/us/usc/ptII/rule2002/d/3" paragraph {
+        num "3" "(3)"
+        content "a hearing on a proposed sale of all, or substantially all, the debtor’s assets;"
+        hash "17a358fdcb1025fafa93f5c60699ae3ed73294bed070cff9e60ba332fcd5a7da"
+      }
+      provision "/us/usc/ptII/rule2002/d/4" paragraph {
+        num "4" "(4)"
+        content "a hearing on a motion to dismiss a case or convert it to another chapter;"
+        hash "d5ff3c9f5f788150fa59875490fbbf99423e2c12f21864280fba7756be2e670e"
+      }
+      provision "/us/usc/ptII/rule2002/d/5" paragraph {
+        num "5" "(5)"
+        content "the time to file an objection to—and the time of the hearing to consider whether to approve—a disclosure statement;"
+        hash "b801d1c2c7721517b66bafa1c2d8363f969b7c6f4b8b9ee36705f075ab8f77c3"
+      }
+      provision "/us/usc/ptII/rule2002/d/6" paragraph {
+        num "6" "(6)"
+        content "the time to file an objection to—and the time of the hearing to consider whether to confirm—a Chapter 11 plan; and"
+        hash "251b1a2627152b13237dd7525aa70e1f1983458811767e1588a3d68884bf2663"
+      }
+      provision "/us/usc/ptII/rule2002/d/7" paragraph {
+        num "7" "(7)"
+        content "the time to accept or reject a proposal to modify a plan."
+        hash "f127673c5af9f9021b1df7c57d47e36ee0802594e88e7c7c465a434eaa74573c"
+      }
+      hash "2bf2b295207468e8aea00dfe421371d4a93106f9793b770867a3c734fa7fe4b3"
+    }
+    provision "/us/usc/ptII/rule2002/e" subsection {
+      num "e" "(e)"
+      heading "Giving Notice of No Dividend in a Chapter 7 Case."
+      chapeau "In a Chapter 7 case, if it appears from the schedules that there are no assets from which to pay a dividend, the notice of the meeting of creditors may state:"
+      provision "/us/usc/ptII/rule2002/e/1" paragraph {
+        num "1" "(1)"
+        content "that fact;"
+        hash "26f6f0c2c49e167f7062ad2c37eb2d96f642a20765edd09c161bdf3475041c0d"
+      }
+      provision "/us/usc/ptII/rule2002/e/2" paragraph {
+        num "2" "(2)"
+        content "that filing proofs of claim is unnecessary; and"
+        hash "9a48fda5b8c715e4e5b88ee359cc7fadcb4d77d8a4289102e35c9dfcc1b7ef1c"
+      }
+      provision "/us/usc/ptII/rule2002/e/3" paragraph {
+        num "3" "(3)"
+        content "that further notice of the time to file proofs of claim will be given if enough assets become available to pay a dividend."
+        hash "8ac824fadb903ade41ff18b1bdc93e96ec369bb75f0bf7d4da485123824ccacc"
+      }
+      hash "e93ff468c265a36a807070f4e99443c13c2b315f43861f3eb4d06940c6f052b1"
+    }
+    provision "/us/usc/ptII/rule2002/f" subsection {
+      num "f" "(f)"
+      heading "Other Notices."
+      provision "/us/usc/ptII/rule2002/f/1" paragraph {
+        num "1" "(1)"
+        chapeau "Various Notices to the Debtor, Creditors, and Indenture Trustees. Except as (l) provides otherwise, the clerk, or some other person as the court" mark "1" 1 " may direct, must give the debtor, creditors, and indenture trustees notice by mail of:"
+        provision "/us/usc/ptII/rule2002/f/1/A" subparagraph {
+          num "A" "(A)"
+          content "the order for relief;"
+          hash "47275485dc45eb9f3b06d117a8e9f15491c631a0cc8edd013cb3b304c558607e"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/B" subparagraph {
+          num "B" "(B)"
+          content "a case’s dismissal or conversion to another chapter;"
+          hash "eb382a5b0a7d04341258f0441b1dea7a0d9d5bab92080e953a11a917c7c0c26d"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/C" subparagraph {
+          num "C" "(C)"
+          content "a suspension of proceedings under § 305;"
+          hash "d97910e9574d966fea589c3e20adce703aa58d35f7c4f4de99528f3cf275b007"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/D" subparagraph {
+          num "D" "(D)"
+          content "the time to file a proof of claim under Rule 3002;"
+          hash "2845f1b0fbee9df53bbf6432afb0c7932f0435621ac84a8a2742f5e3959631f3"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/E" subparagraph {
+          num "E" "(E)"
+          content "the time to file a complaint to object to the debtor’s discharge under § 727, as Rule 4004 provides;"
+          hash "29681b234f578a511dae6d7531f2f8965766a7c078192e00e8b2258657245e5f"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/F" subparagraph {
+          num "F" "(F)"
+          content "the time to file a complaint to determine whether a debt is dischargeable under § 523, as Rule 4007 provides;"
+          hash "7deff5c7fea4e40c422a3d1525f721ef68fa66fab0f219ca02a2d6120606d2bf"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/G" subparagraph {
+          num "G" "(G)"
+          content "a waiver, denial, or revocation of a discharge, as Rule 4006 provides;"
+          hash "421c2da821ceba135dc7808c84f63c8aba74d09975f34ef367f1fc0e368cb36e"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/H" subparagraph {
+          num "H" "(H)"
+          content "entry of an order confirming a plan in a Chapter 9, 11, 12 or 13 case;"
+          hash "bb2ee016d3ba50fc14515cc2396aeb4a35b6cc146bd6a8e86b8368215de7b8f6"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/I" subparagraph {
+          num "I" "(I)"
+          content "a summary of the trustee’s final report in a Chapter 7 case if the net proceeds realized exceed $1,500;"
+          hash "2f6f24ccead202f85fc5654d7cefdc46bde7bd94c67158e9850df44ca2fe105e"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/J" subparagraph {
+          num "J" "(J)"
+          content "a notice under Rule 5008 regarding the presumption of abuse;"
+          hash "7eb674a1d9ada4bdf0be064c956ae1775007d7b6b163bcc7910bad1bfaf8c306"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/K" subparagraph {
+          num "K" "(K)"
+          content "a statement under § 704(b)(1) about whether the debtor’s case would be presumed to be an abuse under § 707(b); and"
+          hash "44d78b47096600d9a08edb3a6b377ae5fb9a7d1f74b51ea926f04e7e449aab0f"
+        }
+        provision "/us/usc/ptII/rule2002/f/1/L" subparagraph {
+          num "L" "(L)"
+          content "the time to request a delay in granting the discharge under § 1141(d)(5)(C), 1228(f), or 1328(h)."
+          hash "2b88f96c06c0a419cb57f1764230406ca91f5e4aa4d2ba94c33c042227841bbd"
+        }
+        hash "15a238ab33cf18eb0e2b9d9e1825fe20b5dce0373bfbebd9270b701b1d066026"
+      }
+      provision "/us/usc/ptII/rule2002/f/2" paragraph {
+        num "2" "(2)"
+        content "Notice of the Time to Accept or Reject a Plan. Notice of the time to accept or reject a plan under Rule 3017(c) must be given in accordance with Rule 3017(d)."
+        hash "2dec7bffbd2791c4318c68b3261d581e3eca5333725f9158d753a49427378d15"
+      }
+      hash "9b1c91cd5876fd9444f0ffa6935c3dbe72ab1655e2096c9bf895374221331f95"
+    }
+    provision "/us/usc/ptII/rule2002/g" subsection {
+      num "g" "(g)"
+      heading "Addressing Notices."
+      provision "/us/usc/ptII/rule2002/g/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. A notice mailed to a creditor, indenture trustee, or equity security holder must be addressed as the entity or its authorized agent provided in its last request filed in the case. The request may be:"
+        provision "/us/usc/ptII/rule2002/g/1/A" subparagraph {
+          num "A" "(A)"
+          content "a proof of claim filed by a creditor or an indenture trustee designating a mailing address (unless a notice of no dividend has been given under (e) and a later notice of a possible dividend under Rule 3002(c)(5) has not been given); or"
+          hash "b0de93ec9893393697a9ece35667ea51a6e95ed5b98d4944736fedeabfdef926"
+        }
+        provision "/us/usc/ptII/rule2002/g/1/B" subparagraph {
+          num "B" "(B)"
+          content "a proof of interest filed by an equity security holder designating a mailing address."
+          hash "73f324a99d2dfaf795646961792308f908a2a3493973c3c168b4e1f71158aa98"
+        }
+        hash "81815213a78d3b480870f8f1481b5ffeb5f1f4d719ab3ecd3e6d19823cab7774"
+      }
+      provision "/us/usc/ptII/rule2002/g/2" paragraph {
+        num "2" "(2)"
+        content "When No Request Has Been Filed. Except as § 342(f) provides otherwise, if a creditor or indenture trustee has not filed a request under (1) or Rule 5003(e), the notice must be mailed to the address shown on the list of creditors or schedule of liabilities, whichever is filed later. If an equity security holder has not filed a request, the notice must be mailed to the address shown on the list of equity security holders."
+        hash "3e2630d4cd88dc1e2678330dfbbe915f0e3a884ec6a53a3822f3716d9e59b5a8"
+      }
+      provision "/us/usc/ptII/rule2002/g/3" paragraph {
+        num "3" "(3)"
+        chapeau "Notices to Representatives of an Infant or Incompetent Person. This paragraph (3) applies if a list or schedule filed under Rule 1007 includes a name and address of an infant’s or an incompetent person’s representative, and a person other than that representative files a request or proof of claim designating a different name and mailing address. Unless the court orders otherwise, the notice must be mailed to the designated address of:"
+        provision "/us/usc/ptII/rule2002/g/3/A" subparagraph {
+          num "A" "(A)"
+          content "the representative; and"
+          hash "30d56f63561fb23e39af217a76ee574b488faabe8ae250b52b1b0af43d17471f"
+        }
+        provision "/us/usc/ptII/rule2002/g/3/B" subparagraph {
+          num "B" "(B)"
+          content "the person filing the request or proof of claim."
+          hash "c497aae1f9842312c9567cb79087f057b6166ff29820430356de1da7cfda6277"
+        }
+        hash "48a8cd2050f60ab3c70dce9c6922566c5c3e69c70ce7e18f3e4bd3c9d3bd737e"
+      }
+      provision "/us/usc/ptII/rule2002/g/4" paragraph {
+        num "4" "(4)"
+        content "Using an Address Agreed to Between an Entity and a Notice Provider. Notwithstanding (g)(1)–(3), when the court orders that notice be given, the notice provider may do so in the manner agreed to between the provider and an entity, and at the address or addresses the entity supplies. An address supplied by the entity is conclusively presumed to be a proper address. But a failure to use a supplied address does not invalidate a notice that is otherwise effective under applicable law."
+        hash "25d2377ae063bcb6056e7ddf9f36c5a37bf04158312c8d2527b2692092b3e43e"
+      }
+      provision "/us/usc/ptII/rule2002/g/5" paragraph {
+        num "5" "(5)"
+        chapeau "When a Notice Is Not Brought to a Creditor’s Attention. A creditor may treat a notice as not having been brought to the creditor’s attention under § 342(g)(1) only if, before the notice was issued, the creditor has filed a statement:"
+        provision "/us/usc/ptII/rule2002/g/5/A" subparagraph {
+          num "A" "(A)"
+          content "designating the name and address of the person or organizational subdivision responsible for receiving notices; and"
+          hash "9fd3266a86c9057ff3b24644680c91498bf9aca3f667ca7abecc4c56c5d1e51f"
+        }
+        provision "/us/usc/ptII/rule2002/g/5/B" subparagraph {
+          num "B" "(B)"
+          content "describing the creditor’s procedures for delivering notices to the designated person or organizational subdivision."
+          hash "aeb152113abc957b1c0e3e59a8c7870c88d079870ddbde2cd44227ae79e6d061"
+        }
+        hash "300d71b2e19b513b5d3683d6012d23f75e98e1d45b1d4eb3aeb976f3a469772d"
+      }
+      hash "f74a415ab0d79482a91785d478e2d84a8c3689974fadd1be8751689f18c894a5"
+    }
+    provision "/us/usc/ptII/rule2002/h" subsection {
+      num "h" "(h)"
+      heading "Notice to Creditors Who Filed Proofs of Claim in a Chapter 7, 12, or 13 Case."
+      provision "/us/usc/ptII/rule2002/h/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "Voluntary Case. This paragraph (1) applies in a voluntary Chapter 7 case, or in a Chapter 12 or 13 case. After 70 days following the order for relief under that chapter or the date of the order converting the case to Chapter 12 or 13, the court may direct that all notices required by (a) be mailed only to:"
+          p "• the debtor;"
+          p "• the trustee;"
+          p "• indenture trustees;"
+          p "• creditors with claims for which proofs of claim have been filed; and"
+          p "• creditors that are still permitted to file proofs of claim because they have received an extension of time under Rule 3002(c)(1) or (2)."
+        }
+        hash "f2d83cbd403971556771e68938279304a0b9f7d4ebcd250131acaf615064404f"
+      }
+      provision "/us/usc/ptII/rule2002/h/2" paragraph {
+        num "2" "(2)"
+        content "Involuntary Case. In an involuntary chapter" mark "2" 2 " 7 case, after 90 days following the order for relief, the court may order that all notices required by (a) be mailed only to those entities listed in (1)."
+        hash "db050b502aa10d2e53d989a9051bc51969d922831f2c74790ed71d8ae5f828ee"
+      }
+      provision "/us/usc/ptII/rule2002/h/3" paragraph {
+        num "3" "(3)"
+        content "When Notice of Insufficient Assets Has Been Given. If notice of insufficient assets to pay a dividend has been given to creditors under (e), after 90 days following the mailing of a notice of the time to file proofs of claim under Rule 3002(c)(5), the court may order that notices be mailed only to those entities listed in (1)."
+        hash "8fa546b14e29ea5f66c9eab3af415c300b41bc06978bd02e5f3c68c160d7c666"
+      }
+      hash "32b032e1e9f28c32f692dcb85e84eca67cf8ab2d9312e96469269bb8d20ef8c1"
+    }
+    provision "/us/usc/ptII/rule2002/i" subsection {
+      num "i" "(i)"
+      heading "Notice to a Committee."
+      provision "/us/usc/ptII/rule2002/i/1" paragraph {
+        num "1" "(1)"
+        content "In General. Any notice required to be mailed under this Rule 2002 must also be mailed to a committee elected under § 705 or appointed under § 1102, or to its authorized agent."
+        hash "b2fba781271c7da849a1fe5c0347c0a60ddce680c31d53899af1bc2042c9103c"
+      }
+      provision "/us/usc/ptII/rule2002/i/2" paragraph {
+        num "2" "(2)"
+        chapeau "Limiting Notices. The court may order that a notice required by (a)(2), (3), or (6) be:"
+        provision "/us/usc/ptII/rule2002/i/2/A" subparagraph {
+          num "A" "(A)"
+          content "sent to the United States trustee; and"
+          hash "ba22527b556bb6acb9d0d2cdb8e58e968938458a5afef611fcee140b56bfd106"
+        }
+        provision "/us/usc/ptII/rule2002/i/2/B" subparagraph {
+          num "B" "(B)"
+          chapeau "mailed only to:"
+          provision "/us/usc/ptII/rule2002/i/2/B/i" clause {
+            num "i" "(i)"
+            content "the committees elected under § 705 or appointed under § 1102, or to their authorized agents; and"
+            hash "f9df385cc027cb0f917966b6b593af8d0f48da31a93b8b14227f1ce458f12872"
+          }
+          provision "/us/usc/ptII/rule2002/i/2/B/ii" clause {
+            num "ii" "(ii)"
+            content "those creditors and equity security holders who file—and serve on the trustee or debtor in possession—a request that all notices be mailed to them."
+            hash "bc67d7d5d4400f65a4184b8e8ba1ae2258d0543b65ffcb4156535e83cc12def6"
+          }
+          hash "47e9764e054f75130ec20ba43f322af91ea9e6301be364281b5559cc00a89112"
+        }
+        hash "a0b05d82a4879f9972338012c2817baf951250ceb77df4e691698df9dd37a07d"
+      }
+      provision "/us/usc/ptII/rule2002/i/3" paragraph {
+        num "3" "(3)"
+        content "Copy to a Committee. A notice required under (a)(1), (a)(5), (b), (f)(1)(B)–(C), or (f)(1)(H)—and any other notice as the court orders—must be sent to a committee appointed under § 1114."
+        hash "5d57f8fcd681dfb2ab1185d565544fb481161eb779d03c415d961c22447e1003"
+      }
+      hash "7644bee0ab014a7143d8643b3c46aa51cbbf697fbe4302093062dfab2b6124f5"
+    }
+    provision "/us/usc/ptII/rule2002/j" subsection {
+      num "j" "(j)"
+      heading "Notice to the United States."
+      chapeau "A notice required to be mailed to all creditors under this Rule 2002 must also be mailed:"
+      provision "/us/usc/ptII/rule2002/j/1" paragraph {
+        num "1" "(1)"
+        content "in a Chapter 11 case in which the Securities and Exchange Commission has filed either a notice of appearance or a request to receive notices, to the SEC at any place it designates;"
+        hash "5ac4fc9c220be233911aed5066a90102067ca37c1363ffa7acde9a109490a16f"
+      }
+      provision "/us/usc/ptII/rule2002/j/2" paragraph {
+        num "2" "(2)"
+        content "in a commodity-broker case, to the Commodity Futures Trading Commission at Washington, D.C.;"
+        hash "f9df81d96fc4764765cecbe53c61c2ab85bc91c5118e9c8677f6b5d8a4eef01d"
+      }
+      provision "/us/usc/ptII/rule2002/j/3" paragraph {
+        num "3" "(3)"
+        content "in a Chapter 11 case, to the Internal Revenue Service at the address in the register maintained under Rule 5003(e) for the district where the case is pending;"
+        hash "38fa6c3872a287f567fce6375beea5d7cce97caa07a82e6d4bb8687da2da058b"
+      }
+      provision "/us/usc/ptII/rule2002/j/4" paragraph {
+        num "4" "(4)"
+        content "in a case in which the documents disclose that a debt (other than for taxes) is owed to the United States, to the United States attorney for the district where the case is pending and to the United States department, agency, or instrumentality through which the debtor became indebted; or"
+        hash "d3d5a13b871bc1877fe129a1c17b6066498d022e5e7ba575eb38e17954dd597b"
+      }
+      provision "/us/usc/ptII/rule2002/j/5" paragraph {
+        num "5" "(5)"
+        content "in a case in which the filed documents disclose a stock interest of the United States, to the Secretary of the Treasury at Washington, D.C."
+        hash "aa035c1728943005c60560dc82711982e0cf9564fc5961f99a23f2781db61227"
+      }
+      hash "d8ac5989f1b78ca302521d866cf73df6b9cecd61edfd180d68a937adcf24ebed"
+    }
+    provision "/us/usc/ptII/rule2002/k" subsection {
+      num "k" "(k)"
+      heading "Notice to the United States Trustee."
+      provision "/us/usc/ptII/rule2002/k/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. Except in a Chapter 9 case or unless the United States trustee requests otherwise, the clerk or the court’s designee must send to the United States trustee notice of:"
+        provision "/us/usc/ptII/rule2002/k/1/A" subparagraph {
+          num "A" "(A)"
+          content "all matters described in (a)(2)–(4), (a)(8)–(9), (b), (f)(1)(A)–(C), (f)(1)(E), (f)(1)(G)–(I), and (q);"
+          hash "389954d13406b5eaa1c78d536c9601939161e603eb926a24667d9ff7a754752a"
+        }
+        provision "/us/usc/ptII/rule2002/k/1/B" subparagraph {
+          num "B" "(B)"
+          content "all hearings on applications for compensation or for reimbursement of expenses; and"
+          hash "0a275fdfd3f109f1fae13c2dba2de25d165f7615c193b8dd510e8f8375875368"
+        }
+        provision "/us/usc/ptII/rule2002/k/1/C" subparagraph {
+          num "C" "(C)"
+          content "any other matter if the United States trustee requests it or the court orders it."
+          hash "3e9192e646a16fc1c7ff365fd6f22c8d2151fdb3f183f71a983b2bba261ea010"
+        }
+        hash "b6891f5caa31bde19dbb1f2f6edf1d8b5d2b866488ecd24f048b483709e494ee"
+      }
+      provision "/us/usc/ptII/rule2002/k/2" paragraph {
+        num "2" "(2)"
+        content "Time to Send. The notice must be sent within the time that (a) or (b) prescribes."
+        hash "3c2c95209a6473d01e0423032d1557418161e552add372c1471e29acabe4ab12"
+      }
+      provision "/us/usc/ptII/rule2002/k/3" paragraph {
+        num "3" "(3)"
+        content "Exception Under the Securities Investor Protection Act. In a case under the Securities Investor Protection Act, 15 U.S.C. § 78aaa et seq., these rules do not require any document to be sent to the United States trustee."
+        hash "6ab86c8eaf72119ee795735ae026b099f91faf90f61270163fa6c63a96627b8e"
+      }
+      hash "6cb92229442dd0534bd37bba6f1d683d4eddf63837455aaffc00e9c7ff3510b6"
+    }
+    provision "/us/usc/ptII/rule2002/l" subsection {
+      num "l" "(l)"
+      heading "Notice by Publication."
+      content "The court may order notice by publication if notice by mail is impracticable or if it is desirable to supplement the notice."
+      hash "9818fc347fde6ddde5435e998d0644abb1efc7e3e0cf921988b0eb6a430c6dee"
+    }
+    provision "/us/usc/ptII/rule2002/m" subsection {
+      num "m" "(m)"
+      heading "Orders Concerning Notices."
+      content "Except as these rules provide otherwise, the court may designate the matters about which, the entity to whom, and the form and manner in which a notice must be sent."
+      hash "96628495f0d187ad63702dc8609fc8ccbc1445613746ff5816c012ac394dd57b"
+    }
+    provision "/us/usc/ptII/rule2002/n" subsection {
+      num "n" "(n)"
+      heading "Notice of an Order for Relief in a Consumer Case."
+      content "In a voluntary case commenced under the Code by an individual debtor whose debts are primarily consumer debts, the clerk, or some other person as the court may direct, shall give the trustee and all creditors notice by mail of the order for relief not more than 20 days after the entry of such order."
+      hash "00141e315b88b6e4d974a82eef60689551022d59eb634e32301d22c74e2f8dbf"
+    }
+    provision "/us/usc/ptII/rule2002/o" subsection {
+      num "o" "(o)"
+      heading "Caption."
+      content "The caption of a notice given under this Rule 2002 must conform to Rule 1005. The caption of a debtor’s notice to a creditor must also include the information that § 342(c) requires."
+      hash "7dea0e7b54c9128f2b8fbc7b5b3457e46e61b117a811bf9a3f49d39d39b35b2b"
+    }
+    provision "/us/usc/ptII/rule2002/p" subsection {
+      num "p" "(p)"
+      heading "Notice to a Creditor with a Foreign Address."
+      provision "/us/usc/ptII/rule2002/p/1" paragraph {
+        num "1" "(1)"
+        content "When Notice by Mail Does Not Suffice. At the request of the United States trustee or a party in interest, or on its own, the court may find that a notice mailed to a creditor with a foreign address within the time these rules prescribe would not give the creditor reasonable notice. The court may then order that the notice be supplemented with notice by other means or that the time prescribed for the notice by mail be extended."
+        hash "5a78530e654b95c089e3cc058f817497e3ab47cc28fa6972fbce6d5aabfeb9eb"
+      }
+      provision "/us/usc/ptII/rule2002/p/2" paragraph {
+        num "2" "(2)"
+        content "Notice of the Time to File a Proof of Claim. Unless the court, for cause, orders otherwise, a creditor with a foreign address must be given at least 30 days’ notice of the time to file a proof of claim under Rule 3002(c) or Rule 3003(c)."
+        hash "5ca8cc6dfdcc5643d097240b1ffa4d16369906ed473923d7ae3e8874b4e09c2d"
+      }
+      provision "/us/usc/ptII/rule2002/p/3" paragraph {
+        num "3" "(3)"
+        content "Determining a Foreign Address. Unless the court, for cause, orders otherwise, the mailing address of a creditor with a foreign address must be determined under (g)."
+        hash "1985cc07f7f2eefd40973b6c02b530cd4524d1de7d7b2a8c06613813ba3f73cf"
+      }
+      hash "4c8d244f1f8a80a6e2891a5024b4b7e06a233d62d9bc0208b39ad1bff6349737"
+    }
+    provision "/us/usc/ptII/rule2002/q" subsection {
+      num "q" "(q)"
+      heading "Notice of a Petition for Recognition of a Foreign Proceeding; Notice of an Intent to Communicate with a Foreign Court or Foreign Representative."
+      provision "/us/usc/ptII/rule2002/q/1" paragraph {
+        num "1" "(1)"
+        content {
+          p "Timing of the Notice; Who Must Receive It. After a petition for recognition of a foreign proceeding is filed, the court must promptly hold a hearing on it. The clerk or the court’s designee must promptly give at least 21 days’ notice by mail of the hearing to:"
+          p "• the debtor;"
+          p "• all persons or bodies authorized to administer the debtor’s foreign proceedings;"
+          p "• all entities against whom provisional relief is being sought under § 1519;"
+          p "• all parties to litigation pending in the United States in which the debtor was a party when the petition was filed; and"
+          p "• any other entities as the court orders."
+        }
+        continuation "If the court consolidates the hearing on the petition with a hearing on a request for provisional relief, the court may set a shorter notice period."
+        hash "96a680b4fb15f5c2581b94ea34127704d459e33c0db2fdbfa75ae495e5851325"
+      }
+      provision "/us/usc/ptII/rule2002/q/2" paragraph {
+        num "2" "(2)"
+        chapeau "Content of the Notice. The notice must:"
+        provision "/us/usc/ptII/rule2002/q/2/A" subparagraph {
+          num "A" "(A)"
+          content "state whether the petition seeks recognition as a foreign main proceeding or a foreign nonmain proceeding; and"
+          hash "c384ea36e535dc068d471fa0e275dca51f0c853597e7fde3f41eae285b8accc8"
+        }
+        provision "/us/usc/ptII/rule2002/q/2/B" subparagraph {
+          num "B" "(B)"
+          content "include a copy of the petition and any other document the court specifies."
+          hash "8edc443f2080dd614189e9ec85690c3d2b77f342d1e07ab392d2f8f63036424d"
+        }
+        hash "592370f2842831b230a5f7923ff42136ee00fc7be0dea9f0873599ae95a0a59a"
+      }
+      provision "/us/usc/ptII/rule2002/q/3" paragraph {
+        num "3" "(3)"
+        content "Communicating with a Foreign Court or Foreign Representative. If the court intends to communicate with a foreign court or foreign representative, the clerk or the court’s designee must give notice by mail of the court’s intention to all those listed in (q)(1)."
+        hash "e20b60a7dd86208d8a68bd7b5fc5ccddc690406b1ef83f49ed1a8f3f300dc673"
+      }
+      hash "c18c54a76298376a1f34e5e1606d8f6616584b246b9a6c0ae0bd69bab2cefdcd"
+    }
+    hash "bd8a19804cc507c78722b3ecbe177837808f8f14c0488b377a797d76de50cd69"
+  }
+  credit "(As amended " ["Pub. L. 98–91, § 2(a)" -> "/us/pl/98/91/s2/a"] ", Aug. 30, 1983, " ["97 Stat. 607" -> "/us/stat/97/607"] "; " ["Pub. L. 98–353, title III, § 321" -> "/us/pl/98/353/tIII/s321"] ", July 10, 1984, " ["98 Stat. 357" -> "/us/stat/98/357"] "; Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 17, 2000, eff. Dec. 1, 2000; Apr. 23, 2001, eff. Dec. 1, 2001; Mar. 27, 2003, eff. Dec. 1, 2003; Apr. 26, 2004, eff. Dec. 1, 2004; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Some of the notices required by this rule may be given either by the clerk or as the court may otherwise direct. For example, the court may order the trustee or debtor in possession to transmit one or more of the notices required by this rule, such as, notice of a proposed sale of property. See § 363(b) of the Code. When publication of notices is required or desirable, reference should be made to Rule 9008."
+    p "Notice of the order for relief is required to be given by § 342 of the Code and by subdivision (f)(1) of this rule. That notice may be combined with the notice of the meeting of creditors as indicated in Official Form No. 16, the notice and order of the meeting of creditors."
+    p "Subdivision (a) sets forth the requirement that 20 days notice be given of the significant events in a case under the Bankruptcy Code. The former Act and Rules provided a ten day notice in bankruptcy and Chapter XI cases, and a 20 day notice in a Chapter X case. This rule generally makes uniform the 20 day notice provision except that subdivision (b) contains a 25 day period for certain events in a chapter 9, 11, or 13 case. Generally, Rule 9006 permits reduction of time periods. Since notice by mail is complete on mailing, the requirement of subdivision (a) is satisfied if the notices are deposited in the mail at least 20 days before the event. See Rule 9006(e). The exceptions referred to in the introductory phrase include the modifications in the notice procedure permitted by subdivision (h) as to non-filing creditors, subdivision (i) as to cases where a committee is functioning, and subdivision (k) where compliance with subdivision (a) is impracticable."
+    p "The notice of a proposed sale affords creditors an opportunity to object to the sale and raise a dispute for the court’s attention. Section 363(b) of the Code permits the trustee or debtor in possession to sell property, other than in the ordinary course of business, only after notice and hearing. If no objection is raised after notice, § 102(1) provides that there need not be an actual hearing. Thus, absent objection, there would be no court involvement with respect to a trustee’s sale. Once an objection is raised, only the court may pass on it."
+    p "Prior to the Code the court could shorten the notice period for a proposed sale of property or dispense with notice. This subdivision (a), permits the 20 day period to be shortened in appropriate circumstances but the rule does not contain a provision allowing the court to dispense with notice. The rule is thus consistent with the Code, §§ 363(b) and 102(1)(A) of the Code. See 28 U.S.C. § 2075. It may be necessary, in certain circumstances, however, to use a method of notice other than mail. Subdivision (a)(2) vests the court with discretion, on cause shown, to order a different method. Reference should also be made to Rule 6004 which allows a different type of notice of proposed sales when the property is of little value."
+    p "Notice of the hearing on an application for compensation or reimbursement of expenses totalling $100 or less need not be given. In chapter 13 cases relatively small amounts are sometimes allowed for post-confirmation services and it would not serve a useful purpose to require advance notice."
+    p "Subdivision (b) is similar to subdivision (a) but lengthens the notice time to 25 days with respect to those events particularly significant in chapter 9, 11 and 13 cases. The additional time may be necessary to formulate objections to a disclosure statement or confirmation of a plan and preparation for the hearing on approval of the disclosure statement or confirmation. The disclosure statement and hearing thereon is only applicable in chapter 9 cases (§ 901(a) of the Code), and chapter 11 cases (§ 1125 of the Code)."
+    p "Subdivision (c) specifies certain matters that should be included in the notice of a proposed sale of property and notice of the hearing on an application for allowances. Rule 6004 fixes the time within which parties in interest may file objections to a proposed sale of property."
+    p "Subdivision (d) relates exclusively to the notices given to equity security holders in chapter 11 cases. Under chapter 11, a plan may impair the interests of the debtor’s shareholders or a plan may be a relatively simple restructuring of unsecured debt. In some cases, it is necessary that equity interest holders receive various notices and in other cases there is no purpose to be served. This subdivision indicates that the court is not mandated to order notices but rather that the matter should be treated with some flexibility. The court may decide whether notice is to be given and how it is to be given. Under § 341(b) of the Code, a meeting of equity security holders is not required in each case, only when it is ordered by the court. Thus subdivision (d)(2) requires notice only when the court orders a meeting."
+    p "In addition to the notices specified in this subdivision, there may be other events or matters arising in a case as to which equity security holders should receive notice. These are situations left to determination by the court."
+    p "Subdivision (e), authorizing a notice of the apparent insufficiency of assets for the payment of any dividend, is correlated with Rule 3002(c)(5), which provides for the issuance of an additional notice to creditors if the possibility of a payment later materializes."
+    p "Subdivision (f) provides for the transmission of other notices to which no time period applies. Clause (1) requires notice of the order for relief; this complements the mandate of § 342 of the Code requiring such notice as is appropriate of the order for relief. This notice may be combined with the notice of the meeting of creditors to avoid the necessity of more than one mailing. See Official Form No. 16, notice of meeting of creditors."
+    p "Subdivision (g) recognizes that an agent authorized to receive notices for a creditor may, without a court order, designate where notices to the creditor he represents should be addressed. Agent includes an officer of a corporation, an attorney at law, or an attorney in fact if the requisite authority has been given him. It should be noted that Official Forms Nos. 17 and 18 do not include an authorization of the holder of a power of attorney to receive notices for the creditor. Neither these forms nor this rule carries any implication that such an authorization may not be given in a power of attorney or that a request for notices to be addressed to both the creditor or his duly authorized agent may not be filed."
+    p "Subdivision (h). After the time for filing claims has expired in a chapter 7 case, creditors who have not filed their claims in accordance with Rule 3002(c) are not entitled to share in the estate except as they may come within the special provisions of § 726 of the Code or Rule 3002(c)(6). The elimination of notice to creditors who have no recognized stake in the estate may permit economies in time and expense. Reduction of the list of creditors to receive notices under this subdivision is dis­cretionary. This subdivision does not apply to the notice of the meeting of creditors."
+    p "Subdivision (i) contains a list of matters of which notice may be given a creditors’ committee or to its authorized agent in lieu of notice to the creditors. Such notice may serve every practical purpose of a notice to all the creditors and save delay and expense. In re Schulte-United, Inc., 59 F.2d 553, 561 (8th Cir. 1932)."
+    p "Subdivision (j). The premise for the requirement that the district director of internal revenue receive copies of notices that all creditors receive in a chapter 11 case is that every debtor is potentially a tax debtor of the United States. Notice to the district director alerts him to the possibility that a tax debtor’s estate is about to be liquidated or reorganized and that the debtor may be discharged. When other indebtedness to the United States is indicated, the United States attorney is notified as the person in the best position to protect the interests of the government. In addition, the provision requires notice by mail to the head of any department, agency, or instrumentality of the United States through whose action the debtor became indebted to the United States. This rule is not intended to preclude a local rule from requiring a state or local tax authority to receive some or all of the notices to creditors under these rules."
+    p "Subdivision (k) specifies two kinds of situations in which notice by publication may be appropriate: (1) when notice by mail is impracticable; and (2) when notice by mail alone is less than adequate. Notice by mail may be impracticable when, for example, the debtor has disappeared or his records have been destroyed and the names and addresses of his creditors are unavailable, or when the number of creditors with nominal claims is very large and the estate to be distributed may be insufficient to defray the costs of issuing the notices. Supplementing notice by mail is also indicated when the debtor’s records are incomplete or inaccurate and it is reasonable to believe that publication may reach some of the creditors who would otherwise be missed. Rule 9008 applies when the court directs notice by publication under this rule. Neither clause (2) of subdivision (a) nor subdivision (k) of this rule is concerned with the publication of advertisement to the general public of a sale of property of the estate at public auction under Rule 6004(b). See 3 Collier, Bankruptcy 522–23 (14th ed. 1971); 4B id. 1165–67 (1967); 2 id. ¶ 363.03 (15th ed. 1981)."
+    p "Subdivision (m). Inclusion in notices to creditors of information as to other names used by the debtor as required by Rule 1005 will assist them in the preparation of their proofs of claim and in deciding whether to file a complaint objecting to the debtor’s discharge. Additional names may be listed by the debtor on his statement of affairs when he did not file the petition. The mailing of notices should not be postponed to await a delayed filing of the statement of financial affairs."
+    hash "d0228a25d5fd8c345ade44726a97a86132307ad8403d110816bb89c1b8751e1f"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (a) is amended to provide that notice of a hearing on an application for compensation must be given only when the amount requested is in excess of $500."
+    p "Subdivision (d). A new notice requirement is added as clause (3). When a proposed sale is of all or substantially all of the debtor’s assets, it is appropriate that equity security holders be given notice of the proposed sale. The clauses of subdivision (d) are renumbered to accommodate this addition."
+    p "Subdivision (f). Clause (7) is eliminated. Mailing of a copy of the discharge order is governed by Rule 4004(g)."
+    p "Subdivision (g) is amended to relieve the clerk of the duty to mail notices to the address shown in a proof of claim when a notice of no dividend has been given pursuant to Rule 2002. This amendment avoids the necessity of the clerk searching proofs of claim which are filed in no dividend cases to ascertain whether a different address is shown."
+    p "Subdivision (n) was enacted by § 321 of the 1984 amendments."
+    hash "50013887362ce4ef906cccdababc63dcbbdb875f6df4456ae709240a69127b17"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a)(3) is amended to exclude compromise or settlement agreements concerning adequate protection or which modify or terminate the automatic stay, provide for use of cash collateral, or create a senior or equal lien on collateral to obtain credit. Notice requirements relating to approval of such agreements are governed by Rule 4001(d)."
+    p "Subdivision (a)(5) is amended to include a hearing on dismissal or conversion of a chapter 12 case. This subdivision does not apply when a hearing is not required. It is also amended to avoid the necessity of giving notice to all creditors of a hearing on the dismissal of a consumer debtor’s case based on substantial abuse of chapter 7. Such hearings on dismissal under § 707(b) of the Code are governed by Rule 1017(e)."
+    p "Subdivision (a)(9) is added to provide for notice of the time fixed for filing objections and the hearing to consider confirmation of a plan in a chapter 12 case. Section 1224 of the Code requires “expedited notice” of the confirmation hearing in a chapter 12 case and requires that the hearing be concluded not later than 45 days after the filing of the plan unless the time is extended for cause. This amendment establishes 20 days as the notice period. The court may shorten this time on its own motion or on motion of a party in interest. The notice includes both the date of the hearing and the date for filing objections, and must be accompanied by a copy of the plan or a summary of the plan in accordance with Rule 3015(d)."
+    p "Subdivision (b) is amended to delete as unnecessary the references to subdivisions (h) and (i)."
+    p "Subdivision (d) does not require notice to equity security holders in a chapter 12 case. The procedural burden of requiring such notice is outweighed by the likelihood that all equity security holders of a family farmer will be informed of the progress of the case without formal notice. Subdivision (d) is amended to recognize that the United States trustee may convene a meeting of equity security holders pursuant to § 341(b)."
+    p "Subdivision (f)(2) is amended and subdivision (f)(4) is deleted to require notice of any conversion of the case, whether the conversion is by court order or is effectuated by the debtor filing a notice of conversion pursuant to §§ 1208(a) or 1307(a). Subdivision (f)(8), renumbered (f)(7), is amended to include entry of an order confirming a chapter 12 plan. Subdivision (f)(9) is amended to increase the amount to $1,500."
+    p "Subdivisions (g) and (j) are amended to delete the words “with the court” and subdivision (i) is amended to delete the words “with the clerk” because these phrases are unnecessary. See Rules 5005(a) and 9001(3)."
+    p "Subdivision (i) is amended to require that the United States trustee receive notices required by subdivision (a)(2), (3) and (7) of this rule notwithstanding a court order limiting such notice to committees and to creditors and equity security holders who request such notices. Subdivision (i) is amended further to include committees elected pursuant to § 705 of the Code and to provide that committees of retired employees appointed in chapter 11 cases receive certain notices."
+    p "Subdivision (k) is derived from Rule X–1008. The administrative functions of the United States trustee pursuant to 28 U.S.C. § 586(a) and standing to be heard on issues under § 307 and other sections of the Code require that the United States trustee be informed of developments and issues in every case except chapter 9 cases. The rule omits those notices described in subdivision (a)(1) because a meeting of creditors is convened only by the United States trustee, and those notices described in subdivision (a)(4) (date fixed for filing claims against a surplus), subdivision (a)(6) (time fixed to accept or reject proposed modification of a plan), subdivision (a)(8) (time fixed for filing proofs of claims in chapter 11 cases), subdivision (f)(3) (time fixed for filing claims in chapter 7, 12, and 13 cases), and subdivision (f)(5) (time fixed for filing complaint to determine dischargeability of debt) because these notices do not relate to matters that generally involve the United States trustee. Nonetheless, the omission of these notices does not prevent the United States trustee from receiving such notices upon request. The United States trustee also receives notice of hearings on applications for compensation or reimbursement without regard to the $500 limitation contained in subdivision (a)(7) of this rule. This rule is intended to be flexible in that it permits the United States trustee in a particular judicial district to request notices in certain categories, and to request not to receive notices in other categories, when the practice in that district makes that desirable."
+    hash "e2aa36b2cf22b75cfdf2a2d2924bf8c908d65b6a9979eec117d38778957d2346"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "Subdivision (j) is amended to avoid the necessity of sending an additional notice to the Washington, D.C. address of the Securities and Exchange Commission if the Commission prefers to have notices sent only to a local office. This change also clarifies that notices required to be mailed pursuant to this rule must be sent to the Securities and Exchange Commission only if it has filed a notice of appearance or has filed a written request. Other amendments are stylistic and make no substantive change."
+    hash "192101b64d82adbf2b369958bad8e1cf521b8905beefaacec8eb73e7f4fd8726"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1996 Amendment"
+    p "Paragraph (a)(4) is abrogated to conform to the abrogation of Rule 3002(c)(6). The remaining paragraphs of subdivision (a) are renumbered, and references to these paragraphs contained in other subdivisions of this rule are amended accordingly."
+    p "Paragraph (f)(8) is amended so that a summary of the trustee’s final account, which is prepared after distribution of property, does not have to be mailed to the debtor, all creditors, and indenture trustees in a chapter 7 case. Parties are sufficiently protected by receiving a summary of the trustee’s final report that informs parties of the proposed distribution of property."
+    p "Subdivision (h) is amended (1) to provide that an order under this subdivision may not be issued if a notice of no dividend is given pursuant to Rule 2002(e) and the time for filing claims has not expired as provided in Rule 3002(c)(5); (2) to clarify that notices required to be mailed by subdivision (a) to parties other than creditors must be mailed to those entities despite an order issued pursuant to subdivision (h); (3) to provide that if the court, pursuant to Rule 3002(c)(1) or 3002(c)(2), has granted an extension of time to file a proof of claim, the creditor for whom the extension has been granted must continue to receive notices despite an order issued pursuant to subdivision (h); and (4) to delete references to subdivision (a)(4) and Rule 3002(c)(6), which have been abrogated."
+    p "Other amendments to this rule are stylistic."
+    p "GAP Report on Rule 2002. No changes since publication, except for stylistic changes and the correction of a typographical error in the committee note."
+    hash "71f0092c93b91bb8a82da5b014004cac666bd012fac8500e2a32804205fd6808"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997 Amendment"
+    p "Paragraph (a)(1) is amended to include notice of a meeting of creditors convened under § 1104(b) of the Code for the purpose of electing a trustee in a chapter 11 case. The court for cause shown may order the 20-day period reduced pursuant to Rule 9006(c)(1)."
+    p "Subdivision (n) is amended to conform to the 1994 amendment to § 342 of the Code. As provided in § 342(c), the failure of a notice given by the debtor to a creditor to contain the information required by § 342(c) does not invalidate the legal effect of the notice."
+    p "GAP Report on Rule 2002. No changes to the published draft."
+    hash "747e37690f887bc8cd753c332bc06923c269ce3b4aa79d9bf7199e1a22d03e43"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "Paragraph (a)(4) is amended to conform to the amendments to Rule 1017. If the United States trustee files a motion to dismiss a case for the debtor’s failure to file the list of creditors, schedules, or the statement of financial affairs within the time specified in § 707(a)(3), the amendments to this rule and to Rule 1017 eliminate the requirement that all creditors receive notice of the hearing."
+    p "Paragraph (a)(4) is amended further to conform to Rule 1017(b), which requires that notice of the hearing on dismissal of a case for failure to pay the filing fee be served on only the debtor and the trustee."
+    p "Paragraph (f)(2) is amended to provide for notice of the suspension of proceedings under § 305."
+    p "GAP Report on Rule 2002. No changes since publication."
+    hash "8aaf4bb288da58c18c175e94b623553e904347f3148e7306a4782b1b14f38ac7"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2000 Amendment"
+    p "Paragraph (a)(6) is amended to increase the dollar amount from $500 to $1,000. The amount was last amended in 1987, when it was changed from $100 to $500. The amendment also clarifies that the notice is required only if a particular entity is requesting more than $1,000 as compensation or reimbursement of expenses. If several professionals are requesting compensation or reimbursement, and only one hearing will be held on all applications, notice under paragraph (a)(6) is required only with respect to the entities that have requested more than $1,000. If each applicant requests $1,000 or less, notice under paragraph (a)(6) is not required even though the aggregate amount of all applications to be considered at the hearing is more than $1,000."
+    p "If a particular entity had filed prior applications or had received compensation or reimbursement of expenses at an earlier time in the case, the amounts previously requested or awarded are not considered when determining whether the present application exceeds $1,000 for the purpose of applying this rule."
+    p "GAP Report on Rule 2002(a). No changes since publication."
+    hash "0035f42c2e8e23eee2093b383ad351f9271190476104478a5d11941582347a3f"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2001 Amendment"
+    p "Subdivision (c)(3) is added to assure that parties given notice of a hearing to consider confirmation of a plan under subdivision (b) are given adequate notice of an injunction provided for in the plan if it would enjoin conduct that is not otherwise enjoined by operation of the Code. The validity and effect of any injunction provided for in a plan are substantive law matters that are beyond the scope of these rules."
+    p "The notice requirement of subdivision (c)(3) is not applicable to an injunction contained in a plan if it is substantially the same as an injunction provided under the Code. For example, if a plan contains an injunction against acts to collect a discharged debt from the debtor, Rule 2002(c)(3) would not apply because that conduct would be enjoined under § 524(a)(2) upon the debtor’s discharge. But if a plan provides that creditors will be enjoined from asserting claims against persons who are not debtors in the case, the notice of the confirmation hearing must include the information required under Rule 2002(c)(3) because that conduct would not be enjoined by operation of the Code. See § 524(e)."
+    p "The requirement that the notice identify the entities that would be subject to the injunction requires only reasonable identification under the circumstances. If the entities that would be subject to the injunction cannot be identified by name, the notice may describe them by class or category if reasonable under the circumstances. For example, it may be sufficient for the notice to identify the entities as “all creditors of the debtor” and for the notice to be published in a manner that satisfies due process requirements."
+    p "Subdivision (g) has been revised to clarify that where a creditor or indenture trustee files both a proof of claim which includes a mailing address and a separate request designating a mailing address, the last paper filed determines the proper address. The amendments also clarify that a request designating a mailing address is effective only with respect to a particular case."
+    p "Under Rule 2002(g), a duly filed proof of claim is considered a request designating a mailing address if a notice of no dividend has been given under Rule 2002(e), but has been superseded by a subsequent notice of possible dividend under Rule 3002(c)(5). A duly filed proof of interest is considered a request designating a mailing address of an equity security holder."
+    p "Rule 2002(g)(3) is added to assure that notices to an infant or incompetent person under this rule are mailed to the appropriate guardian or other legal representative. Under Rule 1007(m), if the debtor knows that a creditor is an infant or incompetent person, the debtor is required to include in the list and schedule of creditors the name and address of the person upon whom process would be served in an adversary proceeding in accordance with Rule 7004(b)(2). If the infant or incompetent person, or another person, files a request or proof of claim designating a different name and mailing address, the notices would have to be mailed to both names and addresses until the court resolved the issue as to the proper mailing address."
+    p "The other amendments to Rule 2002(g) are stylistic."
+    p "Changes Made After Publication and Comments. In Rule 2002(c)(3), the word “highlighted” was replaced with “underlined” because highlighted documents are difficult to scan electronically for inclusion in the clerks’ files. The Committee Note was revised to put in a more prominent position the statement that the validity and effect of any injunction provided for in a plan are substantive matters beyond the scope of the rules."
+    p "In Rule 2002(g), no changes were made."
+    hash "d9ad241200f62580b6ad364957ca349ff293f0fe97f5ca207b6a89a8e57c16b1"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2003 Amendment"
+    p "Subdivision (a)(1) of the rule is amended to direct the clerk or other person giving notice of the § 341 or § 1104(b) meeting of creditors to include the debtor’s full social security number on the notice. Official Form 9, the form of the notice of the meeting of creditors that will become a part of the court’s file in the case, will include only the last four digits of the debtor’s social security number. This rule, however, directs the clerk to include the full social security number on the notice that is served on the creditors and other identified parties, unless the court orders otherwise in a particular case. This will enable creditors and other parties in interest who are in possession of the debtor’s social security number to verify the debtor’s identity and proceed accordingly. The filed Official Form 9, however, will not include the debtor’s full social security number. This will prevent the full social security number from becoming a part of the court’s file in the case, and the number will not be included in the court’s electronic records. Creditors who already have the debtor’s social security number will be able to verify the existence of a case under the debtor’s social security number, but any person searching the electronic case files without the number will not be able to acquire the debtor’s social security number."
+    p "Changes Made After Publication and Comments. The rule amendment was made in response to concerns of both private creditors and taxing authorities that truncating the social security number of a debtor to the last four digits would unduly hamper their ability to identify the debtor and govern their actions accordingly. Therefore, the Advisory Committee amended Rule 2002 to require the clerk to include the debtor’s full social security number on the notice informing creditors of the § 341 meeting and other significant deadlines in the case. This is essentially a continuation of the practice under the current rules, and the amendment is necessary because of the amendment to Rule 1005 that restricts publication of the social security number on the caption of the petition to the final four digits of the number."
+    hash "54cc4c4a84f13281b065e436bb463cf48293896b6b771db14f93fba2efe58425"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-2004-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2004 Amendment"
+    p "The rule is amended to reflect that the structure of the Internal Revenue Service no longer includes a District Director. Thus, rather than sending notice to the District Director, the rule now requires that the notices be sent to the location designated by the Service and set out in the register of addresses maintained by the clerk under Rule 5003(e). The other change is stylistic."
+    hash "8d7e73ceaf04517b019351ac03c273641aa2f427d108614b112d73474f00ba9e"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2005 Amendment"
+    p "A new paragraph (g)(4) is inserted in the rule. The new paragraph authorizes an entity and a notice provider to agree that the notice provider will give notices to the entity at the address or addresses set out in their agreement. Rule 9001(9) sets out the definition of a notice provider."
+    p "The business of many entities is national in scope, and technology currently exists to direct the transmission of notice (both electronically and in paper form) to those entities in an accurate and much more efficient manner than by sending individual notices to the same creditor by separate mailings. The rule authorizes an entity and a notice provider to determine the manner of the service as well as to set the address or addresses to which the notices must be sent. For example, they could agree that all notices sent by the notice provider to the entity must be sent to a single, nationwide electronic or postal address. They could also establish local or regional addresses to which notices would be sent in matters pending in specific districts. Since the entity and notice provider also can agree on the date of the commencement of service under the agreement, there is no need to set a date in the rule after which notices would have to be sent to the address or addresses that the entity establishes. Furthermore, since the entity supplies the address to the notice provider, use of that address is conclusively presumed to be proper. Nonetheless, if that address is not used, the notice still may be effective if the notice is otherwise effective under applicable law. This is the same treatment given under Rule 5003(e) to notices sent to governmental units at addresses other than those set out in that register of addresses."
+    p "The remaining subdivisions of Rule 2002(g) continue to govern the addressing of a notice that is not sent pursuant to an agreement described in Rule 2002(g)(4)."
+    p "Changes Made After Publication and Comment. No changes since publication."
+    hash "fa35b8aed9b49648237372874bd308bd306affa2479e3e94a4e089c37ef93054"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subdivision (b) is amended to provide for 25 days’ notice of the time for the court to make a final determination whether the plan in a small business case can serve as a disclosure statement. Conditional approval of a disclosure statement in a small business case is governed by Rule 3017.1 and does not require 25 days’ notice. The court may consider this matter in a hearing combined with the confirmation hearing in a small business case."
+    p "Because of the requirements of Rule 6004(g), subdivision (c)(1) is amended to require that a trustee leasing or selling personally identifiable information under § 363(b)(1)(A) or (B) of the Code, as amended in 2005, include in the notice of the lease or sale transaction a statement as to whether the lease or sale is consistent with a policy prohibiting the transfer of the information."
+    p "Subdivisions (f)(9) and (10) are new. They reflect the 2005 amendments to §§ 342(d) and 704(b) of the Code. Section 342(d) requires the clerk to give notice to creditors shortly after the commencement of the case as to whether a presumption of abuse exists. Subdivision (f)(9) adds this notice to the list of notices that the clerk must give. Subdivision (f)(10) implements the amendment to § 704(b), which requires the court to provide a copy to all creditors of a statement by the United States trustee or bankruptcy administrator as to whether the debtor’s case would be presumed to be an abuse under § 707(b) not later than five days after receiving it."
+    p "Subdivision (f)(11) is also added to provide notice to creditors of the debtor’s filing of a statement in a chapter 11, 12, or 13 case that there is no reasonable cause to believe that § 522(q) applies in the case. This allows a creditor who disputes that assertion to request a delay of the entry of the discharge in the case."
+    p "Subdivision (g)(2) of the rule is amended because the 2005 amendments to § 342(f) of the Code permit creditors in chapter 7 and 13 individual debtor cases to file a notice with any bankruptcy court of the address to which the creditor wishes all notices to be sent. The amendment to Rule 2002(g)(2) therefore only limits application of the subdivision when a creditor files a notice under § 342(f)."
+    p "New subdivision (g)(5) implements § 342(g)(1) which was added to the Code in 2005. Section 342(g)(1) allows a creditor to treat a notice as not having been brought to the creditor’s attention, and so potentially ineffective, until it is received by a person or organizational subdivision that the creditor has designated to receive notices under the Bankruptcy Code. Under that section, the creditor must have established reasonable procedures for such notices to be delivered to the designated person or subdivision. The rule provides that, in order to challenge a notice under § 342(g)(1), a creditor must have filed the name and address of the designated notice recipient, as well as a description of the procedures for directing notices to that recipient, prior to the time that the challenged notice was issued. The filing required by the rule may be made as part of a creditor’s filing under § 342(f), which allows a creditor to file a notice of the address to be used by all bankruptcy courts or by particular bankruptcy courts to provide notice to the creditor in cases under chapters 7 and 13. Filing the name and address of the designated notice recipient and the procedures for directing notices to that recipient will reduce uncertainty as to the proper party for receiving notice and limit factual disputes as to whether a notice recipient has been designated and as to the nature of procedures adopted to direct notices to the recipient."
+    p "Subdivision (k) is amended to add notices given under subdivision (q) to the list of notices which must be served on the United States trustee."
+    p "Section 1514(d) of the Code, added by the 2005 amendments, requires that such additional time as is reasonable under the circumstances be given to creditors with foreign addresses with respect to notices and the filing of a proof of claim. Thus, subdivision (p)(1) is added to this rule to give the court flexibility to direct that notice by other means shall supplement notice by mail, or to enlarge the notice period, for creditors with foreign addresses. If cause exists, such as likely delays in the delivery of mailed notices in particular locations, the court may order that notice also be given by email, facsimile, or private courier. Alternatively, the court may enlarge the notice period for a creditor with a foreign address. It is expected that in most situations involving foreign creditors, fairness will not require any additional notice or extension of the notice period. This rule recognizes that the court has discretion to establish procedures to determine, on its own initiative, whether relief under subdivision (p) is appropriate, but that the court is not required to establish such procedures and may decide to act only on request of a party in interest."
+    p "Subdivision (p)(2) is added to the rule to grant creditors with a foreign address to which notices are mailed at least 30 days’ notice of the time within which to file proofs of claims if notice is mailed to the foreign address, unless the court orders otherwise. If cause exists, such as likely delays in the delivery of notices in particular locations, the court may extend the notice period for creditors with foreign addresses. The court may also shorten the additional notice time if circumstances so warrant. For example, if the court in a chapter 11 case determines that supplementing the notice to a foreign creditor with notice by electronic means, such as email or facsimile, would give the creditor reasonable notice, the court may order that the creditor be given only 20 days’ notice in accordance with Rule 2002(a)(7)."
+    p "Subdivision (p)(3) is added to provide that the court may, for cause, override a creditor’s designation of a foreign address under Rule 2002(g). For example, if a party in interest believes that a creditor has wrongfully designated a foreign address to obtain additional time when it has a significant presence in the United States, the party can ask the court to order that notices to that creditor be sent to an address other than the one designated by the foreign creditor."
+    p "Subdivision (q) is added to require that notice of the hearing on the petition for recognition of a foreign proceeding be given to the debtor, all administrators in foreign proceedings of the debtor, entities against whom provisional relief is sought, and entities with whom the debtor is engaged in litigation at the time of the commencement of the case. There is no need at this stage of the proceedings to provide notice to all creditors. If the foreign representative should take action to commence a case under another chapter of the Code, the rules governing those proceedings will operate to provide that notice is given to all creditors."
+    p "The rule also requires notice of the court’s intention to communicate with a foreign court or foreign representative."
+    p "Changes Made After Publication. Subdivision (g)(2) was amended to provide that the designated address of a governmental unit under Rule 5003(e) establishes an exception to the rule that a creditor’s address is to be taken from the debtor’s schedules. The fifth and sixth paragraphs of the Committee Note were amended to explain that change."
+    p "Subdivision (p)(3) was added to the rule to provide that the court may override a creditor’s designation of a foreign mailing address under Rule 2002(g). This will permit a party in interest to seek court relief if a creditor has improperly designated a foreign address."
+    p "Subdivision (q)(1) and (2) were amended by adopting language from § 101(24) to identify foreign representatives as “all persons or bodies authorized to administer foreign proceedings of the debtor” rather than as “all administrators in foreign proceedings of the debtor.” References to Rule 5012 in subdivision (q)(2) and in the Committee Note were deleted."
+    hash "0be26b6493061c71f264ffbdeefb1218cde3bf964d9dd94786d0c29a31a87f6f"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2016 Amendment"
+    p "Subdivision (q) is amended to clarify the procedures for giving notice in cross-border proceedings. The amended rule provides, in keeping with Code § 1517(c), for the court to schedule a hearing to be held promptly on the petition for recognition of a foreign proceeding. The amended rule contemplates that a hearing on a request for provisional relief may sometimes overlap substantially with the merits of the petition for recognition. In that case, the court may choose to consolidate the hearing on the request for provisional relief with the hearing on the petition for recognition, see Rules 1018 and 7065, and accordingly shorten the usual 21-day notice period."
+    hash "6fbc2ab9504d721e16f2bdd43a669d8ab551b3b1430e9e133a98a93234ea91cc"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017 Amendment"
+    p "Subdivisions (a) and (b) are amended and reorganized to alter the provisions governing notice under this rule in chapter 13 cases. Subdivision (a)(9) is added to require at least 21 days’ notice of the time for filing objections to confirmation of a chapter 13 plan. Subdivision (b)(3) is added to provide separately for 28 days’ notice of the date of the confirmation hearing in a chapter 13 case. These amendments conform to amended Rule 3015, which governs the time for presenting objections to confirmation of a chapter 13 plan. Other changes are stylistic."
+    hash "6e313ca16a25e52dd51388ec8cc594abe60ac0628add86f0a1ae1c05412ca834"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2020 Amendment"
+    p "Subdivision (f) is amended to add cases under chapter 13 of the Bankruptcy Code to paragraph (7)."
+    p "Subdivision (h) is amended to add cases under chapters 12 and 13 of the Bankruptcy Code and to conform the time periods in the subdivision to the respective deadlines for filing proofs of claim under Rule 3002(c)."
+    p "Subdivision (k) is amended to add a reference to subdivision (a)(9) of this rule. This change corresponds to the relocation of the deadline for objecting to confirmation of a chapter 13 plan from subdivision (b) to subdivision (a)(9). The rule thereby continues to require transmittal of notice of that deadline to the United States trustee."
+    hash "73dce03ef2266f934152ed32494ad743f950bf680cd0c96184d2144e0d5bcd94"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/pl.98.91/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of most provisions in Rule 2002 have been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only. In (f)[,] the phrase “or some other person as the court may direct” has not been restyled because it was enacted by Congress, " ["P.L. 98–91" -> "/us/pl/98/91"] ", " ["97 Stat. 607" -> "/us/stat/97/607"] ", § 2 (1983). [Phrase enacted by " ["Pub. L. 98–91" -> "/us/pl/98/91"] " contained the word “Court” rather than “court”.] Rule 2002(n) has not been restyled because it was also enacted by Congress, " ["P.L. 98–353" -> "/us/pl/98/353"] ", " ["98 Stat. 357" -> "/us/stat/98/357"] ", § 114 [§ 321] (1984). That subsection was erroneously redesignated as subdivision (o) in 2008 [1991], and amended to modify its time period from 20 to 21 days in 2009. Because the Bankruptcy Rules Enabling Act, 28 U.S.C. § 2075, provides no authority to modify statutory language, the subdivision is now returned to the language used by Congress."
+    hash "a69229740e0b661947a30d07f94142c739b6a16ed5695aca7b218c0ff189b98e"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/pl.91.598/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Securities Investor Protection Act, referred to in subd. (k)(3), probably means the Securities Investor Protection Act of 1970, " ["Pub. L. 91–598" -> "/us/pl/91/598"] ", Dec. 30, 1970, " ["84 Stat. 1636" -> "/us/stat/84/1636"] ", which is classified generally to chapter 2B–1 (§ 78aaa et seq.) of Title 15, Commerce and Trade. For complete classification of this Act to the Code, see " ["section 78aaa of Title 15" -> "/us/usc/t15/s78aaa"] " and Tables."
+    hash "0321e5c8e5abb17f16b60a68a841b0d11e9a929dc9d9fb6f55f170dc85bde8a2"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/pl.98.353/amendment-by-public-law" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Amendment by Public Law"
+    p "1984—Subd. (n). " ["Pub. L. 98–353" -> "/us/pl/98/353"] " added subd. (n)."
+    p "1983—Subd. (f). " ["Pub. L. 98–91" -> "/us/pl/98/91"] " inserted “, or some other person as the Court may direct,” after “clerk”."
+    hash "275554940e0623d1c3602c6c1dc52e0ddde9aff05282703e8854c83632d32ca6"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/pl.98.353/effective-date-of-1984-amendment" enacted {
+    group ungrouped
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1984 Amendment"
+    p "Amendment by " ["Pub. L. 98–353" -> "/us/pl/98/353"] " effective with respect to cases filed 90 days after July 10, 1984, see " ["section 552(a) of Pub. L. 98–353" -> "/us/pl/98/353/s552/a"] ", set out as a note under " ["section 101 of this title" -> "/us/usc/t11/s101"] "."
+    hash "ce0d3f0532a1eb696f487e052457b2f07ca42e506eec33fe1e8e762fc8a0e5a2"
+  }
+  note "/us/usc/ptII/rule2002/note/ungrouped/pl.98.91/effective-date-of-1983-amendment" enacted {
+    group ungrouped
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1983 Amendment"
+    p ["Pub. L. 98–91, § 1" -> "/us/pl/98/91/s1"] ", Aug. 30, 1983, " ["97 Stat. 607" -> "/us/stat/97/607"] ", provided:"
+    quoted "/us/pl/98/91/s1" {
+      p "“That rule 2002(f) of the Bankruptcy Rules, as proposed by the United States Supreme Court in the order of April 25, 1983, of the Court, shall take effect on August 1, 1983, except as otherwise provided in section 2 [amending subd. (f) of this rule and enacting a provision set out as a note below].”"
+    }
+    p ["Pub. L. 98–91, § 2(b)" -> "/us/pl/98/91/s2/b"] ", Aug. 30, 1983, " ["97 Stat. 607" -> "/us/stat/97/607"] ", provided that:"
+    quoted "/us/pl/98/91/s2/b" {
+      p "“The amendment made by subsection (a) [amending subd. (f) of this rule] shall take effect on August 1, 1983.”"
+    }
+    hash "87e3700b887de8fabb2c0dd6b8014ec744ff446e6d9a0447219870e69cea024b"
+  }
+  footnote 1 "1" {
+    p "Amendment by " ["Pub. L. 98–91" -> "/us/pl/98/91"] " enacted the word “Court”."
+  }
+  footnote 2 "2" {
+    p "So in original. Probably should be capitalized."
+  }
+  layers {
+    operative "bd8a19804cc507c78722b3ecbe177837808f8f14c0488b377a797d76de50cd69"
+    enacted "d2b610d28aaa23ae2b3973c0cd4decba95d61a55e3cb00110de4f9d264c3b1ef"
+    editorial "309b078f368e89a41b9fff92c4a8ed5cae08e7e4eef1297423f3f03f0bf96a8c"
+  }
+}

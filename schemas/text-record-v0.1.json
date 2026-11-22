@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/text-record-v0.1.json",
+  "title": "fidryn.text-record/v0.1",
+  "description": "One text record, which `fidryn text DIR --json` prints for each provision, container, note, source credit and footnote of a workspace, one compact line of JSON to a record, and which `conformance/uslm_text.py` prints from the publisher's XML. Offsets count the Unicode scalar values of the plain text, and an end is exclusive. The keys stand in the order given here; a schema cannot say so, and the comparison of the two outputs line for line does.",
+  "oneOf": [
+    { "$ref": "#/$defs/provision" },
+    { "$ref": "#/$defs/unit" },
+    { "$ref": "#/$defs/container" },
+    { "$ref": "#/$defs/note" },
+    { "$ref": "#/$defs/credit" },
+    { "$ref": "#/$defs/footnote" }
+  ],
+  "$defs": {
+    "address": {
+      "$comment": "An address: '/' and one or more segments separated by '/'; a segment is ASCII letters, digits, '-', '.', '~' and the en dash, and is never '.' or '..'.",
+      "type": "string",
+      "pattern": "^(/(?!\\.\\.?(/|$))[A-Za-z0-9.~–-]+)+$"
+    },
+    "offset": { "type": "integer", "minimum": 0 },
+    "refs": {
+      "description": "The links of a text, in the order of its runs: start, end and target as the source writes it.",
+      "type": "array",
+      "items": {
+        "type": "array",
+        "prefixItems": [
+          { "$ref": "#/$defs/offset" },
+          { "$ref": "#/$defs/offset" },
+          { "type": "string" }
+        ],
+        "minItems": 3,
+        "items": false
+      }
+    },
+    "spans": {
+      "description": "The superscripts or the subscripts of a text, in the order of its runs: start and end.",
+      "type": "array",
+      "items": {
+        "type": "array",
+        "prefixItems": [{ "$ref": "#/$defs/offset" }, { "$ref": "#/$defs/offset" }],
+        "minItems": 2,
+        "items": false
+      }
+    },
+    "marks": {
+      "description": "The footnote markers of a text, present only when it holds one: the length of the plain text before the marker, the marker as shown, and the ordinal of its footnote.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "array",
+        "prefixItems": [
+          { "$ref": "#/$defs/offset" },
+          { "type": "string" },
+          { "type": "integer", "minimum": 1 }
+        ],
+        "minItems": 3,
+        "items": false
+      }
+    },
+    "text": {
+      "description": "A text object: the plain text under `text`, and its runs.",
+      "type": "object",
+      "required": ["text", "refs", "sup", "sub"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string" },
+        "refs": { "$ref": "#/$defs/refs" },
+        "sup": { "$ref": "#/$defs/spans" },
+        "sub": { "$ref": "#/$defs/spans" },
+        "marks": { "$ref": "#/$defs/marks" }
+      }
+    },
+    "heading": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/text" }]
+    },
+    "num": {
+      "description": "No number, or its value and its shown form: the plain string when it is words only, a text object otherwise.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "array",
+          "prefixItems": [
+            { "type": "string" },
+            { "oneOf": [{ "type": "string" }, { "$ref": "#/$defs/text" }] }
+          ],
+          "minItems": 2,
+          "items": false
+        }
+      ]
+    },
+    "status": {
+      "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }]
+    },
+    "paragraph": {
+      "type": "object",
+      "required": ["p", "refs", "sup", "sub"],
+      "additionalProperties": false,
+      "properties": {
+        "p": { "type": "string", "minLength": 1 },
+        "refs": { "$ref": "#/$defs/refs" },
+        "sup": { "$ref": "#/$defs/spans" },
+        "sub": { "$ref": "#/$defs/spans" },
+        "marks": { "$ref": "#/$defs/marks" }
+      }
+    },
+    "subheading": {
+      "type": "object",
+      "required": ["subheading", "refs", "sup", "sub"],
+      "additionalProperties": false,
+      "properties": {
+        "subheading": { "type": "string" },
+        "refs": { "$ref": "#/$defs/refs" },
+        "sup": { "$ref": "#/$defs/spans" },
+        "sub": { "$ref": "#/$defs/spans" },
+        "marks": { "$ref": "#/$defs/marks" }
+      }
+    },
+    "table": {
+      "type": "object",
+      "required": ["table"],
+      "additionalProperties": false,
+      "properties": {
+        "table": {
+          "description": "One entry for each row: its group and its cells, each a header or not, its spans and its blocks.",
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              { "enum": ["head", "body", "foot"] },
+              {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "prefixItems": [
+                    { "type": "boolean" },
+                    { "type": "integer", "minimum": 1 },
+                    { "type": "integer", "minimum": 1 },
+                    { "type": "array", "items": { "$ref": "#/$defs/block" } }
+                  ],
+                  "minItems": 4,
+                  "items": false
+                }
+              }
+            ],
+            "minItems": 2,
+            "items": false
+          }
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "required": ["image"],
+      "additionalProperties": false,
+      "properties": { "image": { "type": "string" } }
+    },
+    "quoted": {
+      "type": "object",
+      "required": ["quoted"],
+      "additionalProperties": false,
+      "properties": {
+        "quoted": {
+          "type": "object",
+          "required": ["origin", "items"],
+          "additionalProperties": false,
+          "properties": {
+            "origin": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+            "items": { "type": "array", "items": { "$ref": "#/$defs/quotedItem" } }
+          }
+        }
+      }
+    },
+    "block": {
+      "oneOf": [
+        { "$ref": "#/$defs/paragraph" },
+        { "$ref": "#/$defs/subheading" },
+        { "$ref": "#/$defs/table" },
+        { "$ref": "#/$defs/image" },
+        { "$ref": "#/$defs/quoted" }
+      ]
+    },
+    "part": {
+      "type": "object",
+      "required": ["part", "blocks"],
+      "additionalProperties": false,
+      "properties": {
+        "part": { "enum": ["chapeau", "content", "continuation", "proviso"] },
+        "blocks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/block" } }
+      }
+    },
+    "level": {
+      "description": "A level of quoted content, such as a quoted section, which has no address.",
+      "type": "object",
+      "required": ["level", "num", "heading", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "level": { "type": "string", "minLength": 1 },
+        "num": { "$ref": "#/$defs/num" },
+        "heading": { "$ref": "#/$defs/heading" },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/quotedItem" } }
+      }
+    },
+    "quotedItem": {
+      "oneOf": [
+        { "$ref": "#/$defs/block" },
+        { "$ref": "#/$defs/part" },
+        { "$ref": "#/$defs/level" }
+      ]
+    },
+    "child": {
+      "type": "object",
+      "required": ["child"],
+      "additionalProperties": false,
+      "properties": { "child": { "$ref": "#/$defs/address" } }
+    },
+    "addresses": { "type": "array", "items": { "$ref": "#/$defs/address" } },
+    "within": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/address" }] },
+    "provision": {
+      "description": "A provision below the top of its unit: its text parts and children at their places.",
+      "type": "object",
+      "required": ["address", "layer", "kind", "status", "num", "heading", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "address": { "$ref": "#/$defs/address" },
+        "layer": { "const": "operative" },
+        "kind": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/status" },
+        "num": { "$ref": "#/$defs/num" },
+        "heading": { "$ref": "#/$defs/heading" },
+        "items": {
+          "type": "array",
+          "items": { "oneOf": [{ "$ref": "#/$defs/part" }, { "$ref": "#/$defs/child" }] }
+        }
+      }
+    },
+    "unit": {
+      "description": "The top provision of a unit, with the unit's own fields.",
+      "type": "object",
+      "required": [
+        "address",
+        "layer",
+        "kind",
+        "status",
+        "num",
+        "heading",
+        "items",
+        "aliases",
+        "within",
+        "source",
+        "positive_law"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "address": { "$ref": "#/$defs/address" },
+        "layer": { "const": "operative" },
+        "kind": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/status" },
+        "num": { "$ref": "#/$defs/num" },
+        "heading": { "$ref": "#/$defs/heading" },
+        "items": {
+          "type": "array",
+          "items": { "oneOf": [{ "$ref": "#/$defs/part" }, { "$ref": "#/$defs/child" }] }
+        },
+        "aliases": { "$ref": "#/$defs/addresses" },
+        "within": { "$ref": "#/$defs/within" },
+        "source": { "type": "string", "minLength": 1 },
+        "positive_law": { "oneOf": [{ "type": "null" }, { "type": "boolean" }] }
+      }
+    },
+    "container": {
+      "type": "object",
+      "required": ["address", "layer", "kind", "status", "num", "heading", "aliases", "within", "members"],
+      "additionalProperties": false,
+      "properties": {
+        "address": { "$ref": "#/$defs/address" },
+        "layer": { "const": "operative" },
+        "kind": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/status" },
+        "num": { "$ref": "#/$defs/num" },
+        "heading": { "$ref": "#/$defs/heading" },
+        "aliases": { "$ref": "#/$defs/addresses" },
+        "within": { "$ref": "#/$defs/within" },
+        "members": { "$ref": "#/$defs/addresses" }
+      }
+    },
+    "note": {
+      "type": "object",
+      "required": ["address", "layer", "group", "topics", "heading", "blocks"],
+      "additionalProperties": false,
+      "properties": {
+        "address": { "$ref": "#/$defs/address" },
+        "layer": { "enum": ["enacted", "editorial"] },
+        "group": { "type": "string", "minLength": 1 },
+        "topics": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "heading": { "$ref": "#/$defs/heading" },
+        "blocks": { "type": "array", "items": { "$ref": "#/$defs/block" } }
+      }
+    },
+    "credit": {
+      "description": "The source credit of a unit or a container, under the module's address: the keys of a paragraph after `record`.",
+      "type": "object",
+      "required": ["address", "record", "p", "refs", "sup", "sub"],
+      "additionalProperties": false,
+      "properties": {
+        "address": { "$ref": "#/$defs/address" },
+        "record": { "const": "credit" },
+        "p": { "type": "string" },
+        "refs": { "$ref": "#/$defs/refs" },
+        "sup": { "$ref": "#/$defs/spans" },
+        "sub": { "$ref": "#/$defs/spans" },
+        "marks": { "$ref": "#/$defs/marks" }
+      }
+    },
+    "footnote": {
+      "description": "A footnote of a unit or a container, under the module's address, numbered from 1 in document order.",
+      "type": "object",
+      "required": ["address", "record", "ordinal", "shown", "blocks"],
+      "additionalProperties": false,
+      "properties": {
+        "address": { "$ref": "#/$defs/address" },
+        "record": { "const": "footnote" },
+        "ordinal": { "type": "integer", "minimum": 1 },
+        "shown": { "type": "string" },
+        "blocks": { "type": "array", "items": { "$ref": "#/$defs/block" } }
+      }
+    }
+  }
+}

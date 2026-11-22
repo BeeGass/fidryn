@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s54a" {
+  within "/us/usc/t45/ch2"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s54a" section {
+    num "54a" "§ 54a."
+    heading "Certain Federal and State regulations deemed statutory authority"
+    content "A regulation, standard, or requirement in force, or prescribed by the Secretary of Transportation under chapter 201 of title 49 or by a State agency that is participating in investigative and surveillance activities under " ["section 20105 of title 49" -> "/us/usc/t49/s20105"] ", is deemed to be a statute under sections 53 and 54 of this title."
+    hash "020f93cc804f73d2c6dd4f0e1e9497838f2a92a0474866c5ed4b38278da3d33d"
+  }
+  credit "(" ["Apr. 22, 1908, ch. 149, § 4A" -> "/us/act/1908-04-22/ch149/s4A"] ", as added " ["Pub. L. 103–272, § 4(i)" -> "/us/pl/103/272/s4/i"] ", July 5, 1994, " ["108 Stat. 1365" -> "/us/stat/108/1365"] ".)"
+  layers {
+    operative "020f93cc804f73d2c6dd4f0e1e9497838f2a92a0474866c5ed4b38278da3d33d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "26504a40d77c3de31acdaf36bdd93b1a704f9b606a24562288041b96dda1fe7a"
+  }
+}

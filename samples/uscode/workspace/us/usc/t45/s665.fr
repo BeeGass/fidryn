@@ -1,0 +1,41 @@
+edition 2
+module "/us/usc/t45/s665" {
+  within "/us/usc/t45/ch15"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s665" section {
+    num "665" "§ 665."
+    heading "Utilization of services and facilities of Federal departments and agencies; reimbursement; consultation with Board; coordination of activities with Federal departments and agencies"
+    provision "/us/usc/t45/s665/a" subsection {
+      num "a" "(a)"
+      content "In carrying out the provisions of this chapter the Secretary may use available services and facilities of other departments, agencies, and instrumentalities of the Federal Government with their consent and on a reimbursable basis, and shall consult with the Board in carrying out the provisions of this chapter."
+      hash "7e3f72ec76d4ce1783d977eb453f24ff3a1a184684165b0c192571d2c2750c18"
+    }
+    provision "/us/usc/t45/s665/b" subsection {
+      num "b" "(b)"
+      content "Departments, agencies, and instrumentalities of the Federal Government shall exercise their powers, duties, and functions in such manner as will assist in carrying out the provisions of this chapter."
+      hash "e16dcd6b819116710bf5a8474a8092955d54b7b3fd057d53d90d40a81c8b5d70"
+    }
+    hash "6589752872f921d68cc09959ea39997ebccccb052ae0bb4f1ecd5bdaa7a1cce3"
+  }
+  credit "(" ["Pub. L. 91–663, § 6" -> "/us/pl/91/663/s6"] ", Jan. 8, 1971, " ["84 Stat. 1977" -> "/us/stat/84/1977"] "; " ["Pub. L. 104–88, title III, § 325(3)" -> "/us/pl/104/88/tIII/s325/3"] ", Dec. 29, 1995, " ["109 Stat. 951" -> "/us/stat/109/951"] ".)"
+  note "/us/usc/t45/s665/note/editorialNotes/pl.104.88/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1995—Subsec. (a). " ["Pub. L. 104–88" -> "/us/pl/104/88"] " substituted “Board” for “Interstate Commerce Commission”."
+    hash "00e9232735de160031e0c8a5350abe1074abbc1cb8bc201c248c8ed434b54cb3"
+  }
+  note "/us/usc/t45/s665/note/statutoryNotes/pl.104.88/effective-date-of-1995-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1995 Amendment"
+    p "Amendment by " ["Pub. L. 104–88" -> "/us/pl/104/88"] " effective Jan. 1, 1996, see " ["section 2 of Pub. L. 104–88" -> "/us/pl/104/88/s2"] ", set out as an Effective Date note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ", Transportation."
+    hash "16eb732b92d6b0fd94d8511c067f9406d87d2ddd14f399f38f5802eaed297332"
+  }
+  layers {
+    operative "6589752872f921d68cc09959ea39997ebccccb052ae0bb4f1ecd5bdaa7a1cce3"
+    enacted "fc16462d8cc9ac140a17ab6cba0a545a6c0acc3f90b51237827e0b493a490934"
+    editorial "7e8be1cd22967444461315c025f16c82ae2ab88fe87843116b328d35b0772a3e"
+  }
+}

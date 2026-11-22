@@ -1,0 +1,24 @@
+edition 2
+module "/us/usc/t45/s365" {
+  within "/us/usc/t45/ch11"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s365" section {
+    num "365" "§ 365."
+    heading "Omitted"
+    status omitted
+    hash "ebfc5c66f5840a3dcb8fd04c1e976e49f1fd414dff8142f149c2163272c63901"
+  }
+  note "/us/usc/t45/s365/note/editorialNotes/act.1938-06-25.ch680/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Section, acts " ["June 25, 1938, ch. 680, § 15" -> "/us/act/1938-06-25/ch680/s15"] ", " ["52 Stat. 1113" -> "/us/stat/52/1113"] "; " ["June 20, 1939, ch. 227, § 19" -> "/us/act/1939-06-20/ch227/s19"] ", " ["53 Stat. 844" -> "/us/stat/53/844"] ", related to transitional provisions occurring before July 1, 1939."
+    hash "208e7d88df03c23a874dc54134cf2fd5868e84403e12c2fd6f34cef45c056a29"
+  }
+  layers {
+    operative "ebfc5c66f5840a3dcb8fd04c1e976e49f1fd414dff8142f149c2163272c63901"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "453c657bb315b8fecc6b2186d044e46aad1724c783b8dd0bc34122f78a11dadb"
+  }
+}

@@ -1,0 +1,233 @@
+edition 2
+module "/us/usc/t45/s1303" {
+  within "/us/usc/t45/ch22/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1303" section {
+    num "1303" "§ 1303."
+    heading "Definitions"
+    chapeau "For the purposes of this chapter—"
+    provision "/us/usc/t45/s1303/1" paragraph {
+      num "1" "(1)"
+      content "the term “capital expenditures” means amounts expended by the Corporation and its subsidiaries for replacement or rehabilitation of, or enhancements to, the railroad plant, property, trackage, and equipment of the Corporation and its subsidiaries, as determined in accordance with generally accepted accounting principles, and in interpreting generally accepted accounting principles, no amount spent on normal repair, maintenance, and upkeep of such railroad plant, property, trackage, and equipment in the ordinary course of business shall constitute capital expenditures;"
+      hash "9c0c7419ebed03015c3cd9673aa65d182c79194751c47f2b00633e90207b2c24"
+    }
+    provision "/us/usc/t45/s1303/2" paragraph {
+      num "2" "(2)"
+      content "the term “Commission” means the Interstate Commerce Commission;"
+      hash "d29348a2b930480ba378850bb19ce13319dbd9743edf780ee2407725c9ad61fd"
+    }
+    provision "/us/usc/t45/s1303/3" paragraph {
+      num "3" "(3)"
+      content "the term “consolidated funded debt” means the aggregate, after eliminating intercompany items, of all funded debt of the Corporation and its consolidated subsidiaries, consolidated in accordance with generally accepted accounting principles;"
+      hash "4cf037a6d965a68540fe15f9bf3dcd804deeedc9958957bf7dac86a5c48b445c"
+    }
+    provision "/us/usc/t45/s1303/4" paragraph {
+      num "4" "(4)"
+      chapeau "the term “consolidated tangible net worth” means the market value of the common equity of the Corporation as of the sale date, plus or minus the change from the sale date to the date of measurement in the excess, after making appropriate deductions for any minority interest in the net worth of subsidiaries, of—"
+      provision "/us/usc/t45/s1303/4/A" subparagraph {
+        num "A" "(A)"
+        content "the assets of the Corporation and its subsidiaries (excluding intercompany items) which, in accordance with generally accepted accounting principles, are tangible assets, after deducting adequate reserves in each case where, in accordance with generally accepted accounting principles, a reserve is proper, over"
+        hash "9ecf0c6f334d338051e4dc9d1b73e85432127e681a9472460adc98215eed1083"
+      }
+      provision "/us/usc/t45/s1303/4/B" subparagraph {
+        num "B" "(B)"
+        content "all liabilities of the Corporation and its subsidiaries (excluding intercompany items),"
+        hash "7e2d93a3bd0c0a074b572780086e33a9f3cfd0a8b5fb0b9d19d06abeb554c165"
+      }
+      continuation "taking into account inventory and securities on the basis of the cost or current market value, whichever is lower, and not taking into account patents, trademarks, trade names, copyrights, licenses, goodwill, treasury stock, or any write-up in the book value of any assets;"
+      hash "0a6aa4099ff709b26dce164ad387a6aad6798dfbfca34c1486a14a15eb0d2f79"
+    }
+    provision "/us/usc/t45/s1303/5" paragraph {
+      num "5" "(5)"
+      content "the term “Corporation” means the Consolidated Rail Corporation;"
+      hash "1f97ba66ec0e221f715260a6cea15198d9c6e028bec212549e84abc74492e6cb"
+    }
+    provision "/us/usc/t45/s1303/6" paragraph {
+      num "6" "(6)"
+      chapeau "the term “cumulative net income” means, for any period, the net income of the Corporation and its consolidated subsidiaries as determined in accordance with generally accepted accounting principles, before provision for expenses (net of income tax effect) related to—"
+      provision "/us/usc/t45/s1303/6/A" subparagraph {
+        num "A" "(A)"
+        content "amounts paid by the Corporation under section 4024(e), and comparable payments made to present and former employees of the Corporation not covered by such section; and"
+        hash "765d9290793d2a84fcd58d927aea89e810162a8e5a3c39b051706f1319b0d22b"
+      }
+      provision "/us/usc/t45/s1303/6/B" subparagraph {
+        num "B" "(B)"
+        content "the aggregate value of any shares and cash distributed by the Corporation under section 4024(f);"
+        hash "239f463cfeedc50e45b3c6e83bfb06ea2ac81607d94345870a9950394be2e212"
+      }
+      hash "3b349db457ecedadb4d011d3fbfb927e9a76b9fcb9ea3b06872e3710604fbec8"
+    }
+    provision "/us/usc/t45/s1303/7" paragraph {
+      num "7" "(7)"
+      content "the term “debt” means (A) indebtedness, whether or not represented by bonds, debentures, notes, or other securities, for the repayment of money borrowed, (B) deferred indebtedness for the payment of the purchase price of property or assets purchased, (C) guarantees, endorsements, assumptions, and other contingent obligations in respect of, or to purchase or to otherwise acquire, indebtedness of others, and (D) indebtedness secured by any mortgage, pledge, or lien existing on property owned, subject to such mortgage, pledge, or lien, whether or not indebtedness secured thereby shall have been assumed;"
+      hash "cfc84de2ff8860d656023d26b05522b39da92872e29e4d7f89bbd2933219f837"
+    }
+    provision "/us/usc/t45/s1303/8" paragraph {
+      num "8" "(8)"
+      content "the term “funded debt” means all debt created, assumed, or guaranteed, directly or indirectly, by the Corporation and its subsidiaries which matures by its terms, or is renewable at the option of the Corporation or any such subsidiary to a date, more than 1 year after the date of the original creation, assumption, or guarantee of such debt by the Corporation or such subsidiary;"
+      hash "7337b75e318f27929dc1feaa1fd03069f0369f2aab72fcc386bea53658171437"
+    }
+    provision "/us/usc/t45/s1303/9" paragraph {
+      num "9" "(9)"
+      content "the term “liabilities” means all items of indebtedness or liability which, in accordance with generally accepted accounting principles, would be included in determining total liabilities as shown on the liabilities side of a balance sheet as at the date as of which liabilities are to be determined;"
+      hash "2528cfcf3e1dc8bc96eb9068b79d04f5b8534f7bb51e10095882542501907657"
+    }
+    provision "/us/usc/t45/s1303/10" paragraph {
+      num "10" "(10)"
+      content "the term “person” means an individual, corporation, partnership, association, trust, or other entity or organization, including a government or political subdivision thereof or a governmental body;"
+      hash "d26f82f7cfdd39e75a3835383b14396fa40749aff8e810d3a926c6ad0f5e071b"
+    }
+    provision "/us/usc/t45/s1303/11" paragraph {
+      num "11" "(11)"
+      content "the term “preferred stock” means any class or series of preferred stock, and any class or series of common stock having liquidation and dividend rights and preferences superior to the common stock of the Corporation offered for sale under " ["section 1312 of this title" -> "/us/usc/t45/s1312"] ";"
+      hash "9b8e9a7dff1be5eed8caed53d17b77ff175aad7c0046a1de325568d5c74fa8d3"
+    }
+    provision "/us/usc/t45/s1303/12" paragraph {
+      num "12" "(12)"
+      content "the term “public offering” means an underwritten offering to the public of such common stock of the Corporation as the Secretary of Transportation determines to sell under " ["section 1312 of this title" -> "/us/usc/t45/s1312"] ";"
+      hash "d5c3726f43f5973610667bbc2b787ecee24acf851667212aa6166fe8b1473257"
+    }
+    provision "/us/usc/t45/s1303/13" paragraph {
+      num "13" "(13)"
+      content "the term “sale date” means the date on which the initial public offering is closed;"
+      hash "b5e3633a556d48a36e36cc954906973e8d39c1984b51cc01405c6c9bb6a9bce6"
+    }
+    provision "/us/usc/t45/s1303/14" paragraph {
+      num "14" "(14)"
+      content "the term “subsidiary” means any corporation more than 50 percent of whose outstanding voting securities are directly or indirectly owned by the Corporation; and"
+      hash "a6af1c7e446e6f397c008892bb041628bee66ce1b0452fb0f5658bfe9e37cbc1"
+    }
+    provision "/us/usc/t45/s1303/15" paragraph {
+      num "15" "(15)"
+      content "the term “United States share” means a share of common stock of the Corporation held by the United States Government on October 21, 1986, or as a result of any split required pursuant to " ["section 1312(d) of this title" -> "/us/usc/t45/s1312/d"] "."
+      hash "7b6b3fa54df448d21c4d53e3596bf37aa4ee379dc5d3d8dc28e1edbbf1117f74"
+    }
+    hash "665e87dc4b76a76befa5f243b556e8c0ce950c1ead91e9b0a82ff33a6e316953"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4004" -> "/us/pl/99/509/tIV/s4004"] ", Oct. 21, 1986, " ["100 Stat. 1894" -> "/us/stat/100/1894"] ".)"
+  note "/us/usc/t45/s1303/note/editorialNotes/pl.99.509/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Section 4024(e) and section 4024(f), referred to in par. (6), are section 4024(e) and (f) of " ["Pub. L. 99–509" -> "/us/pl/99/509"] ", and are set out as a note under " ["section 797 of this title" -> "/us/usc/t45/s797"] "."
+    hash "49a335fe559a7ac98e6a2906a5385761440bb0e56740d929c698da4f1765d330"
+  }
+  note "/us/usc/t45/s1303/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  definition "/us/usc/t45/s1303/1" {
+    term "capital expenditures"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/2" {
+    term "Commission"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/3" {
+    term "consolidated funded debt"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/4" {
+    term "consolidated tangible net worth"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/5" {
+    term "Corporation"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/6" {
+    term "cumulative net income"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/7" {
+    term "debt"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/8" {
+    term "funded debt"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/9" {
+    term "liabilities"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/10" {
+    term "person"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/11" {
+    term "preferred stock"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/12" {
+    term "public offering"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/13" {
+    term "sale date"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/14" {
+    term "subsidiary"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  definition "/us/usc/t45/s1303/15" {
+    term "United States share"
+    kind means
+    words "For the purposes of this chapter"
+    region "/us/usc/t45/ch22"
+    basis restated
+  }
+  layers {
+    operative "665e87dc4b76a76befa5f243b556e8c0ce950c1ead91e9b0a82ff33a6e316953"
+    enacted "6d1df37b8cc86b034bdcbff2f1979494610c573fd71e5c6fe6a11b358c9f9a17"
+    editorial "c561c1ae5e24e8b065436a1c336e6e23169bb86dd88bd9ed4d9e84e49379f6a9"
+  }
+}

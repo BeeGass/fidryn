@@ -1,0 +1,147 @@
+edition 2
+module "/us/usc/ptVIII/rule8004" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8004" courtRule {
+    num "8004" "Rule 8004."
+    heading "Leave to Appeal from an Interlocutory Order or Decree Under 28 U.S.C. § 158(a)(3)"
+    provision "/us/usc/ptVIII/rule8004/a" subsection {
+      num "a" "(a)"
+      heading "Notice of Appeal and Accompanying Motion for Leave to Appeal."
+      chapeau "To appeal under 28 U.S.C. § 158(a)(3) from a bankruptcy court’s interlocutory order or decree, a party must file with the bankruptcy clerk a notice of appeal under Rule 8003(a). The notice must:"
+      provision "/us/usc/ptVIII/rule8004/a/1" paragraph {
+        num "1" "(1)"
+        content "be filed within the time allowed by Rule 8002;"
+        hash "633db8ce2e8feea9009961af1aa62c07fe726f346ac6102675606d04b4d535ec"
+      }
+      provision "/us/usc/ptVIII/rule8004/a/2" paragraph {
+        num "2" "(2)"
+        content "be accompanied by a motion for leave to appeal prepared in accordance with (b); and"
+        hash "6f54be57a3ef9e78cc42cdd133f8538dca25d99c5e32a4647e1ea851a3d02e86"
+      }
+      provision "/us/usc/ptVIII/rule8004/a/3" paragraph {
+        num "3" "(3)"
+        content "unless served electronically using the court’s electronic-filing system, include proof of service in accordance with Rule 8011(d)."
+        hash "b99b83a84ef00013ffc827526efe83a2ba8cb7f80ff73fe9d5527fb28e8858ca"
+      }
+      hash "2bcf764950d0f82a1037c93c2f9ef4f7caaa6b07edb3cf0fbb8f36c7aada1067"
+    }
+    provision "/us/usc/ptVIII/rule8004/b" subsection {
+      num "b" "(b)"
+      heading "Content of the Motion for Leave to Appeal; Response."
+      provision "/us/usc/ptVIII/rule8004/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "Content. A motion for leave to appeal under 28 U.S.C. § 158(a)(3) must include:"
+        provision "/us/usc/ptVIII/rule8004/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "the facts needed to understand the question presented;"
+          hash "4187efc5225b9ba422c8f23fd6b9d73dbacf2a63391dfa2862e4cb30ce7aac77"
+        }
+        provision "/us/usc/ptVIII/rule8004/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "the question itself;"
+          hash "9a418dc18b191bd5ada88c6dcdb9befa80d50c8aae3f2d225554e52a13e19382"
+        }
+        provision "/us/usc/ptVIII/rule8004/b/1/C" subparagraph {
+          num "C" "(C)"
+          content "the relief sought;"
+          hash "e9770ed16b7aa86411ed3129a8ce049e94838c734b1737c103dca27e1d2c0ba3"
+        }
+        provision "/us/usc/ptVIII/rule8004/b/1/D" subparagraph {
+          num "D" "(D)"
+          content "the reasons why leave to appeal should be granted; and"
+          hash "5de965b909c2edcc56c3aaed67d1cfccb19478038fdb72c8a7e7f9a798627aaa"
+        }
+        provision "/us/usc/ptVIII/rule8004/b/1/E" subparagraph {
+          num "E" "(E)"
+          content "a copy of the interlocutory order or decree and any related opinion or memorandum."
+          hash "c09d25e179cb59cd9df83c590b5a81f82503d1a6c7287835088650ef010573ad"
+        }
+        hash "173293fae41fa5a28aee2a65816dbc924c0c5005c583afd21484de80317595b1"
+      }
+      provision "/us/usc/ptVIII/rule8004/b/2" paragraph {
+        num "2" "(2)"
+        content "Response. Within 14 days after the motion for leave is served, a party may file with the district or BAP clerk a response in opposition or a cross-motion."
+        hash "175e2783b5bcfeb168d7f17bfb5d5df302461345ffe2bfe4deb12fd0e771bd83"
+      }
+      hash "78090195f8928199d867c99a8868bd26cc23bf4cf2d96143ed6c62ab71a2e441"
+    }
+    provision "/us/usc/ptVIII/rule8004/c" subsection {
+      num "c" "(c)"
+      heading "Sending the Notice of Appeal and Motion for Leave to Appeal; Docketing the Appeal; Oral Argument Not Required."
+      provision "/us/usc/ptVIII/rule8004/c/1" paragraph {
+        num "1" "(1)"
+        content "Sending to the District Court or BAP. If a BAP has been established to hear appeals from that district—and an appellant has not elected to have the appeal heard in the district court—the bankruptcy clerk must promptly send to the BAP clerk the notice of appeal and the motion for leave to appeal. Otherwise, the bankruptcy clerk must promptly send the notice and motion to the district clerk."
+        hash "78cb41f0ee909634cff0396424499fead93a3266f6aa501c5989407b3ebcc82c"
+      }
+      provision "/us/usc/ptVIII/rule8004/c/2" paragraph {
+        num "2" "(2)"
+        content "Docketing the Appeal. Upon receiving the notice and motion, the district or BAP clerk must docket the appeal as prescribed by Rule 8003(d)(2)."
+        hash "94503bfc0f01217934c44cfaec0e2f76b15709f06ad0968129d9f66d1bf67ee3"
+      }
+      provision "/us/usc/ptVIII/rule8004/c/3" paragraph {
+        num "3" "(3)"
+        content "Oral Argument Not Required. Unless the district court or BAP orders otherwise, a motion, a cross-motion, and any response will be submitted without oral argument."
+        hash "78e45ba1f72041056322d859aff0d5e09a5ffd189b77eecdf023305ce96a6395"
+      }
+      hash "c39a1d2b5b75a75ef628cb3cea178cfa10cccdd804fab987dc5239b88fb20fca"
+    }
+    provision "/us/usc/ptVIII/rule8004/d" subsection {
+      num "d" "(d)"
+      heading "Failure to File a Motion for Leave to Appeal."
+      chapeau "If an appellant files a timely notice of appeal under this rule but fails to include a motion for leave to appeal, the district court or BAP may:"
+      provision "/us/usc/ptVIII/rule8004/d/1" paragraph {
+        num "1" "(1)"
+        content "treat the notice of appeal as a motion for leave to appeal and grant or deny it; or"
+        hash "1595f9bf92b4e79d8002fbbf1e075c50cbeaadc24c4e395ccbfc055150196206"
+      }
+      provision "/us/usc/ptVIII/rule8004/d/2" paragraph {
+        num "2" "(2)"
+        content "order the appellant to file a motion for leave to appeal within 14 days after the order has been entered—unless the order provides otherwise."
+        hash "60116588d7408de6027176d056067f2ba07e410c998bcb99c77eee4e1021b699"
+      }
+      hash "e36f1c2fbb85e8d70c5c05489ebd68a1ed184833d35ac75162e14555042d2645"
+    }
+    provision "/us/usc/ptVIII/rule8004/e" subsection {
+      num "e" "(e)"
+      heading "Direct Appeal to a Court of Appeals."
+      content "If leave to appeal an interlocutory order or decree is required under 28 U.S.C. § 158(a)(3), an authorization by a court of appeals for a direct appeal under 28 U.S.C. § 158(d)(2) satisfies the requirement."
+      hash "6b96a14fdbfa754ef72e6bb4bc3f7c095c36c06f74c893d9294e0afcb73d57be"
+    }
+    hash "8445d9193929bd1821673bbb752c5485ca16c64dc4a056b9fc9861f8813264af"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8004/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8004, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991, related to service of the notice of appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "1c42968c0c7b3eb3f9907c616aee5f151e3aa06220231771f0c13082e83714b5"
+  }
+  note "/us/usc/ptVIII/rule8004/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rules 8001(b) and 8003 and F.R.App.P. 5. It retains the practice for interlocutory bankruptcy appeals of requiring a notice of appeal to be filed along with a motion for leave to appeal. Like current Rule 8003, it alters the timing of the docketing of the appeal in the district court or BAP."
+    p "Subdivision (a) requires a party seeking leave to appeal under 28 U.S.C. § 158(a)(3) to file with the bankruptcy clerk both a notice of appeal and a motion for leave to appeal."
+    p "Subdivision (b) prescribes the contents of the motion, retaining the requirements of former Rule 8003(a). It also continues to allow another party to file a cross-motion or response to the appellant’s motion. Because of the prompt docketing of the appeal under the current rule, the cross-motion or response must be filed in the district court or BAP, rather than in the bankruptcy court as the former rule required."
+    p "Subdivision (c) requires the bankruptcy clerk to transmit promptly to the district court or BAP the notice of appeal and the motion for leave to appeal. Upon receipt of the notice and the motion, the district or BAP clerk must docket the appeal. Unless the district court or BAP orders otherwise, no oral argument will be held on the motion."
+    p "Subdivision (d) retains the provisions of former Rule 8003(c). It provides that if the appellant timely files a notice of appeal, but fails to file a motion for leave to appeal, the court can either direct that a motion be filed or treat the notice of appeal as the motion and either grant or deny leave."
+    p "Subdivision (e), like former Rule 8003(d), treats the authorization of a direct appeal by the court of appeals as a grant of leave to appeal under 28 U.S.C. § 158(a)(3) if the district court or BAP has not already granted leave. Thus, a separate order granting leave to appeal is not required. If the court of appeals grants permission to appeal, the record must be assembled and transmitted in accordance with Rules 8009 and 8010."
+    p "Changes Made After Publication and Comment. In subdivision (c)(2), the direction for docketing a bankruptcy appeal was changed to reflect the fact that many bankruptcy appeals have dual titles—the bankruptcy case itself and the adversary proceeding that is the subject of the appeal. As published, subdivision (c)(3) stated that the court must dismiss the appeal if the motion for leave to appeal is denied. That sentence was deleted."
+    hash "2c975c454bc11e7f7d62ae2c9a378fd3205b27993d4daa901a60132dcbbfbf85"
+  }
+  note "/us/usc/ptVIII/rule8004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8004 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "e34c441ce08fc0ed4ee23f28916a40b53290a179ed8244fbb756cb1590df3a18"
+  }
+  layers {
+    operative "8445d9193929bd1821673bbb752c5485ca16c64dc4a056b9fc9861f8813264af"
+    enacted "28069c3fe03e5ff724ec0e98bceae0c547df6808c9ce35596c74519a939c0b8a"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

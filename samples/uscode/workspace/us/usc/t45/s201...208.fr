@@ -1,0 +1,41 @@
+edition 2
+module "/us/usc/t45/s201...208" {
+  alias "/us/usc/t45/s201"
+  alias "/us/usc/t45/s202"
+  alias "/us/usc/t45/s203"
+  alias "/us/usc/t45/s204"
+  alias "/us/usc/t45/s205"
+  alias "/us/usc/t45/s206"
+  alias "/us/usc/t45/s207"
+  alias "/us/usc/t45/s208"
+  within "/us/usc/t45/ch9/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s201...208" section {
+    num "201 to 208" "§§ 201 to 208."
+    heading "Omitted"
+    status omitted
+    hash "4dfcd5bd6863c9dae89623b192bc8550e09fa5e37ca6cfe4358bbd2357ea65cb"
+  }
+  note "/us/usc/t45/s201...208/note/editorialNotes/act.1934-06-27.ch868/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Sections 201 to 208, sections 1 to 8, respectively, of " ["act June 27, 1934, ch. 868, § 1" -> "/us/act/1934-06-27/ch868/s1"] ", " ["48 Stat. 1283–1286" -> "/us/stat/48/1283-1286"] ", were omitted pursuant to the decision in the case of Railroad Retirement Board v. Alton R. Co. (Dist. of Col., 1935), 295 U.S. 330, 55 S.Ct. 758, 79 L.Ed. 1468, declaring this subchapter unconstitutional."
+    p "Section 201 defined terms for purposes of this subchapter."
+    p "Section 202 stated purposes of this subchapter and required a special report to be sent from the Railroad Retirement Board to the President."
+    p "Section 203 related to annuities paid under this subchapter."
+    p "Section 204 related to compulsory retirement."
+    p "Section 205 related to employee contributions."
+    p "Section 206 related to existing pension systems."
+    p "Section 207 related to employee representatives."
+    p "Section 208 related to retirement fund established under this subchapter."
+    p "Provisions relating to refund of sums paid by railroads and other carriers of the United States under this subchapter were contained in " ["act June 1, 1938, ch. 315" -> "/us/act/1938-06-01/ch315"] ", §§ 1, 2, " ["52 Stat. 608" -> "/us/stat/52/608"] "."
+    hash "6aa62af4e74aae29950fc403ed25a3abca3dad0c79340c063b2f11b26e1d4ba0"
+  }
+  layers {
+    operative "4dfcd5bd6863c9dae89623b192bc8550e09fa5e37ca6cfe4358bbd2357ea65cb"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "24f73ded22c53242c2e4d16e24d3f402cf89d9b8efe860796c39bd5706083078"
+  }
+}

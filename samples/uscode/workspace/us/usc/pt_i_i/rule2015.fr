@@ -1,0 +1,219 @@
+edition 2
+module "/us/usc/ptII/rule2015" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2015" courtRule {
+    num "2015" "Rule 2015."
+    heading "Duty to Keep Records, Make Reports, and Give Notices"
+    provision "/us/usc/ptII/rule2015/a" subsection {
+      num "a" "(a)"
+      heading "Duties of a Trustee or Debtor in Possession."
+      chapeau "A trustee or debtor in possession must:"
+      provision "/us/usc/ptII/rule2015/a/1" paragraph {
+        num "1" "(1)"
+        content "in a Chapter 7 case and, if the court so orders, in a Chapter 11 case (other than under Subchapter V), file and send to the United States trustee a complete inventory of the debtor’s property within 30 days after qualifying as a trustee or debtor in possession, unless such an inventory has already been filed;"
+        hash "994d201b39213a89da5be1b9ea2348f5eec8be6ac764e83d82c6429d2cc473db"
+      }
+      provision "/us/usc/ptII/rule2015/a/2" paragraph {
+        num "2" "(2)"
+        content "keep a record of receipts and the disposition of money and property received;"
+        hash "ba59105d5abc7a4e755a5dd94855c033bbddc16f41306866fea3cbe1cc02b863"
+      }
+      provision "/us/usc/ptII/rule2015/a/3" paragraph {
+        num "3" "(3)"
+        chapeau "file:"
+        provision "/us/usc/ptII/rule2015/a/3/A" subparagraph {
+          num "A" "(A)"
+          content "the reports and summaries required by § 704(a)(8); and"
+          hash "af95d9a1e611327c0beea1a355f1c09e37b12e417877ea957fd5b3fda58e720d"
+        }
+        provision "/us/usc/ptII/rule2015/a/3/B" subparagraph {
+          num "B" "(B)"
+          content "if payments are made to employees, a statement of the amounts of deductions for all taxes required to be withheld or paid on the employees’ behalf and the place where these funds are deposited;"
+          hash "6351889d77fec68ed12987d3dc16601901e4ab3506f4700c07cc3a4b595ac4e8"
+        }
+        hash "5c570bc1d864739c1ebc755b02b4364d3e14080da19420c53ef25bb6f30d65ff"
+      }
+      provision "/us/usc/ptII/rule2015/a/4" paragraph {
+        num "4" "(4)"
+        chapeau "give notice of the case, as soon as possible after it commences, to the following entities, except those who know or have previously been notified of it:"
+        provision "/us/usc/ptII/rule2015/a/4/A" subparagraph {
+          num "A" "(A)"
+          content "every entity known to be holding money or property subject to the debtor’s withdrawal or order, including every bank, savings- or building-and-loan association, public utility company, and landlord with whom the debtor has a deposit; and"
+          hash "57ad8da75c52c4125a098da27fcb44412569e9a9014c18b0b6426711f42949ed"
+        }
+        provision "/us/usc/ptII/rule2015/a/4/B" subparagraph {
+          num "B" "(B)"
+          content "every insurance company that has issued a policy with a cash-surrender value payable to the debtor;"
+          hash "12b86c0165353e2924354c76a5a69f0550549628f183e692a040d37c33869310"
+        }
+        hash "e3824caf67d6f941ff4ce0bb2a533d67f88b13345468a29484e8e300155251ba"
+      }
+      provision "/us/usc/ptII/rule2015/a/5" paragraph {
+        num "5" "(5)"
+        content "in a Chapter 11 case (other than under Subchapter V), on or before the last day of the month after each calendar quarter during which fees must be paid under 28 U.S.C. § 1930(a)(6), file and send to the United States trustee a statement of those fees and any disbursements made during that quarter; and"
+        hash "fd2ff0e193bd225810788029ffbcdcd2a3d3f365e0028f0a50e72e2cbc26f874"
+      }
+      provision "/us/usc/ptII/rule2015/a/6" paragraph {
+        num "6" "(6)"
+        content {
+          p "in a Chapter 11 small business case, unless the court, for cause, sets a different schedule, file and send to the United States trustee a report under § 308, using Form 425C, for each calendar month after the order for relief—with the following adjustments:"
+          p "• if the order for relief is within the first 15 days of a calendar month, the report must be filed for the rest of that month; or"
+          p "• if the order for relief is after the 15th, the information for the rest of that month must be included in the report for the next calendar month."
+        }
+        continuation "Each report must be filed within 21 days after the last day of the month following the month that the report covers. The obligation to file reports ends on the date that the plan becomes effective or the case is converted or dismissed."
+        hash "72b5eb778f33224d0473aa00c6eceaba0d9489f1eb201d74e0b97810a0d1496b"
+      }
+      hash "24fdddf4fb9849c96b908ba85a475ba1f2ef0b8ff5b0b3e4e9f3e6b5488b0f8a"
+    }
+    provision "/us/usc/ptII/rule2015/b" subsection {
+      num "b" "(b)"
+      heading "Trustee, Debtor in Possession, and Debtor in a Case Under Subchapter V of Chapter 11."
+      content "In a case under Subchapter V of Chapter 11, the debtor in possession must perform the duties prescribed in (a)(2)–(4) and, if the court orders, must file and send to the United States trustee a complete inventory of the debtor’s property within the time the court sets. If the debtor is removed as debtor in possession, the trustee must perform these duties. The debtor must perform the duties prescribed in (a)(6)."
+      hash "ee28e52265f7a5ad44146f78fa3819541604df3ae31ad69fd02ac5ba2b4fc71c"
+    }
+    provision "/us/usc/ptII/rule2015/c" subsection {
+      num "c" "(c)"
+      heading "Duties of a Chapter 12 Trustee or Debtor in Possession."
+      content "In a Chapter 12 case, the debtor in possession must perform the duties prescribed in (a)(2)–(4) and, if the court orders, file and send to the United States trustee a complete inventory of the debtor’s property within the time the court sets. If the debtor is removed as debtor in possession, the trustee must perform these duties."
+      hash "0785f77ad179b15e556bc19587fee281b91a8bf9d9872759bb4cda7819547f10"
+    }
+    provision "/us/usc/ptII/rule2015/d" subsection {
+      num "d" "(d)"
+      heading "Duties of a Chapter 13 Trustee and Debtor."
+      provision "/us/usc/ptII/rule2015/d/1" paragraph {
+        num "1" "(1)"
+        chapeau "Chapter 13 Business Case. In a Chapter 13 case, a debtor engaged in business must:"
+        provision "/us/usc/ptII/rule2015/d/1/A" subparagraph {
+          num "A" "(A)"
+          content "perform the duties prescribed by (a)(2)–(4); and"
+          hash "8f4e204250b3d29b07effc6232ad543356883164e042037ddc2c49f7efb5e045"
+        }
+        provision "/us/usc/ptII/rule2015/d/1/B" subparagraph {
+          num "B" "(B)"
+          content "if the court so orders, file and send to the United States trustee a complete inventory of the debtor’s property within the time the court sets."
+          hash "5804e7e65dd60f83ec89df63efdf4ea405c6bebadb5911fecc5eea88d9d2633f"
+        }
+        hash "43835152790f272eb22761e59be022f6749606b850fc8b1f7f3d6eb1771bc5ab"
+      }
+      provision "/us/usc/ptII/rule2015/d/2" paragraph {
+        num "2" "(2)"
+        content "Other Chapter 13 Case. In a Chapter 13 case in which the debtor is not engaged in business, the trustee must perform the duties prescribed by (a)(2)."
+        hash "c3d4ed1f6fbf9bfe83ccadb49120506b50ea572c1b77bf9359771a9a8c72d78e"
+      }
+      hash "1b1d1a3b1774a6311a422e26a91fc1ea17f3488ccb115a05dcd5871fd5a65ffb"
+    }
+    provision "/us/usc/ptII/rule2015/e" subsection {
+      num "e" "(e)"
+      heading "Duties of a Chapter 15 Foreign Representative."
+      content "In a Chapter 15 case in which the court has granted recognition of a foreign proceeding, the foreign representative must file any notice required under § 1518 within 14 days after becoming aware of the later information."
+      hash "f90093cec1fb7bc292d6c5853cfd31863ec4379c4577011860df728c6cf9beeb"
+    }
+    provision "/us/usc/ptII/rule2015/f" subsection {
+      num "f" "(f)"
+      heading "Making Reports Available in a Chapter 11 Case."
+      content "In a Chapter 11 case, the court may order that copies or summaries of annual reports and other reports be mailed to creditors, equity security holders, and indenture trustees. The court may also order that summaries of these reports be published. A copy of every such report or summary, whether mailed or published, must be sent to the United States trustee."
+      hash "71de50e20aab8435f1ff09f6753a0d72006992664b3d168f8582c209d456128a"
+    }
+    hash "ee8d2b5280a80532829eb9b1f0eeeafceea90aa1c5b70b05ad8323307e4a0c03"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 29, 2002, eff. Dec. 1, 2002; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 23, 2012, eff. Dec. 1, 2012; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule combines the provisions found in former Rules 218, 10–208, 11–30 and 13–208 of the Rules of Bankruptcy Procedure. It specifies various duties which are in addition to those required by §§ 704, 1106, 1302 and 1304 of the Code."
+    p "In subdivision (a) the times permitted to be fixed by the court in clause (3) for the filing of reports and summaries may be fixed by local rule or order."
+    p "Subdivision (b). This subdivision prescribes duties on either the debtor or trustee in chapter 13 cases, depending on whether or not the debtor is engaged in business (§ 1304 of the Code). The duty of giving notice prescribed by subdivision (a)(4) is not included in a nonbusiness case because of its impracticability."
+    p "Subdivision (c) is derived from former Chapter X Rule 10–208(c) which, in turn, was derived from § 190 of the Act. The equity security holders to whom the reports should be sent are those of record at the time of transmittal of such reports."
+    hash "76dbda872e12286d4561e0f702c515f5e43c6702f476cf9c2cebceca86179ad2"
+  }
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (a) is amended to add as a duty of the trustee or debtor in possession the filing of a notice of or a copy of the petition. The filing of such notice or a copy of the petition is essential to the protection of the estate from unauthorized post-petition conveyances of real property. Section 549(c) of the Code protects the title of a good faith purchaser for fair equivalent value unless the notice or copy of the petition is filed."
+    hash "a4e3f6805eefd19aaad94feddbae0d38f127b973c1a175a4661e40f937659134"
+  }
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to provide the United States trustee with information needed to perform supervisory responsibilities in accordance with 28 U.S.C. § 586(a)(3) and to exercise the right to raise, appear and be heard on issues pursuant to § 307 of the Code."
+    p "Subdivision (a)(3) is amended to conform to the 1986 amendments to § 704(8) of the Code and the United States trustee system. It may not be necessary for the court to fix a time to file reports if the United States trustee requests that they be filed within a specified time and there is no dispute regarding such time."
+    p "Subdivision (a)(5) is deleted because the filing of a notice of or copy of the petition to protect real property against unauthorized postpetition transfers in a particular case is within the discretion of the trustee."
+    p "The new subdivision (a)(5) was added to enable the United States trustee, parties in interest, and the court to determine the appropriate quarterly fee required by 28 U.S.C. § 1930(a)(6). The requirements of subdivision (a)(5) should be satisfied whenever possible by including this information in other reports filed by the trustee or debtor in possession. Nonpayment of the fee may result in dismissal or conversion of the case pursuant to § 1112(b) of the Code."
+    p "Rule X–1007(b), which provides that the trustee or debtor in possession shall cooperate with the United States trustee by furnishing information that the United States trustee reasonably requires, is deleted as unnecessary. The deletion of Rule X–1007(b) should not be construed as a limitation of the powers of the United States trustee or of the duty of the trustee or debtor in possession to cooperate with the United States trustee in the performance of the statutory responsibilities of that office."
+    p "Subdivision (a)(6) is abrogated as unnecessary. See § 1106(a)(7) of the Code."
+    p "Subdivision (a)(7) is abrogated. The closing of a chapter 11 case is governed by Rule 3022."
+    p "New subdivision (b), which prescribes the duties of the debtor in possession and trustee in a chapter 12 case, does not prohibit additional reporting requirements pursuant to local rule or court order."
+    hash "ce58e96a50e407b9e89161d6b5640aa3d172931f05d0e483ede11b4f7d060e8f"
+  }
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1996 Amendment"
+    p "Subdivision (a)(1) provides that the trustee in a chapter 7 case and, if the court directs, the trustee or debtor in possession in a chapter 11 case, is required to file and transmit to the United States trustee a complete inventory of the debtor’s property within 30 days after qualifying as trustee or debtor in possession, unless such an inventory has already been filed. Subdivisions (b) and (c) are amended to clarify that a debtor in possession and trustee in a chapter 12 case, and a debtor in a chapter 13 case where the debtor is engaged in business, are not required to file and transmit to the United States trustee a complete inventory of the property of the debtor unless the court so directs. If the court so directs, the court also fixes the time limit for filing and transmitting the inventory."
+    p "GAP Report on Rule 2015. No changes since publication, except for a stylistic change in the first sentence of the committee note."
+    hash "38d5572b41d47939c6c53f3f89f683c2d3349fe2c893e59cd8cf2a627b761b97"
+  }
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2002 Amendment"
+    p "Subdivision (a)(5) is amended to provide that the duty to file quarterly disbursement reports continues only so long as there is an obligation to make quarterly payments to the United States trustee under 28 U.S.C. § 1930(a)(6)."
+    p "Other amendments are stylistic."
+    p "Changes Made After Publication and Comments. No changes were made."
+    hash "2a4e864b6ed5e2b2663420480d86a97d1b795c4c0c5251a49b7f5390c095ac32"
+  }
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subparagraph (a)(6) implements § 308 of the Code, added by the 2005 amendments. That section requires small business chapter 11 debtors to file periodic financial and operating reports, and the rule sets the time for filing those reports and requires the use of an Official Form for the report. The obligation to file reports under this rule does not relieve the trustee or debtor of any other obligations to provide information or documents to the United States trustee."
+    p "The rule also is amended to fix the time for the filing of notices under § 1518, added to the Code in 2005. Former subdivision (d) is renumbered as subdivision (e)."
+    p "Other changes are stylistic."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "f2f979bdce4f7f25bbd4a4168514da836b66d38cc46b6a435ef1608491ecfb63"
+  }
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2012-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2012 Amendment"
+    p "Subdivision (a)(3). Subdivision (a)(3) is amended to correct the reference to § 704. The 2005 amendments to the Code expanded § 704 and created subsections within it. The provision that was previously § 704(8) became § 704(a)(8). The other change to (a)(3) is stylistic."
+    hash "3ffcafae1eef506cdf97689a9f766bea62f32cc21f0b10ede79867b31ad642a9"
+  }
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022 Amendment"
+    p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. Subdivision (b) is amended to prescribe the duties of a debtor in possession, trustee, and debtor in a subchapter V case. Those cases are excepted from subdivision (a) because, unlike other chapter 11 cases, there will generally be both a trustee and a debtor in possession. Subdivision (b) also reflects that § 1187 of the Code prescribes reporting duties for the debtor in a subchapter V case."
+    p "Former subdivisions (b), (c), (d), and (e) are redesignated (c), (d), (e), and (f)[,] respectively."
+    hash "daad920573f7626663863374bda5c231555c81c7d1bc4a2b62997abb0068f085"
+  }
+  note "/us/usc/ptII/rule2015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2015 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "d62f75616d82ef7c99cd451abc35d9e8471406766d9659ab5c7f27f829ff7b2e"
+  }
+  layers {
+    operative "ee8d2b5280a80532829eb9b1f0eeeafceea90aa1c5b70b05ad8323307e4a0c03"
+    enacted "7d6ffc50cfa9171aa9600e14a5ae01a13c19caf22f52e5bd577dd676c922e557"
+    editorial "c5cf958bdf010189eb6f2dfbde6d2919996c773aea6e97613c44ec6f074963b1"
+  }
+}

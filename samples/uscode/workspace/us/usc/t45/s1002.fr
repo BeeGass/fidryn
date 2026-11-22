@@ -1,0 +1,124 @@
+edition 2
+module "/us/usc/t45/s1002" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1002" section {
+    num "1002" "§ 1002."
+    heading "Definitions"
+    chapeau "As used in this chapter, the term—"
+    provision "/us/usc/t45/s1002/1" paragraph {
+      num "1" "(1)"
+      content "“bankruptcy court” means the court having jurisdiction over the reorganization of the Rock Island Railroad;"
+      hash "7e60553a3704ae487c4b8c354fa14fcec7f7c08c8b5bfa81c38582586dfccd48"
+    }
+    provision "/us/usc/t45/s1002/2" paragraph {
+      num "2" "(2)"
+      content "“Board” means the Railroad Retirement Board;"
+      hash "c814b4792ee17445b6966eec6e23c616ca65533434378327654d120d051db7d1"
+    }
+    provision "/us/usc/t45/s1002/3" paragraph {
+      num "3" "(3)"
+      content "“Commission” means the Interstate Commerce Commission;"
+      hash "f4240786a96eb0e91f4ac637d843bbe84088d2b2764c98618d4a37f6d5eea58c"
+    }
+    provision "/us/usc/t45/s1002/4" paragraph {
+      num "4" "(4)"
+      content "“employee” includes any employee of the Rock Island Railroad as of August 1, 1979, but does not include any individual serving as president, vice-president, secretary, treasurer, comptroller, counsel, member of the board of directors, or any other person performing such functions;"
+      hash "ed08af441c168cf6bdfd306124f92f831e7e0df255b0c4fd6a6e6a1776bf007e"
+    }
+    provision "/us/usc/t45/s1002/5" paragraph {
+      num "5" "(5)"
+      content "the term “Rock Island Railroad” means the Chicago, Rock Island and Pacific Railroad Company, the estate of such Company in its reorganization proceeding, or the trustee appointed in such proceeding; and"
+      hash "ff97f9dc47bfc5ffed153c7c70ce1446f4a78fb2652d151d21add21359d6c291"
+    }
+    provision "/us/usc/t45/s1002/6" paragraph {
+      num "6" "(6)"
+      content "the term “Secretary” means the Secretary of Transportation."
+      hash "85ad8bbc803e88881ac154047a9490ecbddf7e869b273651ee3bd56a77d572b7"
+    }
+    hash "7b8a7573e1fbfe5147a1c0c712c47b4638e0ef27013a457a1e5e34c46edd2a40"
+  }
+  credit "(" ["Pub. L. 96–254, title I, § 103" -> "/us/pl/96/254/tI/s103"] ", May 30, 1980, " ["94 Stat. 399" -> "/us/stat/94/399"] "; " ["Pub. L. 96–448, title VII, § 701(b)(3)" -> "/us/pl/96/448/tVII/s701/b/3"] ", Oct. 14, 1980, " ["94 Stat. 1960" -> "/us/stat/94/1960"] ".)"
+  note "/us/usc/t45/s1002/note/editorialNotes/pl.96.254/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This chapter, referred to in text, was in the original “this title”, meaning title I (§ 101 et seq.) of " ["Pub. L. 96–254" -> "/us/pl/96/254"] ", May 30, 1980, " ["94 Stat. 399" -> "/us/stat/94/399"] ", known as the Rock Island Railroad Transition and Employee Assistance Act, which is classified principally to this chapter. For complete classification of title I to the Code, see Short Title note set out under " ["section 1001 of this title" -> "/us/usc/t45/s1001"] " and Tables."
+    hash "58f32671ae49711724a32b17cd7dac5b8f77824d95e1b6b5cc4860dcff8b5044"
+  }
+  note "/us/usc/t45/s1002/note/editorialNotes/pl.96.448/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1980—Par. (5). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " inserted “, the estate of such Company in its reorganization proceeding, or the trustee appointed in such proceeding” after “Railroad Company”. The amendment was executed by inserting amendatory text preceding the semicolon instead of the period at end of par. (5) as directed to reflect the probable intent of Congress, in view of par. (5) being enacted without a closing period."
+    hash "5ab0a08b2d91100b6f2d96e623e9138321bf47b41049df71e47f56f3b6509b38"
+  }
+  note "/us/usc/t45/s1002/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1980 Amendment"
+    p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 14, 1980, see " ["section 710(d) of Pub. L. 96–448" -> "/us/pl/96/448/s710/d"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
+    hash "5bd57dc238e4804a5a01c5250e2074da2589039fa458d2c6ff972282781779c6"
+  }
+  note "/us/usc/t45/s1002/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  definition "/us/usc/t45/s1002/1" {
+    term "bankruptcy court"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch19"
+    basis restated
+    see_note "/us/usc/t45/s1002/note/editorialNotes/pl.96.254/references-in-text"
+  }
+  definition "/us/usc/t45/s1002/2" {
+    term "Board"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch19"
+    basis restated
+    see_note "/us/usc/t45/s1002/note/editorialNotes/pl.96.254/references-in-text"
+  }
+  definition "/us/usc/t45/s1002/3" {
+    term "Commission"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch19"
+    basis restated
+    see_note "/us/usc/t45/s1002/note/editorialNotes/pl.96.254/references-in-text"
+  }
+  definition "/us/usc/t45/s1002/4" {
+    term "employee"
+    kind includes
+    words "As used in this chapter"
+    region "/us/usc/t45/ch19"
+    basis restated
+    see_note "/us/usc/t45/s1002/note/editorialNotes/pl.96.254/references-in-text"
+  }
+  definition "/us/usc/t45/s1002/5" {
+    term "Rock Island Railroad"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch19"
+    basis restated
+    see_note "/us/usc/t45/s1002/note/editorialNotes/pl.96.254/references-in-text"
+  }
+  definition "/us/usc/t45/s1002/6" {
+    term "Secretary"
+    kind means
+    words "As used in this chapter"
+    region "/us/usc/t45/ch19"
+    basis restated
+    see_note "/us/usc/t45/s1002/note/editorialNotes/pl.96.254/references-in-text"
+  }
+  layers {
+    operative "7b8a7573e1fbfe5147a1c0c712c47b4638e0ef27013a457a1e5e34c46edd2a40"
+    enacted "2a870661cc302b22023d2563501f670cb3a3aed9d635085f1a061f0e0eb638ba"
+    editorial "bcf6324600dae135065631915e82d4be7cc914cd5fa09f0c1845c67bd5946162"
+  }
+}

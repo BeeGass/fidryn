@@ -1,0 +1,304 @@
+edition 2
+module "/us/usc/t45/s745" {
+  within "/us/usc/t45/ch16/schIII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s745" section {
+    num "745" "§ 745."
+    heading "Continuing reorganization; supplemental transactions"
+    provision "/us/usc/t45/s745/a" subsection {
+      num "a" "(a)"
+      heading "Proposals"
+      content "If the Secretary or the Association determines that, as part of continuing reorganization, further restructuring of rail properties in the region through transactions supplemental to the final system plan would promote the establishment and retention of a financially self-sustaining rail service system in the region adequate to meet the needs of the region, the Secretary or the Association, as the case may be, may develop proposals for such supplemental transactions as are necessary or appropriate to implement the needed restructuring. Transfers of rail properties included in proposals developed by the Association shall be limited to (1) rail properties which would have qualified for designation under " ["section 716(c)(1)(A) of this title" -> "/us/usc/t45/s716/c/1/A"] " but which were not transferred or conveyed under the final system plan, and which the Association finds to be essential to the efficient operations of the Corporation, and (2) transfers, consistent with the final system plan, of rail properties from the Corporation to a subsidiary thereof. Each proposal (other than a proposal developed by the Association) shall be submitted in writing to the Association and shall state and describe any transactions proposed, the rail properties involved, the parties to such transactions, the financial and other terms of such transactions, the purposes of the chapter or the goals of the final system plan intended to be effectuated by such transactions, and such other information incidental thereto as the Association may prescribe. Within 10 days after receipt of a proposal developed by the Secretary, and upon the development of a proposal developed by the Association, the Association shall publish a summary of such proposal in the Federal Register, and shall afford interested persons (including the Corporation when property is to be transferred to or from the Corporation) an opportunity to comment thereon."
+      hash "fff8b4c499653ef7ac50f60c0f26f9c8a29f38122b1fca8a2335038455a03c4c"
+    }
+    provision "/us/usc/t45/s745/b" subsection {
+      num "b" "(b)"
+      heading "Evaluation by Association"
+      content "The Association shall analyze each proposal containing one or more supplemental transactions, taking into account the comments of interested persons and statements and exhibits submitted at any public hearings which may have been held. The Association shall, within 120 days after the publication of a summary thereof under subsection (a) of this section, publish in the Federal Register a report evaluating such proposal. Such evaluation shall state whether the supplemental transactions contained in such proposal, considered in their entirety, are (1) in the public interest and consistent with the purposes of this chapter and the goals of the final system plan, and (2) fair and equitable. If the Corporation opposes, or seeks modification of, any such proposed transfer, its written comments shall be given due consideration by the Association and shall be published as part of the evaluation. Within 30 days after the Association publishes its report, each proposed transferor or transferee shall notify the Association in writing as to whether any proposed supplemental transaction requiring the transfer of any property from or to such transferor or transferee is acceptable to such proposed transferor or transferee. If any such proposed transferor (other than the Corporation) or transferee fails to notify the Association that any proposed supplemental transaction requiring the transfer of any property from such transferor or to such transferee is acceptable to it, no further administrative or judicial proceedings shall be conducted with respect to such proposed supplemental transaction."
+      hash "9f2f22fbc2c9a23650190782f0bc5596cb7f06afdb97c85e85459b53e41a6c16"
+    }
+    provision "/us/usc/t45/s745/c" subsection {
+      num "c" "(c)"
+      heading "Review by Commission"
+      content "Within 90 days after the publication in the Federal Register of each report referred to in subsection (b) of this section, the Commission shall determine whether the supplemental transactions referred to in the report, considered in their entirety, would be in the public interest and consistent with the purposes of this chapter and the goals of the final system plan. In making such determination, the Commission shall give due consideration to the views received by it, within 30 days after the publication of the applicable report, from the Corporation and the Secretary. The Commission may condition its approval of such supplemental transactions on such reasonable terms and conditions as it may deem necessary in the public interest. The approval by the Commission of such supplemental transactions shall not be a prerequisite to the consummation of such transactions, but any determination of the Commission modifying, approving, or disapproving any proposed supplemental transactions shall be given due weight and consideration by the special court in the proceedings prescribed in subsection (d) of this section. If the Commission fails to act within the time period provided in this subsection, the supplemental transactions involved shall be deemed to have been approved by the Commission. The Commission may prescribe such regulations as may be necessary for the administration of this section."
+      hash "0cce4e0ff6ee63bdc51f63b98289732d1ced7541b4025e1355afb73f906dac81"
+    }
+    provision "/us/usc/t45/s745/d" subsection {
+      num "d" "(d)"
+      heading "Special court proceedings"
+      provision "/us/usc/t45/s745/d/1" paragraph {
+        num "1" "(1)"
+        content "If the Association has made the determination pursuant to subsection (b) of this section that a proposal for supplemental transactions is in the public interest and consistent with the purposes of this chapter and the goals of the final system plan, and is fair and equitable, the Association shall, within 40 days after the date of the Commission’s determination under subsection (c) of this section, or after the expiration of the 90-day period referred to in such subsection (c), whichever is applicable, petition the special court for an order of such court finding that such proposal for supplemental transactions is in the public interest and consistent with the purposes of this chapter and the goals of the final system plan, and is fair and equitable, and directing the Corporation to carry out the supplemental transactions specified in such proposal. If the Association has determined, pursuant to subsection (b) of this section that a proposal made by the Secretary is not in the public interest or is not consistent with the purposes of this chapter and the goals of the final system plan or is not fair and equitable, the Secretary may, if he determines that such proposal is in the public interest and consistent with the purposes of this chapter and the goals of the final system plan and is fair and equitable, petition the special court for an order of such court finding that such proposal for supplemental transactions is in the public interest and consistent with the purposes of this chapter and the goals of the final system plan and is fair and equitable, and directing the Corporation to carry out any supplemental transactions specified in such proposal. Such a petition shall be submitted to the special court within 90 days after the date of the Commission’s determination under such subsection (c), or after the expiration of the 90-day period referred to in such subsection (c), whichever is applicable."
+        hash "5dae96a38275f84d4fb00dfda5b9de6c9c3898cf5d70a150441f2e73974a64ee"
+      }
+      provision "/us/usc/t45/s745/d/2" paragraph {
+        num "2" "(2)"
+        content "After the filing of a petition under paragraph (1) of this subsection, the special court shall decide, after a hearing, whether the proposed supplemental transactions contained in such petition, considered in their entirety, are in the public interest and consistent with the purposes of this chapter and the goals of the final system plan and are fair and equitable. If the special court determines that such proposed supplemental transactions, considered in their entirety, are in the public interest and consistent with the purposes of this chapter and the goals of the final system plan and are fair and equitable, it shall, upon making such determination, issue such orders as may be necessary to direct the Corporation to consummate the transactions. If the special court determines that such proposed supplemental transactions, considered in their entirety, are not in the public interest or not consistent with the purposes of this chapter and the goals of the final system plan, or are not fair and equitable, it shall file an opinion stating its conclusion and the reasons therefor. In such event the Association (in the case of a proposal developed by the Association) or the Secretary (in the case of a proposal developed by the Secretary) may, within 120 days after the filing of such opinion, certify to the special court that the terms and conditions of the proposal have been modified consistent with the opinion of the court and are acceptable to each proposed transferor (other than the Corporation) or transferee, and may petition the special court for reconsideration of the proposal as so modified. After the filing of such petition, the special court shall decide, after a hearing, whether the proposal as modified by the certification is in the public interest and consistent with the purposes of this chapter and the goals of the final system plan and is fair and equitable, and shall enter such further orders as are consistent with its determination."
+        hash "7620f85eafc0749485ab82a802c02f5c6f0a7d9a823f58dbacf1ab45990807f0"
+      }
+      provision "/us/usc/t45/s745/d/3" paragraph {
+        num "3" "(3)"
+        content "The Corporation is authorized to petition the special court and to be represented regarding any proposed supplemental transaction, contained in a proposal developed by either the Association or the Secretary, which involves the properties of the Corporation."
+        hash "da2efc75647cc713ae7c38297e94f8ebd1aa92ceac319697f11f78d0b69db560"
+      }
+      provision "/us/usc/t45/s745/d/4" paragraph {
+        num "4" "(4)"
+        content "In proceedings under this subsection, the special court is authorized to exercise the powers of a reorganization court."
+        hash "d296c3d4b4653a6f4d26b14afee67f9947307f6a1baf1b4e5e4d30b040d8c86a"
+      }
+      provision "/us/usc/t45/s745/d/5" paragraph {
+        num "5" "(5)"
+        content "Any evaluation by the Association, the Secretary, or the Commission shall not be reviewable in any court except the special court in accordance with the provisions of this section. The supplemental transactions shall not be restrained or enjoined by any court nor shall they be otherwise reviewable by any court other than by the special court to the extent provided in this section."
+        hash "b75cc5d677a6d222021a4651cdf931ad65cd0997d6fa91158a816dc486755c38"
+      }
+      provision "/us/usc/t45/s745/d/6" paragraph {
+        num "6" "(6)"
+        content "Notwithstanding any other provision of this chapter, no findings, determinations, or proceedings shall be required with respect to any proposal for supplemental transactions other than as expressly set forth in this section."
+        hash "51cd86aa94cdea5edb8942d0e10b2d238625590af73f77b70c09ad39b1cb91d3"
+      }
+      provision "/us/usc/t45/s745/d/7" paragraph {
+        num "7" "(7)"
+        content "Repealed. " ["Pub. L. 97–35, title XI, § 1155(b)" -> "/us/pl/97/35/tXI/s1155/b"] ", Aug. 13, 1981, " ["95 Stat. 679" -> "/us/stat/95/679"] "."
+        hash "cc71384f21493276440e8d419d0b8349a266ba2f728a9cd98da025bc9aaeccd0"
+      }
+      provision "/us/usc/t45/s745/d/8" paragraph {
+        num "8" "(8)"
+        content "A final order or judgment of the special court entering or denying an order pursuant to this subsection shall be reviewable in the same manner as provided in " ["section 719(e)(3) of this title" -> "/us/usc/t45/s719/e/3"] "."
+        hash "69d59bf035d73cd6edbaf83b60e6dca77366d7ed80b61cabe21900fd4453a2f9"
+      }
+      hash "14208389f7af80982abff30c87b33c3a30b025be8988be0ee6d1f48697667ee3"
+    }
+    provision "/us/usc/t45/s745/e" subsection {
+      num "e" "(e)"
+      heading "“Fair and equitable” defined"
+      chapeau "As used in this section, the term “fair and equitable” means fair and equitable, in accordance with the standards applicable to the approval of a plan of reorganization (or a step in such plan) under section 77 of the Bankruptcy Act" mark "1" 1 " to—"
+      provision "/us/usc/t45/s745/e/1" paragraph {
+        num "1" "(1)"
+        content "the estates of railroads in reorganization in the region and persons leased, operated, or controlled by such railroads who have conveyed rail properties, under " ["section 743(b)(1) of this title" -> "/us/usc/t45/s743/b/1"] ", in exchange for securities of the Corporation, the Association, or profitable railroads and other benefits provided as a consequence of this chapter and to any subsequent holders of such securities at the time of the supplemental transaction involved; and"
+        hash "fa0d8d449335a8e922f7fe36fd943aae41bb9838f7882de698ad9ae4bdb6f640"
+      }
+      provision "/us/usc/t45/s745/e/2" paragraph {
+        num "2" "(2)"
+        content "the holders of other securities of the Corporation."
+        hash "cee96b5fc1403b7e0c0ea2c7e1c2358cf4040eb357e421d97288b5e496f087a9"
+      }
+      continuation "Whenever any property or securities of the Corporation are required to be valued in order to determine whether the terms of a supplemental transaction are fair and equitable, the special court shall give proper recognition to the contributions to the Corporation by all classes of security holders, except that such court shall not assign to the series B preferred stock or the common stock of the Corporation any values added to those securities, by reason of investment by the Association in debentures and series A preferred stock of the Corporation, in excess of any value required by constitutional principles applicable to a reorganization process."
+      hash "92a5411ec7d7ef5c1ab025c4b9361429469b9d57d41d1d4f5326de0fe21839b2"
+    }
+    provision "/us/usc/t45/s745/f" subsection {
+      num "f" "(f)"
+      heading "Expedited proposals"
+      provision "/us/usc/t45/s745/f/1" paragraph {
+        num "1" "(1)"
+        chapeau "Within 240 days after the effective date of the Staggers Rail Act of 1980, the Secretary, after providing an opportunity for comments from interested parties, shall determine whether to initiate a proposal for a supplemental transaction under this section for the transfer of all rail properties of the Corporation in the States of Connecticut and Rhode Island to another railroad in the region. If the Secretary determines that—"
+        provision "/us/usc/t45/s745/f/1/A" subparagraph {
+          num "A" "(A)"
+          content "the proposed transferee railroad is financially and operationally capable of assuming the freight operations and freight service obligations of the Corporation on a financially self-sustaining basis;"
+          hash "ef1088e528caf3ac1ef6d419728ecfa3cf090ebb0ddda83d2750be6b82f9033e"
+        }
+        provision "/us/usc/t45/s745/f/1/B" subparagraph {
+          num "B" "(B)"
+          content "the proposed transfer would promote the establishment and retention of a financially self-sustaining rail system in the States of Connecticut and Rhode Island adequate to meet the needs of such States; and"
+          hash "4f8d24249ea3b6fb5c4b1b7b58ab3cc48d1b4d6aad8b750816a695e339bd04c6"
+        }
+        provision "/us/usc/t45/s745/f/1/C" subparagraph {
+          num "C" "(C)"
+          content "the proposed transfer is consistent with the goals set forth in " ["section 716(a)(8) of this title" -> "/us/usc/t45/s716/a/8"] ","
+          hash "a4ca8b623b2b52e8484a15b91474295bbc2b1789e9e4fae7ad083d0eea04144c"
+        }
+        continuation "the Secretary shall develop such a proposal and may, after providing the Association, the Commission, and the States of Connecticut and Rhode Island an opportunity to review and comment on such proposal, petition the special court for an order to carry out such proposal."
+        hash "cf0de4e8cb971486b17cbc999ca1e9eb0dc5b209ca11f8b4b05e1965f65a7651"
+      }
+      provision "/us/usc/t45/s745/f/2" paragraph {
+        num "2" "(2)"
+        provision "/us/usc/t45/s745/f/2/A" subparagraph {
+          num "A" "(A)"
+          content "Within 10 days after August 13, 1981, the Secretary shall initiate discussions and negotiations for the transfer of some or all of the Corporation’s rail properties and freight service obligations in the States of Connecticut and Rhode Island to one or more parties under a plan which provides for continued rail freight service on all lines operated by the Corporation on August 13, 1981, for at least four years."
+          hash "0a80eb00d1cdf59398d0f24bdea069657a7ade847d74d9bf562ddee0f44f6426"
+        }
+        provision "/us/usc/t45/s745/f/2/B" subparagraph {
+          num "B" "(B)"
+          chapeau "Within 120 days after August 13, 1981, the Secretary shall petition the special court for an order to transfer all of the Corporation’s rail properties and freight service obligations in the States of Connecticut and Rhode Island to one or more railroads in the Region—"
+          provision "/us/usc/t45/s745/f/2/B/i" clause {
+            num "i" "(i)"
+            content "which have under subparagraph (A) of this paragraph completed negotiations and submitted to the Secretary a proposal to assume all of the freight operations and freight service obligations of the Corporation in such States on a financially self-sustaining basis for a period of at least four years; or"
+            hash "38302a27979f13e12ca54fbda420c4bcd60c02c17bf2c950e88a0560f1c741da"
+          }
+          provision "/us/usc/t45/s745/f/2/B/ii" clause {
+            num "ii" "(ii)"
+            content "which have developed a proposal to assume all of the freight operations and freight service obligations of the Corporation in such States under an agreement by and between the Corporation and such railroad or railroads; or"
+            hash "5d1a828d48822f0eb09e7a05307819903c1ea581135edb6ecee4a7538b81bce6"
+          }
+          provision "/us/usc/t45/s745/f/2/B/iii" clause {
+            num "iii" "(iii)"
+            content "which have, prior to May 1, 1981, submitted a proposal to the Secretary for such a transfer."
+            hash "9e13d1bbeb8b3c89b3d2f5869a2fce1fc3f530fd0200a8c6658a79ec4f132c77"
+          }
+          continuation "For the purpose of this section, an order to transfer may include the Corporation if the Corporation agrees to maintain service over lines retained by the Corporation for four years."
+          hash "324ae374890f8c4c407e13de325496711be897dbac9135663348100e6710b09f"
+        }
+        provision "/us/usc/t45/s745/f/2/C" subparagraph {
+          num "C" "(C)"
+          content "To permit efficient and effective rail operations consistent with the public interest, as a part of any transfer under paragraph (2)(B) of this subsection, the Secretary shall promote the transfer of additional non-mainline Corporation properties in adjoining States that connect with properties that are the subject of such transfer."
+          hash "24893c079b892c3d7040974063bad16285156d160132baa5da1adee26022c761"
+        }
+        provision "/us/usc/t45/s745/f/2/D" subparagraph {
+          num "D" "(D)"
+          content "The special court shall determine a fair and equitable price for the rail properties to be transferred under this subsection, and shall, unless the parties otherwise agree, establish divisions of joint rates for through routes over such properties which are fair and equitable to the parties. The special court shall establish a method to ensure that such divisions are promptly paid."
+          hash "f9f25700f8e376be4c370bed5d3645e1c07a1a8d6f7593588e2d587873531a7a"
+        }
+        provision "/us/usc/t45/s745/f/2/E" subparagraph {
+          num "E" "(E)"
+          content "Notwithstanding any other provision of law or agreement in effect on May 1, 1981, the special court shall require that the railroad or railroads to which properties are to be transferred under this subsection assume all charges payable by the Corporation to Amtrak for the carriage of property by rail over those portions of the Northeast Corridor in Connecticut and Rhode Island. If the Corporation operates any rail freight service over those portions of the Northeast Corridor in Connecticut and Rhode Island after the date of such transfer, the Corporation shall pay Amtrak any compensation that may be separately agreed upon by the Corporation and Amtrak, and the railroad or railroads to which properties are transferred under this subsection shall not be obligated to pay any compensation owed by the Corporation to Amtrak for such post-transfer operations by the Corporation."
+          hash "51c88187284afb892ef71176ed167d362a84ec3e4c1c7184b2e41fd3b87b25a4"
+        }
+        hash "cda65e91d7d124479a12e394e031409d2323d827311a557ff366187616ca1818"
+      }
+      provision "/us/usc/t45/s745/f/3" paragraph {
+        num "3" "(3)"
+        content "If the special court determines that a proposal developed under this subsection is fair and equitable, meets the requirements of this subsection, and is in the public interest, it shall issue such orders as may be necessary to carry out such proposal. The provisions of paragraphs (2)–(6) of subsection (d) of this section shall apply to the determination of the special court under this subsection, except that the standards for such determination shall be those set forth in this paragraph."
+        hash "b08c682f29304ffc0cb1cac89edfc057ca43fed7820a436886145871ac02617d"
+      }
+      provision "/us/usc/t45/s745/f/4" paragraph {
+        num "4" "(4)"
+        provision "/us/usc/t45/s745/f/4/A" subparagraph {
+          num "A" "(A)"
+          content "Any employee who was protected by the compensatory provisions of subchapter V" mark "2" 2 " of this chapter immediately prior to August 13, 1981, and who is deprived of employment as a result of the transfer of rail properties under this subsection shall be eligible for benefits under section 797" mark "2" 2 " of this title."
+          hash "24a0718305f1d2fdb6cd803e17c1a41dba81163df46441888768d6c0869b3d63"
+        }
+        provision "/us/usc/t45/s745/f/4/B" subparagraph {
+          num "B" "(B)"
+          content "As used in this paragraph, “employee deprived of employment” means any employee who is unable to secure employment through the normal exercise of seniority rights, but does not include any employee who refuses an offer of employment with a railroad acquiring properties under this subsection."
+          hash "653cc62a4cccca2843fc7144c8721b9e3eb4826334b3d2547deef2d31fcbdb13"
+        }
+        hash "fd5d18f869e95257408dc545504613f85f57c45feb71de709c4a2e4458f0a887"
+      }
+      hash "6395ac6189d0bf93cd7071f88b5298aca99ba210e0000f800a365fd0f910ecba"
+    }
+    provision "/us/usc/t45/s745/g" subsection {
+      num "g" "(g)"
+      heading "Transfer of properties and freight service obligations of specific lines"
+      provision "/us/usc/t45/s745/g/1" paragraph {
+        num "1" "(1)"
+        content "Within 20 days after August 13, 1981, the Secretary shall initiate discussions and negotiations for the expedited transfer of all properties and freight service obligations of the Corporation with respect to the following lines: Canaan, Connecticut, to Pittsfield, Massachusetts; North Adams Junction, Massachusetts, to North Adams, Massachusetts; Hazardville, Connecticut, to Springfield, Massachusetts; Westfield, Massachusetts, to Easthampton, Massachusetts; Westfield, Massachusetts, to Holyoke, Massachusetts."
+        hash "c0ca821f97e1170b81ab693e2e51a60af553f56c43b209734c56230301055063"
+      }
+      provision "/us/usc/t45/s745/g/2" paragraph {
+        num "2" "(2)"
+        content "Within 120 days after August 13, 1981, the Secretary shall transfer, provided a qualified purchaser offers to purchase, the Corporation’s properties and freight service obligations described in paragraph (1) of this subsection to another railroad or railroads in the Region which are determined by the Secretary to be qualified. A qualified purchaser is defined as a railroad financially self-sustaining which guarantees continuous service for at least four years."
+        hash "bd38936899d005b489a17566e44bb18f6436f1c22cf764972a5d0b7781a94541"
+      }
+      provision "/us/usc/t45/s745/g/3" paragraph {
+        num "3" "(3)"
+        content "The Secretary shall determine a fair and equitable price for the rail properties to be transferred under this subsection, and shall, unless the parties otherwise agree, establish divisions of joint rates for through routes over such properties which are fair and equitable to the parties."
+        hash "3827a41eec69c73d2a778da2a70b0b9c7280d032fd0464f032cee95288386ce2"
+      }
+      provision "/us/usc/t45/s745/g/4" paragraph {
+        num "4" "(4)"
+        content "The Secretary shall determine fair and equitable terms for the provision of such trackage rights, on segments of the Corporation’s lines not to exceed 5 miles per line transferred, to acquiring carriers as may be necessary to operate such transferred lines in an efficient manner."
+        hash "058214b8c742f7e5f6c077a39d933d3475916e4312db05585b4af156f9acc37a"
+      }
+      hash "dc146005db4b109527a9f6f5f6fdb9d704681cad40552c7724634c12b48c19f8"
+    }
+    hash "f464d64bc350963d453b93299bcc7e7826dfebbf6f85d31877cc595b0b6e92ff"
+  }
+  credit "(" ["Pub. L. 93–236, title III, § 305" -> "/us/pl/93/236/tIII/s305"] ", as added " ["Pub. L. 94–210, title VI, § 610(b)" -> "/us/pl/94/210/tVI/s610/b"] ", Feb. 5, 1976, " ["90 Stat. 100" -> "/us/stat/90/100"] "; amended " ["Pub. L. 96–448, title VI, § 601(a)" -> "/us/pl/96/448/tVI/s601/a"] ", Oct. 14, 1980, " ["94 Stat. 1958" -> "/us/stat/94/1958"] "; " ["Pub. L. 97–35, title XI, § 1155" -> "/us/pl/97/35/tXI/s1155"] ", Aug. 13, 1981, " ["95 Stat. 677" -> "/us/stat/95/677"] "; " ["Pub. L. 98–620, title IV, § 402(48)" -> "/us/pl/98/620/tIV/s402/48"] ", Nov. 8, 1984, " ["98 Stat. 3360" -> "/us/stat/98/3360"] "; " ["Pub. L. 104–317, title VI, § 605(c)(2)" -> "/us/pl/104/317/tVI/s605/c/2"] ", Oct. 19, 1996, " ["110 Stat. 3859" -> "/us/stat/110/3859"] ".)"
+  note "/us/usc/t45/s745/note/editorialNotes/act.1898-07-01.ch541/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Section 77 of the Bankruptcy Act, referred to in subsec. (e), was classified to section 205 of former Title 11, Bankruptcy. The Bankruptcy Act (" ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ") was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    p "The effective date of the Staggers Rail Act of 1980, referred to in subsec. (f)(1), probably means Oct. 1, 1980, the effective date of " ["section 601(a) of Pub. L. 96–448" -> "/us/pl/96/448/s601/a"] ", which enacted subsec. (f) of this section. See " ["section 710 of Pub. L. 96–448" -> "/us/pl/96/448/s710"] ", set out as an Effective Date of 1980 Amendment note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] "."
+    p "Subchapter V of this chapter, referred to in subsec. (f)(4)(A), was repealed by " ["Pub. L. 97–35, title XI, § 1144(a)(1)" -> "/us/pl/97/35/tXI/s1144/a/1"] ", Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"] "."
+    p ["Section 797 of this title" -> "/us/usc/t45/s797"] ", referred to in subsec. (f)(4)(A), was repealed by " ["Pub. L. 99–509, title IV, § 4024(c)" -> "/us/pl/99/509/tIV/s4024/c"] ", Oct. 21, 1986, " ["100 Stat. 1904" -> "/us/stat/100/1904"] ", effective on the sale date (Apr. 2, 1987)."
+    hash "bcdcc7bece346f3eacf8808d806bdcac79b62af4d38dd966ef89ee171f617a9c"
+  }
+  note "/us/usc/t45/s745/note/editorialNotes/pl.104.317/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1996—Subsec. (d)(4). " ["Pub. L. 104–317" -> "/us/pl/104/317"] ", which directed amendment of par. (4) by striking out “a judge of the United States district court with respect to such proceedings and such powers shall include those of”, was executed by striking out text which contained the words “judge of a United States” rather than “judge of the United States” to reflect the probable intent of Congress."
+    p "1984—Subsec. (d)(2). " ["Pub. L. 98–620" -> "/us/pl/98/620"] " substituted “After” for “Within 180 days after” at beginning of first and last sentences."
+    p "1981—Subsec. (d)(7). " ["Pub. L. 97–35, § 1155(b)" -> "/us/pl/97/35/s1155/b"] ", struck out par. (7) which related to applicable requirements to supplemental transactions."
+    p "Subsec. (f). " ["Pub. L. 97–35, § 1155(a)" -> "/us/pl/97/35/s1155/a"] ", in par. (2) substituted provisions relating to discussions and negotiations, judicial procedures applicable, etc., for transfers, for provisions relating to establishment of a fair and equitable price for properties, and in par. (4) substituted provisions relating to eligibility for benefits of employees deprived of employment, for provisions relating to expedited supplemental transactions."
+    p "Subsec. (g). " ["Pub. L. 97–35, § 1155(c)" -> "/us/pl/97/35/s1155/c"] ", added subsec. (g)."
+    p "1980—Subsec. (f). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " added subsec. (f)."
+    hash "15f92463289c90f751d5ac0a9addb077aa3cdd356916108b44249b0064d47bbd"
+  }
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1996 Amendment"
+    p "Amendment by " ["Pub. L. 104–317" -> "/us/pl/104/317"] " effective 90 days after Oct. 19, 1996, and except as otherwise provided, applicable to proceedings that arise or continue after such effective date, see " ["section 605(e) of Pub. L. 104–317" -> "/us/pl/104/317/s605/e"] ", set out as a note under " ["section 719 of this title" -> "/us/usc/t45/s719"] "."
+    hash "5738327b8d935a396acd7128541b68a5aca7d2af8e8abb78fb66fd0602156b40"
+  }
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.98.620/effective-date-of-1984-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1984 Amendment"
+    p "Amendment by " ["Pub. L. 98–620" -> "/us/pl/98/620"] " not applicable to cases pending on Nov. 8, 1984, see " ["section 403 of Pub. L. 98–620" -> "/us/pl/98/620/s403"] ", set out as a note under " ["section 1657 of Title 28" -> "/us/usc/t28/s1657"] ", Judiciary and Judicial Procedure."
+    hash "b3d0854af378192f7a53e70489f9fc3f7946aec91d2ce245380969a27892e6fd"
+  }
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.97.35/effective-date-of-1981-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1981 Amendment"
+    p "Amendment by " ["Pub. L. 97–35" -> "/us/pl/97/35"] " effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as an Effective Date note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
+    hash "ce7dcc740f9bc75628da6da8e14fc1eb7bee2a77c67bd18e04c70e99f0b41d10"
+  }
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1980 Amendment"
+    p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 1, 1980, see " ["section 710(a) of Pub. L. 96–448" -> "/us/pl/96/448/s710/a"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
+    hash "8414357495bccb2db0922b729682e002ff9e6cb677e7f522f2d91447135103eb"
+  }
+  note "/us/usc/t45/s745/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
+    p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
+    hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
+  }
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "8df987ce55ef91d27f02ab3e754938301447cac8bb0f6033019330c324c8ba4c"
+  }
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Applicability of National Environmental Policy Act"
+    p "Application of National Environmental Policy Act to actions of Commission not affected by title VI of " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", see " ["section 619 of Pub. L. 94–210" -> "/us/pl/94/210/s619"] ", set out as a note under " ["section 791 of this title" -> "/us/usc/t45/s791"] "."
+    hash "7ce373698c822f6cf7cb1f07e93f5e378a6239d819a9e93ab08ae9f21b104a45"
+  }
+  note "/us/usc/t45/s745/note/statutoryNotes/pl.94.210/rail-abandonment-and-discontinuance-of-service-report" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Rail Abandonment and Discontinuance of Service Report"
+    p ["Pub. L. 94–210, title IX, § 904" -> "/us/pl/94/210/tIX/s904"] ", Feb. 5, 1976, " ["90 Stat. 148" -> "/us/stat/90/148"] ", directed Secretary to submit to Congress, within ninety days of Feb. 5, 1976, a report on anticipated effect of any abandonment of lines of railroad and any discontinuances of rail service in States outside the region as defined in " ["section 702 of this title" -> "/us/usc/t45/s702"] ", prior to repeal by " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"] "."
+    hash "9259ced5d6b24adffd6c9654a9093af3bfe572bf262a6c24224ed1ffcfaa932e"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  footnote 2 "2" {
+    p "See References in Text note below."
+  }
+  definition "/us/usc/t45/s745/e" {
+    term "fair and equitable"
+    kind means
+    words "As used in this section"
+    region "/us/usc/t45/s745"
+    basis restated
+  }
+  layers {
+    operative "f464d64bc350963d453b93299bcc7e7826dfebbf6f85d31877cc595b0b6e92ff"
+    enacted "068392bf97c2fe5e0a2df7783184b01b7b7f0d95209cf9edb21cf7556d122854"
+    editorial "158a685a3c3190807590a3ea9a91da88b40ac4243b27bc6e1d405e3d31d81ff0"
+  }
+}

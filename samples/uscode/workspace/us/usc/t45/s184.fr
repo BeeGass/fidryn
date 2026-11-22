@@ -1,0 +1,22 @@
+edition 2
+module "/us/usc/t45/s184" {
+  within "/us/usc/t45/ch8/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s184" section {
+    num "184" "§ 184."
+    heading "System, group, or regional boards of adjustment"
+    content {
+      p "The disputes between an employee or group of employees and a carrier or carriers by air growing out of grievances, or out of the interpretation or application of agreements concerning rates of pay, rules, or working conditions, including cases pending and unadjusted on April 10, 1936 before the National Labor Relations Board, shall be handled in the usual manner up to and including the chief operating officer of the carrier designated to handle such disputes; but, failing to reach an adjustment in this manner, the disputes may be referred by petition of the parties or by either party to an appropriate adjustment board, as hereinafter provided, with a full statement of the facts and supporting data bearing upon the disputes."
+      p "It shall be the duty of every carrier and of its employees, acting through their representatives, selected in accordance with the provisions of this subchapter, to establish a board of adjustment of jurisdiction not exceeding the jurisdiction which may be lawfully exercised by system, group, or regional boards of adjustment, under the authority of " ["section 153 of this title" -> "/us/usc/t45/s153"] "."
+      p "Such boards of adjustment may be established by agreement between employees and carriers either on any individual carrier, or system, or group of carriers by air and any class or classes of its or their employees; or pending the establishment of a permanent National Board of Adjustment as hereinafter provided. Nothing in this chapter shall prevent said carriers by air, or any class or classes of their employees, both acting through their representatives selected in accordance with provisions of this subchapter, from mutually agreeing to the establishment of a National Board of Adjustment of temporary duration and of similarly limited jurisdiction."
+    }
+    hash "3e6fbe791856e3575e89e2bb256a626425f445362ffac2d75b5ed5673fb14073"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 204" -> "/us/act/1926-05-20/ch347/s204"] ", as added " ["Apr. 10, 1936, ch. 166" -> "/us/act/1936-04-10/ch166"] ", " ["49 Stat. 1189" -> "/us/stat/49/1189"] ".)"
+  layers {
+    operative "3e6fbe791856e3575e89e2bb256a626425f445362ffac2d75b5ed5673fb14073"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f3c033e30b920308b919f7a75e1f84717bc10f9ccdb706fe7b83a3fa521d595c"
+  }
+}

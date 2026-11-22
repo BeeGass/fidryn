@@ -1,0 +1,29 @@
+edition 2
+module "/us/usc/t45/s92a" {
+  within "/us/usc/t45/ch5"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s92a" section {
+    num "92a" "§ 92a."
+    heading "Repealed. " ["Aug. 10, 1956, ch. 1041, § 53" -> "/us/act/1956-08-10/ch1041/s53"] ", " ["70A Stat. 641" -> "/us/stat/70A/641"]
+    status repealed
+    hash "29fdabe0d18e4780a4c18cb127fd19d47bf4c6bbd7ff53291504e2ab8d3a7d20"
+  }
+  note "/us/usc/t45/s92a/note/ungrouped/act.1933-02-14.ch51/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 92a, acts " ["Feb. 14, 1933, ch. 51" -> "/us/act/1933-02-14/ch51"] ", " ["47 Stat. 800" -> "/us/stat/47/800"] "; " ["Mar. 2, 1933, ch. 187" -> "/us/act/1933-03-02/ch187"] ", " ["47 Stat. 1424" -> "/us/stat/47/1424"] ", related to compensation of certain railroads for transportation of property and troops of United States. See " ["section 10721 of Title 49" -> "/us/usc/t49/s10721"] ", Transportation."
+    hash "e76767b69a6f02533723dca78bced2a392e6eaa05bf85ebba25f7bdf2cb35e9c"
+  }
+  note "/us/usc/t45/s92a/note/ungrouped/nolaw/h.ba59535adbe58b45" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Prior to repeal, section was classified to section 1375b of former Title 10, Army and Air Force."
+    hash "ba59535adbe58b4508f9783f8eba32e5b5dbeeb16cc830e391b89ef88ea22155"
+  }
+  layers {
+    operative "29fdabe0d18e4780a4c18cb127fd19d47bf4c6bbd7ff53291504e2ab8d3a7d20"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "b93bf5497c2158fa75390a84999ab8869af6515cbc6880e01bb5bec20540e710"
+  }
+}

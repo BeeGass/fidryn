@@ -1,0 +1,166 @@
+edition 2
+module "/us/usc/ptVIII/rule8014" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8014" courtRule {
+    num "8014" "Rule 8014."
+    heading "Briefs"
+    provision "/us/usc/ptVIII/rule8014/a" subsection {
+      num "a" "(a)"
+      heading "Appellant’s Brief."
+      chapeau "The appellant’s brief must contain the following under appropriate headings and in the order indicated:"
+      provision "/us/usc/ptVIII/rule8014/a/1" paragraph {
+        num "1" "(1)"
+        content "a disclosure statement, if required by Rule 8012;"
+        hash "b1d0586f5a616d555be4463abbabf9d943fd3c5a6babc1619750687157956e03"
+      }
+      provision "/us/usc/ptVIII/rule8014/a/2" paragraph {
+        num "2" "(2)"
+        content "a table of contents, with page references;"
+        hash "6f7106ec8ce0271f3161bcd1ff0356d4736272a64d1771a6897e305ab19bdbd8"
+      }
+      provision "/us/usc/ptVIII/rule8014/a/3" paragraph {
+        num "3" "(3)"
+        content "a table of authorities—cases (alphabetically arranged), statutes, and other authorities—with references to the pages of the brief where they are cited;"
+        hash "899287b16eaa1896119709264aebd7cc89b4957e9d4c1dbee65d53fda318c549"
+      }
+      provision "/us/usc/ptVIII/rule8014/a/4" paragraph {
+        num "4" "(4)"
+        chapeau "a jurisdictional statement, including:"
+        provision "/us/usc/ptVIII/rule8014/a/4/A" subparagraph {
+          num "A" "(A)"
+          content "the basis for the bankruptcy court’s subject-matter jurisdiction, citing applicable statutory provisions and stating relevant facts establishing jurisdiction;"
+          hash "f94227625821c42dcd15a9c451bcc9ac1f85596a964f79772af10518d283402c"
+        }
+        provision "/us/usc/ptVIII/rule8014/a/4/B" subparagraph {
+          num "B" "(B)"
+          content "the basis for the district court’s or BAP’s jurisdiction, citing applicable statutory provisions and stating relevant facts establishing jurisdiction;"
+          hash "84b5f849db572ca5adb5af8eb3055a9644431d6ec1c7024119d716b4dd790848"
+        }
+        provision "/us/usc/ptVIII/rule8014/a/4/C" subparagraph {
+          num "C" "(C)"
+          content "the filing dates establishing the timeliness of the appeal; and"
+          hash "8a8e5dc14f8b039b7c34cf42c536c7be6bd3aa1d17a6bd2e8d8d91866d1420cb"
+        }
+        provision "/us/usc/ptVIII/rule8014/a/4/D" subparagraph {
+          num "D" "(D)"
+          content "an assertion that the appeal is from a final judgment, order, or decree—or information establishing the district court’s or BAP’s jurisdiction on another basis;"
+          hash "9fd7a502a7cc125685bb1042676457fc92e727c7eb47075eb238fd38fd88ec19"
+        }
+        hash "f65885abe4a3e63bb842f620941d7b5ae718757988679175c2f63f09bed589bc"
+      }
+      provision "/us/usc/ptVIII/rule8014/a/5" paragraph {
+        num "5" "(5)"
+        content "a statement of the issues presented and, for each one, a concise statement of the applicable standard of appellate review;"
+        hash "6f52bf63aa310e5b2acc5be7ee322beaa1b5c6570857d1ef474f3c70943d0622"
+      }
+      provision "/us/usc/ptVIII/rule8014/a/6" paragraph {
+        num "6" "(6)"
+        content "a concise statement of the case setting out the facts relevant to the issues submitted for review, describing the relevant procedural history, and identifying the rulings presented for review, with appropriate references to the record;"
+        hash "7304eea0580c618dc30f2c323c4e13ebf75c1320ebc941888cea5cc4e0eacafd"
+      }
+      provision "/us/usc/ptVIII/rule8014/a/7" paragraph {
+        num "7" "(7)"
+        content "a summary of the argument, which must contain a succinct, clear, and accurate statement of the arguments made in the body of the brief, and which must not merely repeat the argument headings;"
+        hash "907df79fd66e7c37306764cf133080e881bb057206d19fe526bac383556f7502"
+      }
+      provision "/us/usc/ptVIII/rule8014/a/8" paragraph {
+        num "8" "(8)"
+        content "the argument, which must contain the appellant’s contentions and the reasons for them, with citations to the authorities and parts of the record on which the appellant relies;"
+        hash "a371718b40b97e1f724febec0ab954314b97a79cfeae024485300afcc03c9bb0"
+      }
+      provision "/us/usc/ptVIII/rule8014/a/9" paragraph {
+        num "9" "(9)"
+        content "a short conclusion stating the precise relief sought; and"
+        hash "fe16dd371463851b2ef77c147fe14a675a220b97cf8fc11a42d81c2aa6e1e538"
+      }
+      provision "/us/usc/ptVIII/rule8014/a/10" paragraph {
+        num "10" "(10)"
+        content "the certificate of compliance, if required by Rule 8015(a)(7) or (b)."
+        hash "4cb0b088df4817db4d0f712296086ac9306911196ef66737711bd78c04e54eee"
+      }
+      hash "dd64e171c29549e65840ca615b8354f71355ee2309d5683c26c015984ab0d964"
+    }
+    provision "/us/usc/ptVIII/rule8014/b" subsection {
+      num "b" "(b)"
+      heading "Appellee’s Brief."
+      chapeau "The appellee’s brief must conform to the requirements of (a)(1)–(8) and (10), except that none of the following need appear unless the appellee is dissatisfied with the appellant’s statement:"
+      provision "/us/usc/ptVIII/rule8014/b/1" paragraph {
+        num "1" "(1)"
+        content "the jurisdictional statement;"
+        hash "37242013d1e071961daec92ac235c4bb414fa90699ae6d1c12b4925dfce2e44f"
+      }
+      provision "/us/usc/ptVIII/rule8014/b/2" paragraph {
+        num "2" "(2)"
+        content "the statement of the issues and the applicable standard of appellate review; and"
+        hash "3e54ea22c274cfb360e9584a047bfb4efefab339e914121b0f90b87e0c264e3c"
+      }
+      provision "/us/usc/ptVIII/rule8014/b/3" paragraph {
+        num "3" "(3)"
+        content "the statement of the case."
+        hash "aba93dfb02a42b1294c8d122230861791f599713a0bd6965103016be6f885d92"
+      }
+      hash "1d60c619b60ab7d21c3e88fe191e9907fc55d1d9fbcc161c240487ac23426e7b"
+    }
+    provision "/us/usc/ptVIII/rule8014/c" subsection {
+      num "c" "(c)"
+      heading "Reply Brief."
+      content "The appellant may file a brief in reply to the appellee’s brief. A reply brief must comply with (a)(2)–(3)."
+      hash "67f81e9d2e98cc090756c0bea793edab64ed0575f27e034818aedd333ceffec7"
+    }
+    provision "/us/usc/ptVIII/rule8014/d" subsection {
+      num "d" "(d)"
+      heading "Setting Out Statutes, Rules, Regulations, or Similar Authorities."
+      content "If the court’s determination of the issues presented requires the study of the Code or other statutes, rules, regulations, or similar authority, the relevant parts must be set out in the brief or in an addendum."
+      hash "59fb7bc14c47ab8348f06ac7cb02ba605581743f9b2baddef141e4e632875f65"
+    }
+    provision "/us/usc/ptVIII/rule8014/e" subsection {
+      num "e" "(e)"
+      heading "Briefs in a Case Involving Multiple Appellants or Appellees."
+      content "In a case involving more than one appellant or appellee, including consolidated cases, any number of appellants or appellees may join in a brief, and any party may adopt by reference a part of another’s brief. Parties may also join in reply briefs."
+      hash "e6108fd8ed7df6f3bbb0e09c4214de74176ba01a629cc8b8f13d17b005a3ca87"
+    }
+    provision "/us/usc/ptVIII/rule8014/f" subsection {
+      num "f" "(f)"
+      heading "Citation of Supplemental Authorities."
+      content "If pertinent and significant authorities come to a party’s attention after the party’s brief has been filed—or after oral argument but before a decision—a party may promptly advise the district or BAP clerk by a signed submission, with a copy to all other parties, setting forth the citations. The submission must state the reasons for the supplemental citations, referring either to the pertinent page of a brief or to a point argued orally. The body of the submission must not exceed 350 words. Any response must be similarly limited, and it must be made within 7 days after service unless the court orders otherwise."
+      hash "ab7926d9e18388088fc7cd2675a3b74251cf77fe9071cd4ea5d3042fa6153e50"
+    }
+    hash "063dfc9093eb32fe5324704b3e9b96edf2c20cf28fce3c146cb60feac88ce6f8"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8014/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8014, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987, related to costs, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "a40fd0516035e2ac6c719260361baa30d902bed811508f56ab7acc359ba32ede"
+  }
+  note "/us/usc/ptVIII/rule8014/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8010(a) and (b) and F.R.App.P. 28. Adopting much of the content of Rule 28, it provides greater detail than former Rule 8010 contained regarding appellate briefs."
+    p "Subdivision (a) prescribes the content and structure of the appellant’s brief. It largely follows former Rule 8010(a)(1), but, to ensure national uniformity, it eliminates the provision authorizing a district court or BAP to alter these requirements. Subdivision (a)(1) provides that when Rule 8012 requires an appellant to file a corporate disclosure statement, it must be placed at the beginning of the appellant’s brief. Subdivision (a)(10) is new. It implements the requirement under Rule 8015(a)(7)(C) and (b) for the filing of a certificate of compliance with the limit on the number of words or lines allowed to be in a brief."
+    p "Subdivision (b) carries forward the provisions of former Rule 8010(a)(2)."
+    p "Subdivision (c) is derived from F.R.App.P. 28(c). It authorizes an appellant to file a reply brief, which will generally complete the briefing process."
+    p "Subdivision (d) is similar to former Rule 8010(b), but it is reworded to reflect the likelihood that briefs will generally be filed electronically rather than in paper form."
+    p "Subdivision (e) mirrors F.R.App.P. 28(i). It authorizes multiple appellants or appellees to join in a single brief. It also allows a party to incorporate by reference portions of another party’s brief."
+    p "Subdivision (f) adopts the procedures of F.R.App.P. 28(j) with respect to the filing of supplemental authorities with the district court or BAP after a brief has been filed or after oral argument. Unlike the appellate rule, it specifies a period of 7 days for filing a response to a submission of supplemental authorities. The supplemental submission and response must comply with the signature requirements of Rule 8011(e)."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "3057223e57f36fa80c628b60b7cf61f7e676793ee9c48c89b8ce589516c35a36"
+  }
+  note "/us/usc/ptVIII/rule8014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8014 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "cb4ab1e5e4f8be6dd372bdccab489bd79c843e63a2dde00ea4428bc723d7fa28"
+  }
+  layers {
+    operative "063dfc9093eb32fe5324704b3e9b96edf2c20cf28fce3c146cb60feac88ce6f8"
+    enacted "bc0b7bcdc2ce1577d6061c5b7256ae235cb194d437a4d0a2b3d78b7250d63caa"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

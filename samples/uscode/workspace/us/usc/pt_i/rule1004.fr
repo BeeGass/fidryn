@@ -1,0 +1,43 @@
+edition 2
+module "/us/usc/ptI/rule1004" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1004" courtRule {
+    num "1004" "Rule 1004."
+    heading "Involuntary Petition Against a Partnership"
+    content "A petitioner who files an involuntary petition against a partnership under § 303(b)(3) must promptly send a copy of the petition to—or serve a copy on—each general partner who is not a petitioner. The clerk must promptly issue a summons for service on any general partner who is not a petitioner. Rule 1010 governs the form and service of the summons."
+    hash "539b29f182a8f4666ebf279669dd6082809b9276ce182a1a250f26da033b745e"
+  }
+  credit "(As amended Apr. 29, 2002, eff. Dec. 1, 2002; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Bankruptcy Rule 105 and complements §§ 301 and 303(b)(3) of the Code."
+    p "Subdivision (a) specifies that while all general partners must consent to the filing of a voluntary petition, it is not necessary that they all execute the petition. It may be executed and filed on behalf of the partnership by fewer than all."
+    p "Subdivision (b) implements § 303(b)(3) of the Code which provides that an involuntary petition may be filed by fewer than all the general partners or, when all the general partners are debtors, by a general partner, trustee of the partner or creditors of the partnership. Rule 1010, which governs service of a petition and summons in an involuntary case, specifies the time and mode of service on the partnership. When a petition is filed against a partnership under § 303(b)(3), this rule requires an additional service on the nonfiling general partners. It is the purpose of this subdivision to protect the interests of the nonpetitioning partners and the partnership."
+    hash "2646858c6ef77fe360f3cbde9e44be17cc7f5e9e05daab42d3dc914b37b2da6a"
+  }
+  note "/us/usc/ptI/rule1004/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2002 Amendment"
+    p "Section 303(b)(3)(A) of the Code provides that fewer than all of the general partners in a partnership may commence an involuntary case against the partnership. There is no counterpart provision in the Code setting out the manner in which a partnership commences a voluntary case. The Supreme Court has held in the corporate context that applicable nonbankruptcy law determines whether authority exists for a particular debtor to commence a bankruptcy case. See Price v. Gurney, 324 U.S. 100 (1945). The lower courts have followed this rule in the partnership context as well. See, e.g., Jolly v. Pittore, 170 B.R. 793 (S.D.N.Y. 1994); Union Planters National Bank v. Hunters Horn Associates, 158 B.R. 729 (Bankr. M.D. Tenn. 1993); In re Channel 64 Joint Venture, 61 B.R. 255 (Bankr. S.D. Oh. 1986). Rule 1004(a) could be construed as requiring the consent of all of the general partners to the filing of a voluntary petition, even if fewer than all of the general partners would have the authority under applicable nonbankruptcy law to commence a bankruptcy case for the partnership. Since this is a matter of substantive law beyond the scope of these rules, Rule 1004(a) is deleted as is the designation of subdivision (b)."
+    p "The rule is retitled to reflect that it applies only to involuntary petitions filed against partnerships."
+    p "Changes Made After Publication and Comments. No changes since publication."
+    hash "2026e1a9ffa6bf794e642a856aa71427f96db87b7d083620d8a3c77b45dc89cd"
+  }
+  note "/us/usc/ptI/rule1004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1004 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "ccd9d5c266605358fd30d69d1e1e065326724a6041ae0881eca906df59d8caf6"
+  }
+  layers {
+    operative "539b29f182a8f4666ebf279669dd6082809b9276ce182a1a250f26da033b745e"
+    enacted "4d969fca55ad2795e07e9f0b8d5cd8933a3b04244d7f1cf92854a9a21990f352"
+    editorial "a55c299eebb5e4a7669deab82590186f34316cf7af7594ac6084d8efa0cb7029"
+  }
+}

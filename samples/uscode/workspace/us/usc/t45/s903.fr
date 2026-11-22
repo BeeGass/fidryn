@@ -1,0 +1,43 @@
+edition 2
+module "/us/usc/t45/s903" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s903" section {
+    num "903" "§ 903."
+    heading "Sales and transfers"
+    provision "/us/usc/t45/s903/a" subsection {
+      num "a" "(a)"
+      content "The Milwaukee Railroad may negotiate and enter into agreements to sell, to another rail carrier or any other person, all or any portion of its rail properties used in railroad operations as of October 15, 1979. Such sale agreements may in no event become final and effective until the occurrence of an event described in " ["section 920(b) of this title" -> "/us/usc/t45/s920/b"] ", or April 1, 1980, whichever first occurs. In taking action under this subsection, the Milwaukee Railroad may consult with the Secretary of Transportation."
+      hash "69e1d74ebf912b553d43c788f616c6f5531fed4717fd12de50af0b9139616e16"
+    }
+    provision "/us/usc/t45/s903/b" subsection {
+      num "b" "(b)"
+      provision "/us/usc/t45/s903/b/1" paragraph {
+        num "1" "(1)"
+        content "The Secretary of Transportation, under the authority of " ["section 333 of title 49" -> "/us/usc/t49/s333"] ", may develop plans, participate in negotiations, and recommend to the trustee proposals for the sale or transfer of any rail properties of the Milwaukee Railroad which are used in rail operations as of October 15, 1979. In taking action under this paragraph, the Secretary shall give preference to financially responsible persons, including governmental entities, negotiating for the purchase of any lines with the intent of providing common carrier service."
+        hash "c80997a2074f661624b5c16a22fe823475a7a6ae7fbb853990df44b8c693a594"
+      }
+      provision "/us/usc/t45/s903/b/2" paragraph {
+        num "2" "(2)"
+        content "Any sale or transfer proposal developed under paragraph (1) of this subsection shall be submitted to the bankruptcy court. Such a proposal may in no event become final or effective until the occurrence of an event described in " ["section 920(b) of this title" -> "/us/usc/t45/s920/b"] ", or April 1, 1980, whichever first occurs."
+        hash "3e06d7bbda3dbe808bec6ee4f426ccf55b8586fe16a3d9a19ac4f6951533a95f"
+      }
+      hash "e761c9045e158de145ad118a6287fab27a753aa749087bec59bbd3ce0dbdd5ba"
+    }
+    hash "3ee824c7abbd9e572e4e42286590c02022e8c11f23291cb4cc53762ccae9877f"
+  }
+  credit "(" ["Pub. L. 96–101, § 4" -> "/us/pl/96/101/s4"] ", Nov. 4, 1979, " ["93 Stat. 737" -> "/us/stat/93/737"] ".)"
+  note "/us/usc/t45/s903/note/editorialNotes/pl.97.449/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "In subsec. (b)(1), “" ["section 333 of title 49" -> "/us/usc/t49/s333"] "” was substituted for “section 5(a)–(e) of the Department of Transportation Act [" ["49 U.S.C. 1654(a)" -> "/us/usc/t49/s1654/a"] "–(e)]”, on authority of " ["Pub. L. 97–449, § 6(b)" -> "/us/pl/97/449/s6/b"] ", Jan. 12, 1983, " ["96 Stat. 2443" -> "/us/stat/96/2443"] ", the first section of which enacted subtitle I (§ 101 et seq.) and chapter 31 (§ 3101 et seq.) of subtitle II of Title 49, Transportation."
+    hash "777b4d3a20fbb146631f0b4482148b90b6cf99eb448d19b13654837385ce7ca5"
+  }
+  layers {
+    operative "3ee824c7abbd9e572e4e42286590c02022e8c11f23291cb4cc53762ccae9877f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "80eca02478eff3c4bb7d9734ab85b68e4f7c51c421575522f915a870a0b4a7ff"
+  }
+}

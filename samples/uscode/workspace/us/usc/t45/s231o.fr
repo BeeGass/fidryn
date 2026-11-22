@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s231o" {
+  within "/us/usc/t45/ch9/schIV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s231o" section {
+    num "231o" "§ 231o."
+    heading "Private pensions"
+    content "Nothing in this subchapter shall be taken as restricting or discouraging payment by employers to retired employees of pensions or gratuities in addition to the annuities paid to such employees under this subchapter, nor shall this subchapter be taken as terminating any trust heretofore created for the payment of such pensions or gratuities. The annuity, except a supplemental annuity under " ["section 231a(b) of this title" -> "/us/usc/t45/s231a/b"] ", of an individual shall not be reduced on account of any pension or gratuity paid by an employer to such individual."
+    hash "bb43064c3a8caae23782d109aa9a36961f87eb154f325d0589bcda3f2ab49a8a"
+  }
+  credit "(" ["Aug. 29, 1935, ch. 812, § 16" -> "/us/act/1935-08-29/ch812/s16"] ", as restated " ["June 24, 1937, ch. 382" -> "/us/act/1937-06-24/ch382"] ", pt. I, " ["50 Stat. 307" -> "/us/stat/50/307"] ", as restated " ["Pub. L. 93–445, title I, § 101" -> "/us/pl/93/445/tI/s101"] ", Oct. 16, 1974, " ["88 Stat. 1349" -> "/us/stat/88/1349"] ".)"
+  layers {
+    operative "bb43064c3a8caae23782d109aa9a36961f87eb154f325d0589bcda3f2ab49a8a"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "5170ea388989b91064117f708c20ea67aeafeece124d85e8d0fa3a0e43e93b86"
+  }
+}

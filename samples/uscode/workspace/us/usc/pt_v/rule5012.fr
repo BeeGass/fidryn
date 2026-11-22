@@ -1,0 +1,40 @@
+edition 2
+module "/us/usc/ptV/rule5012" {
+  within "/us/usc/ptV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptV/rule5012" courtRule {
+    num "5012" "Rule 5012."
+    heading "Chapter 15—Agreement to Coordinate Proceedings"
+    content {
+      p "An agreement to coordinate proceedings under § 1527(4) may be approved on motion with an attached copy of the agreement or protocol. Unless the court orders otherwise, the movant must give at least 30 days’ notice of any hearing on the motion by sending a copy to the United States trustee and serving it on:"
+      p "• the debtor;"
+      p "• all persons or bodies authorized to administer the debtor’s foreign proceedings;"
+      p "• all entities against whom provisional relief is sought under § 1519;"
+      p "• all parties to litigation pending in the United States in which the debtor was a party when the petition was filed; and"
+      p "• any other entity the court designates."
+    }
+    hash "9c956f7b1b923381a0a248556690e2e17cf20f08ce769b394b426568e9b18819"
+  }
+  credit "(Added Apr. 28, 2010, eff. Dec. 1, 2010; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptV/rule5012/note/ungrouped/nolaw/committee-notes-on-rules-2010" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010"
+    p "This rule is new. In chapter 15 cases, any party in interest may seek approval of an agreement, frequently referred to as a “protocol,” that will assist with the conduct of the case. Because the needs of the courts and the parties may vary greatly from case to case, the rule does not attempt to limit the form or scope of a protocol. Rather, the rule simply requires that approval of a particular protocol be sought by motion, and designates the persons entitled to notice of the hearing on the motion. These agreements, or protocols, drafted entirely by parties in interest in the case, are intended to provide valuable assistance to the court in the management of the case. Interested parties may find guidelines published by organizations, such as the American Law Institute and the International Insolvency Institute, helpful in crafting agreements or protocols to apply in a particular case."
+    p "Changes Made After Publication. No changes since publication."
+    hash "f53eb43f25248c735d8584d0daf408331cb5aebfc66750c647583c46abf9cfd4"
+  }
+  note "/us/usc/ptV/rule5012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 5012 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "82630686bc6805994321d00c37b94676ebf66a08a99c27d19703c0a816750614"
+  }
+  layers {
+    operative "9c956f7b1b923381a0a248556690e2e17cf20f08ce769b394b426568e9b18819"
+    enacted "778f5408f73d02d86f1a2bb46f4504c6e9f36bcfc43a42d6494da5870e8e1678"
+    editorial "b3e324eddd645d5a457105e972da769976d9beb3fadab6c95b5b398e1fcd15e5"
+  }
+}

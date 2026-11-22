@@ -1,0 +1,35 @@
+edition 2
+module "/us/usc/t45/ch16/schII" {
+  within "/us/usc/t45/ch16"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch16/schII" subchapter {
+    num "II" "SUBCHAPTER II—"
+    heading "UNITED STATES RAILWAY ASSOCIATION"
+    member "/us/usc/t45/s711"
+    member "/us/usc/t45/s712"
+    member "/us/usc/t45/s713"
+    member "/us/usc/t45/s714"
+    member "/us/usc/t45/s715"
+    member "/us/usc/t45/s716"
+    member "/us/usc/t45/s717"
+    member "/us/usc/t45/s718"
+    member "/us/usc/t45/s719"
+    member "/us/usc/t45/s720"
+    member "/us/usc/t45/s721"
+    member "/us/usc/t45/s722"
+    member "/us/usc/t45/s723"
+    member "/us/usc/t45/s724"
+    member "/us/usc/t45/s725"
+    member "/us/usc/t45/s726"
+    member "/us/usc/t45/s727"
+    member "/us/usc/t45/s728"
+    member "/us/usc/t45/s729"
+    hash "7581d03779f7f1f2d6e2e05571baddce9ad36edd5147a59063af0e4aa54695c9"
+  }
+  layers {
+    operative "7581d03779f7f1f2d6e2e05571baddce9ad36edd5147a59063af0e4aa54695c9"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

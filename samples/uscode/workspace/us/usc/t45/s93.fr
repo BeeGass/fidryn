@@ -1,0 +1,24 @@
+edition 2
+module "/us/usc/t45/s93" {
+  within "/us/usc/t45/ch5"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s93" section {
+    num "93" "§ 93."
+    heading "Transferred"
+    status transferred
+    hash "1a5f9a43cf4c9f6e502697931703c7017bd2c6285dff0919427fdf36155920aa"
+  }
+  note "/us/usc/t45/s93/note/editorialNotes/act.1908-04-30.ch153/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Section, " ["act Apr. 30, 1908, ch. 153" -> "/us/act/1908-04-30/ch153"] ", " ["35 Stat. 73" -> "/us/stat/35/73"] ", relating to transportation of Indian goods and supplies, was transferred to " ["section 443b of Title 25" -> "/us/usc/t25/s443b"] ", Indians, prior to editorial reclassification as a note under " ["section 1457 of Title 43" -> "/us/usc/t43/s1457"] ", Public Lands."
+    hash "97412e42fcf9d3640486d35f4b9719f41a8cadd57f597a264de775be3a753a6e"
+  }
+  layers {
+    operative "1a5f9a43cf4c9f6e502697931703c7017bd2c6285dff0919427fdf36155920aa"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "2442b564589ad6bd238542264e2ed3c051dd2bb514d67d75202e85bd9ab52bfa"
+  }
+}

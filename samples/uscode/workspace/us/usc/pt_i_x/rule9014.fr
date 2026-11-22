@@ -1,0 +1,149 @@
+edition 2
+module "/us/usc/ptIX/rule9014" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9014" courtRule {
+    num "9014" "Rule 9014."
+    heading "Contested Matters"
+    provision "/us/usc/ptIX/rule9014/a" subsection {
+      num "a" "(a)"
+      heading "Motion Required."
+      content "In a contested matter not otherwise governed by these rules, relief must be requested by motion. Reasonable notice and an opportunity to be heard must be given to the party against whom relief is sought. No response is required unless the court orders otherwise."
+      hash "02e7c2a099c5535da3422651786e38e578c391fe7245f1e14a2d1b6ddf4d9c1f"
+    }
+    provision "/us/usc/ptIX/rule9014/b" subsection {
+      num "b" "(b)"
+      heading "Service."
+      provision "/us/usc/ptIX/rule9014/b/1" paragraph {
+        num "1" "(1)"
+        content "Motion. The motion must be served within the time prescribed by Rule 9006(d) and in the manner for serving a summons and complaint provided by Rule 7004."
+        hash "4b7f913f446e5aac757b3676ca9eb16a27e8fb67f39c42c49da4cba5f8316841"
+      }
+      provision "/us/usc/ptIX/rule9014/b/2" paragraph {
+        num "2" "(2)"
+        content "Response. Any written response must be served within the time prescribed by Rule 9006(d)."
+        hash "63e9b0c9add406c3c0e7851f9275152ea06bb1aa79df55dbb5545a30df91d652"
+      }
+      provision "/us/usc/ptIX/rule9014/b/3" paragraph {
+        num "3" "(3)"
+        content "Later Filings. After a motion is served, any other document must be served in the manner prescribed by Fed. R. Civ. P. 5(b)."
+        hash "9aea5d31caaa1622d74a12e4487bb1ce1a04d6fdf8f653e93f639e8cd9d7c8ae"
+      }
+      hash "22abb42fd5690b0e5db35944c7cc129d4c535e064ed266dc3e17f9727e093157"
+    }
+    provision "/us/usc/ptIX/rule9014/c" subsection {
+      num "c" "(c)"
+      heading "Applying Part VII Rules."
+      provision "/us/usc/ptIX/rule9014/c/1" paragraph {
+        num "1" "(1)"
+        content "In General. Unless this rule or a court order provides otherwise, the following rules apply in a contested matter: 7009, 7017, 7021, 7025–7026, 7028–7037, 7041–7042, 7052, 7054–7056, 7064, 7069, and 7071. At any stage of a contested matter, the court may order that one or more other Part VII rules apply."
+        hash "494cb56a75d3d2adc69a3b687ed29379151696dd247ea7baabdbab3dd86908fa"
+      }
+      provision "/us/usc/ptIX/rule9014/c/2" paragraph {
+        num "2" "(2)"
+        content {
+          p "Exception. Unless the court orders otherwise, the following subdivisions of Fed. R. Civ. P. 26, as incorporated by Rule 7026, do not apply in a contested matter:"
+          p "• (a)(1), mandatory disclosure;"
+          p "• (a)(2), disclosures about expert testimony;"
+          p "• (a)(3), other pretrial disclosures; and"
+          p "• (f), mandatory meeting before a scheduling conference."
+        }
+        hash "8be3107faccc46a5b4ac1e378ec094db22b68cde24643f8f74574bb5f7790f9b"
+      }
+      provision "/us/usc/ptIX/rule9014/c/3" paragraph {
+        num "3" "(3)"
+        content "Procedural Order. In issuing any procedural order under this subdivision (c), the court must give the parties notice and a reasonable opportunity to comply."
+        hash "298d41db735a3f506f869019989a4428b2fcff8f86f3937a7700e3d6087fd6c3"
+      }
+      provision "/us/usc/ptIX/rule9014/c/4" paragraph {
+        num "4" "(4)"
+        content "Perpetuating Testimony. An entity desiring to perpetuate testimony may do so in the manner provided by Rule 7027 for taking a deposition before an adversary proceeding."
+        hash "5afc085ec4267799f101165ef7eb88eb2dccde7f135823d0df76c74c8724399c"
+      }
+      hash "c054a40bd9712500c9984c8fbd939b8f9a9e38df72879f68dd0b270fef911886"
+    }
+    provision "/us/usc/ptIX/rule9014/d" subsection {
+      num "d" "(d)"
+      heading "Taking Testimony on a Disputed Factual Issue."
+      content "A witness’s testimony on a disputed material factual issue must be taken in the same manner as testimony in an adversary proceeding."
+      hash "2496e5b3b07fd04689545a694a8fda56cd40f6495abd9037983f1f9752510e53"
+    }
+    provision "/us/usc/ptIX/rule9014/e" subsection {
+      num "e" "(e)"
+      heading "Determining Whether a Hearing Will Be an Evidentiary Hearing."
+      content "The court must provide procedures that allow parties—at a reasonable time before a scheduled hearing—to determine whether it will be an evidentiary hearing at which witnesses may testify."
+      hash "65f7b4c4766786648365d79e92381c6487cc319f1ec25a61cb483215df2c0031"
+    }
+    hash "0bc6451ba6540a6ca2d8b4169ba7971c740954cc05b155d5caef3c50c9658fe4"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 29, 2002, eff. Dec. 1, 2002; Apr. 26, 2004, eff. Dec. 1, 2004; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Rules 1017(d), 3020(b)(1), 4001(a), 4003(d), and 6006(a), which govern respectively dismissal or conversion of a case, objections to confirmation of a plan, relief from the automatic stay and the use of cash collateral, avoidance of a lien under § 522(f) of the Code, and the assumption or rejection of executory contracts or unexpired leases, specifically provide that litigation under those rules shall be as provided in Rule 9014. This rule also governs litigation in other contested matters."
+    p "Whenever there is an actual dispute, other than an adversary proceeding, before the bankruptcy court, the litigation to resolve that dispute is a contested matter. For example, the filing of an objection to a proof of claim, to a claim of exemption, or to a disclosure statement creates a dispute which is a contested matter. Even when an objection is not formally required, there may be a dispute. If a party in interest opposes the amount of compensation sought by a professional, there is a dispute which is a contested matter."
+    p "When the rules of Part VII are applicable to a contested matter, reference in the Part VII rules to adversary proceedings is to be read as a reference to a contested matter. See Rule 9002(1)."
+    hash "8e5cafc0b8ba995708f10015f2febc740695842619461a90554a6af053e64336"
+  }
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "This rule is amended to delete Rule 7062 from the list of Part VII rules that automatically apply in a contested matter."
+    p "Rule 7062 provides that Rule 62 F.R.Civ.P., which governs stays of proceedings to enforce a judgment, is applicable in adversary proceedings. The provisions of Rule 62, including the ten-day automatic stay of the enforcement of a judgment provided by Rule 62(a) and the stay as a matter of right by posting a supersedeas bond provided in Rule 62(d), are not appropriate for most orders granting or denying motions governed by Rule 9014."
+    p "Although Rule 7062 will not apply automatically in contested matters, the amended rule permits the court, in its discretion, to order that Rule 7062 apply in a particular matter, and Rule 8005 gives the court discretion to issue a stay or any other appropriate order during the pendency of an appeal on such terms as will protect the rights of all parties in interest. In addition, amendments to Rules 3020, 4001, 6004, and 6006 automatically stay certain types of orders for a period of ten days, unless the court orders otherwise."
+    p "GAP Report on Rule 9014. No changes since publication."
+    hash "ee375e04daf128951240cbde71791dc194851472208f4f41bdb4900c0174244e"
+  }
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2002 Amendment"
+    p "The list of Part VII rules that are applicable in a contested matter is extended to include Rule 7009 on pleading special matters, and Rule 7017 on real parties in interest, infants and incompetent persons, and capacity. The discovery rules made applicable in adversary proceedings apply in contested matters unless the court directs otherwise."
+    p "Subdivision (b) is amended to permit parties to serve papers, other than the original motion, in the manner provided in Rule 5(b) F.R. Civ.P. When the court requires a response to the motion, this amendment will permit service of the response in the same manner as an answer is served in an adversary proceeding."
+    p "Subdivision (d) is added to clarify that if the motion cannot be decided without resolving a disputed material issue of fact, an evidentiary hearing must be held at which testimony of witnesses is taken in the same manner as testimony is taken in an adversary proceeding or at a trial in a district court civil case. Rule 43(a), rather than Rule 43(e), F.R. Civ.P. would govern the evidentiary hearing on the factual dispute. Under Rule 9017, the Federal Rules of Evidence also apply in a contested matter. Nothing in the rule prohibits a court from resolving any matter that is submitted on affidavits by agreement of the parties."
+    p "Subdivision (e). Local procedures for hearings and other court appearances in a contested matter vary from district to district. In some bankruptcy courts, an evidentiary hearing at which witnesses may testify usually is held at the first court appearance in the contested matter. In other courts, it is customary for the court to delay the evidentiary hearing on disputed factual issues until some time after the initial hearing date. In order to avoid unnecessary expense and inconvenience, it is important for attorneys to know whether they should bring witnesses to a court appearance. The purpose of the final sentence of this rule is to require that the court provide a mechanism that will enable attorneys to know at a reasonable time before a scheduled hearing whether it will be necessary for witnesses to appear in court on that particular date."
+    p "Other amendments to this rule are stylistic."
+    p "Changes Made After Publication and Comments:"
+    p "The Advisory Committee made two changes to subdivision (d) after considering the comments received addressing the proposed rule. First, the word “material” is inserted to make explicit that which was implied in the published version of the proposed rule. Second, the reference to F.R.Civ.P. 43(a) was removed. The purpose of proposed subdivision (d) was to recognize that testimony should be taken in the same manner in both contested matters and adversary proceedings. The revision to the published rule states this more directly."
+    p "The Committee Note was amended to reflect the changes made in the text of the rule."
+    hash "c2c5f0ca5fe76c107b65d66fd3092d59a2ab0a2d16700377338e93949a2f414f"
+  }
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2004-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2004 Amendment"
+    p "The rule is amended to provide that the mandatory disclosure requirements of Fed. R. Civ. P. 26, as incorporated by Rule 7026, do not apply in contested matters. The typically short time between the commencement and resolution of most contested matters makes the mandatory disclosure provisions of Rule 26 ineffective. Nevertheless, the court may by local rule or by order in a particular case provide that these provisions of the rule apply in a contested matter."
+    p "Changes Made After Publication. No changes since publication."
+    hash "28f7eb75cc7f1ea638334117ee0c0a77d2e65deb9ffae855c66a3d25e35f3340"
+  }
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2013 Amendment"
+    p "A cross-reference to Rule 9006(d) is added to subdivision (b) to call attention to the time limits for the service of motions, supporting affidavits, and written responses to motions. Rule 9006(d) prescribes time limits that apply unless other limits are fixed by these rules, a court order, or a local rule."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "e664adcf9b25306459614c2328ac1cf204e835bfbac4724a608f35f771de9f9f"
+  }
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9014 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "cb7f7417f7d1d1a41cd67a8479a681f0921fe97db22ad23a90aa907769f57bc2"
+  }
+  note "/us/usc/ptIX/rule9014/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subds. (b)(3) and (c)(2), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "f688b4285f9c2dd236dcbe4078360e2e8d8a940ac293da9972b863cd29fbdc8a"
+  }
+  layers {
+    operative "0bc6451ba6540a6ca2d8b4169ba7971c740954cc05b155d5caef3c50c9658fe4"
+    enacted "1a9cc75ede09267f2a9b907255190bf90a9ef8883da83215ae955ed33b1bc176"
+    editorial "01b441006c12eb17004323f265ccc2c5c09b46c8868c790767a223c78d5884bc"
+  }
+}

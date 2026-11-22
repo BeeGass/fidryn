@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/ptVII/rule7022" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7022" courtRule {
+    num "7022" "Rule 7022."
+    heading "Interpleader"
+    content "Fed. R. Civ. P. 22(a) applies in an adversary proceeding. This rule supplements and does not limit the joinder of parties under Rule 7020."
+    hash "7235d08bc5bc2840bc76e1a5d605c6f83b977dc87e3c53e0e887709c1b4e2fed"
+  }
+  credit "(As amended Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7022/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "The rule is amended to conform to the changes made to the Federal Rules of Civil Procedure through the restyling of those rules effective on December 1, 2007."
+    hash "76923e497c4b9c61312745ce5d68065b9395b228da2fec808e60203abfbd5cf5"
+  }
+  note "/us/usc/ptVII/rule7022/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7022 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "fbf5ec9de176b47838e777d8fc9ec8efbd38b6a0be53c2cdab5b7a9e3d67c0c5"
+  }
+  note "/us/usc/ptVII/rule7022/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "7235d08bc5bc2840bc76e1a5d605c6f83b977dc87e3c53e0e887709c1b4e2fed"
+    enacted "555fb744a7fcc9b7297a4975e8081559de364a93b06a1bbc47e99d908d82fbce"
+    editorial "847720a9ccfea3b2f89c584dd632d3499a497c357050b137d8d730140eb9203a"
+  }
+}

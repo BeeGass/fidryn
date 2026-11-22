@@ -1,0 +1,65 @@
+edition 2
+module "/us/usc/ptIX/rule9013" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9013" courtRule {
+    num "9013" "Rule 9013."
+    heading "Motions; Form and Service"
+    provision "/us/usc/ptIX/rule9013/a" subsection {
+      num "a" "(a)"
+      heading "Request for an Order."
+      chapeau "A request for an order must be made by written motion unless:"
+      provision "/us/usc/ptIX/rule9013/a/1" paragraph {
+        num "1" "(1)"
+        content "an application is authorized by these rules; or"
+        hash "5e704f9e1dce265cad8d8875d81f1941d66e9d7daf585d9475dd3d005d3c34b2"
+      }
+      provision "/us/usc/ptIX/rule9013/a/2" paragraph {
+        num "2" "(2)"
+        content "the request is made during a hearing."
+        hash "8091aaab478448fb4a7df1769c3236ce92328cbd856be2c4384fff37f5950dd7"
+      }
+      hash "a43b4ce955240024543ddb4ad9517db0655cc55fd56f6700f680cc5fb536dd6f"
+    }
+    provision "/us/usc/ptIX/rule9013/b" subsection {
+      num "b" "(b)"
+      heading "Form and Service of a Motion."
+      content {
+        p "A motion must state its grounds with particularity and set forth the relief or order requested. Unless a written motion may be considered ex parte, the movant must, within the time prescribed by Rule 9006(d), serve the motion on:"
+        p "• the trustee or debtor in possession and those entities specified by these rules; or"
+        p "• if these rules do not require service or specify the entities to be served, the entities designated by the court."
+      }
+      hash "91f47d70d8643aeeec56770f26852c688fb4e6c7522136c8253ffd8d2235925c"
+    }
+    hash "ee6020ab793e2bb99af8ae0a49416be61963b909e4fca9ce0560410842d034db"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from Rule 5(a) and Rule 7(b)(1) F.R.Civ.P. Except when an application is specifically authorized by these rules, for example an application under Rule 2014 for approval of the employment of a professional, all requests for court action must be made by motion."
+    hash "9cbc0e7895d24f0e0d190beb3ed05bc06ffc3cabbeff697ba0d86360d0cafc54"
+  }
+  note "/us/usc/ptIX/rule9013/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2013 Amendment"
+    p "A cross-reference to Rule 9006(d) is added to this rule to call attention to the time limits for the service of motions, supporting affidavits, and written responses to motions. Rule 9006(d) prescribes time limits that apply unless other limits are fixed by these rules, a court order, or a local rule. The other changes are stylistic."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "d0e942c0ecb3419fa2994843112d8294e1ea9698962f0251f2c9c1bba0614a10"
+  }
+  note "/us/usc/ptIX/rule9013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9013 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "fdb8a613aab4352a6179f6e10bb7c9c85a2b52e8ae13aeea12c279d1f1226902"
+  }
+  layers {
+    operative "ee6020ab793e2bb99af8ae0a49416be61963b909e4fca9ce0560410842d034db"
+    enacted "347b4048131e6326ff1d6f659950eb3282c92f7c2a54d5b3d9432a8db7aa5fd0"
+    editorial "501f50f82e56647b8e06c556c337ed2d6ab71821dba6a62d7ce946d5ce5e1182"
+  }
+}

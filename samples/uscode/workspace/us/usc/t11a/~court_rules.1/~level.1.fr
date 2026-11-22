@@ -1,0 +1,21 @@
+edition 2
+module "/us/usc/t11a/~courtRules.1/~level.1" {
+  within "/us/usc/t11a/~courtRules.1"
+  source "usc11a.xml"
+  positive_law false
+  container "/us/usc/t11a/~courtRules.1/~level.1" level {
+    heading "OFFICIAL FORMS"
+    hash "514f71d20349632df360538f216755e9b44a3fbfb6d18224f65bc547d298261c"
+  }
+  note "/us/usc/t11a/~courtRules.1/~level.1/note/ungrouped/nolaw/h.ad7626ee9ff7132d" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    p "[The Official Forms prescribed pursuant to Rule 9009 may be found on the United States Courts website.]"
+    hash "ad7626ee9ff7132d2647828a86f70c8325e2b63fb92052f608df02c3c74e019e"
+  }
+  layers {
+    operative "514f71d20349632df360538f216755e9b44a3fbfb6d18224f65bc547d298261c"
+    enacted "562e25642abd23c9d2cc0e0bb5e256a8853ef77df07e8e4b51de0ccb2e7151f0"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

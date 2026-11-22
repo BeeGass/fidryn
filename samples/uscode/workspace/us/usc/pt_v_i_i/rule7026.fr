@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/ptVII/rule7026" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7026" courtRule {
+    num "7026" "Rule 7026."
+    heading "Duty to Disclose; General Provisions Governing Discovery"
+    content "Fed. R. Civ. P. 26 applies in an adversary proceeding."
+    hash "5be0a3ec3b7fa87baeb4a141b73f1eab1d9a44921f35a44a6ccaf7f92c58b656"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7026/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7026 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "be7935391199de8fd4888fd01b64063e43f39100470c3e07c66d305fb6c24620"
+  }
+  note "/us/usc/ptVII/rule7026/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "5be0a3ec3b7fa87baeb4a141b73f1eab1d9a44921f35a44a6ccaf7f92c58b656"
+    enacted "c80bd75d09dd4793cf74a6f94aaf7fd38e419c0fc1eff4c32736fc72367415e8"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

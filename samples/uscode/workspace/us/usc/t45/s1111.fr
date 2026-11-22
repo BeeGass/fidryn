@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s1111" {
+  within "/us/usc/t45/ch20"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1111" section {
+    num "1111" "§ 1111."
+    heading "Repealed. " ["Pub. L. 105–134, title IV, § 408" -> "/us/pl/105/134/tIV/s408"] ", Dec. 2, 1997, " ["111 Stat. 2586" -> "/us/stat/111/2586"]
+    status repealed
+    hash "7c27600c7382edc625aa9f32fcf45a88f1701edcf87dcdda954424e043b69e85"
+  }
+  note "/us/usc/t45/s1111/note/ungrouped/pl.97.35/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 97–35, title XI, § 1163" -> "/us/pl/97/35/tXI/s1163"] ", Aug. 13, 1981, " ["95 Stat. 685" -> "/us/stat/95/685"] "; " ["Pub. L. 99–272, title IV, § 4017(a)(1)" -> "/us/pl/99/272/tIV/s4017/a/1"] ", Apr. 7, 1986, " ["100 Stat. 110" -> "/us/stat/100/110"] ", related to Northeast Corridor cost dispute."
+    hash "78a2104fd1c556d237068c7dfb5f142c87471a05eeeeaea97e4d9ccdb3619543"
+  }
+  layers {
+    operative "7c27600c7382edc625aa9f32fcf45a88f1701edcf87dcdda954424e043b69e85"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "28563c77689b04694f6469d335901d0c667d92841de9274f8e914724f9b82430"
+  }
+}

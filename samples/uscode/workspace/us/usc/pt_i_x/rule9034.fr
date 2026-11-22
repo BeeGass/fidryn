@@ -1,0 +1,88 @@
+edition 2
+module "/us/usc/ptIX/rule9034" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9034" courtRule {
+    num "9034" "Rule 9034."
+    heading "Sending Copies to the United States Trustee"
+    chapeau "Except in a Chapter 9 case or when the United States trustee requests otherwise, an entity filing a pleading, motion, objection, or similar document relating to any of the following must send a copy to the United States trustee within the time required for service:"
+    provision "/us/usc/ptIX/rule9034/a" subsection {
+      num "a" "(a)"
+      content "a proposed use, sale, or lease of property of the estate other than in the ordinary course of business;"
+      hash "b70edf503882a3ad6241ff3b867ff535ca3b9ee2fa73af8c72c9bd3817e99a18"
+    }
+    provision "/us/usc/ptIX/rule9034/b" subsection {
+      num "b" "(b)"
+      content "the approval of a compromise or settlement of a controversy;"
+      hash "491001dc1344a5b3193754c0a4d03bb35666bb8e8a6445afaad02c418e10190d"
+    }
+    provision "/us/usc/ptIX/rule9034/c" subsection {
+      num "c" "(c)"
+      content "the dismissal or conversion of a case to another chapter;"
+      hash "49f247872fbe1c652cd25ec42e0b8f4e9ca7ef3cdbb1c9b01ef2a3f9ac8c4658"
+    }
+    provision "/us/usc/ptIX/rule9034/d" subsection {
+      num "d" "(d)"
+      content "the employment of a professional person;"
+      hash "a3b7e6b84c5d7815c7c3336278cbd7efb24d827762e74fdf5ad07959d1dc1022"
+    }
+    provision "/us/usc/ptIX/rule9034/e" subsection {
+      num "e" "(e)"
+      content "an application for compensation or reimbursement of expenses;"
+      hash "c75c01ec1c8049a8af0bcaad732f572337c370c545f8c2de63ea49537e7e0d72"
+    }
+    provision "/us/usc/ptIX/rule9034/f" subsection {
+      num "f" "(f)"
+      content "a motion for, or the approval of an agreement regarding, the use of cash collateral or authority to obtain credit;"
+      hash "f042f5c1e2892821d4430a6a3f576692c44ddde56b83bbf7a8137184201b0273"
+    }
+    provision "/us/usc/ptIX/rule9034/g" subsection {
+      num "g" "(g)"
+      content "the appointment of a trustee or examiner in a Chapter 11 case;"
+      hash "c62bba389f3d80ad9d6ee3f567e308dadf9af234512c2d0bf8ad7d69368263b0"
+    }
+    provision "/us/usc/ptIX/rule9034/h" subsection {
+      num "h" "(h)"
+      content "the approval of a disclosure statement;"
+      hash "78449d86d33f1e7f1510f5f85ff167ebc6a403e64e727cd4c471619ec79c25a5"
+    }
+    provision "/us/usc/ptIX/rule9034/i" subsection {
+      num "i" "(i)"
+      content "the confirmation of a plan;"
+      hash "4852a1388ef266baf0c95690fac2db0d6846ccd5ba7a4677b247c3a876029ec6"
+    }
+    provision "/us/usc/ptIX/rule9034/j" subsection {
+      num "j" "(j)"
+      content "an objection to, or waiver or revocation of, the debtor’s discharge; or"
+      hash "b411ed471281b5d6b1c5924e1ba34450b775bd64811e378fc107ff00aa7a8aeb"
+    }
+    provision "/us/usc/ptIX/rule9034/k" subsection {
+      num "k" "(k)"
+      content "any other matter in which the United States trustee requests copies of filed documents or the court orders copies sent to the United States trustee."
+      hash "16896933ddb654c9d9ad000893fa1d3045fb441bfb0059733a84051cb77cbed6"
+    }
+    hash "768ff134e22671a678bc3ffe4af2ec964d8bd4e9c0fe37250447354206d2c5d5"
+  }
+  credit "(Added Apr. 30, 1991, eff. Aug. 1, 1991; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9034/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991"
+    p "Section 307 of the Code gives the United States trustee the right to appear and be heard on issues in cases and proceedings under the Code. This rule is intended to keep the United States trustee informed of certain developments and disputes in which the United States trustee may wish to be heard. This rule, which derives from Rule X–1008, also enables the United States trustee to monitor the progress of the case in accordance with 28 U.S.C. § 586(a). The requirement to transmit copies of certain pleadings, motion papers and other documents is intended to be flexible in that the United States trustee in a particular judicial district may request copies of papers in certain categories, and may request not to receive copies of documents in other categories, when the practice in that district makes that desirable. When the rules require that a paper be served on particular parties, the time period in which service is required is also applicable to transmittal to the United States trustee."
+    p "Although other rules require that certain notices be transmitted to the United States trustee, this rule goes further in that it requires the transmittal to the United States trustee of other papers filed in connection with these matters. This rule is not an exhaustive list of the matters of which the United States trustee may be entitled to receive notice."
+    hash "27b183a4e6fece7b41e6cef63930607229d5d11ad6a18a9375a0c2e80cd14d05"
+  }
+  note "/us/usc/ptIX/rule9034/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9034 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "9e7cb69d2adaae931327255709471c2b8ff0437661ccb59f4e6dea41d04f2265"
+  }
+  layers {
+    operative "768ff134e22671a678bc3ffe4af2ec964d8bd4e9c0fe37250447354206d2c5d5"
+    enacted "df8e481cf3ba5a8b34da3aee036a59bd36eda0068fde765d7dfe9d2d2075a3ff"
+    editorial "6e221db452d28524b07181ff93d05672627360650a5762869a1fa53bda8724d3"
+  }
+}

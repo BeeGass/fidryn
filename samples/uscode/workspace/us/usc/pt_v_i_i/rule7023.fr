@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/ptVII/rule7023" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7023" courtRule {
+    num "7023" "Rule 7023."
+    heading "Class Actions"
+    content "Fed. R. Civ. P. 23 applies in an adversary proceeding."
+    hash "c518b67bb5b74fe4093f4410cf82aa644ce0d8fca89b5ac92499dede6274e927"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7023/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7023 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "9ad4e2d66cab63e6adaf18727ad8d630b3fd6e3b3225fbc2f4836f335cbadf3e"
+  }
+  note "/us/usc/ptVII/rule7023/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "c518b67bb5b74fe4093f4410cf82aa644ce0d8fca89b5ac92499dede6274e927"
+    enacted "d4933b2054192e99e2e20cc45f1cdbe40d35d6a760c3365cde47ae5516684e07"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

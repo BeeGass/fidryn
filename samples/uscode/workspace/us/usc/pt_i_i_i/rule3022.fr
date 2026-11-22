@@ -1,0 +1,40 @@
+edition 2
+module "/us/usc/ptIII/rule3022" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3022" courtRule {
+    num "3022" "Rule 3022."
+    heading "Chapter 11—Final Decree"
+    content "After the estate is fully administered in a Chapter 11 case, the court must, on its own or on a party in interest’s motion, enter a final decree closing the case."
+    hash "e725d8fba6fec13711b364cf0e4f056967567ae237afcec002464e15a8692c5f"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Section 350 of the Code requires the court to close the case after the estate is fully administered and the trustee has been discharged. Section 1143 places a five year limitation on the surrender of securities when required for participation under a plan but this provision should not delay entry of the final decree."
+    hash "8938f7ecf895c922bba200f2ad4a3d0b8a25930e03ea1e28f3433221a5e78a91"
+  }
+  note "/us/usc/ptIII/rule3022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Entry of a final decree closing a chapter 11 case should not be delayed solely because the payments required by the plan have not been completed. Factors that the court should consider in determining whether the estate has been fully administered include (1) whether the order confirming the plan has become final, (2) whether deposits required by the plan have been distributed, (3) whether the property proposed by the plan to be transferred has been transferred, (4) whether the debtor or the successor of the debtor under the plan has assumed the business or the management of the property dealt with by the plan, (5) whether payments under the plan have commenced, and (6) whether all motions, contested matters, and adversary proceedings have been finally resolved."
+    p "The court should not keep the case open only because of the possibility that the court’s jurisdiction may be invoked in the future. A final decree closing the case after the estate is fully administered does not deprive the court of jurisdiction to enforce or interpret its own orders and does not prevent the court from reopening the case for cause pursuant to § 350(b) of the Code. For example, on motion of a party in interest, the court may reopen the case to revoke an order of confirmation procured by fraud under § 1144 of the Code. If the plan or confirmation order provides that the case shall remain open until a certain date or event because of the likelihood that the court’s jurisdiction may be required for specific purposes prior thereto, the case should remain open until that date or event."
+    hash "fbe1b7897970dcf0fdeed8e84c8945c4c21860b769fec32fb03701b396e79d1f"
+  }
+  note "/us/usc/ptIII/rule3022/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3022 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "f59eb32a99b29c50cfbbe77107ad6ebe4cda0be35b2952444bf31cfd53952e37"
+  }
+  layers {
+    operative "e725d8fba6fec13711b364cf0e4f056967567ae237afcec002464e15a8692c5f"
+    enacted "4932f2312b5ed2ac4f343af48a3426af8da7db7c1ff4855018bc833a14f0cb8c"
+    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+  }
+}

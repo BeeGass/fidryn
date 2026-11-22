@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s825a" {
+  within "/us/usc/t45/ch17/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s825a" section {
+    num "825a" "§ 825a."
+    heading "Repealed. " ["Pub. L. 99–509, title IV, § 4033(c)(6)" -> "/us/pl/99/509/tIV/s4033/c/6"] ", Oct. 21, 1986, " ["100 Stat. 1909" -> "/us/stat/100/1909"]
+    status repealed
+    hash "774032ce8a55c9d09fd42c7b400db995a36a667ecc3be592f59eae3c25580146"
+  }
+  note "/us/usc/t45/s825a/note/ungrouped/pl.97.468/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 97–468, title IV, § 402" -> "/us/pl/97/468/tIV/s402"] ", Jan. 14, 1983, " ["96 Stat. 2550" -> "/us/stat/96/2550"] ", provided for financial assistance to responsible persons for purchase, lease, or rehabilitation of rail lines of Consolidated Rail Corporation."
+    hash "f725893b9c8ea9b42b2f9b452ad3284d118232fee994f63e5143ff41e27e6ba2"
+  }
+  layers {
+    operative "774032ce8a55c9d09fd42c7b400db995a36a667ecc3be592f59eae3c25580146"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "584a08e8a3e8fd2b22aae2656c8c70aebead098b98da2f3c02788a347d45c00b"
+  }
+}

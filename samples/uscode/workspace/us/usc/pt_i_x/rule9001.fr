@@ -1,0 +1,147 @@
+edition 2
+module "/us/usc/ptIX/rule9001" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9001" courtRule {
+    num "9001" "Rule 9001."
+    heading "Definitions"
+    provision "/us/usc/ptIX/rule9001/a" subsection {
+      num "a" "(a)"
+      heading "In the Code."
+      content "The definitions of words and phrases in §§ 101, 902, 1101, and 1502 and the rules of construction in § 102 apply in these rules."
+      hash "c1498f750b5c5600f3cc81a45a0b7a47dae02c34ed17f29390444f882e5658e3"
+    }
+    provision "/us/usc/ptIX/rule9001/b" subsection {
+      num "b" "(b)"
+      heading "In These Rules."
+      chapeau "In these rules, the following words and phrases have these meanings:"
+      provision "/us/usc/ptIX/rule9001/b/1" paragraph {
+        num "1" "(1)"
+        content "“Bankruptcy clerk” means a clerk appointed under 28 U.S.C. § 156(b)."
+        hash "73de9394bcc36b78c4cdad256dc8c7d90e389ef326a5afeb37fe4821137eca99"
+      }
+      provision "/us/usc/ptIX/rule9001/b/2" paragraph {
+        num "2" "(2)"
+        content "“Clerk” means a bankruptcy clerk if one has been appointed; otherwise, it means the district-court clerk."
+        hash "72d32f593ed9abd7a27f8308f0292ebfd48a03edf40336f7f624964935a70406"
+      }
+      provision "/us/usc/ptIX/rule9001/b/3" paragraph {
+        num "3" "(3)"
+        content "“Code” means Title 11 of the United States Code."
+        hash "d1bf6e85d3d963346c1c4dbef055e5c19b33fe34514949fbfe40c807aa075dd3"
+      }
+      provision "/us/usc/ptIX/rule9001/b/4" paragraph {
+        num "4" "(4)"
+        content "“Court” or “judge” means the judicial officer who presides over the case or proceeding."
+        hash "70b1857fdb5ffe7e0db8d564f5330dcdae8debab7f5a92e81c72b87bcdffa9b7"
+      }
+      provision "/us/usc/ptIX/rule9001/b/5" paragraph {
+        num "5" "(5)"
+        chapeau "“Debtor,” when the debtor is not a natural person and either is required by these rules to perform an act or must appear for examination, includes:"
+        provision "/us/usc/ptIX/rule9001/b/5/A" subparagraph {
+          num "A" "(A)"
+          content {
+            p "if the debtor is a corporation and if the court so designates:"
+            p "• any or all of its officers, directors, trustees, or members of a similar controlling body;"
+            p "• a controlling stockholder or member; or"
+            p "• any other person in control; or"
+          }
+          hash "6d9933178bd3b6707a304915ad7404ba68e852588ea413b08e57a6b5e1c495ae"
+        }
+        provision "/us/usc/ptIX/rule9001/b/5/B" subparagraph {
+          num "B" "(B)"
+          content {
+            p "if the debtor is a partnership:"
+            p "• any or all of its general partners; or"
+            p "• if the court so designates, any other person in control."
+          }
+          hash "43ef84d18a2addd4a2fe2876f432e903e381af884be81834af239e0c81bff3ad"
+        }
+        hash "7608b61d73782d91273b130ff7b434ce02413968884bf6a07b0cab9b92afe7e8"
+      }
+      provision "/us/usc/ptIX/rule9001/b/6" paragraph {
+        num "6" "(6)"
+        content "“Firm” includes a partnership or professional corporation of attorneys or accountants."
+        hash "845f1b9c860e9e7dea7ce8ec07690a51faceae93f0d00ff474334af873d7ddfe"
+      }
+      provision "/us/usc/ptIX/rule9001/b/7" paragraph {
+        num "7" "(7)"
+        content "“Judgment” means any appealable order."
+        hash "43275ca279bb115fad4b9683a30e9c7e6affa6740f210bfad749d7d0213201cb"
+      }
+      provision "/us/usc/ptIX/rule9001/b/8" paragraph {
+        num "8" "(8)"
+        content "“Mail” means first-class mail, postage prepaid."
+        hash "e3c8b67b7c2c4d1968bb790913eba06434b7298253d40a6741cc246d48ad0172"
+      }
+      provision "/us/usc/ptIX/rule9001/b/9" paragraph {
+        num "9" "(9)"
+        content "“Notice provider” means an entity approved by the Administrative Office of the United States Courts to give notice to creditors under Rule 2002(g)(4)."
+        hash "ddb72699f5c4ef988b3c60e15f7e69d0c7ce80b7401d27795d8cad7e374512b0"
+      }
+      provision "/us/usc/ptIX/rule9001/b/10" paragraph {
+        num "10" "(10)"
+        content "“Regular associate” means an attorney regularly employed by, associated with, or counsel to an individual or firm."
+        hash "da5b702a6ea8676b18a81b43a3121b953a96ff669d022d14fd56148b225021ff"
+      }
+      provision "/us/usc/ptIX/rule9001/b/11" paragraph {
+        num "11" "(11)"
+        content "“Trustee” includes a debtor in possession in a Chapter 11 case."
+        hash "6062eeeeee147e119a43716015e867dbae54b497df8724c58d7355b3ee1c7fe4"
+      }
+      provision "/us/usc/ptIX/rule9001/b/12" paragraph {
+        num "12" "(12)"
+        content "“United States trustee” includes an assistant United States trustee and a United States trustee’s designee."
+        hash "4618ba1e3787c610e417de410796dcda80425d314f322970e5097e6e60349095"
+      }
+      hash "25cb507fc2389d9f5518f4f5432f9da54b4c66f6b418d8ece3418b0217962f6a"
+    }
+    hash "213f56167dbefa90f45282ddc2e03652f597e6f694861bb0a00354cd8bdf26bf"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The terms “bankruptcy clerk” and “clerk” have been defined to reflect that unless otherwise stated, for the purpose of these rules, the terms are meant to identify the court officer for the bankruptcy records. If a bankruptcy clerk is appointed, all filings are made with the bankruptcy clerk. If one has not been appointed, all filings are with the clerk of the district court. Rule 5005."
+    p "The rule is also amended to include a definition of “court or judge”. Since a case or proceeding may be before a bankruptcy judge or a judge of the district court, “court or judge” is defined to mean the judicial officer before whom the case or proceeding is pending."
+    hash "3cfac66d6ec6ec92f924f4c339cb2ba01264d4e3bc077775a7f48de8206e55be"
+  }
+  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p ["Section 582 of title 28" -> "/us/usc/t28/s582"] " provides that the Attorney General may appoint one or more assistant United States trustees in any region when the public interest so requires. This rule is amended to clarify that an assistant United States trustee, as well as any designee of the United States trustee, is included within the meaning of “United States trustee” in the rules."
+    hash "c22b118298b539d253e96ab8f0466ea3cfe2af0f05eae2e863d110622da9750c"
+  }
+  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2005 Amendment"
+    p "The rule is amended to add the definition of a notice provider and to renumber the final three definitions in the rule. A notice provider is an entity approved by the Administrative Office of the United States Courts to enter into agreements with entities to give notice to those entities in the form and manner agreed to by those parties. The new definition supports the amendment to Rule 2002(g)(4) that authorizes a notice provider to give notices under Rule 2002."
+    p "Many entities conduct business on a national scale and receive vast numbers of notices in bankruptcy cases throughout the country. Those entities can agree with a notice provider to receive their notices in a form and at an address or addresses that the creditor and notice provider agree upon. There are processes currently in use that provide substantial assurance that notices are not misdirected. Any notice provider would have to demonstrate to the Administrative Office of the United States Courts that it could provide the service in a manner that ensures the proper delivery of notice to creditors. Once the Administrative Office of the United States Courts approves the notice provider to enter into agreements with creditors, the notice provider and other entities can establish the relationship that will govern the delivery of notices in cases as provided in Rule 2002(g)(4)."
+    p "Changes Made After Publication and Comment. No changes since publication."
+    hash "8186502fdba23b24287916a738e591fb6338b9e3e455b4092775ed5728bc3ddc"
+  }
+  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010 Amendment"
+    p "The rule is amended to add § 1502 of the Code to the list of definitional provisions that are applicable to the Rules. That section was added to the Code by the 2005 amendments."
+    p "Changes Made After Publication. No changes since publication."
+    hash "607f2119f37bea1fee331a0622328a878cfdabd3e7563b7eb618f80d56d46261"
+  }
+  note "/us/usc/ptIX/rule9001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9001 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "a67f9b17378654ecbe5e4fc9afd1db49fc1c540c5bae491f8ef418ed1bdeae51"
+  }
+  layers {
+    operative "213f56167dbefa90f45282ddc2e03652f597e6f694861bb0a00354cd8bdf26bf"
+    enacted "f73014d09c06e877b54da0172876b936c2562de06c772dbdda6d3412be63700a"
+    editorial "5d12c0e5225324fa567b610b5453f1657d24a97ca4ee31d8ba2031d34b3ef1f5"
+  }
+}

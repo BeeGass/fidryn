@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s803" {
+  within "/us/usc/t45/ch17/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s803" section {
+    num "803" "§ 803."
+    heading "Repealed. " ["Pub. L. 97–449, § 7(b)" -> "/us/pl/97/449/s7/b"] ", Jan. 12, 1983, " ["96 Stat. 2443" -> "/us/stat/96/2443"]
+    status repealed
+    hash "762c5b6984a00bb54e81f1142d0669a800683149fddfae5815d22a70fc1d6b58"
+  }
+  note "/us/usc/t45/s803/note/ungrouped/pl.94.210/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 94–210, title IX, § 905" -> "/us/pl/94/210/tIX/s905"] ", Feb. 5, 1976, " ["90 Stat. 148" -> "/us/stat/90/148"] ", directed that no person in the United States be discriminated against on the basis of race, color, national origin, or sex with regard to any activity funded in whole or in part under this Act and provided for cut-off of funds to and civil action against any person who persisted in failure to comply. See " ["section 306 of Title 49" -> "/us/usc/t49/s306"] ", Transportation."
+    hash "040b065cc83b0e0487963f63b3460cfc3cfa8225b762a3346e526adfea6cdfe5"
+  }
+  layers {
+    operative "762c5b6984a00bb54e81f1142d0669a800683149fddfae5815d22a70fc1d6b58"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "9cdc58f9a8b4eae294f803bb43961d364c28b26c680047d7b3fe953bee45dfee"
+  }
+}

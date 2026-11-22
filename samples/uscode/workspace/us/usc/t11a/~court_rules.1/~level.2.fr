@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t11a/~courtRules.1/~level.2" {
+  within "/us/usc/t11a/~courtRules.1"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/t11a/~courtRules.1/~level.2" level {
+    heading "APPENDIX"
+    content {
+      image "file:///11appf1p1.eps"
+    }
+    content {
+      image "file:///11appf1p1.eps"
+      image "file:///11appf1p2.eps"
+    }
+    hash "11fcb89878b52759a0ad66e60a3f3478346d164fa8f2badc267bc805fac2cb92"
+  }
+  credit "(As added Apr. 26, 2018, eff. Dec. 1, 2018.)"
+  note "/us/usc/t11a/~courtRules.1/~level.2/note/ungrouped/nolaw/length-limits-stated-in-part-viii-of-the-federal-rules-of-ba" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Length Limits Stated in Part VIII of the Federal Rules of Bankruptcy Procedure"
+    p "Appendix: Length Limits Stated in Part VIII of the Federal Rules of Bankruptcy Procedure can also be found in the order of the Supreme Court amending the Federal Rules of Bankruptcy Procedure, April 26, 2018, available at the Supreme Court website."
+    hash "451b37bebfb2cc348528d9bc9ce3740fd4d17ff3e1fb834210ea6a5c0c2ecf4c"
+  }
+  layers {
+    operative "11fcb89878b52759a0ad66e60a3f3478346d164fa8f2badc267bc805fac2cb92"
+    enacted "c50dd9f2b9e3a3fe63565c246a41d2aa80ccc2d9a74798c3e1836ad53f32b953"
+    editorial "1250af8d0208bd619c27010df608a931f0bc22af65701a768ad45f7f809ce560"
+  }
+}

@@ -1,0 +1,104 @@
+edition 2
+module "/us/usc/ptVI/rule6011" {
+  within "/us/usc/ptVI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVI/rule6011" courtRule {
+    num "6011" "Rule 6011."
+    heading "Claiming Patient Records Scheduled for Destruction in a Health-Care-Business Case"
+    provision "/us/usc/ptVI/rule6011/a" subsection {
+      num "a" "(a)"
+      heading "Notice by Publication About the Records."
+      chapeau "A notice by publication about destroying or claiming patient records under § 351(1)(A) must not identify any patient by name or contain other identifying information. The notice must:"
+      provision "/us/usc/ptVI/rule6011/a/1" paragraph {
+        num "1" "(1)"
+        content "identify with particularity the health-care facility whose patient records the trustee proposes to destroy;"
+        hash "569f6b06bc8b633069d3bcab1fb577fdc950823233be9dcc177b9728e20503fd"
+      }
+      provision "/us/usc/ptVI/rule6011/a/2" paragraph {
+        num "2" "(2)"
+        content "state the name, address, telephone number, email address, and website (if any) of the person from whom information about the records may be obtained;"
+        hash "1dc6b99f90fd207c0123f0b3c736ecab6e0f749c5449a8d73ca88613e61d65b5"
+      }
+      provision "/us/usc/ptVI/rule6011/a/3" paragraph {
+        num "3" "(3)"
+        content "state how to claim the records and the final date for doing so; and"
+        hash "4b0ff4eea1317df4ce50aaf80b1747acfb7664e6b85bef68200d5f3c173c9d6a"
+      }
+      provision "/us/usc/ptVI/rule6011/a/4" paragraph {
+        num "4" "(4)"
+        content "state that if they are not claimed by that date, they will be destroyed."
+        hash "56d0b6b05d25c869ca987b37f6f77444f349851cec64228b078061799a885cac"
+      }
+      hash "245cd6586a45c752d3e41186da3c39ba907ac521ac04515898e23b944cce4af6"
+    }
+    provision "/us/usc/ptVI/rule6011/b" subsection {
+      num "b" "(b)"
+      heading "Notice by Mail About the Records."
+      provision "/us/usc/ptVI/rule6011/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "Required Information. Subject to applicable nonbankruptcy law relating to patient privacy, a notice by mail about destroying or claiming patient records under § 351(1)(B) must:"
+        provision "/us/usc/ptVI/rule6011/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "include the information described in (a); and"
+          hash "ef9a0d819ea7149f490475f517b2ab4790d7de816b25626a62d7a571207f7736"
+        }
+        provision "/us/usc/ptVI/rule6011/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "direct a family member or other representative who receives the notice to tell the patient about it."
+          hash "378fe46df1c1ea06db449dac150c3113c9be2d7e8ff06e5d2c1a930a216fd835"
+        }
+        hash "1fff20dc0c50e8a146ef01dc47a8b4c2d6c2e63ed3b6ee97bb29e2604f6deb14"
+      }
+      provision "/us/usc/ptVI/rule6011/b/2" paragraph {
+        num "2" "(2)"
+        content {
+          p "Mailing. The notice must be mailed to:"
+          p "• the patient;"
+          p "• any family member or other contact person whose name and address have been given to the trustee or debtor for providing information about the patient’s health care;"
+          p "• the Attorney General of the State where the health-care facility is located; and"
+          p "• any insurance company known to have provided health-care insurance to the patient."
+        }
+        hash "03ed2b8f43ba776d02eb2ca27333546a0366369b63cbd67067a8487c830c1e83"
+      }
+      hash "43ff3e8cb12083ae60d6787abd49b5a46b15565eada80b4a723e4695fc184404"
+    }
+    provision "/us/usc/ptVI/rule6011/c" subsection {
+      num "c" "(c)"
+      heading "Proof of Compliance with Notice Requirements."
+      content "Unless the court orders the trustee to file a proof of compliance with § 351(1)(B) under seal, the trustee must keep the proof of compliance for a reasonable time but not file it."
+      hash "965bef78599167a2f6c7ca33d8c0b37b2167756f83d315fde3d8548cb997de6b"
+    }
+    provision "/us/usc/ptVI/rule6011/d" subsection {
+      num "d" "(d)"
+      heading "Report on the Destruction of Unclaimed Records."
+      content "Within 30 days after a patient’s unclaimed records have been destroyed under § 351(3), the trustee must file a report that certifies the destruction and explains the method used. The report must not identify any patient by name or by other identifying information."
+      hash "c27b752d554ba04d9f706c72d5ec38cba9a1415ced5ba168af43074a5feb8b94"
+    }
+    hash "c00a223e285224b8d1675b0512b2b54d476c41c160f7692806b146ea19871dec"
+  }
+  credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVI/rule6011/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008"
+    p "This rule is new. It implements § 351(1), which was added to the Code by the 2005 amendments. That provision requires the trustee to notify patients that their patient records will be destroyed if they remain unclaimed for one year after the publication of a notice in an appropriate newspaper. The Code provision also requires that individualized notice be sent to each patient and to the patient’s family member or other contact person."
+    p "The variety of health care businesses and the range of current and former patients present the need for flexibility in the creation and publication of the notices that will be given. Nevertheless, there are some matters that must be included in any notice being given to patients, their family members, and contact persons to ensure that sufficient information is provided to these persons regarding the trustee’s intent to dispose of patient records. Subdivision (a) of this rule lists the minimum requirements for notices given under § 351(1)(A), and subdivision (b) governs the form of notices under § 351(1)(B). Notices given under this rule are subject to provisions under applicable federal and state law that relate to the protection of patients’ privacy, such as the Health Insurance Portability and Accountability Act of 1996, Pub. L. No. 104–191 (HIPAA)."
+    p "Subdivision (c) directs the trustee to maintain proof of compliance with § 351(1)(B), but because the proof of compliance may contain patient names that should or must remain confidential, it prohibits filing the proof of compliance unless the court orders the trustee to file it under seal."
+    p "Subdivision (d) requires the trustee to file a report with the court regarding the destruction of patient records. This certification is intended to ensure that the trustee properly completed the destruction process. However, because the report will be filed with the court and ordinarily will be available to the public under § 107, the names, addresses, and other identifying information of patients are not to be included in the report to protect patient privacy."
+    p "Changes Made After Publication. Subdivision (b)(2) was amended to add the Attorney General of the State where a health care facility is located to the list of entities entitled to notice of the disposal of patient records."
+    hash "43e4e919999fcbd132a682b77dfd952745dd48a2de6717055e8847188d838278"
+  }
+  note "/us/usc/ptVI/rule6011/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 6011 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "089c82230036495837c2312d14934b8d35367435d96a8729104e8526d6b1dff2"
+  }
+  layers {
+    operative "c00a223e285224b8d1675b0512b2b54d476c41c160f7692806b146ea19871dec"
+    enacted "36ff154979592396e60459b4d89aafa80c31082bebee8335497d193092fe6d97"
+    editorial "0949f180af4af05827ca1df5a238939bcdd930e45d40b1501dfd1b481c2c0da7"
+  }
+}

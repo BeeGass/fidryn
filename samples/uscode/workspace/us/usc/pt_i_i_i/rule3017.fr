@@ -1,0 +1,277 @@
+edition 2
+module "/us/usc/ptIII/rule3017" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3017" courtRule {
+    num "3017" "Rule 3017."
+    heading "Chapter 9 or 11—Hearing on a Disclosure Statement and Plan"
+    provision "/us/usc/ptIII/rule3017/a" subsection {
+      num "a" "(a)"
+      heading "Hearing on a Disclosure Statement; Objections."
+      provision "/us/usc/ptIII/rule3017/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Notice and Hearing."
+        provision "/us/usc/ptIII/rule3017/a/1/A" subparagraph {
+          num "A" "(A)"
+          content {
+            p "Notice. Except as provided in Rule 3017.1 for a small business case, the court must hold a hearing on a disclosure statement filed under Rule 3016(b) and any objection or modification to it. The hearing must be held on at least 28 days’ notice under Rule 2002(b) to:"
+            p "• the debtor;"
+            p "• creditors;"
+            p "• equity security holders; and"
+            p "• other parties in interest."
+          }
+          hash "2cbd5147877597261118a666cbed2e9dc928c870d756e5495c92a24c5e978ac9"
+        }
+        provision "/us/usc/ptIII/rule3017/a/1/B" subparagraph {
+          num "B" "(B)"
+          content {
+            p "Limit on Sending the Plan and Disclosure Statement. A copy of the plan and disclosure statement must be mailed with the notice of a hearing to:"
+            p "• the debtor;"
+            p "• any trustee or appointed committee;"
+            p "• the Securities and Exchange Commission; and"
+            p "• any party in interest that, in writing, requests a copy of the disclosure statement or plan."
+          }
+          hash "410e27cba4b96cbc108f5312a4732bd58c08277c76a585351fb80672d053ffd4"
+        }
+        hash "de63aa4df9d55a174a37ffaf7cff1f6f6cc343c1f15f24ba4884734c3582ce90"
+      }
+      provision "/us/usc/ptIII/rule3017/a/2" paragraph {
+        num "2" "(2)"
+        content {
+          p "Objecting to a Disclosure Statement. An objection to a disclosure statement must be filed and served before the disclosure statement is approved or by an earlier date the court sets. The objection must be served on:"
+          p "• the debtor;"
+          p "• the trustee;"
+          p "• any appointed committee; and"
+          p "• any other entity the court designates."
+        }
+        hash "06bb4fc4eb1826e551adb597fa2385a52244373b2886200248ea29ca2b7d726f"
+      }
+      provision "/us/usc/ptIII/rule3017/a/3" paragraph {
+        num "3" "(3)"
+        content "Chapter 11—Copies to the United States Trustee. In a Chapter 11 case, a copy of every item required to be served or mailed under this Rule 3017(a) must also be sent to the United States trustee within the prescribed time."
+        hash "18030efeeb56c13db183f996fd39cbaf3eee18780cabf7afc0202295080c8df8"
+      }
+      hash "22fc7c6be31725495d7f92053b71c2a67527a643f3684fc8957b21d2a250f00e"
+    }
+    provision "/us/usc/ptIII/rule3017/b" subsection {
+      num "b" "(b)"
+      heading "Court Ruling on the Disclosure Statement."
+      content "After the hearing, the court must determine whether the disclosure statement should be approved."
+      hash "2995d76671af99a2722baa92f5bb5b7f50455d55af51e81692ab803fd5af1f86"
+    }
+    provision "/us/usc/ptIII/rule3017/c" subsection {
+      num "c" "(c)"
+      heading "Time to Accept or Reject a Plan and for the Confirmation Hearing."
+      chapeau "At the time or before the disclosure statement is approved, the court:"
+      provision "/us/usc/ptIII/rule3017/c/1" paragraph {
+        num "1" "(1)"
+        content "must set a deadline for the holders of claims and interests to accept or reject the plan; and"
+        hash "d22e3b4021e7637850f0357623d2f0d7b6a49062a99728ebe71451346e544b92"
+      }
+      provision "/us/usc/ptIII/rule3017/c/2" paragraph {
+        num "2" "(2)"
+        content "may set a date for a confirmation hearing."
+        hash "f77c5d98756569bd892e087a551d2eff4454fadeceaf1e59d160831b52501f73"
+      }
+      hash "4d335297832b0ddc79f8f3bcbaa436a99f5755d41ccacfdb152d333ddd88940c"
+    }
+    provision "/us/usc/ptIII/rule3017/d" subsection {
+      num "d" "(d)"
+      heading "Hearing on Confirmation."
+      provision "/us/usc/ptIII/rule3017/d/1" paragraph {
+        num "1" "(1)"
+        chapeau "Sending the Plan and Related Documents."
+        provision "/us/usc/ptIII/rule3017/d/1/A" subparagraph {
+          num "A" "(A)"
+          chapeau "In General. After the disclosure statement has been approved, the court must order the debtor in possession, the trustee, the plan proponent, or the clerk to mail the following items to creditors and equity security holders and, in a Chapter 11 case, to send a copy of each to the United States trustee:"
+          provision "/us/usc/ptIII/rule3017/d/1/A/i" clause {
+            num "i" "(i)"
+            content "the court-approved disclosure statement;"
+            hash "a7074013668bb151f77bb06e1dba75aa754528fe0dc4540c569d1f1cc512e6e3"
+          }
+          provision "/us/usc/ptIII/rule3017/d/1/A/ii" clause {
+            num "ii" "(ii)"
+            content "the plan or a court-approved summary of it;"
+            hash "1daea7c23371e02bd315ede7e64b449a79257870d0f43c6ce020eb123490274b"
+          }
+          provision "/us/usc/ptIII/rule3017/d/1/A/iii" clause {
+            num "iii" "(iii)"
+            content "a notice of the time to file acceptances and rejections of the plan; and"
+            hash "696b2191f4b609b311c8f68444402585c326497f116616495653f11a15667680"
+          }
+          provision "/us/usc/ptIII/rule3017/d/1/A/iv" clause {
+            num "iv" "(iv)"
+            content "any other information as the court orders—including any opinion approving the disclosure statement or a court-approved summary of the opinion."
+            hash "cc67fde7b94db8bb791fd7f7122da19ff6d3d06047aeeb5b5372b8d58ff76c74"
+          }
+          hash "1cadf5dde0d6f88973c5e8fd20567bc3a775d34c5b37b76e65316804a679447b"
+        }
+        provision "/us/usc/ptIII/rule3017/d/1/B" subparagraph {
+          num "B" "(B)"
+          content "Exception. The court may vary the requirements for an unimpaired class of creditors or equity security holders."
+          hash "783c831d630caadf1682ae3cbc7357ae38d00d2d65771a64a6817b455efc34f6"
+        }
+        hash "b64bce15de6a5a08f29324420080f439f97515a51461a3a87961fabea6190df1"
+      }
+      provision "/us/usc/ptIII/rule3017/d/2" paragraph {
+        num "2" "(2)"
+        content "Time to Object to a Plan; Notice of the Confirmation Hearing. Notice of the time to file an objection to a plan’s confirmation and the date of the hearing on confirmation must be mailed to creditors and equity security holders in accordance with Rule 2002(b). A ballot that conforms to Form 314 must also be mailed to creditors and equity security holders who are entitled to vote on the plan. If the court’s opinion is not sent (or only a summary of the plan was sent), a party in interest may request a copy of the opinion or plan, which must be provided at the plan proponent’s expense."
+        hash "b886d9f234327833a7e59df177362bc8879e3009617c1e9ae7de444b8b71dfdc"
+      }
+      provision "/us/usc/ptIII/rule3017/d/3" paragraph {
+        num "3" "(3)"
+        chapeau "Notice to Unimpaired Classes. If the court orders that the disclosure statement and plan (or the plan summary) not be mailed to an unimpaired class, a notice that the class has been designated as unimpaired must be mailed to the class members. The notice must show:"
+        provision "/us/usc/ptIII/rule3017/d/3/A" subparagraph {
+          num "A" "(A)"
+          content "the name and address of the person from whom the plan (or summary) and the disclosure statement may be obtained at the plan proponent’s expense;"
+          hash "c7dafbae592706235a4b836096732797cc5b84ef67700e153fc6d8ae25878748"
+        }
+        provision "/us/usc/ptIII/rule3017/d/3/B" subparagraph {
+          num "B" "(B)"
+          content "the time to file an objection to the plan’s confirmation; and"
+          hash "9e7d44a739d4535aaa93a1990e4ee3fdcd097439a30b3da07325ce6fa2959969"
+        }
+        provision "/us/usc/ptIII/rule3017/d/3/C" subparagraph {
+          num "C" "(C)"
+          content "the date of the confirmation hearing."
+          hash "8f20ffe6b54e0257cfe177d30ad2ddf761769e3c9c51f269e4b21b0c0781dcdc"
+        }
+        hash "1c12b39b545818fb4473f0e655b6eba662b383cf9cae9b32317886b98380f8f0"
+      }
+      provision "/us/usc/ptIII/rule3017/d/4" paragraph {
+        num "4" "(4)"
+        content "Definition of “Creditors” and “Equity Security Holders.” In this Rule 3017(d), “creditors” and “equity security holders” include record holders of stock, bonds, debentures, notes, and other securities on the date the order approving the disclosure statement is entered—or another date the court sets for cause and after notice and a hearing."
+        hash "22f7dc2d6f6d9cf2339d257932809f40bfe4908800059bdea2375504b2f43b17"
+      }
+      hash "fdcd21c07c441f4f85af0ab365b47e584c414736076809ccaca09a528106f739"
+    }
+    provision "/us/usc/ptIII/rule3017/e" subsection {
+      num "e" "(e)"
+      heading "Procedure for Sending Information to Beneficial Holders of Securities."
+      chapeau "At the hearing under (a), the court must:"
+      provision "/us/usc/ptIII/rule3017/e/1" paragraph {
+        num "1" "(1)"
+        content "determine the adequacy of the procedures for sending the documents and information listed in (d)(1) to beneficial holders of stock, bonds, debentures, notes, and other securities; and"
+        hash "c613a692ef86e707e2fe3a604b93e283570ac10935e691385b0ec8d0e134c3f2"
+      }
+      provision "/us/usc/ptIII/rule3017/e/2" paragraph {
+        num "2" "(2)"
+        content "issue any appropriate orders."
+        hash "c4885ebc8476c7e881addd49a6398653c7274538be822f67b58711d20ceab4c7"
+      }
+      hash "2ead9068a0b75b4b699f3ca7b00223d2f23fbe8b599b8d2457180b9edabfaf68"
+    }
+    provision "/us/usc/ptIII/rule3017/f" subsection {
+      num "f" "(f)"
+      heading "Sending Information to Entities Subject to an Injunction."
+      provision "/us/usc/ptIII/rule3017/f/1" paragraph {
+        num "1" "(1)"
+        chapeau "Timing of the Notice. This Rule 3017(f) applies if, under a plan, an entity that is not a creditor or equity security holder is subject to an injunction against conduct not otherwise enjoined by the Code. At the hearing under (a), the court must consider procedures to provide the entity with at least 28 days’ notice of:"
+        provision "/us/usc/ptIII/rule3017/f/1/A" subparagraph {
+          num "A" "(A)"
+          content "the time to file an objection; and"
+          hash "a849d71614535b6160928c0e2ff3fe7ef70ed29efc47f4d1eae2bd88c00f706e"
+        }
+        provision "/us/usc/ptIII/rule3017/f/1/B" subparagraph {
+          num "B" "(B)"
+          content "the date of the confirmation hearing."
+          hash "97e8aafe86dbf9a06778e147805cc68a2316a64808093945b255c59320476f34"
+        }
+        hash "74878d3ab67acac9598d9407f9643d7af5655857b21a06d01ded5653e0b3401d"
+      }
+      provision "/us/usc/ptIII/rule3017/f/2" paragraph {
+        num "2" "(2)"
+        chapeau "Content of the Notice. The notice must:"
+        provision "/us/usc/ptIII/rule3017/f/2/A" subparagraph {
+          num "A" "(A)"
+          content "provide the information required by Rule 2002(c)(3); and"
+          hash "845918b93e0df598a982d31b5412f9e2d62fa26bd4c430e2bea8c0ecc2445fb2"
+        }
+        provision "/us/usc/ptIII/rule3017/f/2/B" subparagraph {
+          num "B" "(B)"
+          content "if feasible, include a copy of the plan and disclosure statement."
+          hash "b9287a2e796d0afea5e81fa5c404a926ea1a50975dc2739e2ddec09a14c1160f"
+        }
+        hash "df27a9543e634c9717754afd0b4f3740e03ad5b28f06b34153d1ad98649a21f8"
+      }
+      hash "45faa5e37c53f123391ba8170c177c8bee8f532cc5e26bddbd6d3846c116ab06"
+    }
+    hash "6cc55190a60ab63482bd01b530e95b428d7a2e4424b0b0f840ed963cf8472f4e"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 23, 2001, eff. Dec. 1, 2001; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Rule 10–303 which dealt with the approval of a Chapter X plan by the court. There is no requirement for plan approval in a chapter 9 or 11 case under the Code but there is the requirement that a disclosure statement containing adequate financial information be approved by the court after notice and a hearing before votes on a plan are solicited. Section 1125(b) of the Code is made applicable in chapter 9 cases by § 901(a). It is also applicable in railroad reorganization cases under subchapter IV of chapter 11; see § 1161 of the Code."
+    p "Subdivision (a) of this rule provides for the hearing on the disclosure statement. Thus, a hearing would be required in all cases; whether it may be ex parte would depend on the circumstances of the case, but a mere absence of objections would not eliminate the need for a hearing; see § 102(1) of the Code."
+    p "No provision similar to former Rule 10–303(f) is included. That subdivision together with former Rule 10–304 prohibited solicitation of votes until after entry of an order approving the plan. Section 1125(b) of the Code explicitly provides that votes on a plan may not be solicited until a disclosure statement approved by the court is transmitted. Pursuant to the change in rulemaking power, a comparable provision in this rule is unnecessary. 28 U.S.C. § 2075."
+    p "Copies of the disclosure statement and plan need not be mailed with the notice of the hearing or otherwise transmitted prior to the hearing except with respect to the parties explicitly set forth in the subdivision."
+    p "It should be noted that, by construction, the singular includes the plural. Therefore, the phrase “plan or plans” or “disclosure statement or statements” has not been used although the possibility of multiple plans and statements is recognized."
+    p "Subdivision (d) permits the court to require a party other than the clerk of the bankruptcy court to bear the responsibility for transmitting the notices and documents specified in the rule when votes on the plan are solicited. Ordinarily the person responsible for such mailing will be the proponent of the plan. In rare cases the clerk may be directed to mail these documents, particularly when the trustee would have the responsibility but there is insufficient money in the estate to enable the trustee to perform this task."
+    hash "f02b6247376fa6a53c94331b7c4ece017ad8013fc3ca3d07456f0c2fed7a1098"
+  }
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (d). Section 1125(c) of the Code requires that the entire approved disclosure statement be provided in connection with voting on a plan. The court is authorized by § 1125(c) to approve different disclosure statements for different classes. Although the rule does not permit the mailing of a summary of the disclosure statement in place of the approved disclosure statement, the court may approve a summary of the disclosure statement to be mailed with the complete disclosure statement to those voting on the plan."
+    hash "0f3c2a4d20c51dac79228614b986bb498044e07bb002be5dcc4989be824617ef"
+  }
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to enable the United States trustee to monitor and comment with regard to chapter 11 disclosure statements and plans. The United States trustee does not perform these functions in a chapter 9 municipal debt adjustment case. See 28 U.S.C. § 586(a)(3)(B)."
+    p "Subdivision (d) is amended to give the court the discretion to direct that one or more unimpaired classes shall not receive disclosure statements, plans, or summaries of plans. Members of unimpaired classes are not entitled to vote on the plan. Although disclosure statements enable members of unimpaired classes to make informed judgments as to whether to object to confirmation because of lack of feasibility or other grounds, in an unusual case the court may direct that disclosure statements shall not be sent to such classes if to do so would not be feasible considering the size of the unimpaired classes and the expense of printing and mailing. In any event, all creditors are entitled to notice of the time fixed for filing objections and notice of the hearing to consider confirmation of the plan pursuant to Rule 2002(b) and the requirement of such notice may not be excused with respect to unimpaired classes. The amendment to subdivision (d) also ensures that the members of unimpaired classes who do not receive such documents will have sufficient information so that they may request these documents in advance of the hearing on confirmation. The amendment to subdivision (d) is not intended to give the court the discretion to dispense with the mailing of the plan and disclosure statement to governmental units holding claims entitled to priority under § 507(a)(7) because they may not be classified. See § 1123(a)(1)."
+    p "The words “with the court” in subdivision (a) are deleted as unnecessary. See Rules 5005(a) and 9001(3). Reference to the Official Form number in subdivision (d) is deleted in anticipation of future revision and renumbering of the Official Forms."
+    p "Subdivision (e) is designed to ensure that appropriate measures are taken for the plan, disclosure statement, ballot and other materials which are required to be transmitted to creditors and equity security holders under this rule to reach the beneficial holders of securities held in nominee name. Such measures may include orders directing the trustee or debtor in possession to reimburse the nominees out of the funds of the estate for the expenses incurred by them in distributing materials to beneficial holders. In most cases, the plan proponent will not know the identities of the beneficial holders and therefore it will be necessary to rely on the nominal holders of the securities to distribute the plan materials to the beneficial owners."
+    hash "12defadba62adfd87bf0d0a413a265e53628c8c1f5a6add155d5ea09d650d74f"
+  }
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997 Amendment"
+    p "Subdivision (a) is amended to provide that it does not apply to the extent provided in new Rule 3017.1, which applies in small business cases."
+    p "Subdivision (d) is amended to provide flexibility in fixing the record date for the purpose of determining the holders of securities who are entitled to receive documents pursuant to this subdivision. For example, if there may be a delay between the oral announcement of the judge’s order approving the disclosure statement and entry of the order on the court docket, the court may fix the date on which the judge orally approves the disclosure statement as the record date so that the parties may expedite preparation of the lists necessary to facilitate the distribution of the plan, disclosure statement, ballots, and other related documents."
+    p "The court may set a record date pursuant to subdivision (d) only after notice and a hearing as provided in § 102(1) of the Code. Notice of a request for an order fixing the record date may be included in the notice of the hearing to consider approval of the disclosure statement mailed pursuant to Rule 2002(b)."
+    p "If the court fixes a record date pursuant to subdivision (d) with respect to the holders of securities, and the holders are impaired by the plan, the judge also should order that the same record date applies for the purpose of determining eligibility for voting pursuant to Rule 3018(a)."
+    p "Other amendments to this rule are stylistic."
+    p "GAP Report on Rule 3017. No changes to the published draft."
+    hash "7128a8ff304d750ca6e44ba90e622ed7c015b43a95f1764c5639c1b72c08ea46"
+  }
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2001 Amendment"
+    p "Subdivision (f) is added to assure that entities whose conduct would be enjoined under a plan, rather than by operation of the Code, and who will not receive the documents listed in subdivision (d) because they are neither creditors nor equity security holders, are provided with adequate notice of the proposed injunction. It does not address any substantive law issues relating to the validity or effect of any injunction provided under a plan, or any due process or other constitutional issues relating to notice. These issues are beyond the scope of these rules and are left for judicial determination."
+    p "This rule recognizes the need for adequate notice to subjects of an injunction, but that reasonable flexibility under the circumstances may be required. If a known and identifiable entity would be subject to the injunction, and the notice, plan, and disclosure statement could be mailed to that entity, the court should require that they be mailed at the same time that the plan, disclosure statement and related documents are mailed to creditors under Rule 3017(d). If mailing notices and other documents is not feasible because the entities subject to the injunction are described in the plan and disclosure statement by class or category and they cannot be identified individually by name and address, the court may require that notice under Rule 3017(f)(1) be published."
+    p "Changes Made After Publication and Comments. No changes were made in the text of the proposed amendments since publication. The Committee Note was revised to put in a more prominent position the statement that the rule does not address related substantive law issues which are beyond the scope of the rules."
+    hash "bdb769291ef401256c5cb6df2520673bf9d5d4e6d1f4c3a1a0c418a6b12ac87d"
+  }
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptIII/rule3017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3017 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "e9b5d2029b7748709f8a10586403e1ed3b37328b2866c3edb5cced295287afff"
+  }
+  layers {
+    operative "6cc55190a60ab63482bd01b530e95b428d7a2e4424b0b0f840ed963cf8472f4e"
+    enacted "b64db36be29ffa781f5d22a568f7db5745179a01ea1fdd81f428fe26ff7be280"
+    editorial "32272c7d0fb45838a6140544546b51dadd6cb6063e02b133cc92d892c6129b1b"
+  }
+}

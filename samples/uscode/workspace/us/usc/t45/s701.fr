@@ -1,0 +1,150 @@
+edition 2
+module "/us/usc/t45/s701" {
+  within "/us/usc/t45/ch16/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s701" section {
+    num "701" "§ 701."
+    heading "Congressional declaration of policy"
+    provision "/us/usc/t45/s701/a" subsection {
+      num "a" "(a)"
+      heading "Findings"
+      chapeau "The Congress finds and declares that—"
+      provision "/us/usc/t45/s701/a/1" paragraph {
+        num "1" "(1)"
+        content "Essential rail service in the midwest and northeast region of the United States is provided by railroads which are today insolvent and attempting to undergo reorganization under the Bankruptcy Act."
+        hash "97fb41cabc799feaf0c086389dfe01761260c6ade06f2609f2f8fdafb82ce8b4"
+      }
+      provision "/us/usc/t45/s701/a/2" paragraph {
+        num "2" "(2)"
+        content "This essential rail service is threatened with cessation or significant curtailment because of the inability of the trustees of such railroads to formulate acceptable plans for reorganization. This rail service is operated over rail properties which were acquired for a public use, but which have been permitted to deteriorate and now require extensive rehabilitation and modernization."
+        hash "d3dbe249bfda2e7a4c0f3d50e459d1e958be7df87765c8643580bc659c4ee4e1"
+      }
+      provision "/us/usc/t45/s701/a/3" paragraph {
+        num "3" "(3)"
+        content "The public convenience and necessity require adequate and efficient rail service in this region and throughout the Nation to meet the needs of commerce, the national defense, the environment, and the service requirements of passengers, United States mail, shippers, States and their political subdivisions, and consumers."
+        hash "7591f1e6c79c7517b168316ce495567153490940fb777d04f265ff4e88eea6b2"
+      }
+      provision "/us/usc/t45/s701/a/4" paragraph {
+        num "4" "(4)"
+        content "Continuation and improvement of essential rail service in this region is also necessary to preserve and maintain adequate national rail services and an efficient national rail transportation system."
+        hash "87b546552fd2d7d7e79455795033e6e844a79f871f2424a740adb4347360c022"
+      }
+      provision "/us/usc/t45/s701/a/5" paragraph {
+        num "5" "(5)"
+        content "Rail service and rail transportation offer economic and environmental advantages with respect to land use, air pollution, noise levels, energy efficiency and conservation, resource allocation, safety, and cost per ton-mile of movement to such extent that the preservation and maintenance of adequate and efficient rail service is in the national interest."
+        hash "f7c364e1212d3899a1682a425e98e9a510ee999622bbdaf9b07c00735af2e23b"
+      }
+      provision "/us/usc/t45/s701/a/6" paragraph {
+        num "6" "(6)"
+        content "These needs cannot be met without substantial action by the Federal Government."
+        hash "948f4800094efd486699402b42e006ac003a1c7db4455db05a3917f59c3cb622"
+      }
+      hash "034143a52bc82d10af9d79e8489065023c6999745686ccaa33ee7091745458ce"
+    }
+    provision "/us/usc/t45/s701/b" subsection {
+      num "b" "(b)"
+      heading "Purposes"
+      chapeau "It is therefore declared to be the purpose of Congress in this chapter to provide for—"
+      provision "/us/usc/t45/s701/b/1" paragraph {
+        num "1" "(1)"
+        content "the identification of a rail service system in the midwest and northeast region which is adequate to meet the needs and service requirements of this region and of the national rail transportation system;"
+        hash "2d1ed403cab70ae33c781269ca1ad2338abf909f2d7d6419add31764fabe55a2"
+      }
+      provision "/us/usc/t45/s701/b/2" paragraph {
+        num "2" "(2)"
+        content "the reorganization of railroads in this region into an economically viable system capable of providing adequate and efficient rail service to the region;"
+        hash "c10f2cf0fb130ec76d82f98b0a9b510dd697adbf125f8e0f2c856a960a44f33d"
+      }
+      provision "/us/usc/t45/s701/b/3" paragraph {
+        num "3" "(3)"
+        content "the establishment of the United States Railway Association, with enumerated powers and responsibilities;"
+        hash "9843caf5b123ce4090957231cd509613a5ca036f06c80cc1d9366d1705bc8048"
+      }
+      provision "/us/usc/t45/s701/b/4" paragraph {
+        num "4" "(4)"
+        content "the establishment of the Consolidated Rail Corporation, with enumerated powers and responsibilities;"
+        hash "11cc1ea83d1c34faa3025ea4f4e64a344d4d572d40ec3dbf64ba8bc31c78655e"
+      }
+      provision "/us/usc/t45/s701/b/5" paragraph {
+        num "5" "(5)"
+        content "assistance to States and local and regional transportation authorities for continuation of local rail services threatened with cessation; and"
+        hash "05b16ffb2542ac404b6f1ef9e4b4c215f70d3acf3bd21c4ec09666289f001baa"
+      }
+      provision "/us/usc/t45/s701/b/6" paragraph {
+        num "6" "(6)"
+        content "necessary Federal financial assistance at the lowest possible cost to the general tax­payer."
+        hash "87ec8555b6fd86c27863e335bd98833e5863d1e960f5261555ed2f1d85dd8bd0"
+      }
+      hash "763a32ab56a0527a29ab364b43a473dd4275f944c687fec2137d020206136475"
+    }
+    hash "1703f5d24306885a8ce2ff3cb59dbd9c898ae55b29cc17a2eddd1ba077d57417"
+  }
+  credit "(" ["Pub. L. 93–236, title I, § 101" -> "/us/pl/93/236/tI/s101"] ", Jan. 2, 1974, " ["87 Stat. 986" -> "/us/stat/87/986"] ".)"
+  note "/us/usc/t45/s701/note/editorialNotes/act.1898-07-01.ch541/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Bankruptcy Act, referred to in subsec. (a)(1), is " ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ", which was classified generally to former Title 11, Bankruptcy. The Act was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    hash "8a2fc95c60430b144f860a5447579c1ca5f756f24b0098d2b5c2be3a98e83c18"
+  }
+  note "/us/usc/t45/s701/note/statutoryNotes/pl.95.565/short-title-of-1978-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 1978 Amendment"
+    p ["Pub. L. 95–565, § 1" -> "/us/pl/95/565/s1"] ", Nov. 1, 1978, " ["92 Stat. 2397" -> "/us/stat/92/2397"] ", provided:"
+    quoted "/us/pl/95/565/s1" {
+      p "“That this Act [amending sections 726, 747, and 825 of this title and " ["section 975 of Title 43" -> "/us/usc/t43/s975"] ", Public Lands, and enacting provision set out as a note under " ["section 975 of Title 43" -> "/us/usc/t43/s975"] "] may be cited as the ‘United States Railway Association Amendments Act of 1978’.”"
+    }
+    hash "7581b33d617bb632bc6b517fced87aab1f9176db7a35d3707492d4670e465213"
+  }
+  note "/us/usc/t45/s701/note/statutoryNotes/pl.94.555/short-title-of-1976-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 1976 Amendment"
+    p ["Pub. L. 94–555, title II, § 201" -> "/us/pl/94/555/tII/s201"] ", Oct. 19, 1976, " ["90 Stat. 2616" -> "/us/stat/90/2616"] ", provided that:"
+    quoted "/us/pl/94/555/tII/s201" {
+      p "“This title [amending sections 702, 711, 716, 720, 721, 743, 744, 771, 774, 775, 779, 823, 824, 825, 826, 829, 831, and 854 of this title, " ["section 960 of Title 20" -> "/us/usc/t20/s960"] ", Education, sections 1a, 5, 5c, 13, 15, 17, 22, 26c, and 1653 of former Title 49, Transportation, and enacting provisions set out as notes under " ["section 80a–3 of Title 15" -> "/us/usc/t15/s80a–3"] ", Commerce and Trade, and sections 1a and 1654 of former Title 49] may be cited as the ‘Rail Amendments of 1976’.”"
+    }
+    hash "92972aa6861b3c5e0cf21cef253b6c9ebf002a7c2560ee933389c1b4a30ebf44"
+  }
+  note "/us/usc/t45/s701/note/statutoryNotes/pl.94.5/short-title-of-1975-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 1975 Amendment"
+    p ["Pub. L. 94–5, § 1" -> "/us/pl/94/5/s1"] ", Feb. 28, 1975, " ["89 Stat. 7" -> "/us/stat/89/7"] ", provided:"
+    quoted "/us/pl/94/5/s1" {
+      p "“That this Act [enacting " ["section 794 of this title" -> "/us/usc/t45/s794"] " and amending sections 712, 715, 716, 717, 721, 723, 725, and 743 of this title] may be cited as the ‘Regional Rail Reorganization Act Amendments of 1975’.”"
+    }
+    hash "aeb87e294149703a0c1a8c05d011e101735ca1548c13f4c3549074c42fab67c1"
+  }
+  note "/us/usc/t45/s701/note/statutoryNotes/pl.93.236/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p ["Pub. L. 93–236, § 1" -> "/us/pl/93/236/s1"] ", Jan. 2, 1974, " ["87 Stat. 985" -> "/us/stat/87/985"] ", provided in part that this Act [enacting this chapter and amending section 856 of former Title 31, Money and Finance, and section 1(16) of former Title 49, Transportation], may be cited as the “Regional Rail Reorganization Act of 1973”."
+    hash "862e569748ea0f2eecd37bc01707cb15a2e0e93076700166477968435738fd18"
+  }
+  note "/us/usc/t45/s701/note/statutoryNotes/pl.93.236/separability" enacted {
+    group statutoryNotes
+    topic "separability"
+    heading "Separability"
+    p ["Pub. L. 93–236, title VI, § 604" -> "/us/pl/93/236/tVI/s604"] ", Jan. 2, 1974, " ["87 Stat. 1023" -> "/us/stat/87/1023"] ", provided that:"
+    quoted "/us/pl/93/236/tVI/s604" {
+      p "“If any provision of this Act [enacting this chapter and amending section 856 of former Title 31, Money and Finance, and section 1(16) of former Title 49, Transportation] or the application thereof to any person or circumstances is held invalid, the remainder of this Act and the application of such provision to other persons or circumstances shall not be affected thereby.”"
+    }
+    hash "ab0c66a42722bcc4bdaa7c9672fdcd34cf7d92f44d09e239d790a8c884c8ee04"
+  }
+  note "/us/usc/t45/s701/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  layers {
+    operative "1703f5d24306885a8ce2ff3cb59dbd9c898ae55b29cc17a2eddd1ba077d57417"
+    enacted "62ba9ae8384adfe604da3adb17a75bad54fc2f840e7d73a123084e6090bc6670"
+    editorial "5714f23897cccd0f37ee9224d19e7b83a8eb0e78dc60504f4f83495836e0d080"
+  }
+}

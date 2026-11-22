@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s181" {
+  within "/us/usc/t45/ch8/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s181" section {
+    num "181" "§ 181."
+    heading "Application of subchapter I to carriers by air"
+    content "All of the provisions of subchapter I of this chapter except " ["section 153 of this title" -> "/us/usc/t45/s153"] " are extended to and shall cover every common carrier by air engaged in interstate or foreign commerce, and every carrier by air transporting mail for or under contract with the United States Government, and every air pilot or other person who performs any work as an employee or subordinate official of such carrier or carriers, subject to its or their continuing authority to supervise and direct the manner of rendition of his service."
+    hash "7a8cf218d9332de05a22d709aef6945065f86ede80a083091614f657c05046be"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 201" -> "/us/act/1926-05-20/ch347/s201"] ", as added " ["Apr. 10, 1936, ch. 166" -> "/us/act/1936-04-10/ch166"] ", " ["49 Stat. 1189" -> "/us/stat/49/1189"] ".)"
+  layers {
+    operative "7a8cf218d9332de05a22d709aef6945065f86ede80a083091614f657c05046be"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "8c6746c251c903a5983cb19939a3a29fb3ecbaff2c94491dace1492dc840c262"
+  }
+}

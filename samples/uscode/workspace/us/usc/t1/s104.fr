@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t1/s104" {
+  within "/us/usc/t1/ch2"
+  source "usc01.xml"
+  positive_law true
+  provision "/us/usc/t1/s104" section {
+    num "104" "§ 104."
+    heading "Numbering of sections; single proposition"
+    content "Each section shall be numbered, and shall contain, as nearly as may be, a single proposition of enactment."
+    hash "2e14331055de3ed00af3e76a29d09739cc4695873fb3cc546e105ef84c82b15b"
+  }
+  credit "(" ["July 30, 1947, ch. 388" -> "/us/act/1947-07-30/ch388"] ", " ["61 Stat. 634" -> "/us/stat/61/634"] ".)"
+  layers {
+    operative "2e14331055de3ed00af3e76a29d09739cc4695873fb3cc546e105ef84c82b15b"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3ab23192f160f33c37da3ba0fa5f473fd0d08ff8498cdf1c3d31cec52fd5d163"
+  }
+}

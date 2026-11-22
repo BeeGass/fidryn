@@ -1,6 +1,6 @@
 # Internal ledgers
 
-These documents are working ledgers for people changing the 0.2
+These documents are working ledgers for people changing the 0.3
 interpreter: records of how it was reviewed and repaired. They are not
 reader documentation, and parts of them describe earlier states of the
 code. [Implementation status](../implementation-status.md) is the

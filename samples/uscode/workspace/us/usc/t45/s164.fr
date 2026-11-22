@@ -1,0 +1,23 @@
+edition 2
+module "/us/usc/t45/s164" {
+  within "/us/usc/t45/ch8/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s164" section {
+    num "164" "§ 164."
+    heading "Repealed. " ["Oct. 10, 1940, ch. 851, § 4" -> "/us/act/1940-10-10/ch851/s4"] ", " ["54 Stat. 1111" -> "/us/stat/54/1111"]
+    status repealed
+    hash "ee696c857d123b2d84d40188c60d55a1d07aaf1c46131362b2719d1716e29673"
+  }
+  note "/us/usc/t45/s164/note/ungrouped/act.1927-02-11.ch104/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["act Feb. 11, 1927, ch. 104, § 1" -> "/us/act/1927-02-11/ch104/s1"] ", " ["44 Stat. 1072" -> "/us/stat/44/1072"] ", related to advertisements for proposals for purchases or services rendered for Board of Mediation, including arbitration boards."
+    hash "8c4bec328a0e028088165b146e46a62a33e340ce29de7c6db72484099efb20c3"
+  }
+  layers {
+    operative "ee696c857d123b2d84d40188c60d55a1d07aaf1c46131362b2719d1716e29673"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "bac0f5e3fdaee26145f9917ce68b4fee75f7e2edd4ad190ef259b08dbfc4ff84"
+  }
+}

@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/ptVI/rule6001" {
+  within "/us/usc/ptVI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVI/rule6001" courtRule {
+    num "6001" "Rule 6001."
+    heading "Burden of Proving the Validity of a Postpetition Transfer"
+    content "An entity that asserts the validity of a postpetition transfer under § 549 has the burden of proof."
+    hash "f8409a9c00d89859f8f55c1f2ea419228963e6bf35e0dee422738d671334d025"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVI/rule6001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from former Bankruptcy Rule 603. The Act contained, in § 70d, a provision placing the burden of proof on the same person as did Rule 603. The Code does not contain any directive with respect to the burden of proof. This omission, in all probability, resulted from the intention to leave matters affecting evidence to these rules. See H. Rep. No. 95–595, 95th Cong. 1st Sess. (1977) 293."
+    hash "94c0890e6b4b9678248b72460b3b9f1faf7baddf1172481a644946bc95c2cc3a"
+  }
+  note "/us/usc/ptVI/rule6001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 6001 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "2ed137ac194d43b21fa06eccf9c6fda7736ba166c52c688655bbc45292c7dee1"
+  }
+  layers {
+    operative "f8409a9c00d89859f8f55c1f2ea419228963e6bf35e0dee422738d671334d025"
+    enacted "8f938fb2887a3d250b9252049f016212e6f5a83e88f4bccab727b654931a2cd1"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

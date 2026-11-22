@@ -1,0 +1,24 @@
+edition 2
+module "/us/usc/t45/s831" {
+  within "/us/usc/t45/ch17/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s831" section {
+    num "831" "§ 831."
+    heading "Transferred"
+    status transferred
+    hash "5738f0b865159dc18083039ee74788659150dc2f8535c472d0d098378bfad046"
+  }
+  note "/us/usc/t45/s831/note/editorialNotes/pl.94.210/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Section, " ["Pub. L. 94–210, title V, § 511" -> "/us/pl/94/210/tV/s511"] ", Feb. 5, 1976, " ["90 Stat. 76" -> "/us/stat/90/76"] "; " ["Pub. L. 94–555, title II" -> "/us/pl/94/555/tII"] ", §§ 215, 220(e), (f), Oct. 19, 1976, " ["90 Stat. 2625" -> "/us/stat/90/2625"] ", 2629, 2630; " ["Pub. L. 96–448, title IV, § 405(e)" -> "/us/pl/96/448/tIV/s405/e"] ", Oct. 14, 1980, " ["94 Stat. 1947" -> "/us/stat/94/1947"] "; " ["Pub. L. 99–509, title IV, § 4033(c)(5)" -> "/us/pl/99/509/tIV/s4033/c/5"] ", Oct. 21, 1986, " ["100 Stat. 1909" -> "/us/stat/100/1909"] "; " ["Pub. L. 102–240, title I, § 1036(e)" -> "/us/pl/102/240/tI/s1036/e"] ", Dec. 18, 1991, " ["105 Stat. 1986" -> "/us/stat/105/1986"] ", which related to guarantee of obligations, was repealed, except for subsec. (c), by " ["Pub. L. 105–178, title VII, § 7203(a)(2)" -> "/us/pl/105/178/tVII/s7203/a/2"] ", June 9, 1998, " ["112 Stat. 477" -> "/us/stat/112/477"] ". Subsec. (c) of section 831 was amended, redesignated, and transferred to " ["section 823(b) of this title" -> "/us/usc/t45/s823/b"] " by " ["Pub. L. 105–178, title VII, § 7203(a)(3)" -> "/us/pl/105/178/tVII/s7203/a/3"] ", (4), June 9, 1998, " ["112 Stat. 477" -> "/us/stat/112/477"] ". " ["Section 823(b) of this title" -> "/us/usc/t45/s823/b"] " was subsequently repealed by " ["Pub. L. 117–58, div. B, title I, § 21301(b)(1)(A)" -> "/us/pl/117/58/dB/tI/s21301/b/1/A"] ", Nov. 15, 2021, " ["135 Stat. 683" -> "/us/stat/135/683"] "."
+    hash "dc3c392c9bd9afd1b022d536b1f577ef9da38f95c9f4484772a8ad3535df95e3"
+  }
+  layers {
+    operative "5738f0b865159dc18083039ee74788659150dc2f8535c472d0d098378bfad046"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "86a78d6e8ad34d29575a511f68de054189d3eb3f31ff10c7ec655882e4d3637c"
+  }
+}

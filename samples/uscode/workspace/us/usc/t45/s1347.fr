@@ -1,0 +1,146 @@
+edition 2
+module "/us/usc/t45/s1347" {
+  within "/us/usc/t45/ch22/schII/ptC"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1347" section {
+    num "1347" "§ 1347."
+    heading "Tax treatment of Conrail public sale"
+    provision "/us/usc/t45/s1347/a" subsection {
+      num "a" "(a)"
+      heading "Treatment as new corporation"
+      provision "/us/usc/t45/s1347/a/1" paragraph {
+        num "1" "(1)"
+        heading "In general"
+        content "For periods after the public sale, for purposes of title 26, Conrail shall be treated as a new corporation which purchased all of its assets as of the beginning of the day after the date of the public sale for an amount equal to the deemed purchase price."
+        hash "ce4ed4b7375769d09f83fbd215cb0e1bfa87c7909a6aa4f14a574de9659564cd"
+      }
+      provision "/us/usc/t45/s1347/a/2" paragraph {
+        num "2" "(2)"
+        heading "Allocation among assets"
+        content "The deemed purchase price shall be allocated among the assets of Conrail in accordance with the temporary regulations prescribed under " ["section 338 of title 26" -> "/us/usc/t26/s338"] " (as such regulations were in effect on October 21, 1986). The Secretary shall establish specific guidelines for carrying out the preceding sentence so that the basis of each asset will be clearly ascertainable. For purposes of applying the regulations referred to in the first sentence, accounts receivable and materials and supplies shall be treated as cash equivalents."
+        hash "815d8b56a0f509072ba854472c7348868e3b76939cc23b147340124e7d3c36a4"
+      }
+      provision "/us/usc/t45/s1347/a/3" paragraph {
+        num "3" "(3)"
+        heading "Deemed purchase price"
+        chapeau "For purposes of this subsection, the deemed purchase price is an amount equal to the gross amount received pursuant to the public sale, multiplied by a fraction—"
+        provision "/us/usc/t45/s1347/a/3/A" subparagraph {
+          num "A" "(A)"
+          content "the numerator of which is 100 percent, and"
+          hash "28a3fc25e75a0270232ce8351ced95f4bbed46515d9d91e59fabccc6583bedaa"
+        }
+        provision "/us/usc/t45/s1347/a/3/B" subparagraph {
+          num "B" "(B)"
+          content "the denominator of which is the percentage (by value) of the stock of Conrail sold in the public sale."
+          hash "2951d6b1d53d75d5a468b062e1ceab4d8a1961b2b65c555922aa18d5e45a18c2"
+        }
+        continuation "The amount determined under the preceding sentence shall be adjusted under regulations prescribed by the Secretary for liabilities of Conrail and other relevant items."
+        hash "19c89de76aa15c32f9a3c2bdb7ab700db31057e669a206e8dca1fa1e68f37525"
+      }
+      hash "2c93c708fb5504ebeee30ef148a2278cfbb83551dd520641b85536ebef0992c4"
+    }
+    provision "/us/usc/t45/s1347/b" subsection {
+      num "b" "(b)"
+      heading "No income from cancellation of debt or preferred stock"
+      content "No amount shall be included in the gross income of any person by reason of any cancellation of any obligation (or preferred stock) of Conrail in connection with the public sale."
+      hash "7da9faccce0c7f77c0a92b88ab9c1b225cb9652b604b129eec5dbc88069ae7c8"
+    }
+    provision "/us/usc/t45/s1347/c" subsection {
+      num "c" "(c)"
+      heading "Disallowance of certain deductions"
+      content "No deduction shall be allowed to Conrail for any amount which is paid after the date of the public sale to employees of Conrail for services performed on or before the date of the public sale."
+      hash "2a0d8ef81a5631a21c4e75782f883b442fa9b42b5e81b470908d16718d784e82"
+    }
+    provision "/us/usc/t45/s1347/d" subsection {
+      num "d" "(d)"
+      heading "Waiver of certain employee stock ownership plan provisions"
+      chapeau "For purposes of determining whether the employee stock ownership plans of Conrail meet the qualifications of sections 401 and 501 of title 26—"
+      provision "/us/usc/t45/s1347/d/1" paragraph {
+        num "1" "(1)"
+        content "the limits of section 415 of such title (relating to limitations on benefits and contributions under qualified plans) shall not apply with respect to interests in stock transferred pursuant to this Act or a law heretofore enacted, and"
+        hash "69023ea52893198abe2d0ea39deb50058448a27c619d95a3b0298183e3a490b9"
+      }
+      provision "/us/usc/t45/s1347/d/2" paragraph {
+        num "2" "(2)"
+        content "the 2-year waiting period for withdrawals shall not apply to withdrawals of amounts (or shares) in participants accounts in connection with the public sale."
+        hash "5a81cb4b9508ed6f92feab013447368df48df3e6b1578db2759b6bd323e3b3ee"
+      }
+      hash "58f18b842224a6343279021e1a632663b0158359edba2442ef22d35a8eeb3d0d"
+    }
+    provision "/us/usc/t45/s1347/e" subsection {
+      num "e" "(e)"
+      heading "Definitions"
+      chapeau "For purposes of this section—"
+      provision "/us/usc/t45/s1347/e/1" paragraph {
+        num "1" "(1)"
+        heading "Conrail"
+        content "The term “Conrail” means the Consolidated Rail Corporation. Such term includes any corporation which was a subsidiary of Conrail immediately before the public sale."
+        hash "013c7962f3ee4232488d4f572f2ab3d96b7b3b8c936939ba55f62642b61b0056"
+      }
+      provision "/us/usc/t45/s1347/e/2" paragraph {
+        num "2" "(2)"
+        heading "Public sale"
+        content "The term “public sale” means the sale of stock in Conrail pursuant to a public offering under the Conrail Privatization Act [" ["45 U.S.C. 1301" -> "/us/usc/t45/s1301"] " et seq.]. If there is more than 1 public offering under such Act, such term means the sale pursuant to the initial public offering under such Act."
+        hash "37355003838aaea2072789060155ed8c956b8491f19d893703ae4c6a2ffefb48"
+      }
+      provision "/us/usc/t45/s1347/e/3" paragraph {
+        num "3" "(3)"
+        heading "Secretary"
+        content "The term “Secretary” means the Secretary of the Treasury or his delegate."
+        hash "c915f53e6e6a77d74906a8c9b330031ee9f28080698cd8de1714592af43b460e"
+      }
+      hash "1de3a60305b427ad549ebf77ead3cc0894979cdb6175e9c619dbd0f8b32e120b"
+    }
+    hash "11ec4149ffb446a31babb98916fc5239be33603b70a234e16d9c972e4f6fae66"
+  }
+  credit "(" ["Pub. L. 99–509, title VIII, § 8021" -> "/us/pl/99/509/tVIII/s8021"] ", Oct. 21, 1986, " ["100 Stat. 1954" -> "/us/stat/100/1954"] "; " ["Pub. L. 99–514, § 2" -> "/us/pl/99/514/s2"] ", Oct. 22, 1986, " ["100 Stat. 2095" -> "/us/stat/100/2095"] ".)"
+  note "/us/usc/t45/s1347/note/editorialNotes/pl.99.509/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This Act, referred to in subsec. (d)(1), is " ["Pub. L. 99–509" -> "/us/pl/99/509"] ", Oct. 21, 1986, " ["100 Stat. 1874" -> "/us/stat/100/1874"] ", known as the Omnibus Budget Reconciliation Act of 1986. For complete classification of this Act to the Code, see Tables."
+    p "The Conrail Privatization Act, referred to in subsec. (e)(2), is subtitle A (§§ 4001–4052) of title IV of " ["Pub. L. 99–509" -> "/us/pl/99/509"] ", Oct. 21, 1986, " ["100 Stat. 1892" -> "/us/stat/100/1892"] ", which is classified principally to this chapter (§ 1301 et seq.). For complete classification of this Act to the Code, see Short Title note set out under " ["section 1301 of this title" -> "/us/usc/t45/s1301"] " and Tables."
+    hash "90d7c4600751025396be2aedece4c18d068b80d938f5a200bd5ed95573d0a18d"
+  }
+  note "/us/usc/t45/s1347/note/editorialNotes/nolaw/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "This section was enacted as part of the Omnibus Budget Reconciliation Act of 1986, and not as part of subtitle A of title IV of that Act, known as the Conrail Privatization Act, which comprises this chapter."
+    hash "c3fa32f7b9192ebf2b238e1d0847cfa8983badbb3b4651b950d042e0d242b6cc"
+  }
+  note "/us/usc/t45/s1347/note/editorialNotes/pl.99.514/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1986—Subsecs. (a)(1), (2), (d). " ["Pub. L. 99–514" -> "/us/pl/99/514"] " substituted “Internal Revenue Code of 1986” for “Internal Revenue Code of 1954”, which for purposes of codification was translated as “title 26” thus requiring no change in text."
+    hash "6cbf3c8e733698c3d99c1c1756aa947d550ccc5a3d9bd8e2323ceba8556aea39"
+  }
+  definition "/us/usc/t45/s1347/e/1" {
+    term "Conrail"
+    kind means
+    words "For purposes of this section"
+    region "/us/usc/t45/s1347"
+    basis restated
+  }
+  definition "/us/usc/t45/s1347/e/2" {
+    term "public sale"
+    kind means
+    words "For purposes of this section"
+    region "/us/usc/t45/s1347"
+    basis restated
+  }
+  definition "/us/usc/t45/s1347/e/3" {
+    term "Secretary"
+    kind means
+    words "For purposes of this section"
+    region "/us/usc/t45/s1347"
+    basis restated
+  }
+  layers {
+    operative "11ec4149ffb446a31babb98916fc5239be33603b70a234e16d9c972e4f6fae66"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d4f29941ce09de3a968e1ff1c36daabd8ba82dc6e32bed3fb00ae13f21bd06e1"
+  }
+}

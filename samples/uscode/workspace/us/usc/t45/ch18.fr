@@ -1,0 +1,38 @@
+edition 2
+module "/us/usc/t45/ch18" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch18" chapter {
+    num "18" "CHAPTER 18—"
+    heading "MILWAUKEE RAILROAD RESTRUCTURING"
+    member "/us/usc/t45/s901"
+    member "/us/usc/t45/s902"
+    member "/us/usc/t45/s903"
+    member "/us/usc/t45/s904"
+    member "/us/usc/t45/s905"
+    member "/us/usc/t45/s906"
+    member "/us/usc/t45/s907"
+    member "/us/usc/t45/s908"
+    member "/us/usc/t45/s909"
+    member "/us/usc/t45/s910"
+    member "/us/usc/t45/s911"
+    member "/us/usc/t45/s912"
+    member "/us/usc/t45/s913"
+    member "/us/usc/t45/s914"
+    member "/us/usc/t45/s915"
+    member "/us/usc/t45/s916"
+    member "/us/usc/t45/s917"
+    member "/us/usc/t45/s918"
+    member "/us/usc/t45/s919"
+    member "/us/usc/t45/s920"
+    member "/us/usc/t45/s921"
+    member "/us/usc/t45/s922"
+    hash "e3a1ffb93fc228f3840b8f0e8abca9f25b531af8ba23dc78c3c88a064aa57e45"
+  }
+  layers {
+    operative "e3a1ffb93fc228f3840b8f0e8abca9f25b531af8ba23dc78c3c88a064aa57e45"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

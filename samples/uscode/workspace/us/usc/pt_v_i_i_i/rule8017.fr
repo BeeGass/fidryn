@@ -1,0 +1,179 @@
+edition 2
+module "/us/usc/ptVIII/rule8017" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8017" courtRule {
+    num "8017" "Rule 8017."
+    heading "Brief of an Amicus Curiae"
+    provision "/us/usc/ptVIII/rule8017/a" subsection {
+      num "a" "(a)"
+      heading "During the Initial Consideration of a Case on the Merits."
+      provision "/us/usc/ptVIII/rule8017/a/1" paragraph {
+        num "1" "(1)"
+        content "Applicability. This subdivision (a) governs amicus filings during a court’s initial consideration of a case on the merits."
+        hash "d9a8ba214a69b8c1653fa559abdfbfeb8dc5569543b327e1c414cddf83ed1c3e"
+      }
+      provision "/us/usc/ptVIII/rule8017/a/2" paragraph {
+        num "2" "(2)"
+        content "When Permitted. The United States, its officer or agency, or a state may file an amicus brief without the parties’ consent or leave of court. Any other amicus curiae may file a brief only by leave of court or if the brief states that all parties have consented to its filing, but a district court or BAP may prohibit the filing of or may strike an amicus brief that would result in a judge’s disqualification. On its own, and with notice to all parties to an appeal, the district court or BAP may request a brief by an amicus curiae."
+        hash "b7a63ef03ab0aabbe875c6e7c52b6f8b92fb3a6c749f6ea7e74c586dbff78915"
+      }
+      provision "/us/usc/ptVIII/rule8017/a/3" paragraph {
+        num "3" "(3)"
+        chapeau "Motion for Leave to File. A motion for leave must be accompanied by the proposed brief and state:"
+        provision "/us/usc/ptVIII/rule8017/a/3/A" subparagraph {
+          num "A" "(A)"
+          content "the movant’s interest; and"
+          hash "1d809a1e4c7a94f8aeb5532e05e5b0693e215b6cf8ef5a30e2195584ba330896"
+        }
+        provision "/us/usc/ptVIII/rule8017/a/3/B" subparagraph {
+          num "B" "(B)"
+          content "the reason why an amicus brief is desirable and why the matters asserted are relevant to the disposition of the appeal."
+          hash "91db803bb9167bab2e2be78a45673818282a591ab141949efc533bfe0afbde5b"
+        }
+        hash "3e63ab86463f624d620c32d718e48dca8e72e73720154ee60b61b2248103f098"
+      }
+      provision "/us/usc/ptVIII/rule8017/a/4" paragraph {
+        num "4" "(4)"
+        chapeau "Content and Form. An amicus brief must comply with Rule 8015. In addition, the cover must identify the party or parties supported and indicate whether the brief supports affirmance or reversal. If an amicus curiae is a corporation, the brief must include a disclosure statement like that required of parties by Rule 8012. An amicus brief need not comply with Rule 8014, but must include the following:"
+        provision "/us/usc/ptVIII/rule8017/a/4/A" subparagraph {
+          num "A" "(A)"
+          content "a table of contents, with page references;"
+          hash "622f8820ddd2d0e4f6fe480d2776d75f2f39d4ed4e0e5f7b4bf6f978fe9137bd"
+        }
+        provision "/us/usc/ptVIII/rule8017/a/4/B" subparagraph {
+          num "B" "(B)"
+          content "a table of authorities—cases (alphabetically arranged), statutes, and other authorities—with references to the pages of the brief where they are cited;"
+          hash "5a85aa04b82e77ae5f21df18519e5aba8f591dd8d0a4177092cdaf831da97047"
+        }
+        provision "/us/usc/ptVIII/rule8017/a/4/C" subparagraph {
+          num "C" "(C)"
+          content "a concise statement of the identity of the amicus curiae, its interest in the case, and the source of its authority to file;"
+          hash "daf4b730792b416082d96401a380bed8ab54de902a942d17c66c1b072d1d572b"
+        }
+        provision "/us/usc/ptVIII/rule8017/a/4/D" subparagraph {
+          num "D" "(D)"
+          chapeau "unless the amicus curiae is one listed in the first sentence of (2), a statement that indicates whether:"
+          provision "/us/usc/ptVIII/rule8017/a/4/D/i" clause {
+            num "i" "(i)"
+            content "a party’s counsel authored the brief in whole or in part;"
+            hash "1f1da7cb5d34e556ac8ab3f2f879ca9a55599d0aaa501ab97ebfd9bfeadab945"
+          }
+          provision "/us/usc/ptVIII/rule8017/a/4/D/ii" clause {
+            num "ii" "(ii)"
+            content "a party or a party’s counsel contributed money that was intended to fund preparing or submitting the brief; and"
+            hash "d16d9881ba1f2ca54675ee5c09cf7e96d69f5154591c5385ca0178b0e0e7dbf3"
+          }
+          provision "/us/usc/ptVIII/rule8017/a/4/D/iii" clause {
+            num "iii" "(iii)"
+            content "a person—other than the amicus curiae, its members, or its counsel—contributed money that was intended to fund preparing or submitting the brief and, if so, identifies each such person;"
+            hash "5fdff47e10b79bdc605e6026fdf1071f6ab1e156f842ab832a408b2feb072c93"
+          }
+          hash "66cc4980d0758bbd5ac00a6cacb133a89fdcf253729dd865b990241f23ca9603"
+        }
+        provision "/us/usc/ptVIII/rule8017/a/4/E" subparagraph {
+          num "E" "(E)"
+          content "an argument, which may be preceded by a summary and need not include a statement of the applicable standard of review; and"
+          hash "0d7ed7e1740d6cc78ea268729cf08a1cee543eaecf49be28c1c985aea417acdf"
+        }
+        provision "/us/usc/ptVIII/rule8017/a/4/F" subparagraph {
+          num "F" "(F)"
+          content "a certificate of compliance, if required by Rule 8015(h)."
+          hash "4a8bddb9a00cd4e635a5dabe74bd54411b1dda9bbf37cd32b1d9912633461456"
+        }
+        hash "25870f082fe1858be04e9601154cb039107a06d23f62c97a272f7d9be4f2ee88"
+      }
+      provision "/us/usc/ptVIII/rule8017/a/5" paragraph {
+        num "5" "(5)"
+        content "Length. Except by the district court’s or BAP’s permission, an amicus brief must be no more than one-half the maximum length authorized by these rules for a party’s principal brief. If the court grants a party permission to file a longer brief, that extension does not affect the length of an amicus brief."
+        hash "042f0e6f8425848f1730ad06bde7e1e711b086eb2e23e65baec4b4323c611c6d"
+      }
+      provision "/us/usc/ptVIII/rule8017/a/6" paragraph {
+        num "6" "(6)"
+        content "Time for Filing. An amicus curiae must file its brief—accompanied by a motion for leave to file when required—within 7 days after the principal brief of the party being supported is filed. An amicus curiae that does not support either party must file its brief within 7 days after the appellant’s principal brief is filed. The district court or BAP may grant leave for later filing, specifying the time within which an opposing party may answer."
+        hash "8b10652aab8d23fb9bd4171aebaf83847bb2d436359491d7f9e67fd795606358"
+      }
+      provision "/us/usc/ptVIII/rule8017/a/7" paragraph {
+        num "7" "(7)"
+        content "Reply Brief. Except by the district court’s or BAP’s permission, an amicus curiae may not file a reply brief."
+        hash "3315a60e0c01e1051415c07bf62c34c93a9bfdfa1041a6e2c2c631b0045dc829"
+      }
+      provision "/us/usc/ptVIII/rule8017/a/8" paragraph {
+        num "8" "(8)"
+        content "Oral Argument. An amicus curiae may participate in oral argument only with the district court’s or BAP’s permission."
+        hash "3ef1284f0a2fe186163cc68a0405b71013c915f5aac114c475aaf081641359e4"
+      }
+      hash "d7adb8d10565719e35d8cecdb2ec03afaebd8488aeb4c652dcf7864bcd5a3aa6"
+    }
+    provision "/us/usc/ptVIII/rule8017/b" subsection {
+      num "b" "(b)"
+      heading "During Consideration of Whether to Grant Rehearing."
+      provision "/us/usc/ptVIII/rule8017/b/1" paragraph {
+        num "1" "(1)"
+        content "Applicability. This subdivision (b) governs amicus filings during a district court’s or BAP’s consideration of whether to grant rehearing, unless a local rule or order in a particular case provides otherwise."
+        hash "a61a239be9b1f4e5869e3113ce98bd21ca0b05759a3d5d7a81a56333f4ba7130"
+      }
+      provision "/us/usc/ptVIII/rule8017/b/2" paragraph {
+        num "2" "(2)"
+        content "When Permitted. The United States, its officer or agency, or a state may file an amicus brief without the parties’ consent or leave of court. Any other amicus curiae may file a brief only by leave of court."
+        hash "aa1e67f939fba00b578f5e1ceaee4864dfb0d609941d30ed52ffc91546bb63c6"
+      }
+      provision "/us/usc/ptVIII/rule8017/b/3" paragraph {
+        num "3" "(3)"
+        content "Motion for Leave to File. Paragraph (a)(3) applies to a motion for leave to file."
+        hash "3ec2c2f89acf5c54738849419ddda13839497d3eb42550e4a782fbc1f76f5486"
+      }
+      provision "/us/usc/ptVIII/rule8017/b/4" paragraph {
+        num "4" "(4)"
+        content "Content, Form, and Length. Paragraph (a)(4) applies to the amicus brief. The brief must include a certificate under Rule 8015(h) and not exceed 2,600 words."
+        hash "7402a3bf44c2df4684706796dd31ce63a22c0c1db6085040901b793c10346eb6"
+      }
+      provision "/us/usc/ptVIII/rule8017/b/5" paragraph {
+        num "5" "(5)"
+        content "Time to File. An amicus curiae supporting a motion for rehearing or supporting neither party must file its brief—accompanied by a motion for leave to file when required—within 7 days after the motion is filed. An amicus curiae opposing the motion for rehearing must file its brief—accompanied by a motion for leave to file when required—no later than the date set by the court for the response."
+        hash "484e86954d77a0abdcc51843d611dde4b01a7e93ce713e5508f8fb19759159d2"
+      }
+      hash "9a185e1af2ed748bd2c7f072075ad11dffed03d3742107fd2a1db5e8cdfab521"
+    }
+    hash "055b86511592e443c019ebef864ffeb60242ce523cee278c5bdf084df5d50d16"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8017, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 26, 2009, eff. Dec. 1, 2009, related to stay of judgment of district court or bankruptcy appellate panel, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "81976929215fda8821f80bee9fcd5fafc4e33154546f3bccaadf88ef22f7a36a"
+  }
+  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from F.R.App.P. 29. The former Part VIII rules did not address the participation by an amicus curiae in a bankruptcy appeal."
+    p "Subdivision (a) adopts the provisions of F.R.App.P. 29(a). In addition, it authorizes the district court or BAP on its own motion—with notice to the parties—to request the filing of a brief by an amicus curiae."
+    p "Subdivisions (b)–(g) adopt F.R.App.P. 29(b)–(g)."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "65b085c5aa075358604d59a65300e4ddfcfcc7a7a6c5ba21de7f74d618127c2a"
+  }
+  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "Rule 8017 is amended to conform to the recent amendment to F.R.App.P. 29, which now addresses amicus filings in connection with petitions for rehearing. Former Rule 8017 is renumbered Rule 8017(a), and language is added to that subdivision (a) to state that its provisions apply to amicus filings during the district court’s or BAP’s initial consideration of a case on the merits. New subdivision (b) is added to address amicus filings in connection with a motion for rehearing. Subdivision (b) sets default rules that apply when a district court or BAP does not provide otherwise by local rule or by order in a case. A court remains free to adopt different rules governing whether amicus filings are permitted in connection with motions for rehearing and the procedures when such filings are permitted."
+    p "The amendment to subdivision (a)(2) authorizes orders or local rules that prohibit the filing of or permit the striking of an amicus brief by party consent if the brief would result in a judge’s disqualification. The amendment does not alter or address the standards for when an amicus brief requires a judge’s disqualification. It is modeled on an amendment to F.R.App.P. 29(a). A comparable amendment to subdivision (b) is not necessary. Subdivision (b)(1) authorizes local rules and orders governing filings during a court’s consideration of whether to grant rehearing. These local rules or orders may prohibit the filing of or permit the striking of an amicus brief that would result in a judge’s disqualification. In addition, under subdivision (b)(2), a court may deny leave to file an amicus brief that would result in a judge’s disqualification."
+    hash "5e51748c317bb019fc06f201bcde2f6b446fbd89e72383ad2a60d69b43d28783"
+  }
+  note "/us/usc/ptVIII/rule8017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8017 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "ca707a974392fa8df7b0a632282ba997538a16b142f02b1ad8dbecccc7fc74e7"
+  }
+  layers {
+    operative "055b86511592e443c019ebef864ffeb60242ce523cee278c5bdf084df5d50d16"
+    enacted "0e4a2a7c4c7990941dc1f83abf2706610e28897d54415f22a012504775f19dda"
+    editorial "a987651c0d32d92de7c440e372f6f86e589b3fc6109cdd03963682e5747570f9"
+  }
+}

@@ -1,0 +1,149 @@
+edition 2
+module "/us/usc/ptI/rule1014" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1014" courtRule {
+    num "1014" "Rule 1014."
+    heading "Transferring a Case to Another District; Dismissing a Case Improperly Filed"
+    provision "/us/usc/ptI/rule1014/a" subsection {
+      num "a" "(a)"
+      heading "Dismissal or Transfer."
+      provision "/us/usc/ptI/rule1014/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Petition Filed in the Proper District. If a petition is filed in the proper district, the court may transfer the case to another district in the interest of justice or for the convenience of the parties. The court may do so:"
+        provision "/us/usc/ptI/rule1014/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "on its own or on a party in interest’s timely motion; and"
+          hash "b5b395896e0025db790f1143368df05d993d14e0922a2e939ffea114b6ae6258"
+        }
+        provision "/us/usc/ptI/rule1014/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "only after a hearing on notice to the petitioner, United States trustee, and other entities as the court orders."
+          hash "d8a9d9ae996cc49bf8753e4c4e4f57df6cae342c75d8b9d117da0ff4a479dd31"
+        }
+        hash "45a0bcd93ba1a64cc895dd9433e933f5d28b9157ccc86adad6d666dbd9c0e6ef"
+      }
+      provision "/us/usc/ptI/rule1014/a/2" paragraph {
+        num "2" "(2)"
+        content "Petition Filed in an Improper District. If a petition is filed in an improper district, the court may dismiss the case or may transfer it to another district on the same grounds and under the same procedures as stated in (1)."
+        hash "cb8b8dda57379889f4dfe206b0889b854682df85647c602553a1b1d2e65910b4"
+      }
+      hash "586db6e5ef32e2e74950a6003210b3ec5edb6e7890f621ebb18d19ad1eaf8bbb"
+    }
+    provision "/us/usc/ptI/rule1014/b" subsection {
+      num "b" "(b)"
+      heading "Petitions Involving the Same or Related Debtors Filed in Different Districts."
+      provision "/us/usc/ptI/rule1014/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "Scope. This Rule 1014(b) applies if petitions commencing cases or seeking recognition under Chapter 15 are filed in different districts by, regarding, or against:"
+        provision "/us/usc/ptI/rule1014/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "the same debtor;"
+          hash "442f180aad6ecb98043f92bd2ea5d6751478076ab7f4208e7159179c2d425280"
+        }
+        provision "/us/usc/ptI/rule1014/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "a partnership and one or more of its general partners;"
+          hash "7408f039fd5090d3b442645ce71aa6be00314a1ba2f2aa521602f03303623484"
+        }
+        provision "/us/usc/ptI/rule1014/b/1/C" subparagraph {
+          num "C" "(C)"
+          content "two or more general partners; or"
+          hash "9d50fd834e8efcdd0e5db2e7669884c8f08738797e2ca1987cb56bccdc9bde3f"
+        }
+        provision "/us/usc/ptI/rule1014/b/1/D" subparagraph {
+          num "D" "(D)"
+          content "a debtor and an affiliate."
+          hash "71f4b858bd74c86ff4e8c03382c6936d2ea8055aa1bc349743ec871009eb0454"
+        }
+        hash "526894f41d1e2bf18ae9443450f2e3d05fa671e270227761e93ccc1713f49825"
+      }
+      provision "/us/usc/ptI/rule1014/b/2" paragraph {
+        num "2" "(2)"
+        content {
+          p "Court Action. The court in the district where the first petition is filed may determine the district or districts in which the cases should proceed in the interest of justice or for the convenience of the parties. The court may do so on timely motion and after a hearing on notice to:"
+          p "• the United States trustee;"
+          p "• entities entitled to notice under Rule 2002(a); and"
+          p "• other entities as the court orders."
+        }
+        hash "31f3032ef728327ae3cd7cfda386a5525332d9f5ce01c9c33add286d06416d67"
+      }
+      provision "/us/usc/ptI/rule1014/b/3" paragraph {
+        num "3" "(3)"
+        content "Later-Filed Petitions. The court in the district where the first petition is filed may order the parties to the later-filed cases not to proceed further until the motion is decided."
+        hash "3559b3f6219afc051dfb527e648b9fba4f37ad866c7553d3d15910b8c58cbf82"
+      }
+      hash "33536b60cd9cb1c7d7faa2cadf50d7e8da7025c01a0e887873f21fdb2fb86470"
+    }
+    hash "16deaf34c64a69d5f19451ab4015fd546e335d3847b2cbb8ebfe5c313f77ef64"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 30, 2007, eff. Dec. 1, 2007; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 25, 2014, eff. Dec. 1, 2014; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1014/note/ungrouped/pl.95.598/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from former Bankruptcy Rule 116 which contained venue as well as transfer provisions. " ["Public Law 95–598" -> "/us/pl/95/598"] ", however, placed the venue provisions in [former] 28 U.S.C. § 1472, and no purpose is served by repeating them in this rule. Transfer of cases is provided in [former] 28 U.S.C. § 1475 but this rule adds the procedure for obtaining transfer. Pursuant to [former] 28 U.S.C. § 1472, proper venue for cases filed under the Code is either the district of domicile, residence, principal place of business, or location of principal assets for 180 days or the longer portion thereof immediately preceding the petition. [Former] 28 U.S.C. § 1475 permits the court to transfer a case in the interest of justice and for the convenience of the parties. If the venue is improper, the court may retain or transfer the case in the interest of justice and for the convenience of the parties pursuant to [former] 28 U.S.C. § 1477."
+    p "Subdivision (a) of the rule is derived from former Bankruptcy Rule 116(b). It implements [former] 28 U.S.C. §§ 1475 and 1477 and clarifies the procedure to be followed in requesting and effecting transfer of a case. Subdivision (a) protects the parties against being subjected to a transfer except on a timely motion of a party in interest. If the transfer would result in fragmentation or duplication of administration, increase expense, or delay closing the estate, such a factor would bear on the timeliness of the motion as well as on the propriety of the transfer under the standards prescribed in subdivision (a). Subdivision (a) of the rule requires the interest of justice and the convenience of the parties to be the grounds of any transfer of a case or of the retention of a case filed in an improper district as does [former] 28 U.S.C. § 1477. Cf. 28 U.S.C. § 1404(a) (district court may transfer any civil action “[f]or the convenience of parties and witnesses, in the interest of justice”). It also expressly requires a hearing on notice to the petitioner or petitioners before the transfer of any case may be ordered. Under this rule, a motion by a party in interest is necessary. There is no provision for the court to act on its own initiative."
+    p "Subdivision (b) is derived from former Bankruptcy Rule 116(c). It authorizes the court in which the first petition is filed under the Code by or against a debtor to entertain a motion seeking a determination whether the case so commenced should continue or be transferred and consolidated or administered jointly with another case commenced by or against the same or related person in another court under a different chapter of the Code. Subdivision (b) is correlated with [former] 28 U.S.C. § 1472 which authorizes petitioners to file cases involving a partnership and partners or affiliated debtors."
+    p "The reference in subdivision (b) to petitions filed “by” a partner or “by” any other of the persons mentioned is to be understood as referring to voluntary petitions. It is not the purpose of this subdivision to permit more than one case to be filed in the same court because a creditor signing an involuntary petition happens to be a partner, a partnership, or an affiliate of a debtor."
+    p "Transfers of adversary proceedings in cases under title 11 are governed by Rule 7087 and [former] 28 U.S.C. § 1475."
+    hash "652abbe5a9be395b26ea398ef94b1085875a2214eb62eea2d8ee6d28e120b78a"
+  }
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Both paragraphs 1 and 2 of subdivision (a) are amended to conform to the standard for transfer in 28 U.S.C. § 1412. Formerly, 28 U.S.C. § 1477 authorized a court either to transfer or retain a case which had been commenced in a district where venue was improper. However, 28 U.S.C. § 1412, which supersedes 28 U.S.C. § 1477, authorizes only the transfer of a case. The rule is amended to delete the reference to retention of a case commenced in the improper district. Dismissal of a case commenced in the improper district as authorized by 28 U.S.C. § 1406 has been added to the rule. If a timely motion to dismiss for improper venue is not filed, the right to object to venue is waived."
+    p "The last sentence of the rule has been deleted as unnecessary."
+    hash "d0491f554355101c41794a65d987786f9a5dd225f20593ef621d318aa06522c4"
+  }
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (b) is amended to provide that a motion for transfer of venue under this subdivision shall be filed in the district in which the first petition is pending. If the case commenced by the first petition has been transferred to another district prior to the filing of a motion to transfer a related case under this subdivision, the motion must be filed in the district to which the first petition had been transferred."
+    p "The other amendments to this rule are consistent with the responsibilities of the United States trustee in the supervision and administration of cases pursuant to 28 U.S.C. § 586(a)(3). The United States trustee may appear and be heard on issues relating to the transfer of the case or dismissal due to improper venue. See § 307 of the Code."
+    hash "22cc338569f643c116d8166fbd2e9ac508aa9538e4449eb1da6bea9632b43e0d"
+  }
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2007 Amendment"
+    p "Courts have generally held that they have the authority to dismiss or transfer cases on their own motion. The amendment recognizes this authority and also provides that dismissal or transfer of the case may take place only after notice and a hearing."
+    p "Other amendments are stylistic."
+    p "Changes Made After Publication. No changes since publication."
+    hash "20e3bb39c55d3e119ffd41b7120ffb3b2c40ceedc922d5b6ce8ec77f487bf917"
+  }
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010 Amendment"
+    p "Subdivision (b). Subdivision (b) of the rule is amended to provide that petitions for recognition of a foreign proceeding are included among those that are governed by the procedure for determining where cases should go forward when multiple petitions involving the same debtor are filed. The amendment adds a specific reference to chapter 15 petitions and also provides that the rule governs proceedings regarding a debtor as well as those that are filed by or against a debtor."
+    p "Other changes are stylistic."
+    p "Changes Made After Publication. No changes since publication."
+    hash "cbfa8bdfd7906c387e5331fdba8c1546d9c4b17cbe20f894caaa0e01090e8238"
+  }
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2014-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014 Amendment"
+    p "Subdivision (b) provides a practical solution for resolving venue issues when related cases are filed in different districts. It designates the court in which the first-filed petition is pending as the decision maker if a party seeks a determination of where the related cases should proceed. Subdivision (b) is amended to clarify when proceedings in the subsequently filed cases are stayed. It requires an order of the court in which the first-filed petition is pending to stay proceedings in the related cases. Requiring a court order to trigger the stay will prevent the disruption of other cases unless there is a judicial determination that this subdivision of the rule applies and that a stay of related cases is needed while the court makes its venue determination."
+    p "Notice of the hearing must be given to all debtors, trustees, creditors, indenture trustees, and United States trustees in the affected cases, as well as any other entity that the court directs. Because the clerk of the court that makes the determination often may lack access to the names and addresses of entities in other cases, a court may order the moving party to provide notice."
+    p "The other changes to subdivision (b) are stylistic."
+    p "Changes Made After Publication and Comment. The only change made after publication and comment was stylistic."
+    hash "cb8a8f14327509c9503e06aeb3a4fdcfa0d34119a6dbec3000d7da51b44eccfe"
+  }
+  note "/us/usc/ptI/rule1014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1014 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "5a40973c271c0b8bc94f1a7e2f8a6f607cb9cfaef8237ded46cb1068cf3125b4"
+  }
+  layers {
+    operative "16deaf34c64a69d5f19451ab4015fd546e335d3847b2cbb8ebfe5c313f77ef64"
+    enacted "ddbd7f583aa9b3dc2e98c984f1e72a1f2438829c89599b852dab03ac4439eb55"
+    editorial "9011cb5f341662642195a53edebb70fafc05bcc46d698a7e545d46600a7c67a8"
+  }
+}

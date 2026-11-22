@@ -1,0 +1,95 @@
+edition 2
+module "/us/usc/ptIX/rule9022" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9022" courtRule {
+    num "9022" "Rule 9022."
+    heading "Notice of a Judgment or Order"
+    provision "/us/usc/ptIX/rule9022/a" subsection {
+      num "a" "(a)"
+      heading "Issued by a Bankruptcy Judge."
+      provision "/us/usc/ptIX/rule9022/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. Upon entering a judgment or order, the clerk must:"
+        provision "/us/usc/ptIX/rule9022/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "promptly serve notice of the entry on the contesting parties and other entities the court designates;"
+          hash "21a72c06d55c9a681514dd55b4b5048545d27bf9696fbbd7c7d33ba2e597ad0c"
+        }
+        provision "/us/usc/ptIX/rule9022/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "do so in the manner provided by Fed. R. Civ. P. 5(b);"
+          hash "b325ee7d9952ad4052f244dfc7d13c74e2a7889bf3462a9d6cf23426c087b105"
+        }
+        provision "/us/usc/ptIX/rule9022/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "except in a Chapter 9 case, promptly send a copy of the judgment or order to the United States trustee; and"
+          hash "393e5f5b9aeb4949736996615759cc2cc64557fdd8a0329c0c7b13e879c1d35a"
+        }
+        provision "/us/usc/ptIX/rule9022/a/1/D" subparagraph {
+          num "D" "(D)"
+          content "note service on the docket."
+          hash "581603d9d2fbd523be03cf884dff08cb194c4660698e02f61099d643b83a0278"
+        }
+        hash "02c392c3bafca1d80126ccbc8f20e89d75b2d796a282b4b796e96c49f349da8a"
+      }
+      provision "/us/usc/ptIX/rule9022/a/2" paragraph {
+        num "2" "(2)"
+        content "Lack of Notice; Time to Appeal. Except as permitted by Rule 8002, lack of notice of the entry does not affect the time to appeal or relieve—or authorize the court to relieve—a party for failing to appeal within the time allowed."
+        hash "e54f8c53eb9de24b4d1c508089650d0f4561b40078e08c104d2709977c7e4e10"
+      }
+      hash "ed6f3f533817460a126deffdd4d0b0806321f0d56f21740663659c9891ff4c62"
+    }
+    provision "/us/usc/ptIX/rule9022/b" subsection {
+      num "b" "(b)"
+      heading "Issued by a District Judge."
+      content "Notice of a district judge’s judgment or order is governed by Fed. R. Civ. P. 77(d). Except in a Chapter 9 case, the clerk must promptly send a copy of the judgment or order to the United States trustee."
+      hash "182ce324141ad4e185422189811687ea1f5621a327bab93b346740d70d95dabb"
+    }
+    hash "127d151a74119a23665679e6d3d4151634a46e47d2356bad84b6749082f8ed36"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 2001, eff. Dec. 1, 2001; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a) of this rule is an adaptation of Rule 77(d) F.R.Civ.P."
+    p "Subdivision (b) complements Rule 9021(b). When a district court acts as an appellate court, Rule 8016(b) requires the clerk to give notice of the judgment on appeal."
+    hash "d6bd4ae11da62f7760666744e154e08f0e74ab943cbb55e589394a0ac3b07c3d"
+  }
+  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to enable the United States trustee to be informed of all developments in the case so that administrative and supervisory functions provided in 28 U.S.C. § 586(a) may be performed."
+    hash "8d0d1752902c246a13a0f3186b8eb452ab352ef433c914009134388c498fdbae"
+  }
+  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2001 Amendment"
+    p "Rule 5(b) F.R.Civ.P., which is made applicable in adversary proceedings by Rule 7005, is being restyled and amended to authorize service by electronic means—or any other means not otherwise authorized under Rule 5(b)—if consent is obtained from the person served. The amendment to Rule 9022(a) authorizes the clerk to serve notice of entry of a judgment or order by electronic means if the person served consents, or to use any other means of service authorized under Rule 5(b), including service by mail. This amendment conforms to the amendments made to Rule 77(d) F.R.Civ.P."
+    p "Changes Made After Publication and Comments. No changes were made."
+    hash "c5da93baa235b48cc18bfa0c7b636f3a0259101ec355b495631f8db26d8b45e7"
+  }
+  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9022 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "ddcb3b843c5bfc16e42d08dce1514b85ae92db42e3d22ca4f5fc6ca81f3875d6"
+  }
+  note "/us/usc/ptIX/rule9022/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subds. (a)(1)(B) and (b), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "eeba882a60a1ef4d183c6c619f1ef999e39fc5c621c933932dbbd1bf95922049"
+  }
+  layers {
+    operative "127d151a74119a23665679e6d3d4151634a46e47d2356bad84b6749082f8ed36"
+    enacted "d73d9ea1bd454f0d882efbeaedb5ab8f458adb044c6f860d01c949e332a04a5a"
+    editorial "63158ef09b3f632f2ff7765f2c4c25acf20417424c15464e16ba73220b840533"
+  }
+}

@@ -1,0 +1,101 @@
+edition 2
+module "/us/usc/t45/s81...92" {
+  alias "/us/usc/t45/s81"
+  alias "/us/usc/t45/s82"
+  alias "/us/usc/t45/s83"
+  alias "/us/usc/t45/s84"
+  alias "/us/usc/t45/s85"
+  alias "/us/usc/t45/s86"
+  alias "/us/usc/t45/s87"
+  alias "/us/usc/t45/s88"
+  alias "/us/usc/t45/s89"
+  alias "/us/usc/t45/s90"
+  alias "/us/usc/t45/s91"
+  alias "/us/usc/t45/s92"
+  within "/us/usc/t45/ch5"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s81...92" section {
+    num "81 to 92" "§§ 81 to 92."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "bec78f64e0aa0732244c4b856d0a8b958db24bea7c5b22d91443bc7dc1b0e449"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/pl.95.598/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 81, R.S. § 5256; Nov. 6, 1978, " ["Pub. L. 95–598, title III, § 322(g)" -> "/us/pl/95/598/tIII/s322/g"] ", " ["92 Stat. 2679" -> "/us/stat/92/2679"] ", related to Union Pacific Railroad Company, its books, records, correspondence, other documents, dividends, stock issuance, mortgages or pledges, and directors or officers."
+    hash "42f3b416531231bb3a2f4223768eb640bcac0252b942946bd4d2972a170521b7"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/nolaw/h.f5716f67d30b9cb9" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 82, R.S. § 5257, provided for connection of other roads with Union Pacific Railroad or any of its branches."
+    hash "f5716f67d30b9cb9dad8a0e0b7d4ca5bddd07c0023b4a79409392063150aa25b"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/act.1864-07-02.ch216/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 83, acts " ["July 2, 1864, ch. 216, § 15" -> "/us/act/1864-07-02/ch216/s15"] ", " ["13 Stat. 362" -> "/us/stat/13/362"] "; " ["June 20, 1874, ch. 331" -> "/us/act/1874-06-20/ch331"] ", " ["18 Stat. 111" -> "/us/stat/18/111"] "; " ["Mar. 3, 1911, ch. 231, § 291" -> "/us/act/1911-03-03/ch231/s291"] ", " ["36 Stat. 1167" -> "/us/stat/36/1167"] ", provided that companies authorized by Pacific Railroad Acts to construct railroads were required to operate roads and telegraphs as one continuous line and to afford equal advantages and facilities as to rates, time, and transportation to the other companies without discrimination."
+    hash "e9053b4e31a5dfc6241b01e06974d7bb321c81d5e3a32fa8dbab53e05278a84f"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/nolaw/h.6e0894c11f81f072" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 84, R.S. § 5258, authorized interstate transport by railroads."
+    hash "6e0894c11f81f0726b77846b11c6213654143cbcd96e473649f7d8e4d3ddea37"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/nolaw/h.0a0133485ade7ac0" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 85, R.S. § 5259, related to compensation of directors, engineers, commissioners, or other agents appointed by the United States to examine roads or to act in conjunction with other officers of railroads or other corporations receiving land grants or other subsidies."
+    hash "0a0133485ade7ac02226f4b36d1b2bfafe829c651d73516ab4a3b2c970dce5c2"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/nolaw/h.246f296d9975e3df" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 86, R.S. § 5260, related to withholding by Secretary of the Treasury of payments to certain railroads."
+    hash "246f296d9975e3dfd9e92b9b54b9a93d180f8009d06dfa9e3d108a7409ff6c7e"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/act.1948-06-25.ch646/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 87, R.S. § 5261; " ["June 25, 1948, ch. 646, § 4" -> "/us/act/1948-06-25/ch646/s4"] ", " ["62 Stat. 986" -> "/us/stat/62/986"] "; Apr. 2, 1982, " ["Pub. L. 97–164, title I, § 161(8)" -> "/us/pl/97/164/tI/s161/8"] ", " ["96 Stat. 49" -> "/us/stat/96/49"] "; Oct. 29, 1992, " ["Pub. L. 102–572, title IX, § 902(b)(2)" -> "/us/pl/102/572/tIX/s902/b/2"] ", " ["106 Stat. 4516" -> "/us/stat/106/4516"] ", provided that companies from whom payments for freight and transportation had been withheld under provisions of " ["section 86 of this title" -> "/us/usc/t45/s86"] " could sue in Court of Federal Claims."
+    hash "f8494dcd30578179eeaed347d09048ac79ff32f8ca91d7a7f71183f06b802903"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/act.1911-03-03.ch231/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 88, R.S. § 5262; " ["Mar. 3, 1911, ch. 231, § 291" -> "/us/act/1911-03-03/ch231/s291"] ", " ["36 Stat. 1167" -> "/us/stat/36/1167"] ", related to jurisdiction of proper United States district court to hear and determine all cases of mandamus to compel Union Pacific Railroad Company to operate its road."
+    hash "2f297eab4b1dea615ea02ff0cc1e63436ce2bd82485de35acbc8cac24b498368"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/act.1874-06-22.ch414/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 89, acts " ["June 22, 1874, ch. 414" -> "/us/act/1874-06-22/ch414"] ", " ["18 Stat. 200" -> "/us/stat/18/200"] "; " ["Mar. 3, 1911, ch. 231, § 291" -> "/us/act/1911-03-03/ch231/s291"] ", " ["36 Stat. 1167" -> "/us/stat/36/1167"] ", directed Secretary of the Treasury to require that railroad companies, their successors and assigns, pay United States a percentage of net earnings as provided for by law."
+    hash "6dbef4111ee3ab20991b474b656b73bccdd1af6bc3a4b6b2fa4d68f1e1504e84"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/act.1879-03-03.ch183/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 90, " ["act Mar. 3, 1879, ch. 183, § 1" -> "/us/act/1879-03-03/ch183/s1"] ", " ["20 Stat. 420" -> "/us/stat/20/420"] ", authorized Secretary of the Treasury to settle accounts of Union Pacific, Central Pacific, Kansas Pacific, Western Pacific, and Sioux City and Pacific Railroad Companies for services provided to Government in transporting the Army and mails."
+    hash "26156ecb721e45b6b0d30c7852180ef035304c87271cd5314544b6a1e96aad33"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/act.1897-03-03.ch386/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 91, " ["act Mar. 3, 1897, ch. 386" -> "/us/act/1897-03-03/ch386"] ", " ["29 Stat. 663" -> "/us/stat/29/663"] ", provided that provisions of " ["section 90 of this title" -> "/us/usc/t45/s90"] " were extended and made applicable to Navy and Marine Corps transportation."
+    hash "c9dfbbb8347ff7b443ce6c9e329cbdf9085c444f1f5b0c150abc089816ca1e8a"
+  }
+  note "/us/usc/t45/s81...92/note/ungrouped/act.1901-03-03.ch831/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 92, " ["act Mar. 3, 1901, ch. 831, § 1" -> "/us/act/1901-03-03/ch831/s1"] ", " ["31 Stat. 1023" -> "/us/stat/31/1023"] ", authorized and directed Secretary of the Treasury to settle claims stemming from Government transportation over non-bond-aided lines."
+    hash "1a540edc9914245c80ce85d8f8eaa788caeac7d565b5dcb8411b96ceccd7ebb2"
+  }
+  layers {
+    operative "bec78f64e0aa0732244c4b856d0a8b958db24bea7c5b22d91443bc7dc1b0e449"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "ac0e31c6471cd14ebc4af64125a45578c858331c5294f457b84eeda3bd83de1f"
+  }
+}

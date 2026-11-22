@@ -1,0 +1,83 @@
+edition 2
+module "/us/usc/ptIII/rule3012" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3012" courtRule {
+    num "3012" "Rule 3012."
+    heading "Determining the Amount of a Secured or Priority Claim"
+    provision "/us/usc/ptIII/rule3012/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      content {
+        p "On a party in interest’s request, after notice and a hearing, the court may determine the amount of a secured claim under § 506(a) or the amount of a priority claim under § 507. The notice must be served on:"
+        p "• the claim holder; and"
+        p "• any other entity the court designates."
+      }
+      hash "80f7445463bb60ddbb35cf01c498be784fe515a9d9c58b432282fc3158986985"
+    }
+    provision "/us/usc/ptIII/rule3012/b" subsection {
+      num "b" "(b)"
+      heading "Determining the Amount of a Claim."
+      provision "/us/usc/ptIII/rule3012/b/1" paragraph {
+        num "1" "(1)"
+        content "Secured Claim. Except as provided in (c), a request to determine the amount of a secured claim may be made by motion, in an objection to a claim, or in a plan filed in a Chapter 12 or 13 case. If the request is included in a plan, a copy of the plan must be served on the claim holder and any other entity the court designates as if it were a summons and complaint under Rule 7004."
+        hash "b3a2b91df7324e526b533588867f8c28b52854363ce241095bc649327c273dc1"
+      }
+      provision "/us/usc/ptIII/rule3012/b/2" paragraph {
+        num "2" "(2)"
+        content "Priority Claim. A request to determine the amount of a priority claim may be made only by motion after the claim is filed or in an objection to the claim."
+        hash "a7c144e05277d0e9f3ef28153e750e57a36fdaebf3dca858d78c426537822c27"
+      }
+      hash "09971d38e79d0753de3258719de1226741524f073c9cab02274b6f4f65ff6528"
+    }
+    provision "/us/usc/ptIII/rule3012/c" subsection {
+      num "c" "(c)"
+      heading "Governmental Unit’s Secured Claim."
+      chapeau "A request to determine the amount of a governmental unit’s secured claim may be made only by motion—or in an objection to a claim—filed after:"
+      provision "/us/usc/ptIII/rule3012/c/1" paragraph {
+        num "1" "(1)"
+        content "the governmental unit has filed the proof of claim; or"
+        hash "bae5cb9d5bae179acb79884b40eec5fdee2fe088a3d32ac22b0f3e824b63f64c"
+      }
+      provision "/us/usc/ptIII/rule3012/c/2" paragraph {
+        num "2" "(2)"
+        content "the time to file it under Rule 3002(c)(1) has expired."
+        hash "2b6dfde3e2efbba7f1db80948aaf2b167561478819f5a7e6f7c62015a10f2095"
+      }
+      hash "7b56b8da902045b9a35678b30bf2c5892f47ba5208113c4febc66c08a000e68d"
+    }
+    hash "fd60b2a53915db9b7ee6829bb56bfcf90ee8ff8209be90f14e45572d34989e85"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Pursuant to § 506(a) of the Code, secured claims are to be valued and allowed as secured to the extent of the value of the collateral and unsecured, to the extent it is enforceable, for the excess over such value. The valuation of secured claims may become important in different contexts e.g., to determine the issue of adequate protection under § 361, impairment under § 1124, or treatment of the claim in a plan pursuant to § 1129(b) of the Code. This rule permits the issue to be raised on motion by a party in interest. The secured creditor is entitled to notice of the hearing on the motion and the court may direct that others in the case also receive such notice."
+    p "An adversary proceeding is commenced when the validity, priority, or extent of a lien is at issue as prescribed by Rule 7001. That proceeding is relevant to the basis of the lien itself while valuation under Rule 3012 would be for the purposes indicated above."
+    hash "01fd0b030e0d3e99f8accf37acecfb6593bc7e1f0c58576c3a7915b89e8bbc04"
+  }
+  note "/us/usc/ptIII/rule3012/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017 Amendment"
+    p "This rule is amended and reorganized."
+    p "Subdivision (a) provides, in keeping with the former version of this rule, that a party in interest may seek a determination of the amount of a secured claim. The amended rule provides that the amount of a claim entitled to priority may also be determined by the court."
+    p "Subdivision (b) is added to provide that a request to determine the amount of a secured claim may be made in a chapter 12 or chapter 13 plan, as well as by a motion or a claim objection. When the request is made in a plan, the plan must be served on the holder of the claim and any other entities the court designates according to Rule 7004. Secured claims of governmental units are not included in this subdivision and are governed by subdivision (c). The amount of a claim entitled to priority may be determined through a motion or a claim objection."
+    p "Subdivision (c) clarifies that a determination under this rule with respect to a secured claim of a governmental unit may be made only by motion or in a claim objection, but not until the governmental unit has filed a proof of claim or its time for filing a proof of claim has expired."
+    hash "5d10826ad60f18993c6315e07048baa33d5f46762a4c2aa86bf2da59704e64e5"
+  }
+  note "/us/usc/ptIII/rule3012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3012 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "c85fe5b3dbd691d54bdee624c0c4ee5a75633ca22e2676fb34ecbc20b40acf22"
+  }
+  layers {
+    operative "fd60b2a53915db9b7ee6829bb56bfcf90ee8ff8209be90f14e45572d34989e85"
+    enacted "3ecb33d4eea1cdf559cd84c8667bf2dff73f599604aac5663213d03fc7103066"
+    editorial "0f68983e70fd9e3687bba1641d4e1ed44a3521eac7ce9dc7d1a109ccebc157ad"
+  }
+}

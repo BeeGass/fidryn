@@ -1,0 +1,62 @@
+edition 2
+module "/us/usc/t45/s367" {
+  within "/us/usc/t45/ch11"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s367" section {
+    num "367" "§ 367."
+    heading "Short title"
+    content "This chapter may be cited as the “Railroad Unemployment Insurance Act”."
+    hash "d8b3b0f2246c57a2401d09ad77da965603a1afe7a10fa107d643554c02dc1c5f"
+  }
+  credit "(" ["June 25, 1938, ch. 680, § 17" -> "/us/act/1938-06-25/ch680/s17"] ", " ["52 Stat. 1113" -> "/us/stat/52/1113"] ".)"
+  note "/us/usc/t45/s367/note/editorialNotes/act.1938-06-25.ch680/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This chapter, referred to in text, was in the original “this Act”, meaning " ["act June 25, 1938, ch. 680" -> "/us/act/1938-06-25/ch680"] ", " ["52 Stat. 1094" -> "/us/stat/52/1094"] ", which enacted this chapter and amended sections 503 and 1104 and former " ["section 1107 of Title 42" -> "/us/usc/t42/s1107"] ", The Public Health and Welfare. For complete classification of this Act to the Code, see Tables."
+    hash "029e9d38e3da7110a77fd08c97b797322a3c80d8475e1c2a24d3ca02d1861f1a"
+  }
+  note "/us/usc/t45/s367/note/editorialNotes/pl.104.251/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "Another section 17 of Act June 25, 1938, was classified to " ["section 368 of this title" -> "/us/usc/t45/s368"] " prior to repeal by " ["Pub. L. 104–251, § 5(c)" -> "/us/pl/104/251/s5/c"] ", Oct. 9, 1996, " ["110 Stat. 3165" -> "/us/stat/110/3165"] "."
+    hash "2e36dec5c91d5d32995d9859b461d2c8ba90d7eb3e80f1f6d8eec8b30be23bb1"
+  }
+  note "/us/usc/t45/s367/note/statutoryNotes/pl.116.260/short-title-of-2020-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 2020 Amendment"
+    p ["Pub. L. 116–260, div. N, title II, § 231" -> "/us/pl/116/260/dN/tII/s231"] ", Dec. 27, 2020, " ["134 Stat. 1957" -> "/us/stat/134/1957"] ", provided that:"
+    quoted "/us/pl/116/260/dN/tII/s231" {
+      p "“This subchapter [subchapter III (§§ 231–235) of title II of div. N of " ["Pub. L. 116–260" -> "/us/pl/116/260"] ", amending " ["section 352 of this title" -> "/us/usc/t45/s352"] ", " ["section 906 of Title 2" -> "/us/usc/t2/s906"] ", The Congress, and " ["section 9030 of Title 15" -> "/us/usc/t15/s9030"] ", Commerce and Trade, and enacting provisions set out as notes under " ["section 352 of this title" -> "/us/usc/t45/s352"] ", " ["section 906 of Title 2" -> "/us/usc/t2/s906"] ", and " ["section 9030 of Title 15" -> "/us/usc/t15/s9030"] "] may be cited as the ‘Continued Assistance to Rail Workers Act of 2020’.”"
+    }
+    hash "7fc64d67fb97d3aa209c0ca2070b6f1a61294c604f586a93871d18b489d9b328"
+  }
+  note "/us/usc/t45/s367/note/statutoryNotes/pl.104.251/short-title-of-1996-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 1996 Amendment"
+    p ["Pub. L. 104–251, § 1" -> "/us/pl/104/251/s1"] ", Oct. 9, 1996, " ["110 Stat. 3161" -> "/us/stat/110/3161"] ", provided that:"
+    quoted "/us/pl/104/251/s1" {
+      p "“This Act [amending " ["section 352 of this title" -> "/us/usc/t45/s352"] ", repealing " ["section 368 of this title" -> "/us/usc/t45/s368"] ", and enacting provisions set out as a note under " ["section 352 of this title" -> "/us/usc/t45/s352"] "] may be cited as the ‘Railroad Unemployment Insurance Amendments Act of 1996’.”"
+    }
+    hash "acafc7c9fcd904f2c5c173228a536848227bde20cef4d7bd4158dba7526387bc"
+  }
+  note "/us/usc/t45/s367/note/statutoryNotes/pl.100.647/short-title-of-1988-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 1988 Amendment"
+    p ["Pub. L. 100–647, title VII, § 7001" -> "/us/pl/100/647/tVII/s7001"] ", Nov. 10, 1988, " ["102 Stat. 3757" -> "/us/stat/102/3757"] ", provided that:"
+    quoted "/us/pl/100/647/tVII/s7001" {
+      p "“This title [enacting " ["section 369 of this title" -> "/us/usc/t45/s369"] ", amending sections 231, 231a, 231e, 351 to 355, 358, 360, 361, and 362 of this title and sections 3321, 3322, 6157, 6201, 6317, 6513, and 6601 of Title 26, Internal Revenue Code, omitting " ["section 3323 of Title 26" -> "/us/usc/t26/s3323"] ", enacting provisions set out as notes under sections 231, 231a, 351 to 353, 355, and 358 of this title and " ["section 3321 of Title 26" -> "/us/usc/t26/s3321"] ", and amending provisions set out as notes under " ["section 231n of this title" -> "/us/usc/t45/s231n"] "] may be cited as the ‘Railroad Unemployment Insurance and Retirement Improvement Act of 1988’.”"
+    }
+    hash "e7ae9848883406d323ff41aad504a148cb607d3c4af997d9e27ac9a512769054"
+  }
+  layers {
+    operative "d8b3b0f2246c57a2401d09ad77da965603a1afe7a10fa107d643554c02dc1c5f"
+    enacted "cea4da46dff30a63a1b9b5705ba68f5dc09a67fa7fb29d8cfc20eb4cbcf22366"
+    editorial "320b006425171f0aae2b17694dbc3701377b32c7f3cb923369e360800af3e51b"
+  }
+}

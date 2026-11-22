@@ -1,0 +1,126 @@
+edition 2
+module "/us/usc/t45/s797c" {
+  within "/us/usc/t45/ch16/schVII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s797c" section {
+    num "797c" "§ 797c."
+    heading "Central register of railroad employment"
+    provision "/us/usc/t45/s797c/a" subsection {
+      num "a" "(a)"
+      heading "Register"
+      provision "/us/usc/t45/s797c/a/1" paragraph {
+        num "1" "(1)"
+        content "The Railroad Retirement Board (hereafter in this section referred to as the “Board”) shall prepare and maintain a register of persons separated from railroad employment after at least one year of completed service with a railroad who have declared their current availability for employment in the railroad industry. The register shall be subdivided by class and craft of prior employment and shall be updated periodically to reflect current availability."
+        hash "14eee90ac65112a19e6a0bd877c8b53aeba1867e39decaa42e6351014d5445dc"
+      }
+      provision "/us/usc/t45/s797c/a/2" paragraph {
+        num "2" "(2)"
+        content "Each entry in the register shall include, or provide access to, basic information concerning the individual’s experience and qualifications."
+        hash "6a1f998be86ebc3070a15eec94205fca85763213ef948302272aadebaaef65c0"
+      }
+      provision "/us/usc/t45/s797c/a/3" paragraph {
+        num "3" "(3)"
+        content "The Board shall place at the top of the register those former railroad employees entitled to priority under applicable provisions of law, including this chapter."
+        hash "a93dbd46f4adc002eb5207b0ccfef1d3e5313fddf827b07f6bfafabfdc8ec8c9"
+      }
+      hash "af49d20d500ed25073241c866e37e6cf65a273767c70211994709c727ba1e1d3"
+    }
+    provision "/us/usc/t45/s797c/b" subsection {
+      num "b" "(b)"
+      heading "Corporation employees"
+      content "As soon as is practicable after August 13, 1981, the Corporation shall provide to the Board the names of its former employees who elect to appear on the register and who have not been offered employment with acquiring railroads."
+      hash "1b7525278ea1871c804f1b5150fec0d46f1c28bb7d9c8a4dc3f7398a49708127"
+    }
+    provision "/us/usc/t45/s797c/c" subsection {
+      num "c" "(c)"
+      heading "Vacancy notices; warning; civil penalty"
+      provision "/us/usc/t45/s797c/c/1" paragraph {
+        num "1" "(1)"
+        content "Each railroad shall timely file with the Board a notice of vacancy with respect to any position for which the railroad intends to accept applications from persons other than current employees of that carrier."
+        hash "849a3d409381aed3ae16f2ed5a63ed510c5649b8058895ef2dbf24a5d386da74"
+      }
+      provision "/us/usc/t45/s797c/c/2" paragraph {
+        num "2" "(2)"
+        provision "/us/usc/t45/s797c/c/2/A" subparagraph {
+          num "A" "(A)"
+          content "As soon as the Board becomes aware of any failure on the part of a railroad to comply with paragraph (1), the Board shall issue a warning to such railroad of its potential liability under subparagraph (B)."
+          hash "bed81b22c202d8a6c0b42186ef88c1949c25751e85a713f72170c1b55cf9b813"
+        }
+        provision "/us/usc/t45/s797c/c/2/B" subparagraph {
+          num "B" "(B)"
+          content "Any railroad failing to comply with paragraph (1) of this subsection after being warned by the Board under subparagraph (A) shall be liable for a civil penalty in the amount of $500 for each subsequent vacancy with respect to which such railroad has so failed to comply."
+          hash "e7cf8d8990a7692b78a1b166a9ccc7648f856436280b886939136ee9bd4a6386"
+        }
+        hash "39a5edb0830a145910e652e6a962e44722b05430723d2fc96f6f296d567a80db"
+      }
+      hash "16fa7ab7e08c2a888f40b24a82b44b6cc2ef5a0abed0c33efab3d6e41d461e8a"
+    }
+    provision "/us/usc/t45/s797c/d" subsection {
+      num "d" "(d)"
+      heading "Placement"
+      content "The Board shall, through distribution of copies of the central register (or portions thereof) to railroads and representatives of classes or crafts of employees and through publication of employment information derived from vacancy notices filed with the Board, promote the placement of former railroad employees possessing requisite skills and experience in appropriate positions with other railroads."
+      hash "aec67968ec72a1f391e74761ddfe07f17c22b0808b55984ba07aa79a068497fd"
+    }
+    provision "/us/usc/t45/s797c/e" subsection {
+      num "e" "(e)"
+      heading "Employment applications"
+      content "In addition to its responsibilities under subsections (a) through (d) of this section, the Board shall facilitate the filing of employment applications with respect to current vacancies in the industry by former railroad employees entitled to priority under applicable provisions of law, including this chapter."
+      hash "c0b1a1d0db15ba5b7fa8e2c657fae461925d7da741dab2b86652b2ef70015a47"
+    }
+    provision "/us/usc/t45/s797c/f" subsection {
+      num "f" "(f)"
+      heading "Expiration"
+      content "The provisions of this section shall cease to be effective on the expiration of the 6-year period beginning on August 13, 1981."
+      hash "71a5c8fce0977dadd1f52986268e7733989f9fc36bee2581a359188111d10738"
+    }
+    provision "/us/usc/t45/s797c/g" subsection {
+      num "g" "(g)"
+      heading "Resolution of disputes"
+      chapeau "Any dispute, grievance, or claim arising under this section, " ["section 797b of this title" -> "/us/usc/t45/s797b"] ", " ["section 907 of this title" -> "/us/usc/t45/s907"] ", or " ["section 1004 of this title" -> "/us/usc/t45/s1004"] " shall be subject to resolution in accordance with the following procedures:"
+      provision "/us/usc/t45/s797c/g/1" paragraph {
+        num "1" "(1)"
+        content "Any employee with such a dispute, grievance, or claim may petition the Board to review and investigate the dispute, grievance, or claim."
+        hash "d766267296869bae8087885823f6b4677f033de67f3ea5de2ff1614f841b663a"
+      }
+      provision "/us/usc/t45/s797c/g/2" paragraph {
+        num "2" "(2)"
+        content "The Board shall investigate the dispute, grievance, or claim, and if it concludes that the employee’s rights under this section, " ["section 797b of this title" -> "/us/usc/t45/s797b"] ", " ["section 907 of this title" -> "/us/usc/t45/s907"] ", or " ["section 1004 of this title" -> "/us/usc/t45/s1004"] " may have been violated, the dispute, grievance, or claim shall be subject to resolution in accordance with the procedures set forth in " ["section 153 of this title" -> "/us/usc/t45/s153"] "."
+        hash "f2abf058a299bb02b5e2120b95452058ee8eafc67f6973a3a6c19e4948449e44"
+      }
+      provision "/us/usc/t45/s797c/g/3" paragraph {
+        num "3" "(3)"
+        content "In the case of any violation of this section, " ["section 797b of this title" -> "/us/usc/t45/s797b"] ", " ["section 907 of this title" -> "/us/usc/t45/s907"] ", or " ["section 1004 of this title" -> "/us/usc/t45/s1004"] ", the Adjustment Board (or any division or delegate thereof) or any other board of adjustment created under " ["section 153 of this title" -> "/us/usc/t45/s153"] " shall, where appropriate, award such relief, including back pay, as may be necessary to enforce the employee’s rights."
+        hash "1cda84144b92b53d28f78450b3d5b58210a202564d1000c65bc28774173b8f3b"
+      }
+      hash "5674a8ff2a1fa2a42c1199d483040afd5d349aa01a6c381aeac6e780c5cc9cf5"
+    }
+    hash "2d5d44793f8286dace92cb4d96984ac813c85b678e1c0bd2902879afc6a4ab56"
+  }
+  credit "(" ["Pub. L. 93–236, title VII, § 704" -> "/us/pl/93/236/tVII/s704"] ", as added " ["Pub. L. 97–35, title XI, § 1143(a)" -> "/us/pl/97/35/tXI/s1143/a"] ", Aug. 13, 1981, " ["95 Stat. 663" -> "/us/stat/95/663"] "; amended " ["Pub. L. 97–468, title II, § 235" -> "/us/pl/97/468/tII/s235"] ", Jan. 14, 1983, " ["96 Stat. 2547" -> "/us/stat/96/2547"] "; " ["Pub. L. 99–272, title IV, § 4011(a)" -> "/us/pl/99/272/tIV/s4011/a"] ", (b), Apr. 7, 1986, " ["100 Stat. 108" -> "/us/stat/100/108"] ", 109.)"
+  note "/us/usc/t45/s797c/note/editorialNotes/pl.99.272/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1986—Subsec. (c). " ["Pub. L. 99–272, § 4011(a)" -> "/us/pl/99/272/s4011/a"] ", designated existing provisions as par. (1) and added par. (2)."
+    p "Subsec. (f). " ["Pub. L. 99–272, § 4011(b)" -> "/us/pl/99/272/s4011/b"] ", substituted “6-year” for “4-year”."
+    p "1983—Subsec. (f). " ["Pub. L. 97–468, § 235(a)" -> "/us/pl/97/468/s235/a"] ", substituted “4-year” for “3-year”."
+    p "Subsec. (g). " ["Pub. L. 97–468, § 235(b)" -> "/us/pl/97/468/s235/b"] ", substituted “this section, " ["section 797b of this title" -> "/us/usc/t45/s797b"] ", " ["section 907 of this title" -> "/us/usc/t45/s907"] ", or " ["section 1004 of this title" -> "/us/usc/t45/s1004"] "” for “this section or " ["section 797b of this title" -> "/us/usc/t45/s797b"] "” wherever appearing."
+    hash "63f786fe0f1dec54628881d63d0f8d25e8f3539b0440794b77b18c2773da28d6"
+  }
+  note "/us/usc/t45/s797c/note/statutoryNotes/pl.99.272/effective-date-of-1986-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1986 Amendment"
+    p ["Pub. L. 99–272, title IV, § 4011(d)" -> "/us/pl/99/272/tIV/s4011/d"] ", Apr. 7, 1986, " ["100 Stat. 109" -> "/us/stat/100/109"] ", provided that:"
+    quoted "/us/pl/99/272/tIV/s4011/d" {
+      p "“The amendments made by subsections (a) and (c) [amending this section and enacting provisions set out as a note under " ["section 797b of this title" -> "/us/usc/t45/s797b"] "] shall take effect on the date of enactment of this Act [Apr. 7, 1986], and the amendment made by subsection (b) [amending this section] shall be effective as of August 1, 1985.”"
+    }
+    hash "8ed62f859a87792d9abb97beabdb8c1cf04ee5eb869b1e01a7e967f56c266f33"
+  }
+  layers {
+    operative "2d5d44793f8286dace92cb4d96984ac813c85b678e1c0bd2902879afc6a4ab56"
+    enacted "206a4d97e80f4d6061eb79c3cc4d048efbc1120244f7701e04d2fea55e3f2c5a"
+    editorial "de41c036d5b981fa78d9d144b53a6c62c7999378b84581d6ef4d59cec0655db6"
+  }
+}

@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/ptIX/rule9032" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9032" courtRule {
+    num "9032" "Rule 9032."
+    heading "Effect of an Amendment to the Federal Rules of Civil Procedure"
+    content "To the extent these rules incorporate by reference the Federal Rules of Civil Procedure, an amendment to those rules is also effective under these rules, unless the amendment or these rules provide otherwise."
+    hash "ca1031b5cd4d3c98a29a89f827e093d53527d02611d2c0a9062f595cb51cce8e"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9032/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to provide flexibility so that the Bankruptcy Rules may provide that subsequent amendments to a Federal Rule of Civil Procedure made applicable by these rules are not effective with regard to Bankruptcy Code cases or proceedings. For example, in view of the anticipated amendments to, and restructuring of, Rule 4 F.R.Civ.P., Rule 7004(g) will prevent such changes from affecting Bankruptcy Code cases until the Advisory Committee on Bankruptcy Rules has an opportunity to consider such amendments and to make appropriate recommendations for incorporating such amendments into the Bankruptcy Rules."
+    hash "cada9c558d76eadbb05ea3583d0d31750cd978d7c41e86f6dbd49a9ff11203bb"
+  }
+  note "/us/usc/ptIX/rule9032/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9032 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "eccce1a26dfcfe859f8d5ca85a0b3e1ba44ec8ad53b1114d07502d9b62f04d8e"
+  }
+  note "/us/usc/ptIX/rule9032/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "ca1031b5cd4d3c98a29a89f827e093d53527d02611d2c0a9062f595cb51cce8e"
+    enacted "69c382160e895bd8c2c59d3b52d2d7954525deb1e2d93177b287c6d2fe1ec8c0"
+    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+  }
+}

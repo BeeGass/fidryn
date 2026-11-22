@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fidryn.dev/schemas/change-set-v0.1.json",
+  "title": "fidryn.change-set/v0.1",
+  "description": "What changed between two generated workspaces of one prefix, which `fidryn changes OLD_DIR NEW_DIR --json` prints: the provisions, notes and containers added, removed, moved or amended, by layer, and the bindings of curated workspaces that are stale against the newer workspace. Every list is sorted, and every key is present.",
+  "type": "object",
+  "required": ["schema", "prefix", "old", "new", "operative", "enacted_notes", "editorial", "containers", "stale_bindings"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "fidryn.change-set/v0.1" },
+    "prefix": { "$ref": "#/$defs/address" },
+    "old": { "$ref": "#/$defs/release" },
+    "new": { "$ref": "#/$defs/release" },
+    "operative": {
+      "type": "object",
+      "required": ["added", "removed", "amended_text", "amended_structure", "moved"],
+      "additionalProperties": false,
+      "properties": {
+        "added": { "$ref": "#/$defs/addresses" },
+        "removed": { "$ref": "#/$defs/addresses" },
+        "amended_text": { "$ref": "#/$defs/addresses" },
+        "amended_structure": { "$ref": "#/$defs/addresses" },
+        "moved": { "$ref": "#/$defs/moved" }
+      }
+    },
+    "enacted_notes": {
+      "type": "object",
+      "required": ["added", "removed", "amended", "moved"],
+      "additionalProperties": false,
+      "properties": {
+        "added": { "$ref": "#/$defs/addresses" },
+        "removed": { "$ref": "#/$defs/addresses" },
+        "amended": { "$ref": "#/$defs/addresses" },
+        "moved": { "$ref": "#/$defs/moved" }
+      }
+    },
+    "editorial": {
+      "type": "object",
+      "required": ["added", "removed", "amended", "moved", "credits_changed", "footnotes_changed"],
+      "additionalProperties": false,
+      "properties": {
+        "added": { "$ref": "#/$defs/addresses" },
+        "removed": { "$ref": "#/$defs/addresses" },
+        "amended": { "$ref": "#/$defs/addresses" },
+        "moved": { "$ref": "#/$defs/moved" },
+        "credits_changed": { "$ref": "#/$defs/addresses" },
+        "footnotes_changed": { "$ref": "#/$defs/addresses" }
+      }
+    },
+    "containers": {
+      "type": "object",
+      "required": ["added", "removed", "changed"],
+      "additionalProperties": false,
+      "properties": {
+        "added": { "$ref": "#/$defs/addresses" },
+        "removed": { "$ref": "#/$defs/addresses" },
+        "changed": { "$ref": "#/$defs/addresses" }
+      }
+    },
+    "stale_bindings": {
+      "$comment": "Sorted by workspace, module and binding.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "required": ["workspace", "module", "binding", "address", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "workspace": { "type": "string", "minLength": 1 },
+          "module": { "$ref": "#/$defs/address" },
+          "binding": { "type": "string", "minLength": 1 },
+          "address": { "$ref": "#/$defs/address" },
+          "reason": {
+            "enum": ["provision removed or moved", "provision text changed", "enacted notes of the unit changed"]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "address": {
+      "$comment": "A segment is ASCII letters, digits, '-', '.', '~' and the en dash, and is never '.' or '..'.",
+      "type": "string",
+      "pattern": "^(/(?!\\.\\.?(/|$))[A-Za-z0-9.~–-]+)+$"
+    },
+    "addresses": {
+      "$comment": "Sorted by the bytes of the addresses.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/address" }
+    },
+    "moved": {
+      "$comment": "Sorted by the address moved from, then by the address moved to.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "required": ["from", "to"],
+        "additionalProperties": false,
+        "properties": {
+          "from": { "$ref": "#/$defs/address" },
+          "to": { "$ref": "#/$defs/address" }
+        }
+      }
+    },
+    "release": {
+      "type": "object",
+      "required": ["release", "lock_digest"],
+      "additionalProperties": false,
+      "properties": {
+        "release": { "type": "string", "minLength": 1 },
+        "lock_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

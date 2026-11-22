@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/ch21" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch21" chapter {
+    num "21" "CHAPTER 21—"
+    heading "ALASKA RAILROAD TRANSFER"
+    member "/us/usc/t45/s1201"
+    member "/us/usc/t45/s1202"
+    member "/us/usc/t45/s1203"
+    member "/us/usc/t45/s1204"
+    member "/us/usc/t45/s1205"
+    member "/us/usc/t45/s1206"
+    member "/us/usc/t45/s1207"
+    member "/us/usc/t45/s1208"
+    member "/us/usc/t45/s1209"
+    member "/us/usc/t45/s1210"
+    member "/us/usc/t45/s1211"
+    member "/us/usc/t45/s1212"
+    member "/us/usc/t45/s1213"
+    member "/us/usc/t45/s1214"
+    hash "f6a819c91644840924fb353de81ceb60034644b7d8c8c2d97cfaab044f7efc6d"
+  }
+  layers {
+    operative "f6a819c91644840924fb353de81ceb60034644b7d8c8c2d97cfaab044f7efc6d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

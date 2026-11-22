@@ -5,6 +5,11 @@ updates:
     target-branch: dev
     schedule:
       interval: weekly
+    # Version 3 of ureq changes how the filing client of the first edition
+    # classifies failures; the move is made when that client is replaced.
+    ignore:
+      - dependency-name: ureq
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: uv
     directory: /
     target-branch: dev

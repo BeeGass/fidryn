@@ -15,13 +15,15 @@ members = [
     "crates/fidryn-solve",
     "crates/fidryn-adapt",
     "crates/fidryn-render",
+    "crates/fidryn-provision",
+    "crates/fidryn-ingest-uscode",
     "tests",
     "benches",
     "xtask",
 ]
 
 [workspace.package]
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 license = "MIT"
 authors = ["Bryan Gass"]
@@ -29,36 +31,44 @@ repository = "https://github.com/BeeGass/fidryn"
 rust-version = "1.98"
 
 [workspace.dependencies]
-fidryn-syntax = { version = "0.2.0", path = "crates/fidryn-syntax" }
-fidryn-hir = { version = "0.2.0", path = "crates/fidryn-hir" }
-fidryn-core = { version = "0.2.0", path = "crates/fidryn-core" }
-fidryn-check = { version = "0.2.0", path = "crates/fidryn-check" }
-fidryn-eval = { version = "0.2.0", path = "crates/fidryn-eval" }
-fidryn-handlers = { version = "0.2.0", path = "crates/fidryn-handlers" }
-fidryn-driver = { version = "0.2.0", path = "crates/fidryn-driver" }
-fidryn-verify = { version = "0.2.0", path = "crates/fidryn-verify" }
-fidryn-kernel = { version = "0.2.0", path = "crates/fidryn-kernel" }
-fidryn-trace = { version = "0.2.0", path = "crates/fidryn-trace" }
-fidryn-solve = { version = "0.2.0", path = "crates/fidryn-solve" }
-fidryn-adapt = { version = "0.2.0", path = "crates/fidryn-adapt" }
-fidryn-render = { version = "0.2.0", path = "crates/fidryn-render" }
-fidryn-cli = { version = "0.2.0", path = "crates/fidryn-cli" }
+fidryn-syntax = { version = "0.3.0", path = "crates/fidryn-syntax" }
+fidryn-hir = { version = "0.3.0", path = "crates/fidryn-hir" }
+fidryn-core = { version = "0.3.0", path = "crates/fidryn-core" }
+fidryn-check = { version = "0.3.0", path = "crates/fidryn-check" }
+fidryn-eval = { version = "0.3.0", path = "crates/fidryn-eval" }
+fidryn-handlers = { version = "0.3.0", path = "crates/fidryn-handlers" }
+fidryn-driver = { version = "0.3.0", path = "crates/fidryn-driver" }
+fidryn-verify = { version = "0.3.0", path = "crates/fidryn-verify" }
+fidryn-kernel = { version = "0.3.0", path = "crates/fidryn-kernel" }
+fidryn-trace = { version = "0.3.0", path = "crates/fidryn-trace" }
+fidryn-solve = { version = "0.3.0", path = "crates/fidryn-solve" }
+fidryn-adapt = { version = "0.3.0", path = "crates/fidryn-adapt" }
+fidryn-render = { version = "0.3.0", path = "crates/fidryn-render" }
+fidryn-provision = { version = "0.3.0", path = "crates/fidryn-provision" }
+fidryn-ingest-uscode = { version = "0.3.0", path = "crates/fidryn-ingest-uscode" }
+fidryn-cli = { version = "0.3.0", path = "crates/fidryn-cli" }
 anyhow = "1.0.100"
 axum = { version = "0.8.9", features = ["json"] }
 tokio = { version = "1.47.1", features = ["rt-multi-thread", "macros", "net", "signal", "sync"] }
 tower = { version = "0.5.2", features = ["util"] }
 blake3 = "1.8.2"
 clap = { version = "4.5.48", features = ["derive"] }
+# Selects the pure-Rust backend for the `deflate-flate2` feature of `zip`.
+flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 indexmap = { version = "2.11.4", features = ["serde"] }
 la-arena = "0.3.1"
-rowan = "0.16.1"
+rowan = "0.17.0"
+roxmltree = "0.21.2"
 rust_decimal = { version = "1.39.0", features = ["serde"] }
 ryu-js = "1.0.3"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = { version = "1.0.145", features = ["preserve_order"] }
+sha2 = "0.11.1"
 thiserror = "2.0.17"
 time = { version = "0.3.44", features = ["formatting", "macros", "parsing", "serde"] }
 salsa = "0.28.5"
+unicode-normalization = "0.1.26"
+zip = { version = "9.6.1", default-features = false, features = ["deflate-flate2"] }
 
 [profile.release]
 lto = "thin"

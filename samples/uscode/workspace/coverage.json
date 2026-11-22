@@ -1,0 +1,127 @@
+{
+  "schema": "fidryn.coverage/v0.1",
+  "prefix": "/us/usc",
+  "release": "119-142",
+  "totals": {
+    "units": 563,
+    "containers": 72,
+    "provisions": 4857,
+    "units_by_kind": {
+      "courtRule": 229,
+      "level": 1,
+      "section": 333
+    },
+    "units_by_status": {
+      "in-force": 482,
+      "omitted": 9,
+      "repealed": 68,
+      "transferred": 4
+    },
+    "containers_by_kind": {
+      "appendix": 1,
+      "chapter": 25,
+      "courtRules": 1,
+      "level": 1,
+      "part": 13,
+      "subchapter": 29,
+      "title": 2
+    },
+    "addresses": {
+      "aliases": 229,
+      "disambiguated": 0,
+      "assigned": 3
+    },
+    "notes": {
+      "enacted": 1498,
+      "editorial": 593
+    },
+    "notes_by_group": {
+      "courtRules": 1,
+      "editorialNotes": 303,
+      "execDoc": 9,
+      "statutoryNotes": 539,
+      "ungrouped": 1239
+    },
+    "footnotes": 107,
+    "with_images": 1,
+    "references": {
+      "operative": {
+        "exact": 644,
+        "target-status": 14,
+        "ambiguous": 0,
+        "unit-only": 11,
+        "range-form": 1,
+        "no-unit": 273,
+        "outside": 192,
+        "malformed": 0
+      },
+      "enacted": {
+        "exact": 332,
+        "target-status": 18,
+        "ambiguous": 0,
+        "unit-only": 14,
+        "range-form": 0,
+        "no-unit": 364,
+        "outside": 1454,
+        "malformed": 0
+      },
+      "editorial": {
+        "exact": 275,
+        "target-status": 47,
+        "ambiguous": 0,
+        "unit-only": 14,
+        "range-form": 1,
+        "no-unit": 259,
+        "outside": 4919,
+        "malformed": 0
+      }
+    },
+    "outside_by_body": {
+      "/us/act": 739,
+      "/us/pl": 3310,
+      "/us/stat": 2516
+    },
+    "definitions": {
+      "enacted": 7,
+      "restated": 100,
+      "unresolved": 37
+    },
+    "definitions_by_kind": {
+      "borrowed": 7,
+      "does_not_include": 1,
+      "includes": 15,
+      "means": 121
+    },
+    "not_imported": {
+      "tables_of_contents": 19,
+      "footnotes_in_tables_of_contents": 4,
+      "links_in_tables_of_contents": 341,
+      "release_notes": 3,
+      "links_without_words": 0,
+      "note_group_headings": 358
+    }
+  },
+  "by_source": [
+    {
+      "source": "usc01.xml",
+      "positive_law": true,
+      "units": 39,
+      "provisions": 129,
+      "definitions": 10
+    },
+    {
+      "source": "usc11a.xml",
+      "positive_law": false,
+      "units": 230,
+      "provisions": 2362,
+      "definitions": 4
+    },
+    {
+      "source": "usc45.xml",
+      "positive_law": false,
+      "units": 294,
+      "provisions": 2366,
+      "definitions": 130
+    }
+  ]
+}

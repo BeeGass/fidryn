@@ -1,0 +1,19 @@
+<!-- Invented for tests: this document is not the text of any law. -->
+<uscDoc xmlns="http://xml.house.gov/schemas/uslm/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xml.house.gov/schemas/uslm/1.0 USLM-1.0.15.xsd">
+<meta>
+<docPublicationName>Online@999-1</docPublicationName>
+<property role="is-positive-law">no</property>
+</meta>
+<appendix identifier="/us/usc/t99a"><num value="99a">Title 99—Appendix</num><heading>Appendix</heading>
+<compiledAct identifier="/us/usc/t99a/pl/999/2"><heading>DEMONSTRATION ACT</heading>
+<title identifier="/us/usc/t99a/pl/999/2/tI"><num value="I">TITLE I</num><heading>Invented Matters</heading>
+<section identifier="/us/usc/t99a/pl/999/2/tI/s101"><num value="101">Sec. 101.</num><heading>Aim of the Invented Act</heading><content>The invented act shows how a compiled act is read.</content></section>
+</title>
+</compiledAct>
+<courtRules identifier="/us/usc/t99a/courtRules/Proc"><heading>RULES OF INVENTED PROCEDURE</heading>
+<article identifier="/us/usc/t99a/courtRules/Proc/aA"><num value="A">ARTICLE A.</num><heading>Opening Matters</heading>
+<courtRule identifier="/us/usc/t99a/courtRules/Proc/rule7"><num value="7">Rule 7.</num><heading>Reach of the Invented Rules</heading><content>The invented rules govern invented hearings.</content></courtRule>
+</article>
+</courtRules>
+</appendix>
+</uscDoc>

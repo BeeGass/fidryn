@@ -1,0 +1,102 @@
+edition 2
+module "/us/usc/ptVIII/rule8012" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8012" courtRule {
+    num "8012" "Rule 8012."
+    heading "Disclosure Statement"
+    provision "/us/usc/ptVIII/rule8012/a" subsection {
+      num "a" "(a)"
+      heading "Disclosure by a Nongovernmental Corporation."
+      chapeau "Any nongovernmental corporation that is a party to a district-court or BAP proceeding or that seeks to intervene must file a statement that:"
+      provision "/us/usc/ptVIII/rule8012/a/1" paragraph {
+        num "1" "(1)"
+        content "identifies any parent corporation and any publicly held corporation that owns 10% or more of its stock; or"
+        hash "67929e2a62e906c557cde4d1bca2a7541140dd3e7d83f98fd7ea41f2f784658d"
+      }
+      provision "/us/usc/ptVIII/rule8012/a/2" paragraph {
+        num "2" "(2)"
+        content "states that there is no such corporation."
+        hash "d1effc9d25a7ceb393df9544b00c9dd395a78b2906977824f5d9166ef13f5316"
+      }
+      hash "063679bf1083c281aad357333c6ba11fe9399f2ab91080ebfc1c7a7e62ca9381"
+    }
+    provision "/us/usc/ptVIII/rule8012/b" subsection {
+      num "b" "(b)"
+      heading "Disclosure About the Debtor."
+      chapeau "The debtor, the trustee, or, if neither is a party, the appellant must file a statement that:"
+      provision "/us/usc/ptVIII/rule8012/b/1" paragraph {
+        num "1" "(1)"
+        content "identifies each debtor not named in the caption; and"
+        hash "ee715c02f7d1917e73b3e0af3b9ba7a86b4fd03c4c3f279513dbfcdb6b18fc55"
+      }
+      provision "/us/usc/ptVIII/rule8012/b/2" paragraph {
+        num "2" "(2)"
+        content "for each debtor that is a corporation, discloses the information required by (a)."
+        hash "f650ffc1646866dc62eec330d4e5f2467196219a370fb6b1a8999678dee87657"
+      }
+      hash "b6734e6d21887fb57b8d9553d76d732f8a51cde563a810ec38ecbb05f26e2fd3"
+    }
+    provision "/us/usc/ptVIII/rule8012/c" subsection {
+      num "c" "(c)"
+      heading "Time to File; Supplemental Filing."
+      chapeau "A Rule 8012 statement must:"
+      provision "/us/usc/ptVIII/rule8012/c/1" paragraph {
+        num "1" "(1)"
+        content "be filed with the principal brief or upon filing a motion, response, petition, or answer in the district court or BAP, whichever occurs first—unless a local rule requires earlier filing;"
+        hash "0c3528f71cb0c811981e6ba01a0af076b427e9c51a40d65658db4f89072d8227"
+      }
+      provision "/us/usc/ptVIII/rule8012/c/2" paragraph {
+        num "2" "(2)"
+        content "be included before the table of contents in the principal brief; and"
+        hash "f65d45c6baa590ebfcbb724c390a76fd011ca3538b55413d235e8cbdac4f1fac"
+      }
+      provision "/us/usc/ptVIII/rule8012/c/3" paragraph {
+        num "3" "(3)"
+        content "be supplemented whenever the information required by this rule changes."
+        hash "bfe155ca1c667d31f1ad3cc0a359fc0e519bbd351a37364ff84e56fcdbab5c2f"
+      }
+      hash "3db3cebef9416cfcbe929dfcedef8143c7dbc91aa2945d6ff1d758507f2e5322"
+    }
+    hash "feb839f81cb5763af288a98431fd5e784e3e303abe73315a1b42b86d9394217c"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8012, Apr. 25, 1983, eff. Aug. 1, 1983, related to oral argument, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "2b7740b21a3f65bbb1e15412d977003d294ad575cd951ecf60e99ba2582f8f48"
+  }
+  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from F.R.App.P. 26.1. It requires the filing of corporate disclosure statements and supplemental statements in order to assist district court and BAP judges in determining whether they should recuse themselves. Rule 9001 makes the definitions in § 101 of the Code applicable to these rules. Under § 101(9) the word “corporation” includes a limited liability company, limited liability partnership, business trust, and certain other entities that are not designated under applicable law as corporations."
+    p "If filed separately from a brief, motion, response, petition, or answer, the statement must be filed and served in accordance with Rule 8011. Under Rule 8015(a)(7)(B)(iii), the corporate disclosure statement is not included in calculating applicable word-count limitations."
+    p "Changes Made After Publication and Comment. A sentence was added to the Committee Note to draw attention to the broad definition of “corporation” under § 101(9) of the Bankruptcy Code."
+    hash "36bf2cb23db08e40f1286a3d41295077c46838e72e2287ce586931ea936ec469"
+  }
+  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2020 Amendment"
+    p "The rule is amended to conform to recent amendments to F.R.App.P. 26.1. Subdivision (a) is amended to encompass nongovernmental corporations that seek to intervene on appeal."
+    p "New subdivision (b) requires disclosure of the name of all of the debtors in the bankruptcy case. The names of the debtors are not always included in the caption of appeals. It also requires, for corporate debtors, disclosure of the same information required to be disclosed under subdivision (a)."
+    p "Subdivision (c), previously subdivision (b), now applies to all the disclosure requirements in Rule 8012."
+    hash "ecd70482d9c070aeaaf30353db9093bcf80e6f1b1d6cab59107ce803de830495"
+  }
+  note "/us/usc/ptVIII/rule8012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8012 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "214e40faa01d5d19a5f3c8afaa0742ff5c0d609ef6fb3ed6c022b464ccf21138"
+  }
+  layers {
+    operative "feb839f81cb5763af288a98431fd5e784e3e303abe73315a1b42b86d9394217c"
+    enacted "14bdfa0e419b6888e6874211640820c31fcd80e34108bd693e373fb050306afd"
+    editorial "5b89c3ff0a1b95395f7a91f2e56edff335ed43df3b85d0636398e312746369a1"
+  }
+}

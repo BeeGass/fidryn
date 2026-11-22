@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/ptVII/rule7005" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7005" courtRule {
+    num "7005" "Rule 7005."
+    heading "Serving and Filing Pleadings and Other Papers"
+    content "Fed. R. Civ. P. 5 applies in an adversary proceeding."
+    hash "d71f36f4f318cbc5c599686af99ce1a5942efc424a0e944be15291ed3bad35d3"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7005/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Rule 5 F.R.Civ.P. refers to Rule 4 F.R.Civ.P. Pursuant to Rule 7002 this reference is to Rule 4 F.R.Civ.P. as incorporated and modified by Rule 7004."
+    hash "3e7216b653dab46a966b5005cbf59ea0af2ea32518262976cfdff33970951ece"
+  }
+  note "/us/usc/ptVII/rule7005/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7005 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "e990251f457cad2cb314824b8577a97e441f7537e66a8e10ae1f561bde36c6ea"
+  }
+  note "/us/usc/ptVII/rule7005/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a8b0d14404030ae6cd9802bba522a79598c37d8f345183f04aac21d3f850d80"
+  }
+  layers {
+    operative "d71f36f4f318cbc5c599686af99ce1a5942efc424a0e944be15291ed3bad35d3"
+    enacted "f57c7fcb1ec59030d14725f3c68a7cba1fd4e337ea5e467ebe5448fc64af78a0"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

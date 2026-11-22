@@ -30,6 +30,13 @@ pub enum DiagnosticCode {
     E540,
     W610,
     W620,
+    E700,
+    E710,
+    E720,
+    E730,
+    E740,
+    W750,
+    W760,
 }
 
 impl DiagnosticCode {
@@ -53,12 +60,19 @@ impl DiagnosticCode {
             Self::E540 => "E540",
             Self::W610 => "W610",
             Self::W620 => "W620",
+            Self::E700 => "E700",
+            Self::E710 => "E710",
+            Self::E720 => "E720",
+            Self::E730 => "E730",
+            Self::E740 => "E740",
+            Self::W750 => "W750",
+            Self::W760 => "W760",
         }
     }
 
     pub fn severity(self) -> Severity {
         match self {
-            Self::W610 | Self::W620 => Severity::Warning,
+            Self::W610 | Self::W620 | Self::W750 | Self::W760 => Severity::Warning,
             _ => Severity::Error,
         }
     }
@@ -83,6 +97,13 @@ impl DiagnosticCode {
             Self::E540 => "MissingLegalSource",
             Self::W610 => "OpenUniverse",
             Self::W620 => "BoundedVerification",
+            Self::E700 => "InvalidAddress",
+            Self::E710 => "IntegrityMismatch",
+            Self::E720 => "UnresolvedModule",
+            Self::E730 => "WorkspaceViolation",
+            Self::E740 => "PinMismatch",
+            Self::W750 => "StaleBinding",
+            Self::W760 => "ToolchainMismatch",
         }
     }
 }
@@ -155,5 +176,117 @@ impl fmt::Display for Diagnostic {
             write!(f, "{source}: ")?;
         }
         write!(f, "{} {}: {}", self.code, self.code.title(), self.message)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{DiagnosticCode, Severity};
+    use std::fs;
+    use std::path::Path;
+
+    /// Every code of the enum. The `match` below is exhaustive, so a code
+    /// added to the enum stops this module from compiling until it is named
+    /// there; add it to the list in the same edit.
+    fn every_code() -> Vec<DiagnosticCode> {
+        use DiagnosticCode::*;
+        let codes = vec![
+            E100, E200, E210, E310, E320, E330, E340, E410, E420, E430, E431, E510, E511, E520,
+            E530, E540, W610, W620, E700, E710, E720, E730, E740, W750, W760,
+        ];
+        for code in &codes {
+            match code {
+                E100 | E200 | E210 | E310 | E320 | E330 | E340 | E410 | E420 | E430 | E431
+                | E510 | E511 | E520 | E530 | E540 | W610 | W620 | E700 | E710 | E720 | E730
+                | E740 | W750 | W760 => {}
+            }
+        }
+        codes
+    }
+
+    /// The lines of the first fenced block under `## Diagnostic codes`.
+    fn code_list(guide: &str) -> Vec<String> {
+        let mut lines = guide
+            .lines()
+            .skip_while(|line| line.trim_end() != "## Diagnostic codes");
+        assert!(
+            lines.next().is_some(),
+            "the guide has no `## Diagnostic codes` section"
+        );
+        let mut lines = lines.skip_while(|line| !line.starts_with("```"));
+        assert!(
+            lines.next().is_some(),
+            "the `## Diagnostic codes` section has no code block"
+        );
+        lines
+            .take_while(|line| !line.starts_with("```"))
+            .map(|line| line.trim_end().to_owned())
+            .collect()
+    }
+
+    #[test]
+    fn new_codes_have_their_names_titles_and_severities() {
+        let expected = [
+            (
+                DiagnosticCode::E700,
+                "E700",
+                "InvalidAddress",
+                Severity::Error,
+            ),
+            (
+                DiagnosticCode::E710,
+                "E710",
+                "IntegrityMismatch",
+                Severity::Error,
+            ),
+            (
+                DiagnosticCode::E720,
+                "E720",
+                "UnresolvedModule",
+                Severity::Error,
+            ),
+            (
+                DiagnosticCode::E730,
+                "E730",
+                "WorkspaceViolation",
+                Severity::Error,
+            ),
+            (DiagnosticCode::E740, "E740", "PinMismatch", Severity::Error),
+            (
+                DiagnosticCode::W750,
+                "W750",
+                "StaleBinding",
+                Severity::Warning,
+            ),
+            (
+                DiagnosticCode::W760,
+                "W760",
+                "ToolchainMismatch",
+                Severity::Warning,
+            ),
+        ];
+        for (code, name, title, severity) in expected {
+            assert_eq!(code.as_str(), name);
+            assert_eq!(code.title(), title, "{name}");
+            assert_eq!(code.severity(), severity, "{name}");
+        }
+    }
+
+    #[test]
+    fn the_code_list_of_the_architecture_guide_is_the_enum() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../docs/ARCHITECTURE.md");
+        let guide = fs::read_to_string(&path)
+            .unwrap_or_else(|error| panic!("read docs/ARCHITECTURE.md: {error}"));
+        let mut listed = code_list(&guide);
+        listed.sort();
+        let mut expected: Vec<String> = every_code()
+            .into_iter()
+            .map(|code| format!("{} {}", code.as_str(), code.title()))
+            .collect();
+        expected.sort();
+        assert_eq!(
+            listed, expected,
+            "docs/ARCHITECTURE.md must list every diagnostic code once, with its title"
+        );
     }
 }

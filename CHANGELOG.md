@@ -5,6 +5,325 @@ interchange schema versions are maintained independently of the interpreter.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-22
+
+### Changed
+
+- `fidryn check PATH` given a directory checks the workspace at its top,
+  where 0.2.0 tried to read the directory as a module file and reported
+  `E100`; given a file, it checks the module as before.
+- The public enumeration `fidryn_core::DiagnosticCode` has seven new
+  variants, `E700`, `E710`, `E720`, `E730`, `E740`, `W750` and `W760`, and
+  `fidryn_cli::Command` four, `Ingest`, `Text`, `Coverage` and `Changes`.
+  Neither is `#[non_exhaustive]`, so a `match` that lists every variant of
+  either no longer compiles. `Command::Check` has five new fields, `jobs`,
+  `cache_dir`, `no_cache`, `report` and `unresolved`, which a pattern
+  without `..` and an expression that builds the variant must name.
+
+### Added
+
+- Law modules of edition 2, which hold provisions of law as data. A file
+  whose first two words are `edition 2` is read by a parser of its own,
+  lowered into the model of `fidryn-provision`, and checked as one module by
+  `fidryn check`: its shape, its addresses, the normalization of its text,
+  its hashes, its footnote markers and its definitions. Every other command,
+  and `fidryn_cli::compile_source` and `compile_module`, refuses such a file
+  with `E100`. A file without the marker is read as before.
+- `fidryn_provision::render::render`, which writes a module in its
+  canonical form with every hash computed, and `hash::tree_hashes`, the tree
+  hash of every provision of a tree in one pass.
+- The documentation check reads a block that begins with `edition 2` as a
+  complete module and checks it.
+- Workspaces of edition 2 modules. `fidryn check DIR` checks a directory
+  with a manifest, `workspace.json`, at its top: every module by itself,
+  then the manifest, the lock `law.lock.json` of a generated workspace,
+  where each module stands, the agreement of the module files with the
+  lock (`E730`), the containers and their members (`E720`), and the
+  toolchain's version (`W760`, a warning); it prints a summary line.
+  `fidryn_driver::workspace::GeneratedWriter` writes a generated workspace.
+  The manifest, the lock and the retrieval record refuse a file whose JSON
+  value is not the value they write back, and have the JSON Schemas
+  `schemas/workspace-v0.1.json`, `law-lock-v0.1.json` and
+  `retrieval-v0.1.json`.
+- `fidryn ingest uscode ARCHIVE_DIR --out DIR` imports the United States
+  Code from the archives of one release of the official XML release point
+  published by the Office of the Law Revision Counsel, each verified
+  against its retrieval record, and writes a generated workspace that
+  `fidryn check` accepts, the same bytes on every run and on every host.
+  `--title T` writes only the titles named, `--jobs N` sets the number of
+  workers, and `--verify` writes nothing and reports each path under `DIR`
+  that is missing, extra or different, every entry a run would refuse
+  among the extra. `GeneratedWriter::compare` makes a writer that compares
+  instead of writing, by the rule by which `create` refuses a directory.
+- The importer of the Code, and the independent reading in `conformance/`,
+  read a document whose `docPublicationName` writes the release with an en
+  dash, each en dash of the name read as a hyphen, and a document without
+  the property `is-positive-law`, whose modules then declare no
+  `positive_law` and whose units have `"positive_law":null` in their text
+  records. A document with two such properties is refused by both.
+- `fidryn text DIR [ADDRESS] [--json]` prints the text of the provisions
+  and notes of a workspace, or of one address and what lies below it: for
+  a person, each provision indented by its depth and the notes after the
+  provisions of their unit, or with `--json` one text record to a line in
+  the byte order of their addresses, whose JSON Schema is
+  `schemas/text-record-v0.1.json`. `fidryn_driver::workspace::read_modules`
+  reads the modules of a workspace. The repository holds the workspace
+  imported from the sample of the Code, `samples/uscode/workspace/`, and
+  `cargo xtask uscode-sample`, which `cargo xtask ci` runs, checks that the
+  committed archives match their retrieval record, that the workspace is,
+  byte for byte, what the importer writes from them on one worker and on
+  eight, that it checks with no error, that its counts of references by
+  layer and outcome are those of the committed profile, and that its text
+  equals, line for line, what `conformance/uslm_text.py` reads from the
+  publisher's XML; `--update` writes the workspace.
+- The importer of the Code extracts definitions: a provision whose first
+  paragraph of a chapeau or a content defines a term in one of a closed list
+  of forms gets a `definition` block in its unit's module, with the terms,
+  the kind (`means`, `includes`, `does_not_include` or `borrowed`), the
+  words that state its reach, or `unstated`, the region those words name,
+  the basis (`enacted`, `restated` or `unresolved`), what a borrowed
+  definition borrows from, and the editorial note "References in Text" to
+  read with a restated one (`fidryn_ingest_uscode::definitions::extract`).
+  The rules do not find every definition. The one-module check accepts
+  reach words that stand in the text of the provision or in the chapeau of
+  any of its ancestors. The sample's modules hold the definitions
+  extracted from them. `conformance/usc_definitions.py` implements the
+  rules a second time, on the independent reading of the publisher's XML
+  and sharing no code with the importer: it writes the definitions of a
+  release, one JSON object to a line, and with `--against DIR` compares
+  them with those of a workspace. `cargo xtask uscode-sample` holds the
+  definitions of the sample's modules to it.
+- References and interfaces. The check of a workspace gives every
+  reference of every module one of eight outcomes (`exact`,
+  `target-status`, `ambiguous`, `unit-only`, `range-form`, `no-unit`,
+  `outside` and `malformed`), counted by layer and never a diagnostic. It
+  runs in two phases on `--jobs` threads, with the same output for any
+  number of them: each module by itself, then the checks across modules
+  from the interface of each module alone
+  (`fidryn_provision::Interface`, `fidryn.interface/v0.1`;
+  `fidryn_driver::workspace::check_interfaces`). `fidryn check DIR
+  --report FILE` writes the check report, whose JSON Schema is
+  `schemas/check-report-v0.1.json`, and `--unresolved FILE` every
+  reference whose outcome is not `exact`, one JSON object to a line.
+- A cache of the check of a workspace. The result of checking each module
+  file by itself, its digest, its diagnostics and its interface, is kept on
+  disk under a key of the file's bytes, the toolchain's version and the
+  identity of the running executable, and a later check reads it instead
+  of checking the module again; its output is the same but for the count
+  `from cache`, which does not depend on the number of workers. The
+  directory is `--cache-dir DIR`, else `$FIDRYN_CACHE_DIR`, else
+  a directory of the user; `--no-cache` keeps none. The module of
+  a damaged entry is checked again and its entry rewritten, and a cache
+  that cannot be written does not fail the check.
+- Names across curated modules. The check of a workspace resolves the
+  imports, citations and bindings of each curated module from the
+  interfaces alone (`fidryn_check::e2::names::resolve`): an import names a
+  module of the workspace or of a dependency (`E720`); its alias and the
+  names it brings into scope share one set with the module's citations
+  and bindings; and the name after `binds`, `name` or `alias.name`, names
+  exactly one citation (`E200`). An address that two modules declare is
+  `E700`. The interface records the range of each part of an import, a
+  citation and a binding.
+- Dependencies between workspaces. A curated workspace names each
+  generated workspace it depends on with its relative `path`, its
+  `release` and the BLAKE3 of the bytes of its lock; a dependency that is
+  no generated workspace with a lock, of another digest or release, or
+  with an error of its own is `E740`, and an absolute path, a name listed
+  twice and a prefix that overlaps another are `E730`. Each dependency is
+  checked by itself through the cache of the depending workspace, and
+  nothing is written into its directory, but through a symbolic link below
+  the cache's directory that leads into it: a cache whose directory is the
+  directory of a dependency, lies inside it or holds it is not used, and
+  the check says so once. The target
+  of every citation gets an outcome from the modules of the workspace and
+  of its dependencies: the check report counts the citations by outcome,
+  in `citations`, and the unresolved list has a line for each citation
+  that is not `exact`; what a dependency that failed hides is left out of
+  both.
+  `check_interfaces` takes what is known of each dependency
+  (`fidryn_driver::workspace::DependencyInterfaces`).
+- A curated sample, `samples/uscode/curated/`, which depends on the
+  generated sample of the Code at its pinned release and cites sections,
+  deeper provisions, a rule of the appendix title and a note of it.
+  `cargo xtask uscode-sample` also checks it, and fails on an error, a
+  warning or a citation whose outcome is not `exact`, naming the file, and
+  when the check counts no citation, naming the curated sample; `--update`
+  also writes the pin and the toolchain of its manifest.
+- Bindings and staleness. The check of a workspace compares each binding
+  of a curated module with the dependency it binds into: a binding is
+  stale (`W750`, a warning at its name, counted in `warnings` and never
+  changing the exit status) when its address is no longer a provision of
+  a dependency ("provision removed or moved"), when the tree hash of the
+  provision differs ("provision text changed"), or when the enacted-layer
+  hash of its unit differs ("enacted notes of the unit changed"); the
+  warning names the binding, the address, the reason, the release it was
+  written against and the release of the dependency. A change to
+  editorial matter makes nothing stale, and a dependency that failed
+  makes no binding stale. `fidryn text DIR ADDRESS --hashes` prints the
+  two lines a binding to a provision records, `provision_hash` and
+  `notes_hash`, and `fidryn_provision::staleness` gives the reason
+  (`StaleReason`). An alias of a unit stands for the unit in
+  `AddressIndex::provision_hash`. The curated sample binds one section of
+  the generated sample, and the sample step fails when that binding is
+  stale. `DependencyInterfaces::Loaded`, what is known of a dependency
+  that passed its checks, holds its name, the release of its lock, which a
+  stale binding into it is reported with, its prefix and the interfaces of
+  its modules.
+- The coverage ledger of a generated workspace, `coverage.json`,
+  `fidryn.coverage/v0.1`, with the JSON Schema
+  `schemas/coverage-v0.1.json`: the units, containers and provisions
+  imported, the notes, footnotes and images, the references of each layer
+  by outcome, the definitions extracted by basis and by kind, the lock's
+  counts of addresses and of what was not imported, and a row for each
+  source file. `fidryn_provision::records::coverage` counts it from the
+  interfaces of the modules, the index of their addresses, the manifest
+  and the lock. `GeneratedWriter::finish` writes it after the lock, and
+  `--verify` compares it; `fidryn coverage DIR` prints it, counted from the
+  modules as they stand (`fidryn_driver::workspace::read_coverage`). The
+  sample's workspace holds its ledger, `cargo xtask uscode-sample` holds
+  the ledger to `fidryn coverage` and, key for key, to the independent
+  profile, and the site shows its figures in the guide Coverage,
+  `docs/coverage.md`, whose table the step generates and checks.
+- Change sets. `fidryn changes OLD_DIR NEW_DIR` prints what changed
+  between two generated workspaces of one prefix, each read as `fidryn
+  check` reads it: the provisions added, removed, moved, amended in their
+  own words or in their own structure, the enacted and the editorial notes
+  added, removed, moved or amended, the units and containers whose credit
+  or footnotes changed, and the containers added, removed or changed. Units
+  are compared by their layer hashes first, and only those whose hashes
+  differ are read again; a removed and an added provision whose tree hashes
+  are equal with their own numbers left out have moved
+  (`fidryn_provision::changes::unnumbered_hash`). With `--bindings DIR` it
+  lists the bindings of a curated workspace that are stale against
+  `NEW_DIR`, whatever its pin; a directory given twice is read once. As
+  `fidryn check` does, it says once when a cache could not be used or
+  written. It prints the text of a commit message, or
+  with `--json` the change set, whose JSON Schema is
+  `schemas/change-set-v0.1.json`
+  (`fidryn_driver::workspace::changes::change_set`).
+  `conformance/usc_compare.py` compares two releases of the publisher's XML
+  from their text records alone and checks a change set against them; the
+  conformance tests, which `cargo xtask ci` now runs with the built binary
+  in `FIDRYN_BINARY`, run both on invented pairs of releases.
+- `tools/check-law-repository.sh DIR`, a script of the repository, checks
+  every workspace at the top of a directory, such as a law repository, with
+  a release build of the commit, or with the binary `FIDRYN_BINARY` names:
+  it compares the version each manifest records with the binary's and runs
+  `fidryn check` on each, every run under limits of time and of address
+  space where `timeout` and `prlimit` exist (it says which limit it cannot
+  apply), with a cache outside `DIR` that it makes only when `DIR` holds a
+  workspace, and fails when a version differs or a check fails.
+  It builds through `lease` when that command exists and never falls back.
+- `law-repository.pin.json`, which names no law repository, and the
+  workflow `Law integration`, whose two jobs check the law repository at
+  its pin with the toolchain of the commit under test, and the newest of
+  each against the other; while the pin is empty each job says so and
+  ends, and the workflow runs only when it is started by hand.
+- The reference of law modules is the guide Law modules of the site, in
+  the group Write, in reading order, with a section of its limits;
+  `docs/implementation-status.md` has a section for edition 2, and
+  `docs/language.md` a section on the two editions.
+- `tools/replay_uscode.py`, which makes the 27 release points the
+  publisher lists for 2026, in its order, the commits of a repository of
+  the imported law: each release fetched when it is absent, imported into
+  `uscode.next/` and checked, its two readings compared, its change set
+  written to `changes/<release>.json`, `uscode/` replaced, and the text
+  form of the change set committed as the message, read back and held to
+  it byte for byte. The comparison holds what `fidryn text uscode.next
+  --json` prints to what `conformance/uslm_text.py` prints for the
+  release's archives, line for line, and the tables of contents that
+  `conformance/usc_profile.py` counts to those of the import's ledger; a
+  difference stops the replay before the commit, naming the release and
+  the first line that differs or the two counts, and `--no-readings` skips
+  the comparison and says so; a release kept uncompared by such a run is
+  compared by the next run without the option before its commit. A replay
+  that is stopped goes on from the release it was in; it removes only
+  `uscode/`, under stated conditions. It starts each run of `fidryn` and
+  of the two scripts in a session of its own, with a limit on its time and
+  on the address space of each of its processes, and kills every process
+  of a run that reaches its time; a script with `--jobs N` above 1 runs as
+  N workers, its own process and a small tracker, so that it may take up
+  to N + 2 times `--memory-limit`.
+  `tools/draw_definition_samples.py` draws, with a seed and a generator
+  written out in the tool, the two samples of 500 that a person reads to
+  judge the extracted definitions and to estimate the ones the closed
+  patterns miss, each line with what a reader needs and an empty verdict.
+- The cache of `fidryn check DIR` and of `fidryn changes` is, by default,
+  `fidryn` in the cache directory of the user, outside every workspace:
+  in `XDG_CACHE_HOME`, else in `~/.cache`, and on Windows in
+  `LOCALAPPDATA`; when none of them is set to an absolute path, or the
+  directory there lies inside a workspace that is read or inside one of its
+  dependencies, the check keeps no cache and says so once. One cache serves
+  every workspace. A check trusts what its cache holds, so a cache belongs
+  where only people one trusts can write; a cache named inside a workspace
+  with `--cache-dir` or `FIDRYN_CACHE_DIR` is used, and a `.fidryn-cache`
+  that a workspace carries is otherwise not read.
+- `fidryn ingest uscode --out DIR` writes only over an earlier output of
+  itself: before it writes anything it reads the head of every `.fr` file
+  of `DIR`, and refuses the directory, naming each, for a file of the first
+  edition, a module of another prefix and a module at another path; it
+  removes only modules of an earlier run.
+- A command reads the manifest and the lock of a workspace and of each
+  dependency, and an entry of the cache, only from a regular file of at
+  most 64 MiB: a symbolic link, a named pipe, a device or a directory in
+  its place is refused before it is opened (`E730`, and `E740` for a
+  dependency), a larger file is refused with a sentence that gives the
+  bound, and such an entry of the cache is a miss.
+- The edition marker is looked for in a regular file only: an input that
+  is no regular file, such as a pipe or `/dev/stdin`, is read by every
+  command as a file of the first edition, as in 0.2.0, and a module of
+  edition 2 is read from a regular file.
+- The importer of the Code and the independent reading in `conformance/`
+  read the topics of a note as its `topic` attribute split at spaces with
+  no empty member, so that an empty attribute gives no topic, and read
+  quoted content whose `origin` is empty as having none; a topic that holds
+  any other white space is refused with the note named. A workspace the
+  importer writes from such a release checks.
+- Both readings of the publisher's XML refuse a `ref` that has an `href`
+  and the class `footnoteRef`, which would be at once a link and a footnote
+  marker, with the element named.
+- Both readings of the publisher's XML refuse, with the element named, a
+  footnote inside a footnote, a `note` in quoted content anywhere but
+  directly in it or in one of its levels, white space inside a `br`, an
+  `img` or a column, an identifier of a unit or a container with an empty
+  member, and an identifier of a provision that is empty or begins with a
+  space. Both read a `continuation` or a `proviso` inside a `content` that
+  stands directly in a note as blocks of the note, split the class of a
+  `ref` into words at ASCII white space alone, close the open paragraph of
+  a level of quoted content at its `num` and at its `heading`, leave a
+  footnote inside a release note out with the note, and count each `toc`
+  element once, one inside another included.
+- A change set pairs like-named notes by their note hashes before it
+  compares notes by address: within one unit or container, one layer and
+  one family of notes whose addresses differ only in the ordinal that marks
+  like-named notes, an old and a new note of equal hashes are one note,
+  unchanged at one address and `moved` between two, so that a note inserted
+  before two like-named notes is `added` and the two have moved.
+  `conformance/usc_compare.py` pairs them in the same way, by their
+  records, before it builds the sets that `--against` checks.
+- `fidryn ingest uscode` opens the retrieval record only when it is a
+  regular file, refusing a symbolic link, a directory, a pipe or a device in
+  its place before it is opened, and reads it through a bound of 1 MiB; the
+  files of the archive directory that the record does not list are named in
+  the order of the bytes of their names.
+- The importer of the Code refuses, with the element named and before it
+  reads the document's modules, an element nested more than 64 deep in its
+  unit or container and a container more than 64 deep among the containers
+  of its file, so that it writes no module the check refuses for its
+  nesting and reads no document deeper than that; the independent reading
+  refuses the same. It refuses a document of more than 8,388,608 nodes,
+  three times the largest member of release 119-142.
+- `fidryn changes` holds each module file it reads again to the BLAKE3
+  that its check accepted, and ends with an `E730` naming a file that
+  changed after the check read it.
+- `conformance/uslm_text.py` and `usc_profile.py` hold the size of a
+  deflated member to the end of its compressed stream as well as to its
+  header, and refuse a member whose header declares fewer bytes than it
+  holds.
+- A roadmap page, `docs/roadmap.md`, shown on the site as the guide
+  "Roadmap": the destination, what exists today at each depth, and what
+  comes next.
+
 ## [0.2.0] - 2026-11-22
 
 ### Changed

@@ -1,0 +1,42 @@
+edition 2
+module "/us/usc/ptIII" {
+  within "/us/usc/t11a/~courtRules.1"
+  source "usc11a.xml"
+  positive_law false
+  container "/us/usc/ptIII" part {
+    num "III" "PART III—"
+    heading "CLAIMS; PLANS; DISTRIBUTIONS TO CREDITORS AND EQUITY SECURITY HOLDERS"
+    member "/us/usc/ptIII/rule3001"
+    member "/us/usc/ptIII/rule3002"
+    member "/us/usc/ptIII/rule3002.1"
+    member "/us/usc/ptIII/rule3003"
+    member "/us/usc/ptIII/rule3004"
+    member "/us/usc/ptIII/rule3005"
+    member "/us/usc/ptIII/rule3006"
+    member "/us/usc/ptIII/rule3007"
+    member "/us/usc/ptIII/rule3008"
+    member "/us/usc/ptIII/rule3009"
+    member "/us/usc/ptIII/rule3010"
+    member "/us/usc/ptIII/rule3011"
+    member "/us/usc/ptIII/rule3012"
+    member "/us/usc/ptIII/rule3013"
+    member "/us/usc/ptIII/rule3014"
+    member "/us/usc/ptIII/rule3015"
+    member "/us/usc/ptIII/rule3015.1"
+    member "/us/usc/ptIII/rule3016"
+    member "/us/usc/ptIII/rule3017"
+    member "/us/usc/ptIII/rule3017.1"
+    member "/us/usc/ptIII/rule3017.2"
+    member "/us/usc/ptIII/rule3018"
+    member "/us/usc/ptIII/rule3019"
+    member "/us/usc/ptIII/rule3020"
+    member "/us/usc/ptIII/rule3021"
+    member "/us/usc/ptIII/rule3022"
+    hash "44e888158ba1b2001d76371fd2b1ebd25e943f9f423470900f488f0af33eedcf"
+  }
+  layers {
+    operative "44e888158ba1b2001d76371fd2b1ebd25e943f9f423470900f488f0af33eedcf"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

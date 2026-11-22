@@ -1,0 +1,25 @@
+edition 2
+module "/us/usc/t45/s917" {
+  within "/us/usc/t45/ch18"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s917" section {
+    num "917" "§ 917."
+    heading "Applicability of National Environmental Policy Act"
+    content "The provisions of the National Environmental Policy Act [" ["42 U.S.C. 4321" -> "/us/usc/t42/s4321"] " et seq.] shall not apply to transactions carried out pursuant to this chapter."
+    hash "edac3fdb6615bb3b9c6b0a6745efdd1989ab6ffc2ea0a0cdb4e7e00b4bc715c5"
+  }
+  credit "(" ["Pub. L. 96–101, § 19" -> "/us/pl/96/101/s19"] ", Nov. 4, 1979, " ["93 Stat. 746" -> "/us/stat/93/746"] ".)"
+  note "/us/usc/t45/s917/note/editorialNotes/pl.91.190/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The National Environmental Policy Act, referred to in text, probably means the National Environmental Policy Act of 1969, " ["Pub. L. 91–190" -> "/us/pl/91/190"] ", Jan. 1, 1970, " ["83 Stat. 852" -> "/us/stat/83/852"] ", which is classified generally to chapter 55 (§ 4321 et seq.) of Title 42, The Public Health and Welfare. For complete classification of this Act to the Code, see Short Title note set out under " ["section 4321 of Title 42" -> "/us/usc/t42/s4321"] " and Tables."
+    hash "59e7d42b7bc9323a4eaf09ef236b9776dbde16efa97c77854b03338fdeb9d4dd"
+  }
+  layers {
+    operative "edac3fdb6615bb3b9c6b0a6745efdd1989ab6ffc2ea0a0cdb4e7e00b4bc715c5"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "3f1db258543fee470d4b37672fa17ed0640cf315756ec86812dc25dff721002f"
+  }
+}

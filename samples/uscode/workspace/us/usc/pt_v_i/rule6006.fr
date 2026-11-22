@@ -1,0 +1,191 @@
+edition 2
+module "/us/usc/ptVI/rule6006" {
+  within "/us/usc/ptVI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVI/rule6006" courtRule {
+    num "6006" "Rule 6006."
+    heading "Assuming, Rejecting, or Assigning an Executory Contract or Unexpired Lease"
+    provision "/us/usc/ptVI/rule6006/a" subsection {
+      num "a" "(a)"
+      heading "Procedure in General."
+      content "Rule 9014 governs a proceeding to assume, reject, or assign an executory contract or unexpired lease, other than as part of a plan."
+      hash "d866de4b1153d195098654ce96c0bbe8c9ed5c9c93dd9c2faaf7c89a09fef044"
+    }
+    provision "/us/usc/ptVI/rule6006/b" subsection {
+      num "b" "(b)"
+      heading "Requiring a Trustee, Debtor in Possession, or Debtor to Assume or Reject a Contract or Lease."
+      content "In a Chapter 9, 11, 12, or 13 case, Rule 9014 governs a proceeding by a party to an executory contract or unexpired lease to require the trustee, debtor in possession, or debtor to determine whether to assume or reject the contract or lease."
+      hash "0dd2ba9146b4abb813e415507711f76c5a5038e563c26f4220d29c327bd684bf"
+    }
+    provision "/us/usc/ptVI/rule6006/c" subsection {
+      num "c" "(c)"
+      heading "Notice of a Motion."
+      content {
+        p "Notice of a motion under (a) or (b) must be given to:"
+        p "• the other party to the contract or lease;"
+        p "• other parties in interest as the court orders; and"
+        p "• except in a Chapter 9 case, the United States trustee."
+      }
+      hash "a0ed8ade3fe6a45b08e23d4310b4b088356ccac0e8e587ae47f4eb297348b18c"
+    }
+    provision "/us/usc/ptVI/rule6006/d" subsection {
+      num "d" "(d)"
+      heading "Staying an Order Authorizing an Assignment."
+      content "Unless the court orders otherwise, an order authorizing the trustee to assign an executory contract or unexpired lease under § 365(f) is stayed for 14 days after the order is entered."
+      hash "a82e4845dd037cbdd161fbd28cf2479083402b455681647cd03f77b1640f2e4d"
+    }
+    provision "/us/usc/ptVI/rule6006/e" subsection {
+      num "e" "(e)"
+      heading "Combining in One Motion a Request Involving Multiple Contracts or Leases."
+      provision "/us/usc/ptVI/rule6006/e/1" paragraph {
+        num "1" "(1)"
+        chapeau "Requests to Assume or Assign. The trustee must not seek authority to assume or assign multiple executory contracts or unexpired leases in one omnibus motion unless:"
+        provision "/us/usc/ptVI/rule6006/e/1/A" subparagraph {
+          num "A" "(A)"
+          content "they are all between the same parties or are to be assigned to the same assignee;"
+          hash "d4c7765a02dab2c6239844669e11daa9e649af0c8febde48f1437cc723eba567"
+        }
+        provision "/us/usc/ptVI/rule6006/e/1/B" subparagraph {
+          num "B" "(B)"
+          content "the trustee seeks to assume—but not assign to more than one assignee—unexpired leases of real property; or"
+          hash "cc197f7c64586dd35377cfd92cc16b227f7bca5b8db1e16e18084b5b151b6739"
+        }
+        provision "/us/usc/ptVI/rule6006/e/1/C" subparagraph {
+          num "C" "(C)"
+          content "the court allows the motion to be filed."
+          hash "8e8fa9cf7e33740c155879cc24444b75bf1070c96fc4873a2ab52c7c3365c76e"
+        }
+        hash "c074df90149ddf36b539f476b71dbc925cfc10eba3f16bfa09887ba2b1d2ebba"
+      }
+      provision "/us/usc/ptVI/rule6006/e/2" paragraph {
+        num "2" "(2)"
+        content "Requests to Reject. Subject to (f), a trustee may join in one omnibus motion requests for authority to reject multiple executory contracts or unexpired leases."
+        hash "1b36ae0af72b555c6124a7c36f8e42b2fd4947153ed2cab2ad0fd72befda8bdf"
+      }
+      hash "67e84480b8805376d4925ca7a96e5801a0bde4d7285885e763332b08b8302894"
+    }
+    provision "/us/usc/ptVI/rule6006/f" subsection {
+      num "f" "(f)"
+      heading "Content of an Omnibus Motion."
+      chapeau "A motion to reject—or, if permitted under (e), a motion to assume or assign—multiple executory contracts or unexpired leases that are not between the same parties must:"
+      provision "/us/usc/ptVI/rule6006/f/1" paragraph {
+        num "1" "(1)"
+        content "state in a conspicuous place that the parties’ names and their contracts or leases are listed in the motion;"
+        hash "048df1f832ab2b91da4fe8220b6f96ae61e27a3ac3ee5decc16f0fe64523403d"
+      }
+      provision "/us/usc/ptVI/rule6006/f/2" paragraph {
+        num "2" "(2)"
+        content "list the parties alphabetically and identify the corresponding contract or lease;"
+        hash "9e02d4959233ba346decee996f33857abf45b0df81d44e1c6263283213e7fe87"
+      }
+      provision "/us/usc/ptVI/rule6006/f/3" paragraph {
+        num "3" "(3)"
+        content "specify the terms, including how a default will be cured, for each requested assumption or assignment;"
+        hash "78c7ac8ada39aa706af31479040b2a52f1393931afe27fcace50380bfcdc716c"
+      }
+      provision "/us/usc/ptVI/rule6006/f/4" paragraph {
+        num "4" "(4)"
+        content "specify the terms, including the assignee’s identity and the adequate assurance of future performance by each assignee, for each requested assignment;"
+        hash "3ecf0f831474a8d263e0f335348e8273959e5195ec7192ae112ae48c854d36b3"
+      }
+      provision "/us/usc/ptVI/rule6006/f/5" paragraph {
+        num "5" "(5)"
+        content "be numbered consecutively with other omnibus motions to reject, assume, or assign executory contracts or unexpired leases; and"
+        hash "8a8e123db8dbbf89e2ce6cfd8243dac8b3caabcc287b7b1f95f409041b8a55d0"
+      }
+      provision "/us/usc/ptVI/rule6006/f/6" paragraph {
+        num "6" "(6)"
+        content "be limited to no more than 100 executory contracts or unexpired leases."
+        hash "20f59f24a3a1e75255bee0d89311aec9bc09448a7248b04f025f05d8171ef351"
+      }
+      hash "bb0fe4ed489406f5c43c2c92c6e087b9f6d8620821e7ca2618683ee64132c65c"
+    }
+    provision "/us/usc/ptVI/rule6006/g" subsection {
+      num "g" "(g)"
+      heading "Determining the Finality of an Order Regarding an Omnibus Motion."
+      content "The finality of an order regarding any executory contract or unexpired lease included in an omnibus motion must be determined as though the contract or lease were the subject of a separate motion."
+      hash "ff50a093dfe603eec0610a69d616c6037ab000a43adf46290ff7d08c4b3fe33a"
+    }
+    hash "7f3be9028ede9f4b0621919c1fecfaa9cd1ca3a5561aae6ac2f3b798e27ac87d"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 22, 1993, eff. Aug. 1, 1993; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 30, 2007, eff. Dec. 1, 2007; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Section 365(a) of the Code requires court approval for the assumption or rejection of an executory contract by the trustee or debtor in possession. The trustee or debtor in possession may also assign an executory contract, § 365(f)(1), but must first assume the contract, § 365(f)(2). Rule 6006 provides a procedure for obtaining court approval. It does not apply to the automatic rejection of contracts which are not assumed in chapter 7 liquidation cases within 60 days after the order for relief, or to the assumption or rejection of contracts in a plan pursuant to § 1123(b)(2) or § 1322(b)(7)."
+    p "Subdivision (a) by referring to Rule 9014 requires a motion to be brought for the assumption, rejection, or assignment of an executory contract. Normally, the motion will be brought by the trustee, debtor in possession or debtor in a chapter 9 or chapter 13 case. The authorization to assume a contract and to assign it may be sought in a single motion and determined by a single order."
+    p "Subdivision (b) makes applicable the same motion procedure when the other party to the contract seeks to require the chapter officer to take some action. Section 365(d)(2) recognizes that this procedure is available to these contractual parties. This provision of the Code and subdivision of the rule apply only in chapter 9, 11 and 13 cases. A motion is not necessary in chapter 7 cases because in those cases a contract is deemed rejected if the trustee does not timely assume it."
+    p "Subdivision (c) provides for the court to set a hearing on a motion made under subdivision (a) or (b). The other party to the contract should be given appropriate notice of the hearing and the court may order that other parties in interest, such as a creditors’ committee, also be given notice."
+    hash "3bb3285edce361defa6fb4b241ad6f3a44ce5accdfe26e1781c67f8fa1b5eccc"
+  }
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivisions (a) and (b) are amended to conform to the 1984 amendment to § 365 of the Code, which governs assumption or rejection of time share interests."
+    p "Section 1113, governing collective bargaining agreements, was added to the Code in 1984. It sets out requirements that must be met before a collective bargaining agreement may be rejected. The application to reject a collective bargaining agreement referred to in § 1113 shall be made by motion. The motion to reject creates a contested matter under Rule 9014, and service is made pursuant to Rule 7004 on the representative of the employees. The time periods set forth in § 1113(d) govern the scheduling of the hearing and disposition of a motion to reject the agreement."
+    hash "4b473a1c1416ec51c8d8940a47472ec2c08fcb72d80916fb8754b4e67a9e8465"
+  }
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "References to time share interests are deleted as unnecessary. Time share interests are within the scope of this rule to the extent that they are governed by § 365 of the Code."
+    p "Subdivision (b) is amended to include chapter 12 cases."
+    p "Subdivision (c) is amended to enable the United States trustee to appear and be heard on the issues relating to the assumption or rejection of executory contracts and unexpired leases. See §§ 307, 365, and 1113 of the Code."
+    hash "5a1ccd7f3d30092a5ae970ea28f9a129fbdc37bf0ceceac6ad6b3e466674cfcf"
+  }
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1993-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1993 Amendment"
+    p "This rule is amended to delete the requirement for an actual hearing when no request for a hearing is made. See Rule 9014."
+    hash "c1e8bac5580086acce43bebd8bfc95f887b3911ba626fa0b25d9ad57aaf860aa"
+  }
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "Subdivision (d) is added to provide sufficient time for a party to request a stay pending appeal of an order authorizing the assignment of an executory contract or unexpired lease under § 365(f) of the Code before the assignment is consummated. The stay under subdivision (d) does not affect the time for filing a notice of appeal in accordance with Rule 8002."
+    p "The court may, in its discretion, order that Rule 6006(d) is not applicable so that the executory contract or unexpired lease may be assigned immediately in accordance with the order entered by the court. Alternatively, the court may order that the stay under Rule 6006(d) is for a fixed period less than 10 days."
+    p "GAP Report on Rule 6006. No changes since publication."
+    hash "3ae186b0b5acadd8404b02d0eade82ed96e20e0ff7e9b32e9f6a781360ebbe54"
+  }
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2007 Amendment"
+    p "The rule is amended to authorize the use of omnibus motions to reject multiple executory contracts and unexpired leases. In some cases there may be numerous executory contracts and unexpired leases, and this rule permits the combining of up to one hundred of these contracts and leases in a single motion to initiate the contested matter."
+    p "The rule also is amended to authorize the use of a single motion to assume or assign executory contracts and unexpired leases (i) when such contracts and leases are with a single nondebtor party, (ii) when such contracts and leases are being assigned to the same assignee, (iii) when the trustee proposes to assume, but not assign to more than one assignee, real property leases, or (iv) the court authorizes the filing of a joint motion to assume or to assume and assign executory contracts and unexpired leases under other circumstances that are not specifically recognized in the rule."
+    p "An omnibus motion to assume, assign, or reject multiple executory contracts and unexpired leases must comply with the procedural requirements set forth in subdivision (f) of the rule, unless the court orders otherwise. These requirements are intended to ensure that the nondebtor parties to the contracts and leases receive effective notice of the motion. Among those requirements is the requirement in subdivision (f)(5) that these motions be consecutively numbered (e.g., Debtor in Possession’s First Omnibus Motion for Authority to Assume Executory Contracts and Unexpired Leases, Debtor in Possession’s Second Omnibus Motion for Authority to Assume Executory Contracts and Unexpired Leases, etc.). There may be a need for several of these motions in a particular case. Numbering the motions consecutively is essential to keep track of these motions on the court’s docket and should avoid confusion that might otherwise result from similar or identically-titled motions."
+    p "Subdivision (g) of the rule provides that the finality of any order respecting an executory contract or unexpired lease included in an omnibus motion shall be determined as though such contract or lease had been the subject of a separate motion. A party seeking to appeal any such order is neither required, nor permitted, to await the court’s resolution of all other contracts or leases included in the omnibus motion to obtain appellate review of the order. The rule permits the listing of multiple contracts or leases for convenience, and that convenience should not impede timely review of the court’s decision with respect to each contract or lease."
+    p "Changes After Publication. Subdivision (e) of the proposed rule was amended as suggested by the NBC to insert a third category of requests that the trustee may make under an omnibus motion. The list of categories was numbered, and the new category is set out in (e)(2)."
+    hash "a5923cd8dd35c10e5b33df2f69ca5f613c97898d74b717d2dc20922cb90bb6be"
+  }
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptVI/rule6006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 6006 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "fd14329496faa61aec689fbff2b94d9d0c8491d1be9e49b074280277a359ec4f"
+  }
+  layers {
+    operative "7f3be9028ede9f4b0621919c1fecfaa9cd1ca3a5561aae6ac2f3b798e27ac87d"
+    enacted "6a9efeb4a6f2509c4fe5b30ac7f8dc0a87d54e20f6b9abdb0230554d174afa75"
+    editorial "3b3e8a1e2fb3c8b3c0a195d74326661e86f4208e036d6ff6c954e0d011cc669b"
+  }
+}

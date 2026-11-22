@@ -1,0 +1,38 @@
+edition 2
+module "/us/usc/t45/s832...834" {
+  alias "/us/usc/t45/s832"
+  alias "/us/usc/t45/s833"
+  alias "/us/usc/t45/s834"
+  within "/us/usc/t45/ch17/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s832...834" section {
+    num "832 to 834" "§§ 832 to 834."
+    heading "Repealed. " ["Pub. L. 105–178, title VII, § 7203(a)(2)" -> "/us/pl/105/178/tVII/s7203/a/2"] ", June 9, 1998, " ["112 Stat. 477" -> "/us/stat/112/477"]
+    status repealed
+    hash "13b850be7f8a37745b7245e37e82b51ded3e57185ff14eab0b31c05bf586b74d"
+  }
+  note "/us/usc/t45/s832...834/note/ungrouped/pl.94.210/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 832, " ["Pub. L. 94–210, title V, § 512" -> "/us/pl/94/210/tV/s512"] ", Feb. 5, 1976, " ["90 Stat. 79" -> "/us/stat/90/79"] ", related to issuance of notes or obligations."
+    hash "fc3c6819d7d72a7c942ae1ecda79ad84ad11a63aa1c5ce6b20db8ca9ec06c295"
+  }
+  note "/us/usc/t45/s832...834/note/ungrouped/pl.94.210/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 833, " ["Pub. L. 94–210, title V, § 513" -> "/us/pl/94/210/tV/s513"] ", Feb. 5, 1976, " ["90 Stat. 80" -> "/us/stat/90/80"] ", related to default on guaranteed obligations."
+    hash "7fe653497de12d0d47ff6641c8c1bb7520edba556248edaeb9d263c941b290bb"
+  }
+  note "/us/usc/t45/s832...834/note/ungrouped/pl.94.210/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 834, " ["Pub. L. 94–210, title V, § 514" -> "/us/pl/94/210/tV/s514"] ", Feb. 5, 1976, " ["90 Stat. 81" -> "/us/stat/90/81"] ", related to audit of transactions."
+    hash "f316d53bdd4f8f0f862c36ac9d9464ee816f60c14ac23377620b61cdef410378"
+  }
+  layers {
+    operative "13b850be7f8a37745b7245e37e82b51ded3e57185ff14eab0b31c05bf586b74d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "bc29f196a06750025b4a24edb05ce903d53d048c2874299a9e125dfef8331b31"
+  }
+}

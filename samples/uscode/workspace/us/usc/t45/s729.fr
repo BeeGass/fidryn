@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/t45/s729" {
+  within "/us/usc/t45/ch16/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s729" section {
+    num "729" "§ 729."
+    heading "Advisory Board"
+    content "Members of the Board of Directors of the Association serving on the day before August 13, 1981, shall serve as an Advisory Board to the Association. A member of the Advisory Board who is not otherwise an employee of the Federal Government shall receive reimbursement for travel, subsistence, and other necessary expenses incurred in the performance of such duties. The Chairman of the Association shall serve as Chairman of the Advisory Board. Any vacancy on the Advisory Board shall be filled by the Association with a representative from the group which had a representative in the vacant position."
+    hash "61b389c524e22856e6bd28673a995d3d96e9166ecd78b79f1539ddfec468148a"
+  }
+  credit "(" ["Pub. L. 93–236, title II, § 219" -> "/us/pl/93/236/tII/s219"] ", as added " ["Pub. L. 97–35, title XI, § 1150(a)" -> "/us/pl/97/35/tXI/s1150/a"] ", Aug. 13, 1981, " ["95 Stat. 675" -> "/us/stat/95/675"] ".)"
+  note "/us/usc/t45/s729/note/statutoryNotes/pl.97.35/effective-date" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date"
+    p "Section effective Aug. 13, 1981, see " ["section 1169 of Pub. L. 97–35" -> "/us/pl/97/35/s1169"] ", set out as a note under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] "."
+    hash "c0941333df7fda0a7e45f1a15726e04b8f5639248b2b6fb747963faa50869950"
+  }
+  note "/us/usc/t45/s729/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  note "/us/usc/t45/s729/note/statutoryNotes/nolaw/termination-of-advisory-boards" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Termination of Advisory Boards"
+    p "Advisory boards established after Jan. 5, 1973, to terminate not later than the expiration of the 2-year period beginning on the date of their establishment, unless, in the case of a board established by the President or an officer of the Federal Government, such board is renewed by appropriate action prior to the expiration of such 2-year period, or in the case of a board established by the Congress, its duration is otherwise provided for by law. See sections 1001(2) and 1013 of Title 5, Government Organization and Employees."
+    hash "bbbfc68a18642386ede24663207dab1dcba5c5a1fcfe3de6f1bfefe5f3abf75b"
+  }
+  layers {
+    operative "61b389c524e22856e6bd28673a995d3d96e9166ecd78b79f1539ddfec468148a"
+    enacted "9b49d1dd22ae15fa1883791cfd18ca43d41464c2a1a264234fcc9a8ebc2af50b"
+    editorial "1991ac03bc2df4ceb1d0a9eec693c91f6b7c4666b3fa3f9ac69c8e99ee64956f"
+  }
+}

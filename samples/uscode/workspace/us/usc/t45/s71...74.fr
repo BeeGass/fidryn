@@ -1,0 +1,52 @@
+edition 2
+module "/us/usc/t45/s71...74" {
+  alias "/us/usc/t45/s71"
+  alias "/us/usc/t45/s72"
+  alias "/us/usc/t45/s73"
+  alias "/us/usc/t45/s74"
+  within "/us/usc/t45/ch4"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s71...74" section {
+    num "71 to 74" "§§ 71 to 74."
+    heading "Repealed. " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"]
+    status repealed
+    hash "bdd7f2d17094af82dbe4a16fcb57b522b991e8c50d8d75745b5b5c6e9d9a6c02"
+  }
+  note "/us/usc/t45/s71...74/note/ungrouped/act.1906-06-29.ch3594/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 71, " ["act June 29, 1906, ch. 3594, § 1" -> "/us/act/1906-06-29/ch3594/s1"] ", " ["34 Stat. 607" -> "/us/stat/34/607"] ", related to transportation of animals, provided maximum time for their confinement while in transit, unloading for rest and feeding, and included special provision for unloading sheep. See " ["section 80502 of Title 49" -> "/us/usc/t49/s80502"] ", Transportation."
+    hash "3d5a4a2b57a04f456d4f404da4c7cec4749c91b551930861ed8d01c24fed7be2"
+  }
+  note "/us/usc/t45/s71...74/note/ungrouped/act.1906-06-29.ch3594/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 72, " ["act June 29, 1906, ch. 3594, § 2" -> "/us/act/1906-06-29/ch3594/s2"] ", " ["34 Stat. 608" -> "/us/stat/34/608"] ", provided that animals in transit were to be fed and watered by or at expense of owner and that railroad was to have a lien upon such animals for food, care, and custody. See " ["section 80502 of Title 49" -> "/us/usc/t49/s80502"] "."
+    hash "9973042aa10ca2d9ad6ea35d33fddef26ff7153b7fd36b68e2e19acc4bf719c1"
+  }
+  note "/us/usc/t45/s71...74/note/ungrouped/act.1906-06-29.ch3594/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 73, " ["act June 29, 1906, ch. 3594, § 3" -> "/us/act/1906-06-29/ch3594/s3"] ", " ["34 Stat. 608" -> "/us/stat/34/608"] ", provided penalty for failure to comply with provisions of sections 71 and 72 of this title with proviso that provisions regarding unloading of animals would not apply when animals in transit had proper food, water, space, and opportunity to rest. See " ["section 80502 of Title 49" -> "/us/usc/t49/s80502"] "."
+    hash "846710a899406b4b1c6657423a6d4c1ca2dedb5d54999df1d7ae968a33b6d629"
+  }
+  note "/us/usc/t45/s71...74/note/ungrouped/act.1906-06-29.ch3594/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 74, acts " ["June 29, 1906, ch. 3594, § 4" -> "/us/act/1906-06-29/ch3594/s4"] ", " ["34 Stat. 608" -> "/us/stat/34/608"] "; " ["Mar. 3, 1911, ch. 231, § 291" -> "/us/act/1911-03-03/ch231/s291"] ", " ["36 Stat. 1167" -> "/us/stat/36/1167"] ", provided that penalty created by " ["section 73 of this title" -> "/us/usc/t45/s73"] " was recoverable by civil action and that United States attorneys had duty to prosecute violations of this chapter. See " ["section 80502 of Title 49" -> "/us/usc/t49/s80502"] "."
+    hash "f11e9fb79b83fabfc068b324d08af79238d88cb52d052763a3f96ee970ef72f4"
+  }
+  note "/us/usc/t45/s71...74/note/statutoryNotes/act.1906-06-29.ch3594/short-title" enacted {
+    group statutoryNotes
+    topic "shortTitle"
+    heading "Short Title"
+    p ["Act June 29, 1906, ch. 3594" -> "/us/act/1906-06-29/ch3594"] ", " ["34 Stat. 607" -> "/us/stat/34/607"] ", which enacted this chapter and which was repealed by " ["Pub. L. 103–272, § 7(b)" -> "/us/pl/103/272/s7/b"] ", July 5, 1994, " ["108 Stat. 1379" -> "/us/stat/108/1379"] ", was popularly known as the “Live Stock Transportation Act” and also as the “Cruelty to Animals Act”, “Twenty-Eight Hour Law”, and “Food and Rest Law”."
+    hash "ce8c16ab67150acb94112dd84b31a698f9fa83f8fbd5401042208098f0a13426"
+  }
+  layers {
+    operative "bdd7f2d17094af82dbe4a16fcb57b522b991e8c50d8d75745b5b5c6e9d9a6c02"
+    enacted "ddec1c7d8aa9d38df6561bba060f1db0a61d67ac204bb3dfed6af975f087d4d2"
+    editorial "becc0a979b1f29466211bcf0f44bc6b6f91bed8fc49f1d54b4362d19ba173fea"
+  }
+}

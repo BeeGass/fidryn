@@ -1,0 +1,54 @@
+edition 2
+module "/us/usc/ptI/rule1004.1" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1004.1" courtRule {
+    num "1004.1" "Rule 1004.1."
+    heading "Voluntary Petition on Behalf of an Infant or Incompetent Person"
+    provision "/us/usc/ptI/rule1004.1/a" subsection {
+      num "a" "(a)"
+      heading "Represented Infant or Incompetent Person."
+      content "If an infant or an incompetent person has a representative—such as a general guardian, committee, conservator, or similar fiduciary—the representative may file a voluntary petition on behalf of the infant or incompetent person."
+      hash "abb511e2eef41144f305b7791814a332ab855b21efa34c6b6446a99ea69aac41"
+    }
+    provision "/us/usc/ptI/rule1004.1/b" subsection {
+      num "b" "(b)"
+      heading "Unrepresented Infant or Incompetent Person."
+      chapeau "If an infant or an incompetent person does not have a representative:"
+      provision "/us/usc/ptI/rule1004.1/b/1" paragraph {
+        num "1" "(1)"
+        content "a next friend or guardian ad litem may file the petition; and"
+        hash "ea6e9ba369045855aa6b45691e9622e109a0a75a3b4b1e5decb403f7f64a6a54"
+      }
+      provision "/us/usc/ptI/rule1004.1/b/2" paragraph {
+        num "2" "(2)"
+        content "the court must appoint a guardian ad litem or issue any other order needed to protect the interests of the infant debtor or incompetent debtor."
+        hash "5fb5ddad26f59b16edac8f7f285a4b1618c8d5c10dd7996d21b11bfb2f38f54c"
+      }
+      hash "92754eb4fb5605d85c7761c83835e9104d906276108cbdd43f3d3fcd95969009"
+    }
+    hash "5d084475ca00ef207ede5dd9bcab5b856b2d572eb399bc9c0e780cc4b77befc1"
+  }
+  credit "(Added Apr. 29, 2002, eff. Dec. 1, 2002; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1004.1/note/ungrouped/nolaw/committee-notes-on-rules-2002" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2002"
+    p "This rule is derived from Rule 17(c) F.R. Civ. P. It does not address the commencement of a case filed on behalf of a missing person. See, e.g., In re King, 234 B.R. 515 (Bankr. D.N.M. 1999)"
+    p "Changes Made After Publication and Comments. No changes were made."
+    hash "28664cf8601c311e063b87d5d301f81a8578cb9e63a9f0dbe308a57645661b8d"
+  }
+  note "/us/usc/ptI/rule1004.1/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1004.1 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "0087a90dd219d9e9acf2f9c414a2ec48539ffd523d9ef9d07232196bacc84265"
+  }
+  layers {
+    operative "5d084475ca00ef207ede5dd9bcab5b856b2d572eb399bc9c0e780cc4b77befc1"
+    enacted "2458f0ef50c86f9c5d49e23651c96f33fde2e6dee916555c908684768708ae03"
+    editorial "d369302448354ea2db6c53db3a1bc21992708ea8183d664e36f0113960502bd6"
+  }
+}

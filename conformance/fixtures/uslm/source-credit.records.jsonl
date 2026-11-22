@@ -1,0 +1,4 @@
+{"address":"/us/usc/t99","layer":"operative","kind":"title","status":null,"num":["99","Title 99"],"heading":{"text":"Invented","refs":[],"sup":[],"sub":[]},"aliases":[],"within":null,"members":["/us/usc/t99/s1"]}
+{"address":"/us/usc/t99","record":"credit","p":"(Jan. 1, 2099, ch. 1, 99 Stat. 1.)","refs":[[1,20,"/us/act/2099-01-01/ch1"],[22,32,"/us/stat/99/1"]],"sup":[],"sub":[]}
+{"address":"/us/usc/t99/s1","layer":"operative","kind":"section","status":null,"num":["1","§ 1."],"heading":{"text":"Credited","refs":[],"sup":[],"sub":[]},"items":[{"part":"content","blocks":[{"p":"Text.","refs":[],"sup":[],"sub":[]}]}],"aliases":[],"within":"/us/usc/t99","source":"usc99.xml","positive_law":true}
+{"address":"/us/usc/t99/s1","record":"credit","p":"(Pub. L. 999–10, § 1, Feb. 3, 2099, 99 Stat. 2.)","refs":[[1,20,"/us/pl/999/10/s1"],[36,46,"/us/stat/99/2"]],"sup":[],"sub":[]}

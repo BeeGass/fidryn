@@ -1,0 +1,17 @@
+edition 2
+module "/us/usc/t45/ch13/schII" {
+  within "/us/usc/t45/ch13"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch13/schII" subchapter {
+    num "II" "SUBCHAPTER II—"
+    heading "RULES, REGULATIONS, ORDERS, AND STANDARDS"
+    member "/us/usc/t45/s431...447"
+    hash "6116a2274829ad3efe19b108f9865bf75e77ca5478815dcbe5846c22f6947080"
+  }
+  layers {
+    operative "6116a2274829ad3efe19b108f9865bf75e77ca5478815dcbe5846c22f6947080"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

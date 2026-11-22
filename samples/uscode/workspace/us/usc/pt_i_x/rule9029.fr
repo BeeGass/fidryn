@@ -1,0 +1,107 @@
+edition 2
+module "/us/usc/ptIX/rule9029" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9029" courtRule {
+    num "9029" "Rule 9029."
+    heading "Adopting Local Rules; Limit on Enforcing a Local Rule; Absence of Controlling Law"
+    provision "/us/usc/ptIX/rule9029/a" subsection {
+      num "a" "(a)"
+      heading "Adopting Local Rules."
+      provision "/us/usc/ptIX/rule9029/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "By District Courts. Each district court, acting by a majority of its judges, may make and amend rules governing practice and procedure in all cases and proceedings within its bankruptcy jurisdiction. Fed. R. Civ. P. 83 governs the procedure for adopting local rules. The rules must:"
+        provision "/us/usc/ptIX/rule9029/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "be consistent with—but not duplicate—Acts of Congress and these rules;"
+          hash "efb589ad96af2ea14244a3fd0f4f0876e54fb2bfeebf711003d1b52983c64e8a"
+        }
+        provision "/us/usc/ptIX/rule9029/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "not prohibit or limit using Official Forms; and"
+          hash "00e6c985fd68e541eaa4ae1610376afc340e22a1c059467a4f85e1273a90145e"
+        }
+        provision "/us/usc/ptIX/rule9029/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "conform to any uniform numbering system prescribed by the Judicial Conference of the United States."
+          hash "8783cca9dcce982804142dbe527ad2844891f9f32cc93bbed680cc74f5b4e0f8"
+        }
+        hash "7b81cc37ae7a10a35d59089a1c03ba38d062a2992aa0122928108017a8563874"
+      }
+      provision "/us/usc/ptIX/rule9029/a/2" paragraph {
+        num "2" "(2)"
+        content "Delegating Authority to the Bankruptcy Judges. A district court may—subject to any limitation or condition it may prescribe and Fed. R. Civ. P. 83—authorize the district’s bankruptcy judges to make and amend local bankruptcy rules."
+        hash "ad571a0aeb7e036e4d86be965c04bc07fc0e8be0f873fb1cf449c8477e7ceb73"
+      }
+      hash "55938f61936114430649caa09499c24312ea1dde453b31a205c72c7a8cbaa3ea"
+    }
+    provision "/us/usc/ptIX/rule9029/b" subsection {
+      num "b" "(b)"
+      heading "Limit on Enforcing a Local Rule Regarding Form."
+      content "A local rule imposing a requirement of form must not be enforced in a way that causes a party to lose any right because of a nonwillful failure to comply."
+      hash "8385781ed4118a339d5dcc5d93102d625bdf2b2a7c89bb2f66ea065997080957"
+    }
+    provision "/us/usc/ptIX/rule9029/c" subsection {
+      num "c" "(c)"
+      heading "Procedure When There Is No Controlling Law."
+      content "A judge may regulate practice in any manner consistent with federal law, these rules, the Official Forms, and the district’s local rules. For any requirement set out elsewhere, a sanction or other disadvantage may be imposed for noncompliance only if the alleged violator was given actual notice of the requirement in the particular case."
+      hash "81fb410132e1b55de78b841efa5054c213ab698ed06e7dbd4e9eea8acd4d1e3d"
+    }
+    hash "0554e0844624b1fde656895ad03391703d99c13ba422c3a9ec18778332bf29db"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 27, 1995, eff. Dec. 1, 1995; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9029/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is an adaptation of Rule 83 F.R.Civ.P. and Rule 57(a) F.R.Crim.P. Under this rule bankruptcy courts may make local rules which govern practice before those courts. Circuit councils and district courts are authorized by Rule 8018 to make local rules governing appellate practice."
+    hash "b654eb972ea7f1247e50023968f705f05c25ee9eaede48c23806da58f48f0d98"
+  }
+  note "/us/usc/ptIX/rule9029/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Rule 9029 is amended to authorize the district court to promulgate local rules governing bankruptcy practice. This rule, as amended, permits the district court to authorize the bankruptcy judges to promulgate or recommend local rules for adoption by the district court."
+    p "Effective August 1, 1985, Rule 83 F.R.Civ.P., governing adoption of local rules, was amended to achieve greater participation by the bar, scholars, and the public in the rule making process; to authorize the judicial council to abrogate local rules; and to make certain that single-judge standing orders are not inconsistent with these rules or local rules. Rule 9029 has been amended to incorporate Rule 83. The term “court” in the last sentence of the rule includes the judges of the district court and the bankruptcy judges of the district. Rule 9001(4)."
+    hash "62e8f16cf36a169621686fe230fc62c7d69936554eaa18c483e554ac4cc554c9"
+  }
+  note "/us/usc/ptIX/rule9029/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to make it clear that the Official Forms must be accepted in every bankruptcy court."
+    hash "8249f5c194f8726db3db84665ec5863d38e9c3ed740696a87c0962aa29ae1821"
+  }
+  note "/us/usc/ptIX/rule9029/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1995-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1995 Amendment"
+    p "Subdivision (a). This rule is amended to reflect the requirement that local rules be consistent not only with applicable national rules but also with Acts of Congress. The amendment also states that local rules should not repeat applicable national rules and Acts of Congress."
+    p "The amendment also requires that the numbering of local rules conform with any uniform numbering system that may be prescribed by the Judicial Conference. Lack of uniform numbering might create unnecessary traps for counsel and litigants. A uniform numbering system would make it easier for an increasingly national bar and for litigants to locate a local rule that applies to a particular procedural issue."
+    p "Paragraph (2) of subdivision (a) is new. Its aim is to protect against loss of rights in the enforcement of local rules relating to matters of form. For example, a party should not be deprived of a right to a jury trial because its attorney, unaware of—or forgetting—a local rule directing that jury demands be noted in the caption of the case, includes a jury demand only in the body of the pleading. The proscription of paragraph (2) is narrowly drawn—covering only violations that are not willful and only those involving local rules directed to matters of form. It does not limit the court’s power to impose substantive penalties upon a party if it or its attorney stubbornly or repeatedly violates a local rule, even one involving merely a matter of form. Nor does it affect the court’s power to enforce local rules that involve more than mere matters of form—for example, a local rule requiring that a party demand a jury trial within a specified time period to avoid waiver of the right to a trial by jury."
+    p "Subdivision (b). This rule provides flexibility to the court in regulating practice when there is no controlling law. Specifically, it permits the court to regulate practice in any manner consistent with federal law, with rules adopted under 28 U.S.C. § 2075, with Official Forms, and with the district’s local rules."
+    p "This rule recognizes that courts rely on multiple directives to control practice. Some courts regulate practice through the published Federal Rules and the local rules of the court. Some courts also have used internal operating procedures, standing orders, and other internal directives. Although such directives continue to be authorized, they can lead to problems. Counsel or litigants may be unaware of various directives. In addition, the sheer volume of directives may impose an unreasonable barrier. For example, it may be difficult to obtain copies of the directives. Finally, counsel or litigants may be unfairly sanctioned for failing to comply with a directive. For these reasons, the amendment to this rule disapproves imposing any sanction or other disadvantage on a person for noncompliance with such an internal directive, unless the alleged violator has been furnished in a particular case with actual notice of the requirement."
+    p "There should be no adverse consequence to a party or attorney for violating special requirements relating to practice before a particular judge unless the party or attorney has actual notice of those requirements. Furnishing litigants with a copy outlining the judge’s practices—or attaching instructions to a notice setting a case for conference or trial—would suffice to give actual notice, as would an order in a case specifically adopting by reference a judge’s standing order and indicating how copies can be obtained."
+    hash "f0b4dcb0d0006010efad8050addfc128a7e377e9713cdd4bab8f622edf5af076"
+  }
+  note "/us/usc/ptIX/rule9029/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9029 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "cc99f50d7c22f58f9e8370b3b4ca97a56aa835e3300dc94cf56ed5c1b7e35a16"
+  }
+  note "/us/usc/ptIX/rule9029/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subd. (a), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "deb4c0aa4ee80b33fd9101f209f848844329e50da3c46e96b8b0c3857dca9936"
+  }
+  layers {
+    operative "0554e0844624b1fde656895ad03391703d99c13ba422c3a9ec18778332bf29db"
+    enacted "c34a246e1a695aecf15ff084cc07c44860707ca3bf61abeb6bd05ef0cdd945cb"
+    editorial "01c88750da4b8c144c70187fb7229cc656ba6f5ecb63626c35c9ae51fa5d9bdb"
+  }
+}

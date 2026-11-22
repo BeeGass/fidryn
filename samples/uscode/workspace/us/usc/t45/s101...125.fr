@@ -1,0 +1,192 @@
+edition 2
+module "/us/usc/t45/s101...125" {
+  alias "/us/usc/t45/s101"
+  alias "/us/usc/t45/s102"
+  alias "/us/usc/t45/s103"
+  alias "/us/usc/t45/s104"
+  alias "/us/usc/t45/s105"
+  alias "/us/usc/t45/s106"
+  alias "/us/usc/t45/s107"
+  alias "/us/usc/t45/s108"
+  alias "/us/usc/t45/s109"
+  alias "/us/usc/t45/s110"
+  alias "/us/usc/t45/s111"
+  alias "/us/usc/t45/s112"
+  alias "/us/usc/t45/s113"
+  alias "/us/usc/t45/s114"
+  alias "/us/usc/t45/s115"
+  alias "/us/usc/t45/s116"
+  alias "/us/usc/t45/s117"
+  alias "/us/usc/t45/s118"
+  alias "/us/usc/t45/s119"
+  alias "/us/usc/t45/s120"
+  alias "/us/usc/t45/s121"
+  alias "/us/usc/t45/s122"
+  alias "/us/usc/t45/s123"
+  alias "/us/usc/t45/s124"
+  alias "/us/usc/t45/s125"
+  within "/us/usc/t45/ch6"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s101...125" section {
+    num "101 to 125" "§§ 101 to 125."
+    heading "Repealed. " ["May 20, 1926, ch. 347, § 14" -> "/us/act/1926-05-20/ch347/s14"] ", " ["44 Stat. 587" -> "/us/stat/44/587"]
+    status repealed
+    hash "41725425a620566bcf5c1420fc041a82bf7bb5a0e9af22df5ecd192b010ea2f2"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 101, " ["act July 15, 1913, ch. 6, § 1" -> "/us/act/1913-07-15/ch6/s1"] ", " ["38 Stat. 103" -> "/us/stat/38/103"] ", related to carriers and shipping affected by application of provisions of this chapter. See section 151 et seq. of this title."
+    hash "bb06771db1b36b6319f1ac8c506e3204cdf90749e90a29e6b0b3560d86e47863"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 102, " ["act July 15, 1913, ch. 6, § 1" -> "/us/act/1913-07-15/ch6/s1"] ", " ["38 Stat. 103" -> "/us/stat/38/103"] ", defined “railroad” and “transportation” as used throughout this chapter. See section 151 et seq. of this title."
+    hash "917b45d65053b25a1d81c961aad5e80fbc724b1869a1725917985ef7c927e4da"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 103, " ["act July 15, 1913, ch. 6, § 1" -> "/us/act/1913-07-15/ch6/s1"] ", " ["38 Stat. 103" -> "/us/stat/38/103"] ", related to employees affected by application of provisions of this chapter. See section 151 et seq. of this title."
+    hash "ebfba2e49313b995013dd65ef5f9a64e5f8c0802f3955ee13f9e75e65ec45932"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 104, " ["act July 15, 1913, ch. 6, § 1" -> "/us/act/1913-07-15/ch6/s1"] ", " ["38 Stat. 103" -> "/us/stat/38/103"] ", defined “employer” and “employee” as used throughout this chapter. See section 151 et seq. of this title."
+    hash "f58b217aaf61853a479514b81837d123fc4fa7c3a81c1ad49e9e486851f96d9f"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/5" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 105, " ["act July 15, 1913, ch. 6, § 2" -> "/us/act/1913-07-15/ch6/s2"] ", " ["38 Stat. 104" -> "/us/stat/38/104"] ", related to submission of controversies to the Board of Mediation and Conciliation for adjustment. See section 151 et seq. of this title."
+    hash "b8aa6acc8812117d50a28210ed5c8255432a518dccae5966f7e54c9de84fc590"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/6" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 106, " ["act July 15, 1913, ch. 6, § 2" -> "/us/act/1913-07-15/ch6/s2"] ", " ["38 Stat. 104" -> "/us/stat/38/104"] ", related to proffer of services by board in public interest in urgent cases. See section 151 et seq. of this title."
+    hash "68b6e14131ea746bfc981a9ab23bc2cb8fb85c3265faad86cd88d88af716d949"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/7" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 107, " ["act July 15, 1913, ch. 6, § 2" -> "/us/act/1913-07-15/ch6/s2"] ", " ["38 Stat. 104" -> "/us/stat/38/104"] ", related to application of board’s opinions as to meaning of agreement after mediation. See section 151 et seq. of this title."
+    hash "e20a6ebb97f9f0e613659af77c1c6a85ad7a05c70904bf81a3356b8f9c49ca0d"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/8" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 108, " ["act July 15, 1913, ch. 6, § 3" -> "/us/act/1913-07-15/ch6/s3"] ", " ["38 Stat. 104" -> "/us/stat/38/104"] ", related to submission of controversies to board of arbitrators and selection of members. See section 151 et seq. of this title."
+    hash "684f36aa401be5ddf4746ad9c4899af8c4afd5d91cbd792e827eb40058f9dfe5"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/9" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 109, " ["act July 15, 1913, ch. 6, § 4" -> "/us/act/1913-07-15/ch6/s4"] ", " ["38 Stat. 105" -> "/us/stat/38/105"] ", related to requirements for a valid agreement to arbitrate under terms of this chapter. See section 151 et seq. of this title."
+    hash "0f164a761481ad26c5d47d676cfe39339ad799a8ad9353f14a6e62d96c8719c5"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/10" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 110, " ["act July 15, 1913, ch. 6, § 5" -> "/us/act/1913-07-15/ch6/s5"] ", " ["38 Stat. 106" -> "/us/stat/38/106"] ", related to authority of arbitrators for purposes of this chapter and arbitration hereunder. See section 151 et seq. of this title."
+    hash "be2c40f9ed55a57c247afa587fb7ed9251340884540b12c8afe7c17cd94cdacb"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/11" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 111, " ["act July 15, 1913, ch. 6, § 6" -> "/us/act/1913-07-15/ch6/s6"] ", " ["38 Stat. 106" -> "/us/stat/38/106"] ", related to acknowledgement and filing of an agreement of arbitration under this chapter. See section 151 et seq. of this title."
+    hash "d44d9a31e54cd7f65f44dc71be259cadb1a297a78a4dadf3cfa5b9cb44911a77"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/12" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 112, " ["act July 15, 1913, ch. 6, § 6" -> "/us/act/1913-07-15/ch6/s6"] ", " ["38 Stat. 106" -> "/us/stat/38/106"] ", related to written notification of appointment to be submitted to selected arbitrators. See section 151 et seq. of this title."
+    hash "cde4806ecacab528a89e33254e90622b0adec2f7ffa1f17fdbe6ae367153a2af"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/13" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 113, " ["act July 15, 1913, ch. 6, § 6" -> "/us/act/1913-07-15/ch6/s6"] ", " ["38 Stat. 106" -> "/us/stat/38/106"] ", related to notice to Board of Mediation and Conciliation by selected arbitrators. See section 151 et seq. of this title."
+    hash "7e7c4ef9455f232af30c74437ed3d425383d5d6b287f6801c26f789c6ce8c828"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/14" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 114, " ["act July 15, 1913, ch. 6, § 6" -> "/us/act/1913-07-15/ch6/s6"] ", " ["38 Stat. 106" -> "/us/stat/38/106"] ", related to reconvention of board of arbitration when desired by parties. See section 151 et seq. of this title."
+    hash "0357b6d8d8777b73464571be22f37f915818d21ad1cc8eb13e987c12cb0e1666"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/15" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 115, " ["act July 15, 1913, ch. 6, § 7" -> "/us/act/1913-07-15/ch6/s7"] ", " ["38 Stat. 106" -> "/us/stat/38/106"] ", related to organization and procedure of board of arbitration under this chapter. See section 151 et seq. of this title."
+    hash "baa596dade72a46bdadaf35779c507bfca7cab045ac7e14769664cd28241f3b6"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/16" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 116, " ["act July 15, 1913, ch. 6, § 7" -> "/us/act/1913-07-15/ch6/s7"] ", " ["38 Stat. 106" -> "/us/stat/38/106"] ", related to particular papers bearing on mediation or arbitration under former law. See section 151 et seq. of this title."
+    hash "ebb72e20cae2b4f681e1b5012d5868c689ff27a5a5b5daa02c20e78d6365f81a"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/17" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 117, " ["act July 15, 1913, ch. 6, § 8" -> "/us/act/1913-07-15/ch6/s8"] ", " ["38 Stat. 107" -> "/us/stat/38/107"] ", related to time when an award under this chapter was to be operative. See section 151 et seq. of this title."
+    hash "955e25f16e8c6a886aeda746d8b5c67073b2035212f541d9077cd407367af3b1"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/18" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 118, " ["act July 15, 1913, ch. 6, § 8" -> "/us/act/1913-07-15/ch6/s8"] ", " ["38 Stat. 107" -> "/us/stat/38/107"] ", related to procedure for appeal to former circuit court of appeals under this chapter. See section 151 et seq. of this title."
+    hash "77a3094fa817b396348dc04f44757a44fb52f17c1ba333eba9c783d2ac2e4acb"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/19" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 119, " ["act July 15, 1913, ch. 6, § 8" -> "/us/act/1913-07-15/ch6/s8"] ", " ["38 Stat. 107" -> "/us/stat/38/107"] ", related to finality of a determination of former circuit court of appeals. See section 151 et seq. of this title."
+    hash "de93e36d619161aed1e1bcb77c690bfdf34fe854cf2221ade2e5d94a4a1475b7"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/20" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 120, " ["act July 15, 1913, ch. 6, § 8" -> "/us/act/1913-07-15/ch6/s8"] ", " ["38 Stat. 107" -> "/us/stat/38/107"] ", related to judgment on exception to award and judgment by agreement. See section 151 et seq. of this title."
+    hash "11899d38951c253e8c25c172f75d973e09522e976864786be9ec71e45863d5be"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/21" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 121, " ["act July 15, 1913, ch. 6, § 8" -> "/us/act/1913-07-15/ch6/s8"] ", " ["38 Stat. 107" -> "/us/stat/38/107"] ", related to compulsory labor under this chapter. See section 151 et seq. of this title."
+    hash "414a6a78504c6cc4ed6e56335759abfb2736beb7e099067b9f25b487d7367245"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/22" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 122, " ["act July 15, 1913, ch. 6, § 9" -> "/us/act/1913-07-15/ch6/s9"] ", " ["38 Stat. 107" -> "/us/stat/38/107"] ", related to rights of employees under Federal court receivers. See section 151 et seq. of this title."
+    hash "b8c5fcd842a5ffbce33d7bd30253fda04b3e8efeca13c6a0a2e5dc520aa92e0c"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/23" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 123, acts " ["July 15, 1913, ch. 6, § 10" -> "/us/act/1913-07-15/ch6/s10"] ", " ["38 Stat. 108" -> "/us/stat/38/108"] "; " ["June 5, 1920, ch. 235, § 1" -> "/us/act/1920-06-05/ch235/s1"] ", " ["41 Stat. 886" -> "/us/stat/41/886"] ", related to pay and expenses of arbitrators. See section 151 et seq. of this title."
+    hash "9cd81767231109e30fa4612c62b49684b8cbbe05ec823eb67413d1cbfa32e859"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/24" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 124, " ["act July 15, 1913, ch. 6, § 11" -> "/us/act/1913-07-15/ch6/s11"] ", " ["38 Stat. 108" -> "/us/stat/38/108"] ", related to constitution of United States Board of Mediation and Conciliation. See section 151 et seq. of this title."
+    hash "2e97ff7ded70d892a34f5601b76f0bc66411e818fa576b935c07ea893444d3b8"
+  }
+  note "/us/usc/t45/s101...125/note/ungrouped/act.1913-07-15.ch6/noheading/25" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 125, " ["act July 15, 1913, ch. 6, § 11" -> "/us/act/1913-07-15/ch6/s11"] ", " ["38 Stat. 108" -> "/us/stat/38/108"] ", related to repeal of certain prior law."
+    hash "0c20896cd9af7087a38be5e87f91b4a1e2a8da65d8256fc1168b5192dc97b515"
+  }
+  layers {
+    operative "41725425a620566bcf5c1420fc041a82bf7bb5a0e9af22df5ecd192b010ea2f2"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "bedecbb1a842ba0b952dc76c567b67d96cfb913db514f90a60e6de1df795bd2e"
+  }
+}

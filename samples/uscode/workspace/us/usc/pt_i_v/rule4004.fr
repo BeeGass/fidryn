@@ -1,0 +1,310 @@
+edition 2
+module "/us/usc/ptIV/rule4004" {
+  within "/us/usc/ptIV"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIV/rule4004" courtRule {
+    num "4004" "Rule 4004."
+    heading "Granting or Denying a Discharge"
+    provision "/us/usc/ptIV/rule4004/a" subsection {
+      num "a" "(a)"
+      heading "Time to Object to a Discharge; Notice."
+      provision "/us/usc/ptIV/rule4004/a/1" paragraph {
+        num "1" "(1)"
+        content "Chapter 7. In a Chapter 7 case, a complaint—or a motion under § 727(a)(8) or (9)—objecting to a discharge must be filed within 60 days after the first date set for the § 341(a) meeting of creditors."
+        hash "0524c0bc934afedfdb174e764ac9a1c0bcedf9274d7d97795ae1a06925ccaddc"
+      }
+      provision "/us/usc/ptIV/rule4004/a/2" paragraph {
+        num "2" "(2)"
+        content "Chapter 11. In a Chapter 11 case, a complaint objecting to a discharge must be filed on or before the first date set for the hearing on confirmation."
+        hash "a2d6a6ed0b25fc357777ea6b6844ee20d3db504137935cfba7f3e3b067f3d92c"
+      }
+      provision "/us/usc/ptIV/rule4004/a/3" paragraph {
+        num "3" "(3)"
+        content "Chapter 13. In a Chapter 13 case, a motion objecting to a discharge under § 1328(f) must be filed within 60 days after the first date set for the § 341(a) meeting of creditors."
+        hash "02ef4bc90222b5e608cd656f27f7eb4dfcbe395293b16d2cf593c2b9b65d41d5"
+      }
+      provision "/us/usc/ptIV/rule4004/a/4" paragraph {
+        num "4" "(4)"
+        content {
+          p "Notice to the United States Trustee, the Creditors, and the Trustee. At least 28 days’ notice of the time for filing must be given to:"
+          p "• the United States trustee under Rule 2002(k);"
+          p "• all creditors under Rule 2002(f);"
+          p "• the trustee; and"
+          p "• the trustee’s attorney."
+        }
+        hash "c3ae3803da3abb04d7db0004a18450c30a0e5261dbd9f052168b6b9c0900e2f2"
+      }
+      hash "5354050ca3a1e45a70d8f6c745a8dbdc8688bf6aa89131a128d02cdca1f6a175"
+    }
+    provision "/us/usc/ptIV/rule4004/b" subsection {
+      num "b" "(b)"
+      heading "Extending the Time to File an Objection."
+      provision "/us/usc/ptIV/rule4004/b/1" paragraph {
+        num "1" "(1)"
+        content "Motion Before the Time Expires. On a party in interest’s motion and after notice and a hearing, the court may, for cause, extend the time to object to a discharge. The motion must be filed before the time has expired."
+        hash "69fb34a66146be927223d60b3659260fadd1ce0af1863c722b0b0d53861b2e76"
+      }
+      provision "/us/usc/ptIV/rule4004/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Motion After the Time Has Expired. After the time to object has expired and before a discharge is granted, a party in interest may file a motion to extend the time if:"
+        provision "/us/usc/ptIV/rule4004/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "the objection is based on facts that, if learned after the discharge is granted, would provide a basis for revocation under § 727(d);"
+          hash "5fd3a9ca35f3e5ff834a7d43b6d506e60cd98cb565f66f615faeed2ce802dd1e"
+        }
+        provision "/us/usc/ptIV/rule4004/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "the movant did not know those facts in time to object; and"
+          hash "4e7a5191e6f02a12eb32d69ce070b877dff6ce80323df276a901eb7f1bc4b64f"
+        }
+        provision "/us/usc/ptIV/rule4004/b/2/C" subparagraph {
+          num "C" "(C)"
+          content "the movant files the motion promptly after learning about them."
+          hash "76f02f3d5ed5b1f62683328863fd501b01267f480bbf52a2960958964a1012c5"
+        }
+        hash "761b53e885a68e1cb12940a84febe69226045f94f6e5d958586198c7d5753c33"
+      }
+      hash "bb03bd133e08a800f5a58a4feae071a833634fd5777e2418fea5c65af28ff89b"
+    }
+    provision "/us/usc/ptIV/rule4004/c" subsection {
+      num "c" "(c)"
+      heading "Granting a Discharge."
+      provision "/us/usc/ptIV/rule4004/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "Chapter 7. In a Chapter 7 case, when the times to object to discharge and to file a motion to dismiss the case under Rule 1017(e) expire, the court must promptly grant the discharge—except under these circumstances:"
+        provision "/us/usc/ptIV/rule4004/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "the debtor is not an individual;"
+          hash "17a56a2640cc1117d9cab9a1d087d17d5fe338243bdc447fefee6db44e61971f"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "a complaint—or a motion under § 727(a)(8) or (9)—objecting to the discharge is pending;"
+          hash "0fe219f5c49127a7698015de2906432bd797aef1490507ff91cb989ce5da0bb9"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "the debtor has filed a waiver under § 727(a)(10);"
+          hash "afa78c82d9478a0c2289621f51d7e9353c2e3fa6342c85e1a44ec0fdc4c687a0"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/D" subparagraph {
+          num "D" "(D)"
+          content "a motion is pending to dismiss the case under § 707;"
+          hash "9233b1429905d0f32fbd557b9a5373ce550a87996b9b291b70134f4b45ae0656"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/E" subparagraph {
+          num "E" "(E)"
+          content "a motion is pending to extend the time to file a complaint objecting to the discharge;"
+          hash "5c1fbb54e6f8b871426c5b42b9cda89e23d87f1a4a91b757950457fc0cd0adeb"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/F" subparagraph {
+          num "F" "(F)"
+          content "a motion is pending to extend the time to file a motion to dismiss the case under Rule 1017(e)(1);"
+          hash "f8f8daa588a1a36ab2a5d550e8ff18bbf9a5399652a25c679531c1b08a1a615c"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/G" subparagraph {
+          num "G" "(G)"
+          content "the debtor has not fully paid the filing fee required by 28 U.S.C. § 1930(a)—together with any other fee prescribed by the Judicial Conference of the United States under 28 U.S.C. § 1930(b) that is payable to the clerk upon commencing a case—unless the court has waived the fees under 28 U.S.C. § 1930(f);"
+          hash "24760114f1ba0a9e3f071f8942f04ec408859e56a900dc1ec7047b701438b855"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/H" subparagraph {
+          num "H" "(H)"
+          content "the debtor has not filed a certificate showing that a course on personal financial management has been completed—if such a certificate is required by Rule 1007(b)(7);"
+          hash "aa9765810ddfb86989e58179e7aa1694e10d6d1ded7a963b50ccec6fc29dd315"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/I" subparagraph {
+          num "I" "(I)"
+          content "a motion is pending to delay or postpone a discharge under § 727(a)(12);"
+          hash "754fdef601da40b3d5e79a34a62cbe7c636a1d3eddb16fc48231991e4df12370"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/J" subparagraph {
+          num "J" "(J)"
+          content "a motion is pending to extend the time to file a reaffirmation agreement under Rule 4008(a);"
+          hash "4d2be75b1557d6643cbba53534eb163e2959fe95bd4d7aea7641736730fe53f8"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/K" subparagraph {
+          num "K" "(K)"
+          content "the court has not concluded a hearing on a presumption—in effect under § 524(m)—that a reaffirmation agreement is an undue hardship; or"
+          hash "711dec884d31b53537fd10d39ef69f20ab235d45d22dc98c5c4300930e5cfb8b"
+        }
+        provision "/us/usc/ptIV/rule4004/c/1/L" subparagraph {
+          num "L" "(L)"
+          content "a motion is pending to delay discharge because the debtor has not filed with the court all tax documents required to be filed under § 521(f)."
+          hash "a5ae9a5ec35fd57e85f0bd12cebb573a07abbfbd98de56e20ddd46e12230864c"
+        }
+        hash "132a757c092b432f106bc0886aafd26112a66c565ecc0eb6f13acdf9a12cf9d5"
+      }
+      provision "/us/usc/ptIV/rule4004/c/2" paragraph {
+        num "2" "(2)"
+        content "Delay in Entering a Discharge in General. On the debtor’s motion, the court may delay entering a discharge for 30 days and, on a motion made within that time, delay entry to a date certain."
+        hash "1d92dd0a5d4e3bda056bdb378a846cc4ac17068aa576b5da12ef32965bc8c411"
+      }
+      provision "/us/usc/ptIV/rule4004/c/3" paragraph {
+        num "3" "(3)"
+        content "Delaying Entry Because of Rule 1007(b)(8). If the debtor is required to file a statement under Rule 1007(b)(8), the court must not grant a discharge until at least 30 days after the statement is filed."
+        hash "24fbeec7066ede7ad288b9707c9862ddf30f9c524154e36955f5858b7b41e6cd"
+      }
+      provision "/us/usc/ptIV/rule4004/c/4" paragraph {
+        num "4" "(4)"
+        content "Individual Chapter 11 or Chapter 13 Case. In a Chapter 11 case in which the debtor is an individual—or in a Chapter 13 case—the court must not grant a discharge if the debtor has not filed a certificate required by Rule 1007(b)(7)."
+        hash "78e6d2cd1b3e1f03fae1c3887d43fb8ef63a252708d358c0fce565d79b849bcf"
+      }
+      hash "e2733e807784b87c8057a8a1dd471f9fb8313e5d729e8b52e9901ffa6d2ed68b"
+    }
+    provision "/us/usc/ptIV/rule4004/d" subsection {
+      num "d" "(d)"
+      heading "Applying Part VII Rules and Rule 9014."
+      content "The Part VII rules govern an objection to a discharge, except that Rule 9014 governs an objection to a discharge under § 727(a)(8) or (9) or § 1328(f)."
+      hash "3872fbf97d1818e77927a9b119719e6a19c7cd14d42244b2cafb40814108e79d"
+    }
+    provision "/us/usc/ptIV/rule4004/e" subsection {
+      num "e" "(e)"
+      heading "Form of a Discharge Order."
+      content "A discharge order must conform to the appropriate Official Form."
+      hash "36753fe1367679c694af6345bfcf988802a8a1bf6287a405efb8e557228e1bd6"
+    }
+    provision "/us/usc/ptIV/rule4004/f" subsection {
+      num "f" "(f)"
+      heading "Registering a Discharge in Another District."
+      content "A discharge order that becomes final may be registered in another district by filing a certified copy with the clerk for that district. When registered, the order has the same effect as an order of the court where it is registered."
+      hash "0db589bb066f974ea350d3b91cf45dcf1d763f9bf9fe7580234f674de8ab855d"
+    }
+    provision "/us/usc/ptIV/rule4004/g" subsection {
+      num "g" "(g)"
+      heading "Notice of a Final Discharge Order."
+      content "The clerk must promptly mail a copy of the final discharge order to those entities listed in (a)(4)."
+      hash "771356d6527c2c87aae6ae1deb9cc88aca3f07c02d3b487de04d05bdd2f8a014"
+    }
+    hash "724477163eeaa14d0d695c57a65eae5a4fd09eee9b299f36273a5369d1fbcc50"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 17, 2000, eff. Dec. 1, 2000; Apr. 29, 2002, eff. Dec. 1, 2002; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 26, 2011, eff. Dec. 1, 2011; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Bankruptcy Rule 404."
+    p "Subdivisions (a) and (b) of this rule prescribe the procedure for determining whether a discharge will be granted pursuant to § 727 of the Code. The time fixed by subdivision (a) may be enlarged as provided in subdivision (b)."
+    p "The notice referred to in subdivision (a) is required to be given by mail and addressed to creditors as provided in Rule 2002."
+    p "An extension granted on a motion pursuant to subdivision (b) of the rule would ordinarily benefit only the movant, but its scope and effect would depend on the terms of the extension."
+    p "Subdivision (c). If a complaint objecting to discharge is filed, the court’s grant or denial of the discharge will be entered at the conclusion of the proceeding as a judgment in accordance with Rule 9021. The inclusion of the clause in subdivision (c) qualifying the duty of the court to grant a discharge when a waiver has been filed is in accord with the construction of the Code. 4 Collier, Bankruptcy ¶ 727.12 (15th ed. 1979)."
+    p "The last sentence of subdivision (c) takes cognizance of § 524(c) of the Code which authorizes a debtor to enter into enforceable reaffirmation agreements only prior to entry of the order of discharge. Immediate entry of that order after expiration of the time fixed for filing complaints objecting to discharge may render it more difficult for a debtor to settle pending litigation to determine the dischargeability of a debt and execute a reaffirmation agreement as part of a settlement."
+    p "Subdivision (d). An objection to discharge is required to be made by a complaint, which initiates an adversary proceeding as provided in Rule 7003. Pursuant to Rule 5005, the complaint should be filed in the court in which the case is pending."
+    p "Subdivision (e). Official Form No. 27 to which subdivision (e) refers, includes notice of the effects of a discharge specified in § 524(a) of the Code."
+    p "Subdivision (f). Registration may facilitate the enforcement of the order of discharge in a district other than that in which it was entered. See 2 Moore’s Federal Practice ¶ 1.04[2] (2d ed. 1967). Because of the nationwide service of process authorized by Rule 7004, however, registration of the order of discharge is not necessary under these rules to enable a discharged debtor to obtain relief against a creditor proceeding anywhere in the United States in disregard of the injunctive provisions of the order of discharge."
+    p "Subdivision (g). Notice of discharge should be mailed promptly after the order becomes final so that creditors may be informed of entry of the order and of its injunctive provisions. Rule 2002 specifies the manner of the notice and persons to whom the notice is to be given."
+    hash "ad7e1dc51fb9ec0a84c53b7c922abf60a7ef290253e11ef91298c640286d92ae"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to conform to § 727(c) which gives the United States trustee the right to object to discharge. This amendment is derived from Rule X–1008(a)(1) and is consistent with Rule 2002. The amendment to subdivision (c) is to prevent a timely motion to dismiss a chapter 7 case for substantial abuse from becoming moot merely because a discharge order has been entered. Reference to the Official Form number in subdivision (e) is deleted in anticipation of future revision and renumbering of the Official Forms."
+    hash "aa2c51be37c81015a67473e40a253328a6964ab3e01641089533b9e8885f56c1"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1996 Amendment"
+    p "Subsection (c) is amended to delay entry of the order of discharge if a motion pursuant to Rule 4004(b) to extend the time for filing a complaint objecting to discharge is pending. Also, this subdivision is amended to delay entry of the discharge order if the debtor has not paid in full the filing fee and the administrative fee required to be paid upon the commencement of the case. If the debtor is authorized to pay the fees in installments in accordance with Rule 1006, the discharge order will not be entered until the final installment has been paid."
+    p "The other amendments to this rule are stylistic."
+    p "GAP Report on Rule 4004. No changes have been made since publication, except for stylistic changes."
+    hash "773045fdbe8f10b48089b06cf6f776b81b2ee6c1a6223cb0f7e72ca45c6629cf"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "Subdivision (a) is amended to clarify that, in a chapter 7 case, the deadline for filing a complaint objecting to discharge under § 727(a) is 60 days after the first date set for the meeting of creditors, whether or not the meeting is held on that date. The time for filing the complaint is not affected by any delay in the commencement or conclusion of the meeting of creditors. This amendment does not affect the right of any party in interest to file a motion for an extension of time to file a complaint objecting to discharge in accordance with Rule 4004(b)."
+    p "The substitution of the word “filed” for “made” in subdivision (b) is intended to avoid confusion regarding the time when a motion is “made” for the purpose of applying these rules. See, e.g., In re Coggin, 30 F.3d 1443 (11th Cir. 1994). As amended, this rule requires that a motion for an extension of time for filing a complaint objecting to discharge be filed before the time has expired."
+    p "Other amendments to this rule are stylistic."
+    p "GAP Report on Rule 4004. No changes since publication."
+    hash "57d4f28bea50a02176d3d816f60aeefca6fa10c9178080d55a3ab255d48f6885"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2000-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2000 Amendment"
+    p "Subdivision (c) is amended so that a discharge will not be granted while a motion requesting an extension of time to file a motion to dismiss the case under § 707(b) is pending. Other amendments are stylistic."
+    p "GAP Report on Rule 4004(c). No changes since publication except for style revisions."
+    hash "db6b017749f14edeef56ea732976fb87d4f5a42cbc387660fe6b4ef85d4befce"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2002-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2002 Amendment"
+    p "Subdivision (c)(1)(D) is amended to provide that the filing of a motion to dismiss under § 707 of the Bankruptcy Code postpones the entry of the discharge. Under the present version of the rule, only motions to dismiss brought under § 707(b) cause the postponement of the discharge. This amendment would change the result in cases such as In re Tanenbaum, 210 B.R. 182 (Bankr. D. Colo. 1997)."
+    p "Changes Made After Publication and Comments. No changes were made."
+    hash "c8063d7f5d78cc3a587a76f8322c3bb602f1e19ef92662dbe35658031db77cbf"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subdivision (c)(1)(G) is amended to reflect the fee waiver provision in 28 U.S.C. § 1930, added by the 2005 amendments."
+    p "Subdivision (c)(1)(H) is new. It reflects the 2005 addition to the Code of §§ 727(a)(11) and 1328(g), which require that individual debtors complete a course in personal financial management as a condition to the entry of a discharge. Including this requirement in the rule helps prevent the inadvertent entry of a discharge when the debtor has not complied with this requirement. If a debtor fails to file the required statement regarding a personal financial management course, the clerk will close the bankruptcy case without the entry of a discharge."
+    p "Subdivision (c)(1)(I) is new. It reflects the 2005 addition to the Code of § 727(a)(12). This provision is linked to § 522(q). Section 522(q) limits the availability of the homestead exemption for individuals who have been convicted of a felony or who owe a debt arising from certain causes of action within a particular time frame. The existence of reasonable cause to believe that § 522(q) may be applicable to the debtor constitutes grounds for withholding the discharge."
+    p "Subdivision (c)(1)(J) is new. It accommodates the deadline for filing a reaffirmation agreement established by Rule 4008(a)."
+    p "Subdivision (c)(1)(K) is new. It reflects the 2005 revisions to § 524 of the Code that alter the requirements for approval of reaffirmation agreements. Section 524(m) sets forth circumstances under which a reaffirmation agreement is presumed to be an undue hardship. This triggers an obligation to review the presumption and may require notice and a hearing. Subdivision (c)(1)(J) has been added to prevent the discharge from being entered until the court approves or disapproves the reaffirmation agreement in accordance with § 524(m)."
+    p "Subdivision (c)(1)(L) is new. It implements § 1228(a) of Public Law Number 109–8, an uncodified provision of the Bankruptcy Abuse Prevention and Consumer Protection Act of 2005, which prohibits entry of a discharge unless required tax documents have been provided to the court."
+    p "Subdivision (c)(3) is new. It postpones the entry of the discharge of an individual debtor in a case under chapter 11, 12, or 13 if there is a question as to the applicability of § 522(q) of the Code. The postponement provides an opportunity for a creditor to file a motion to limit the debtor’s exemption under that provision."
+    p "Other changes are stylistic."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "004e69a27551edf9ef576d3d611c6aa9403245f947b22e924a04b4c5de67b40b"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010 Amendment"
+    p "Subdivision (a). Subdivision (a) is amended to include a deadline for filing a motion objecting to a debtor’s discharge under §§ 727(a)(8), [sic] (a)(9), or 1328(f) of the Code. These sections establish time limits on the issuance of discharges in successive bankruptcy cases by the same debtor."
+    p "Subdivision (c). Subdivision (c)(1) is amended because a corresponding amendment to subdivision (d) directs certain objections to discharge to be brought by motion rather than by complaint. Subparagraph (c)(1)(B) directs the court not to grant a discharge if a motion or complaint objecting to discharge has been filed unless the objection has been decided in the debtor’s favor."
+    p "Subdivision (c)(4) is new. It directs the court in chapter 11 and 13 cases to withhold the entry of the discharge if an individual debtor has not filed a statement of completion of a course concerning personal financial management as required by Rule 1007(b)(7)."
+    p "Subdivision (d). Subdivision (d) is amended to direct that objections to discharge under §§ 727(a)(8), (a)(9), and 1328(f) be commenced by motion rather than by complaint. Objections under the specified provisions are contested matters governed by Rule 9014. The title of the subdivision is also amended to reflect this change."
+    p "Changes Made After Publication. Subdivision (d) was amended to provide that objections to discharge under §§ 727(a)(8), (a)(9), and 1328(f) are commenced by motion rather than by complaint and are governed by Rule 9014. Because of the relocation of this provision from the previously proposed Rule 7001(b), subdivisions (a) and (c)(1) of this rule were revised to change references to “motion under Rule 7001(b)” to “motion under § 727(a)(8) or (a)(9).” Other stylistic changes were made to the rule, and the Committee Note was revised to reflect these changes."
+    hash "060d6e867f257ccf688ae32d225bd96c90ed7c9fff842760cc36dd60a1aaa9ec"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2011-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2011 Amendment"
+    p "Subdivision (b). Subdivision (b) is amended to allow a party, under certain specified circumstances, to seek an extension of time to object to discharge after the time for filing has expired. This amendment addresses the situation in which there is a gap between the expiration of the time for objecting to discharge and the entry of the discharge order. If, during that period, a party discovers facts that would provide grounds for revocation of discharge, it may not be able to seek revocation under § 727(d) of the Code because the facts would have been known prior to the granting of the discharge. Furthermore, during that period the debtor may commit an act that provides a basis for both denial and revocation of the discharge. In those situations, subdivision (b)(2) allows a party to file a motion for an extension of time to object to discharge based on those facts so long as they were not known to the party before expiration of the deadline for objecting. The motion must be filed promptly after discovery of those facts."
+    p "Changes Made After Publication. Following publication minor stylistic changes were made to the language of the rule, and a sentence was added to the Committee Note to clarify that the rule applies whenever the debtor commits an act during the gap period that provides a basis for both denial and revocation of the discharge."
+    hash "81c4f3ec1133ac5805b963348bf93d5d3a3249f591c8b5f3f80b15951e76431c"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2013 Amendment"
+    p "Subdivision (c)(1) is amended in several respects. The introductory language of paragraph (1) is revised to emphasize that the listed circumstances do not just relieve the court of the obligation to enter the discharge promptly but that they prevent the court from entering a discharge."
+    p "Subdivision (c)(1)(H) is amended to reflect the simultaneous amendment of Rule 1007(b)(7). The amendment of the latter rule relieves a debtor of the obligation to file a statement of completion of a course concerning personal financial management if the course provider notifies the court directly that the debtor has completed the course. Subparagraph (H) now requires postponement of the discharge when a debtor fails to file a statement of course completion only if the debtor has an obligation to file the statement."
+    p "Subdivision (c)(1)(K) is amended to make clear that the prohibition on entering a discharge due to a presumption of undue hardship under § 524(m) of the Code ceases when the presumption expires or the court concludes a hearing on the presumption."
+    p "Changes Made After Publication and Comment. Because this amendment is being made to conform to a simultaneous amendment of Rule 1007(b)(7) and is otherwise technical in nature, final approval is sought without publication."
+    hash "a1d438a4a2fe7dea018b64c5b5056d2b1cd01b460436d870f0d5f515bd411e19"
+  }
+  note "/us/usc/ptIV/rule4004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 4004 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    p "Additionally, the following substantive changes have been made."
+    p "The amendments to Rule 4004(c)(1)(H) and (c)(4) reflect the amendment to Rule 1007(b)(7) that replaces the requirement for submission of a statement showing that the debtor has completed a course on personal financial management with the requirement that the debtor provide the certificate of course completion issued by the approved provider of that course."
+    hash "4bea440741f98d6ac75b556e7f1bb7a1d8003f6aea75e1aa69df7c93b61391c4"
+  }
+  layers {
+    operative "724477163eeaa14d0d695c57a65eae5a4fd09eee9b299f36273a5369d1fbcc50"
+    enacted "fe9ce430d4d24ddac0081162db8ac531a7d82d88eccd5cb716ba77715965c655"
+    editorial "ac1dab0495ddb231ad036814458a1734124a527a91027257b4bd6329fbd73caa"
+  }
+}

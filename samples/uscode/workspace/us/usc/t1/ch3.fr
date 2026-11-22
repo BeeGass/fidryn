@@ -1,0 +1,29 @@
+edition 2
+module "/us/usc/t1/ch3" {
+  within "/us/usc/t1"
+  source "usc01.xml"
+  positive_law true
+  container "/us/usc/t1/ch3" chapter {
+    num "3" "CHAPTER 3—"
+    heading "CODE OF LAWS OF UNITED STATES AND SUPPLEMENTS; DISTRICT OF COLUMBIA CODE AND SUPPLEMENTS"
+    member "/us/usc/t1/s201"
+    member "/us/usc/t1/s202"
+    member "/us/usc/t1/s203"
+    member "/us/usc/t1/s204"
+    member "/us/usc/t1/s205"
+    member "/us/usc/t1/s206"
+    member "/us/usc/t1/s207"
+    member "/us/usc/t1/s208"
+    member "/us/usc/t1/s209"
+    member "/us/usc/t1/s210"
+    member "/us/usc/t1/s211"
+    member "/us/usc/t1/s212"
+    member "/us/usc/t1/s213"
+    hash "d402a07e2b1a20e6d643f0374aef75c611085c0e2f6082d884fcd386f012d395"
+  }
+  layers {
+    operative "d402a07e2b1a20e6d643f0374aef75c611085c0e2f6082d884fcd386f012d395"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

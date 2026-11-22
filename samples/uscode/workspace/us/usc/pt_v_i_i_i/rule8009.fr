@@ -1,0 +1,296 @@
+edition 2
+module "/us/usc/ptVIII/rule8009" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8009" courtRule {
+    num "8009" "Rule 8009."
+    heading "Record on Appeal; Sealed Documents"
+    provision "/us/usc/ptVIII/rule8009/a" subsection {
+      num "a" "(a)"
+      heading "Designating the Record on Appeal; Statement of the Issues; Content of the Record."
+      provision "/us/usc/ptVIII/rule8009/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Appellant’s Designation and Statement of the Issues. The appellant must:"
+        provision "/us/usc/ptVIII/rule8009/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "file with the bankruptcy clerk a designation of the items to be included in the record on appeal and a statement of the issues to be presented; and"
+          hash "42987ce0c78f7690328822112d8dbb6ff5ae69735a848f686385f77d3617df97"
+        }
+        provision "/us/usc/ptVIII/rule8009/a/1/B" subparagraph {
+          num "B" "(B)"
+          content {
+            p "file and serve the designation and statement on the appellee within 14 days after:"
+            p "• the notice of appeal as of right has become effective under Rule 8002; or"
+            p "• an order granting leave to appeal has been entered."
+          }
+          continuation "Premature service is treated as service on the first day on which filing is timely."
+          hash "a319b89ceb25ea481d2f21d685fa96574d2fa6a5e8cff6b8686b7e8324afca6d"
+        }
+        hash "e58209d4b1c67dc64c0a098f4dfe7774c7b739d07d45de22d05183493f9e5438"
+      }
+      provision "/us/usc/ptVIII/rule8009/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Appellee’s and Cross-Appellant’s Designation and Statement of the Issues."
+        provision "/us/usc/ptVIII/rule8009/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "Appellee. Within 14 days after being served, the appellee may file with the bankruptcy clerk and serve on the appellant a designation of additional items to be included in the record."
+          hash "746845030d6f9c162ce99a02f20c2885b2e661a05594b870c629fe14f6b03297"
+        }
+        provision "/us/usc/ptVIII/rule8009/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "Cross-Appellant. An appellee who files a cross-appeal must file and serve a designation of additional items to be included in the record and a statement of the issues to be presented on the cross-appeal."
+          hash "4d00b859d9db7e221e885544f0fcdf7d40c38f6bfa1b0fb25fd00fa2eb051825"
+        }
+        hash "782f74028f193646d98f197787c8b93b72101643d16868d255c27d186e861243"
+      }
+      provision "/us/usc/ptVIII/rule8009/a/3" paragraph {
+        num "3" "(3)"
+        content "Cross-Appellee’s Designation. Within 14 days after the cross-appellant’s designation and statement have been served, the cross-appellee may file with the bankruptcy clerk and serve on the cross-appellant a designation of additional items to be included in the record."
+        hash "2ffe6e241efd3cc576eecf903a0e3f07804651dcd0ab91c1dd9193ad2b31edad"
+      }
+      provision "/us/usc/ptVIII/rule8009/a/4" paragraph {
+        num "4" "(4)"
+        content {
+          p "Record on Appeal. The record on appeal must include:"
+          p "• the docket entries kept by the bankruptcy clerk;"
+          p "• items designated by the parties;"
+          p "• the notice of appeal;"
+          p "• the judgment, order, or decree being appealed;"
+          p "• any order granting leave to appeal;"
+          p "• any certification required for a direct appeal to the court of appeals;"
+          p "• any opinion, findings of fact and conclusions of law relating to the issues on appeal, including transcripts of all oral rulings;"
+          p "• any transcript ordered under (b);"
+          p "• any statement required by (c); and"
+          p "• any other items from the record that the court where the appeal is pending orders to be included."
+        }
+        hash "353decefd39823f01039341c2d9d793d55c88cba23112ac3ddd45fb9e8d85a9b"
+      }
+      provision "/us/usc/ptVIII/rule8009/a/5" paragraph {
+        num "5" "(5)"
+        content "Copies for the Bankruptcy Clerk. If paper copies are needed and the bankruptcy clerk requests copies of designated items, the party filing the designation must provide them. If the party fails to do so, the bankruptcy clerk must prepare them at that party’s expense."
+        hash "290cd46d5eef0ce3f610bf11136d35f3b452feb9ad15e4592cd6a10b9ab78a19"
+      }
+      hash "d2521b4bbce9418593cec3bf577737e729b75119d721a7a5d85596f2c3a5bf8c"
+    }
+    provision "/us/usc/ptVIII/rule8009/b" subsection {
+      num "b" "(b)"
+      heading "Transcript of Proceedings."
+      provision "/us/usc/ptVIII/rule8009/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "Appellant’s Duty to Order. Within the period prescribed by (a)(1), the appellant must:"
+        provision "/us/usc/ptVIII/rule8009/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "order in writing from the reporter, as defined in Rule 8010(a)(1), a transcript of such parts of the proceedings not already on file as the appellant considers necessary for the appeal, and file a copy of the order with the bankruptcy clerk; or"
+          hash "b1182765d08501222907188624298f80b7d787e14a140eb9fb1fff5f4779b8b0"
+        }
+        provision "/us/usc/ptVIII/rule8009/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "file with the bankruptcy clerk a certificate stating that the appellant is not ordering a transcript."
+          hash "48017e35d453f0469bf400df07645c444d6076859cf550fa470e1c7425cefda9"
+        }
+        hash "8d54ce8bc09b94c22937ab6541b178c9cc1d7aaedb585038b1e670965fd4ba36"
+      }
+      provision "/us/usc/ptVIII/rule8009/b/2" paragraph {
+        num "2" "(2)"
+        chapeau "Appellee’s Duty to Order as a Cross-Appellant. Within 14 days after the appellant has filed a copy of the transcript order—or a certificate stating that the appellant is not ordering a transcript—the appellee as cross-appellant must:"
+        provision "/us/usc/ptVIII/rule8009/b/2/A" subparagraph {
+          num "A" "(A)"
+          content "order in writing from the reporter a transcript of such additional parts of the proceedings as the cross-appellant considers necessary for the appeal, and file a copy of the order with the bankruptcy clerk; or"
+          hash "c2a85ca42509afe927fbfc64d6a5d2ea683f8e5db7ed988afb7751111bbcd467"
+        }
+        provision "/us/usc/ptVIII/rule8009/b/2/B" subparagraph {
+          num "B" "(B)"
+          content "file with the bankruptcy clerk a certificate stating that the cross-appellant is not ordering a transcript."
+          hash "ba35e27cbb1804eee4eee0b0a024727ea9f84c49ca6eb2ef6d81c0cd8bef8790"
+        }
+        hash "517a2fd1568b9f66c9c2245863690465598032a93425ebde76520ffc6261d687"
+      }
+      provision "/us/usc/ptVIII/rule8009/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Appellee’s or Cross-Appellee’s Right to Order. Within 14 days after the appellant or cross-appellant has filed a copy of a transcript order—or a certificate stating that the appellant or cross-appellant is not ordering a transcript—the appellee or cross-appellee:"
+        provision "/us/usc/ptVIII/rule8009/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "may order in writing from the reporter a transcript of any additional parts of the proceeding that the appellee or cross-appellee considers necessary for the appeal; and"
+          hash "ba64d864dbad2e95c6b5ada026b3e56fc5cb0648e8c02fdd60a259ca0e635510"
+        }
+        provision "/us/usc/ptVIII/rule8009/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "must file a copy of the order with the bankruptcy clerk."
+          hash "8f1b67a4b35be33e588f93379bafaec19dede1ee05550e0a01a241e3cc79d836"
+        }
+        hash "8dcc946f9ec6fe891a3bd41c7ce8169f7deeadfa557a398f0ccbf5d2402625e0"
+      }
+      provision "/us/usc/ptVIII/rule8009/b/4" paragraph {
+        num "4" "(4)"
+        content "Payment. At the time of ordering, a party must make satisfactory arrangements with the reporter to pay for the transcript."
+        hash "09ca4184bb1eff99e0a08fb54336fd49edf3cb32f19dd51a750f2b31e3d47440"
+      }
+      provision "/us/usc/ptVIII/rule8009/b/5" paragraph {
+        num "5" "(5)"
+        content "Unsupported Finding or Conclusion. If the appellant intends to argue on appeal that a finding or conclusion is unsupported by the evidence or is contrary to the evidence, the appellant must include in the record a transcript of all relevant testimony and a copy of all relevant exhibits."
+        hash "21146667e1079d49ac7b220c6f577246d7452521aa7f28a4e175e40daa1cb788"
+      }
+      hash "66459f828363ef2c8432f2a3e3f3dbda7bc2671413a7cc7b785425bf8dbf2ef5"
+    }
+    provision "/us/usc/ptVIII/rule8009/c" subsection {
+      num "c" "(c)"
+      heading "When a Transcript Is Unavailable."
+      provision "/us/usc/ptVIII/rule8009/c/1" paragraph {
+        num "1" "(1)"
+        content "Statement of the Evidence. If a transcript of a hearing or trial is unavailable, the appellant may prepare a statement of the evidence or proceedings from the best available means, including the appellant’s recollection. The statement must be filed within the time prescribed by (a)(1) and served on the appellee."
+        hash "decd1fea9ec92ef5195aea75baf33415a9ad133e7146e706651f05faf6fb2bc1"
+      }
+      provision "/us/usc/ptVIII/rule8009/c/2" paragraph {
+        num "2" "(2)"
+        content "Appellee’s Response. The appellee may serve objections or proposed amendments within 14 days after being served."
+        hash "a445b4073480b118d8042c2559db850159c77d8aa9811428309379f08e6ba184"
+      }
+      provision "/us/usc/ptVIII/rule8009/c/3" paragraph {
+        num "3" "(3)"
+        content "Court Approval. The statement and any objections or proposed amendments must then be submitted to the bankruptcy court for settlement and approval. As settled and approved, the statement must be included by the bankruptcy clerk in the record on appeal."
+        hash "88a238a51d70050c8cac3af8eaf661fb639246241adcecc103e3fa9803a495a5"
+      }
+      hash "fe396ae849c85915438f9a90b22e8dc792c4934d6960f5914bc3bda632dace9e"
+    }
+    provision "/us/usc/ptVIII/rule8009/d" subsection {
+      num "d" "(d)"
+      heading "Agreed Statement as the Record on Appeal."
+      provision "/us/usc/ptVIII/rule8009/d/1" paragraph {
+        num "1" "(1)"
+        content "Agreed Statement. Instead of the record on appeal as defined in (a), the parties may prepare, sign, and submit to the bankruptcy court a statement of the case showing how the issues presented by the appeal arose and were decided in the bankruptcy court."
+        hash "0914490d026f5cb083a8e5c174176b8dafbaebab644916bf7c4e31733fbb8abe"
+      }
+      provision "/us/usc/ptVIII/rule8009/d/2" paragraph {
+        num "2" "(2)"
+        chapeau "Content. The statement must set forth only those facts alleged and proved or sought to be proved that are essential to the court’s resolution of the issues. If the statement is accurate, it—together with any additions that the bankruptcy court considers necessary to a full presentation of the issues on appeal—must be:"
+        provision "/us/usc/ptVIII/rule8009/d/2/A" subparagraph {
+          num "A" "(A)"
+          content "approved by the bankruptcy court; and"
+          hash "93cbb5bbef6bf151907e368220d2b84845a529362ab86e432869e72f7a381906"
+        }
+        provision "/us/usc/ptVIII/rule8009/d/2/B" subparagraph {
+          num "B" "(B)"
+          content "certified to the court where the appeal is pending as the record on appeal."
+          hash "c9159b98c638c4fbb434a9aa3f7bc601d3f64bd7929dc8a08ec941c4d425f4fc"
+        }
+        hash "44b9c6c2b8f2ec749c6ee3ae8b5d4a784dcb19a942c76c2fd5e985c9a5cd1cbc"
+      }
+      provision "/us/usc/ptVIII/rule8009/d/3" paragraph {
+        num "3" "(3)"
+        content "Time to Send the Agreed Statement to the Appellate Court. The bankruptcy clerk must then send the agreed statement to the clerk of the court where the appeal is pending within the time provided by Rule 8010. A copy may be filed in place of the appendix required by Rule 8018(b) or, in the case of a direct appeal to the court of appeals, by Fed. R. App. P. 30."
+        hash "b4564fa19b1d335626b23194ad8326781944e770c30de89c4f9d1c1b9ec6c8ae"
+      }
+      hash "d70a93c4a23a1cb89b06c025f83482265289115ff52deceb3150417b45de3225"
+    }
+    provision "/us/usc/ptVIII/rule8009/e" subsection {
+      num "e" "(e)"
+      heading "Correcting or Modifying the Record."
+      provision "/us/usc/ptVIII/rule8009/e/1" paragraph {
+        num "1" "(1)"
+        content "Differences About Accuracy; Improper Designations. If any difference arises about whether the record accurately discloses what occurred in the bankruptcy court, the difference must be submitted to and settled by the bankruptcy court and the record conformed accordingly. If an item has been improperly designated as part of the record on appeal, a party may move to strike that item."
+        hash "610798ddde500b8f9f3dc9f4b8920f51cdd876b7b47723856c8d2db9da9150a1"
+      }
+      provision "/us/usc/ptVIII/rule8009/e/2" paragraph {
+        num "2" "(2)"
+        chapeau "Omissions and Misstatements. If anything material to either party is omitted from or misstated in the record by error or accident, the omission or misstatement may be corrected, and a supplemental record may be certified and sent:"
+        provision "/us/usc/ptVIII/rule8009/e/2/A" subparagraph {
+          num "A" "(A)"
+          content "on stipulation of the parties;"
+          hash "f6fec2829325ba6c7d34cd98105e517a2729484942edbb307f8fc3f6ecd8ac8b"
+        }
+        provision "/us/usc/ptVIII/rule8009/e/2/B" subparagraph {
+          num "B" "(B)"
+          content "by the bankruptcy court before or after the record has been sent; or"
+          hash "7f46c9e2ff961fdd20fd1759ba63ce06ca4548b53212a2c912d2c97403c1a2b4"
+        }
+        provision "/us/usc/ptVIII/rule8009/e/2/C" subparagraph {
+          num "C" "(C)"
+          content "by the court where the appeal is pending."
+          hash "c9982737c97be40a833280b1ea6cbd2aec60ff1e8955d8836e177aaa6bedb9a1"
+        }
+        hash "121be47ed6ecaee769cd042fca844022018c65a399f094815ef2a98869afde58"
+      }
+      provision "/us/usc/ptVIII/rule8009/e/3" paragraph {
+        num "3" "(3)"
+        content "Remaining Questions. All other questions about the form and content of the record must be presented to the court where the appeal is pending."
+        hash "77fa0a38a86fa6313baa4df1f8cb389c51d9474452ba69dfdad74fce5f2b7266"
+      }
+      hash "0c686e4e545999618910dd2f7d38d5927ad5a41febdbfbd77876cf314cc8ef59"
+    }
+    provision "/us/usc/ptVIII/rule8009/f" subsection {
+      num "f" "(f)"
+      heading "Sealed Documents."
+      provision "/us/usc/ptVIII/rule8009/f/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. A document placed under seal by the bankruptcy court may be designated as a part of the record on appeal. But a document so designated:"
+        provision "/us/usc/ptVIII/rule8009/f/1/A" subparagraph {
+          num "A" "(A)"
+          content "must be identified without revealing confidential or secret information; and"
+          hash "982bee16fdae1ebbb0914776f0bc6e2cedd6fe0a16dfe6524468340ee919f4a6"
+        }
+        provision "/us/usc/ptVIII/rule8009/f/1/B" subparagraph {
+          num "B" "(B)"
+          content "may be sent only as (2) prescribes."
+          hash "14a01dbe0fe63b0ea96da7315ef7781407c75d149d5e541642155c5b17d14ecf"
+        }
+        hash "c25d104803277248bb94147c5f95bc0c7c74894d2a3ea1bdf8686c52860db9d7"
+      }
+      provision "/us/usc/ptVIII/rule8009/f/2" paragraph {
+        num "2" "(2)"
+        content "When to Send a Sealed Document. To have a sealed document sent as part of the record, a party must file in the court where the appeal is pending a motion to accept the document under seal. If the motion is granted, the movant must notify the bankruptcy court, and the bankruptcy clerk must promptly send the sealed document to the clerk of the court where the appeal is pending."
+        hash "903488e14643db7493382709bc7eb0f0a70a68eadfa7b7b74e24679586b21568"
+      }
+      hash "e1b9b635e695bf32ca0e99b8a443345b2bb99919bf62609a7ca59376dd45057c"
+    }
+    provision "/us/usc/ptVIII/rule8009/g" subsection {
+      num "g" "(g)"
+      heading "Duty to Assist the Bankruptcy Clerk."
+      content "All parties to an appeal must take any other action needed to enable the bankruptcy clerk to assemble and send the record."
+      hash "f2d4d8a8cdc3a3bf92d87abf51e0b27475853cb5530bdacd4d74d8a20d22647d"
+    }
+    hash "0d5d5768cf4933c3f231574625db97a802ffb23fd4472ffa8cc6b12aba2077ad"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8009, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Mar. 26, 2009, eff. Dec. 1, 2009, related to briefs and appendix and filing and service, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "16e7c65000b32c8af43741238889c8779c716204e733e1d76fcc3e3cb924f225"
+  }
+  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from former Rule 8006 and F.R.App.P. 10 and 11(a). The provisions of this rule and Rule 8010 are applicable to appeals taken directly to a court of appeals under 28 U.S.C. § 158(d)(2), as well as to appeals to a district court or BAP. See F.R.App.P. 6(c)(2)(A) and (B)."
+    p "The rule retains the practice of former Rule 8006 of requiring the parties to designate items to be included in the record on appeal. In this respect, the bankruptcy rule differs from the appellate rule. Among other things, F.R.App.P. 10(a) provides that the record on appeal consists of all the documents and exhibits filed in the case. This requirement would often be unworkable in a bankruptcy context because thousands of items might have been filed in the overall bankruptcy case."
+    p "Subdivision (a) provides the time period for an appellant to file a designation of items to be included in the record on appeal and a statement of the issues to be presented. It then provides for the designation of additional items by the appellee, cross-appellant, and cross-appellee, as well as for the cross-appellant’s statement of the issues to be presented in its appeal. Subdivision (a)(4) prescribes the content of the record on appeal. Ordinarily, the bankruptcy clerk will not need to have paper copies of the designated items because the clerk will either transmit them to the appellate court electronically or otherwise make them available electronically. If the bankruptcy clerk requires a paper copy of some or all of the items designated as part of the record, the clerk may request the party that designated the item to provide the necessary copies, and the party must comply with the request or bear the cost of the clerk’s copying."
+    p "Subdivision (b) governs the process for ordering a complete or partial transcript of the bankruptcy court proceedings. In situations in which a transcript is unavailable, subdivision (c) allows for the parties’ preparation of a statement of the evidence or proceedings, which must be approved by the bankruptcy court."
+    p "Subdivision (d) adopts the practice of F.R.App.P. 10(d) of permitting the parties to agree on a statement of the case in place of the record on appeal. The statement must show how the issues on appeal arose and were decided in the bankruptcy court. It must be approved by the bankruptcy court in order to be certified as the record on appeal."
+    p "Subdivision (e), modeled on F.R.App.P. 10(e), provides a procedure for correcting the record on appeal if an item is improperly designated, omitted, or misstated."
+    p "Subdivision (f) is a new provision that governs the handling of any document that remains sealed by the bankruptcy court and that a party wants to include in the record on appeal. The party must request the court where the appeal is pending to accept the document under seal, and that motion must be granted before the bankruptcy clerk may transmit the sealed document to the district, BAP, or circuit clerk."
+    p "Subdivision (g) requires the parties’ cooperation with the bankruptcy clerk in assembling and transmitting the record. It retains the requirement of former Rule 8006, which was adapted from F.R.App.P. 11(a)."
+    p "Changes Made After Publication and Comment. In subdivision (a)(2) and (3), the place of filing was clarified. “Docket entries kept by the bankruptcy clerk” was added to the list in subdivision (a)(4)."
+    hash "b2850843d6fc6515b09a18925a40c6622944e17aeb8463e593143b282a2fbb1d"
+  }
+  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8009 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "2fd276f60d60053d5c3be07892e94d0640cd673ad6cc1b3c9dadb02ff97653a0"
+  }
+  note "/us/usc/ptVIII/rule8009/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Appellate Procedure, referred to in subd. (d)(3), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "244d05084cff660c15125f5e8f826561b7bea989cc710b479ce0805b95e41148"
+  }
+  layers {
+    operative "0d5d5768cf4933c3f231574625db97a802ffb23fd4472ffa8cc6b12aba2077ad"
+    enacted "1c78d0f865a582c67bd782ce79796dc4a55ff0c2f9bf267773bc4212e252ea98"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

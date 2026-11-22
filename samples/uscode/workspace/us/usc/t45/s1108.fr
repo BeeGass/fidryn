@@ -1,0 +1,42 @@
+edition 2
+module "/us/usc/t45/s1108" {
+  within "/us/usc/t45/ch20"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1108" section {
+    num "1108" "§ 1108."
+    heading "Concerted economic action"
+    provision "/us/usc/t45/s1108/a" subsection {
+      num "a" "(a)"
+      heading "Strikes interfering with rail freight service of Conrail"
+      content "Any person engaging in concerted economic action over disputes with Amtrak Commuter or any commuter authority shall not be entitled to engage in any strike against, or otherwise to induce any employee of, Conrail, where an effect thereof is to interfere with rail freight service provided by Conrail."
+      hash "a18a91cb0c730b97df284d81614996124e46342181586fbb8c505eb48f69ccc3"
+    }
+    provision "/us/usc/t45/s1108/b" subsection {
+      num "b" "(b)"
+      heading "Strikes interfering with Amtrak Commuter’s rail passenger service"
+      content "Any person engaging in concerted economic action over disputes arising out of freight operations provided by Conrail shall not be entitled to engage in any strike against, or otherwise to induce any employee of, Amtrak Commuter or any commuter authority, where an effect thereof is to interfere with rail passenger service."
+      hash "d7659650141a5b2f15f176e32f332929bc7a8886513787335cdab9427d103a2c"
+    }
+    provision "/us/usc/t45/s1108/c" subsection {
+      num "c" "(c)"
+      heading "Railway Labor Act deemed violated"
+      content "Any concerted action in violation of this section shall be deemed to be a violation of the Railway Labor Act [" ["45 U.S.C. 151" -> "/us/usc/t45/s151"] " et seq.]."
+      hash "e7d6c2ee2f57e095fcdaadf9070a7ee82c7cc759e18ca3355738d6fdb56e0e79"
+    }
+    hash "235d059f04ae996b58b60f477815149de943acbce9f13b2b2a504366b9728707"
+  }
+  credit "(" ["Pub. L. 97–35, title XI, § 1158" -> "/us/pl/97/35/tXI/s1158"] ", Aug. 13, 1981, " ["95 Stat. 682" -> "/us/stat/95/682"] ".)"
+  note "/us/usc/t45/s1108/note/editorialNotes/act.1926-05-20.ch347/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Railway Labor Act, referred to in subsec. (c), is " ["act May 20, 1926, ch. 347" -> "/us/act/1926-05-20/ch347"] ", " ["44 Stat. 577" -> "/us/stat/44/577"] ", which is classified principally to chapter 8 (§ 151 et seq.) of this title. For complete classification of this Act to the Code, see " ["section 151 of this title" -> "/us/usc/t45/s151"] " and Tables."
+    hash "93d9d5f481cb7c9efcc499670ddfac4c4370b5cec1df3988ce5071fef4e7973e"
+  }
+  layers {
+    operative "235d059f04ae996b58b60f477815149de943acbce9f13b2b2a504366b9728707"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "52fa7e70faeae14aaf05e8eeb1c05af5d60d038b46345db19967175156806072"
+  }
+}

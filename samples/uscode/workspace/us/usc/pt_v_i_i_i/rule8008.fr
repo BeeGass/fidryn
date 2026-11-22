@@ -1,0 +1,80 @@
+edition 2
+module "/us/usc/ptVIII/rule8008" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8008" courtRule {
+    num "8008" "Rule 8008."
+    heading "Indicative Rulings"
+    provision "/us/usc/ptVIII/rule8008/a" subsection {
+      num "a" "(a)"
+      chapeau "Motion for Relief Filed When an Appeal Is Pending; Bankruptcy Court’s Options." mark "1" 1 " If a party files a timely motion in the bankruptcy court for relief that the court lacks authority to grant because an appeal has been docketed and is pending, the bankruptcy court may:"
+      provision "/us/usc/ptVIII/rule8008/a/1" paragraph {
+        num "1" "(1)"
+        content "defer considering the motion;"
+        hash "5afc2430d6c707cd76e29ba343ec294f5346e673c5b55ecca1b48e799017ba56"
+      }
+      provision "/us/usc/ptVIII/rule8008/a/2" paragraph {
+        num "2" "(2)"
+        content "deny the motion;"
+        hash "8c7c5cb92305513d656d91a76ed1a9d164ead14d1a30de5ed3d70ddc44f693de"
+      }
+      provision "/us/usc/ptVIII/rule8008/a/3" paragraph {
+        num "3" "(3)"
+        content "state that it would grant the motion if the court where the appeal is pending remands for that purpose; or"
+        hash "c72d969deb2faedb96d3641f1549531ea83ec45567bbd0b6c93cd2419dc47bc6"
+      }
+      provision "/us/usc/ptVIII/rule8008/a/4" paragraph {
+        num "4" "(4)"
+        content "state that the motion raises a substantial issue."
+        hash "b2bd9f300059d335bbe05ce6c8d2278b4af74f26f0d30367a96b4969f5d6d319"
+      }
+      hash "aba929e10de1d421fba9d91325fc53e24204ccd1ee5a4134484199a9b6367c64"
+    }
+    provision "/us/usc/ptVIII/rule8008/b" subsection {
+      num "b" "(b)"
+      content "Notice to the Court Where the Appeal Is Pending." sup "1" " If the bankruptcy court states that it would grant the motion or that the motion raises a substantial issue, the movant must promptly notify the clerk of the court where the appeal is pending."
+      hash "cc7c1490fb7f5d88930eebc0cac8c0736c4689b86b0bc8b0bb91052b318a79f1"
+    }
+    provision "/us/usc/ptVIII/rule8008/c" subsection {
+      num "c" "(c)"
+      content "Remand After an Indicative Ruling." sup "1" " If the bankruptcy court states that it would grant the motion or that the motion raises a substantial issue, the district court or BAP may remand for further proceedings but retains jurisdiction unless it expressly dismisses the appeal. If the district court or BAP remands but retains jurisdiction, the parties must promptly notify the clerk of that court when the bankruptcy court has decided the motion on remand."
+      hash "ab717679b8bf1ebdf073267ea792aaa915ec43a7f10689df34a475e4caaf89bc"
+    }
+    hash "fee2d6ea2c375e58569a9b8c13578169b5373ab0f3c9f83c79d2b88ac5fdd123"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8008/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8008, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 1996, eff. Dec. 1, 1996, related to filing and service, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "969ee54163058e037fba6bae8181a3c8a67afa9fda9b936f41eb5a0eaf070a59"
+  }
+  note "/us/usc/ptVIII/rule8008/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is an adaptation of F.R.Civ.P. 62.1 and F.R.App.P. 12.1. It provides a procedure for the issuance of an indicative ruling when a bankruptcy court determines that, because of a pending appeal, the court lacks jurisdiction to grant a request for relief that the court concludes is meritorious or raises a substantial issue. The rule does not attempt to define the circumstances in which an appeal limits or defeats the bankruptcy court’s authority to act in the face of a pending appeal. In contrast, Rule 8002(b) identifies motions that, if filed within the relevant time limit, suspend the effect of a notice of appeal filed before the last such motion is resolved. In those circumstances, the bankruptcy court has authority to resolve the motion without resorting to the indicative ruling procedure."
+    p "Subdivision (b) requires the movant to notify the court where an appeal is pending if the bankruptcy court states that it would grant the motion or that it raises a substantial issue. This provision applies to appeals pending in the district court, the BAP, or the court of appeals."
+    p "Federal Rules of Appellate Procedure 6 and 12.1 govern the procedure in the court of appeals following notification of the bankruptcy court’s indicative ruling."
+    p "Subdivision (c) of this rule governs the procedure in the district court or BAP upon notification that the bankruptcy court has issued an indicative ruling. The district court or BAP may remand to the bankruptcy court for a ruling on the motion for relief. The district court or BAP may also remand all proceedings, thereby terminating the initial appeal, if it expressly states that it is dismissing the appeal. It should do so, however, only when the appellant has stated clearly its intention to abandon the appeal. Otherwise, the district court or BAP may remand for the purpose of ruling on the motion, while retaining jurisdiction to proceed with the appeal after the bankruptcy court rules, provided that the appeal is not then moot and a party wishes to proceed."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "313dd5e6f99703eea26c3ed686c6b3703a5525232f7bbee6722d0169c0053832"
+  }
+  note "/us/usc/ptVIII/rule8008/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8008 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "90f33605ceefba3f6fde249f9c9a9380231bf1597a29dea04309e2e97b69bfe3"
+  }
+  footnote 1 "1" {
+    p "So in original. The heading probably should not be italicized."
+  }
+  layers {
+    operative "fee2d6ea2c375e58569a9b8c13578169b5373ab0f3c9f83c79d2b88ac5fdd123"
+    enacted "895c29ace11ab6519f5b16dbea77f8cafea82cd88920d648acfebe67fa253dac"
+    editorial "fec81caed15aa1098bd0ccb0f3952ef4fb9ebe1fbf97de2d26ddf107a8cf7d08"
+  }
+}

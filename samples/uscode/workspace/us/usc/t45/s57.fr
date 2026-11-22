@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s57" {
+  within "/us/usc/t45/ch2"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s57" section {
+    num "57" "§ 57."
+    heading "Who included in term “common carrier”"
+    content "The term “common carrier” as used in this chapter shall include the receiver or receivers or other persons or corporations charged with the duty of the management and operation of the business of a common carrier."
+    hash "8fe8d244a7b2c07e2ff6b2686d29db181c9cd9ae1f1553d77c6c82b1c200022f"
+  }
+  credit "(" ["Apr. 22, 1908, ch. 149, § 7" -> "/us/act/1908-04-22/ch149/s7"] ", " ["35 Stat. 66" -> "/us/stat/35/66"] ".)"
+  layers {
+    operative "8fe8d244a7b2c07e2ff6b2686d29db181c9cd9ae1f1553d77c6c82b1c200022f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "0475a3bd3b7960f7da6f875730405892b24870e91b882df07d873d61654c806b"
+  }
+}

@@ -1,0 +1,106 @@
+edition 2
+module "/us/usc/ptII/rule2014" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2014" courtRule {
+    num "2014" "Rule 2014."
+    heading "Employing Professionals"
+    provision "/us/usc/ptII/rule2014/a" subsection {
+      num "a" "(a)"
+      heading "Order Approving Employment; Application for Employment."
+      provision "/us/usc/ptII/rule2014/a/1" paragraph {
+        num "1" "(1)"
+        content "Order Approving Employment. The court may approve the employment of an attorney, accountant, appraiser, auctioneer, agent, or other professional under § 327, § 1103, or § 1114 only on the trustee’s or committee’s application."
+        hash "23c545f4ddf025b0a92747feced597fbafbd4f5e723f646988d51038b215ed9c"
+      }
+      provision "/us/usc/ptII/rule2014/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Application for Employment. The applicant must file the application and, except in a Chapter 9 case, must send a copy to the United States trustee. The application must state specific facts showing:"
+        provision "/us/usc/ptII/rule2014/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "the need for the employment;"
+          hash "c1c68f480b790e461a3923aaadb011eb45685cb8effab574acb937b5f226f81a"
+        }
+        provision "/us/usc/ptII/rule2014/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "the name of the person to be employed;"
+          hash "2d385fbdd38a3b4eb03579cb3152c4c4831bc99135a51b730e1862bde7a26625"
+        }
+        provision "/us/usc/ptII/rule2014/a/2/C" subparagraph {
+          num "C" "(C)"
+          content "the reasons for the selection;"
+          hash "3993de7060a2e2c4dd87d779709ec8de46a2bbe3d21980d5f9ed116c7638788a"
+        }
+        provision "/us/usc/ptII/rule2014/a/2/D" subparagraph {
+          num "D" "(D)"
+          content "the professional services to be rendered;"
+          hash "20d4afcbbd7a6ab78e74677fbb7cd0cdbceef779bbfb87770051458f37ceeb1b"
+        }
+        provision "/us/usc/ptII/rule2014/a/2/E" subparagraph {
+          num "E" "(E)"
+          content "any proposed arrangement for compensation; and"
+          hash "79ac7ccbd96b5f423fc73732491f31ecbc05a786eb47e7ff834e8a20c286ad8a"
+        }
+        provision "/us/usc/ptII/rule2014/a/2/F" subparagraph {
+          num "F" "(F)"
+          content {
+            p "to the best of the applicant’s knowledge, all the person’s connections with:"
+            p "• the debtor;"
+            p "• creditors;"
+            p "• any other party in interest;"
+            p "• their respective attorneys and accountants;"
+            p "• the United States trustee; and"
+            p "• any person employed in the United States trustee’s office."
+          }
+          hash "7783acf5b39ace978e1f666b9d341bff94ae23971c8634086b962125e26fa1d7"
+        }
+        hash "24d04fd40d215293cff62bc50dea38e25f47c9688368b84a3b13a82b67b76206"
+      }
+      provision "/us/usc/ptII/rule2014/a/3" paragraph {
+        num "3" "(3)"
+        content "Verified Statement of the Person to Be Employed. The application must be accompanied by a verified statement of the person to be employed, setting forth that person’s connections with any entity listed in (2)(F)."
+        hash "6f0e320e74c17df19ec756c45c45c8186477be438edf668eedbd932b28aa1fe5"
+      }
+      hash "4e7fe42fae1985bf47d77fc8830c1019830d37df38de8053665dd874e4e759df"
+    }
+    provision "/us/usc/ptII/rule2014/b" subsection {
+      num "b" "(b)"
+      heading "Services Rendered by a Member or Associate of a Law or Accounting Firm."
+      content "If a law partnership or corporation is employed as an attorney, or an accounting partnership or corporation is employed as an accountant—or if a named attorney or accountant is employed—then any partner, member, or regular associate may act as so employed, without further court order."
+      hash "47258ee1ec6604d7b1e8ab3eb28f87e480a1fb59bcb80cd5f92b24083c9f2103"
+    }
+    hash "04aaba07e6f77de069e31ba68655e7fe6276fa66ac9240ff44551199b7928147"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a) is adapted from the second sentence of former Bankruptcy Rule 215(a). The remainder of that rule is covered by § 327 of the Code."
+    p "Subdivision (b) is derived from former Bankruptcy Rule 215(f). The compensation provisions are set forth in § 504 of the Code."
+    hash "370c822e2aa180465ff051070fca76719cce500c56af685c2c3068479a5fc3ce"
+  }
+  note "/us/usc/ptII/rule2014/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to include retention of professionals by committees of retired employees pursuant to § 1114 of the Code."
+    p "The United States trustee monitors applications filed under § 327 of the Code and may file with the court comments with respect to the approval of such applications. See 28 U.S.C. § 586(a)(3)(H) [now 586(a)(3)(I)]. The United States trustee also monitors creditors’ committees in accordance with 28 U.S.C. § 586(a)(3)(E). The addition of the second sentence of subdivision (a) is designed to enable the United States trustee to perform these duties."
+    p "Subdivision (a) is also amended to require disclosure of the professional’s connections with the United States trustee or persons employed in the United States trustee’s office. This requirement is not intended to prohibit the employment of such persons in all cases or to enlarge the definition of “disinterested person” in § 101(13) [now 101(14)] of the Code. However, the court may consider a connection with the United States trustee’s office as a factor when exercising its discretion. Also, this information should be revealed in the interest of full disclosure and confidence in the bankruptcy system, especially since the United States trustee monitors and may be heard on applications for compensation and reimbursement of professionals employed under this rule."
+    p "The United States trustee appoints committees pursuant to § 1102 of the Code which is applicable in chapter 9 cases under § 901. In the interest of full disclosure and confidence in the bankruptcy system, a connection between the United States trustee and a professional employed by the committee should be revealed in every case, including a chapter 9 case. However, since the United States trustee does not have any role in the employment of professionals in chapter 9 cases, it is not necessary in such cases to transmit to the United States trustee a copy of the application under subdivision (a) of this rule. See 28 U.S.C. § 586(a)(3)(H) [now 586(a)(3)(I)]."
+    hash "884fc43459e29ae402a0ceefdab1d8f8f1be4c2770955fc7fb5397703c81a911"
+  }
+  note "/us/usc/ptII/rule2014/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2014 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "b472afdc93c161ef7493122586fbf9b6291193903b0e55a7718448774b7099cf"
+  }
+  layers {
+    operative "04aaba07e6f77de069e31ba68655e7fe6276fa66ac9240ff44551199b7928147"
+    enacted "177b10a0c915957bbc963f7f7d82ead104687aef0c108f0272636dc31b630efe"
+    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+  }
+}

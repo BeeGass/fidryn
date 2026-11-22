@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s797f" {
+  within "/us/usc/t45/ch16/schVII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s797f" section {
+    num "797f" "§ 797f."
+    heading "Contracting out"
+    content "All work in connection with the operation or services provided by the Corporation on the rail lines, properties, equipment, or facilities acquired pursuant to the provisions of this chapter and the maintenance, repair, rehabilitation, or modernization of such lines, properties, equipment, or facilities which has been performed by practice or agreement in accordance with provisions of the existing contracts in effect with the representatives of the employees of the classes or crafts involved shall continue to be performed by the Corporation’s employees, including employees on furlough. Should the Corporation lack a sufficient number of employees, including employees on furlough, and be unable to hire additional employees, to perform the work required, it shall be permitted to subcontract that part of such work which cannot be performed by its employees, including those on furlough, except where agreement by the representatives of the employees of the classes or crafts involved is required by applicable collective-bargaining agreements. The term “unable to hire additional employees” as used in this section contemplates establishment and maintenance by the Corporation of an apprenticeship, training, or recruitment program to provide an adequate number of skilled employees to perform the work."
+    hash "8c154504b0a93d6b02713d8cce90974386a3d1ccdfc6ace944749f44607875ae"
+  }
+  credit "(" ["Pub. L. 93–236, title VII, § 707" -> "/us/pl/93/236/tVII/s707"] ", as added " ["Pub. L. 97–35, title XI, § 1143(a)" -> "/us/pl/97/35/tXI/s1143/a"] ", Aug. 13, 1981, " ["95 Stat. 665" -> "/us/stat/95/665"] ".)"
+  layers {
+    operative "8c154504b0a93d6b02713d8cce90974386a3d1ccdfc6ace944749f44607875ae"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "dfa4d4b4414be05e2bd628d03b751bcd425b34deadeb85809cdfa780f4392a9e"
+  }
+}

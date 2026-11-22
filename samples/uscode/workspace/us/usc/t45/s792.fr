@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/t45/s792" {
+  within "/us/usc/t45/ch16/schVI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s792" section {
+    num "792" "§ 792."
+    heading "Repealed. " ["Pub. L. 97–375, title I, § 111(b)" -> "/us/pl/97/375/tI/s111/b"] ", Dec. 21, 1982, " ["96 Stat. 1821" -> "/us/stat/96/1821"]
+    status repealed
+    hash "77a17e47eeb450b179b37083f4868e951cb744ae4b017fd047f72b158f45f3d3"
+  }
+  note "/us/usc/t45/s792/note/ungrouped/pl.93.236/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section, " ["Pub. L. 93–236, title VI, § 602" -> "/us/pl/93/236/tVI/s602"] ", Jan. 2, 1974, " ["87 Stat. 1022" -> "/us/stat/87/1022"] ", provided that as part of his annual report, the Secretary transmit to Congress a comprehensive report on the effectiveness of the Association and the Corporation in implementing the purposes of this chapter, together with any recommendations for additional legislative or other action."
+    hash "0584f0b5b149c3f230704b47490839dc216ebf72f0f0a3dbc831a06070141aae"
+  }
+  note "/us/usc/t45/s792/note/ungrouped/pl.97.449/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Subsequent to repeal by " ["Pub. L. 97–375" -> "/us/pl/97/375"] ", section was repealed and the provisions thereof were reenacted as the last sentence of " ["section 308(a) of Title 49" -> "/us/usc/t49/s308/a"] ", Transportation, by " ["Pub. L. 97–449" -> "/us/pl/97/449"] ", §§ 1(b), 7(b), Jan. 12, 1983, " ["96 Stat. 2413" -> "/us/stat/96/2413"] ", 2443. " ["Section 6(a) of Pub. L. 97–449" -> "/us/pl/97/449/s6/a"] " provided that:"
+    quoted "/us/pl/97/449/s6/a" {
+      p "“Sections 1–5 of this act restate, without substantive change, laws enacted before November 15, 1982, that were replaced by those sections. * * * Laws enacted after November 14, 1982, that are inconsistent with this Act supersede this Act to the extent of the inconsistency.”"
+    }
+    p "Accordingly, the last sentence of " ["section 308(a) of Title 49" -> "/us/usc/t49/s308/a"] " was superseded by the repeal made by " ["section 111(b) of Pub. L. 97–375" -> "/us/pl/97/375/s111/b"] ", and was specifically repealed by " ["Pub. L. 98–216, § 2(1)(A)(ii)" -> "/us/pl/98/216/s2/1/A/ii"] ", Feb. 14, 1984, " ["98 Stat. 4" -> "/us/stat/98/4"] "."
+    hash "ede40a7a72aa0571edac29881d9e4feb605d62f99b78d97c891074ef2fb0b0e2"
+  }
+  note "/us/usc/t45/s792/note/ungrouped/pl.97.375/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p ["Pub. L. 97–375, title I, § 111(b)" -> "/us/pl/97/375/tI/s111/b"] ", Dec. 21, 1982, " ["96 Stat. 1821" -> "/us/stat/96/1821"] ", which repealed this section, was itself repealed by " ["Pub. L. 98–216, § 6(b)" -> "/us/pl/98/216/s6/b"] ", Feb. 14, 1984, " ["98 Stat. 8" -> "/us/stat/98/8"] "."
+    hash "0b714f1da98b4437ae24bf5ee24644726480a6db643f088dc7601ad9b8382d67"
+  }
+  layers {
+    operative "77a17e47eeb450b179b37083f4868e951cb744ae4b017fd047f72b158f45f3d3"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f7834080ecb3dca40bab15b48b8f741c603fc140db170a17b93cd99c066f9862"
+  }
+}

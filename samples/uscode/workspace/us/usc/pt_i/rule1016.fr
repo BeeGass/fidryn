@@ -1,0 +1,50 @@
+edition 2
+module "/us/usc/ptI/rule1016" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1016" courtRule {
+    num "1016" "Rule 1016."
+    heading "Death or Incompetency of a Debtor"
+    provision "/us/usc/ptI/rule1016/a" subsection {
+      num "a" "(a)"
+      heading "Chapter 7 Case."
+      content "In a Chapter 7 case, the debtor’s death or incompetency does not abate the case. The case continues, as far as possible, as though the death or incompetency had not occurred."
+      hash "7ee19cdbb7ecf4ed961f1bea38df5aafef61fe5e89472333b890b62b12c23701"
+    }
+    provision "/us/usc/ptI/rule1016/b" subsection {
+      num "b" "(b)"
+      heading "Chapter 11, 12, or 13 Case."
+      content "Upon the debtor’s death or incompetency in a Chapter 11, 12, or 13 case, the court may dismiss the case or may permit it to continue if further administration is possible and is in the parties’ best interests. If the case continues, it must proceed and be concluded in the same manner as though the death or incompetency had not occurred."
+      hash "e5479ccb6390ef6f987c95645c79d6e73318ee07aecbf6867058434b2a568bb1"
+    }
+    hash "8f04442b2a4e165c117c910b32123756ff04c7b6cc11500c57f5bd9ba197246d"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from former Rules 118 and 11–16. In a chapter 11 reorganization case or chapter 13 individual’s debt adjustment case, the likelihood is that the case will be dismissed."
+    hash "e5f5f66b45ab5349a849603e416f6b54c68cf95e55c8cc17c0447f65c952443c"
+  }
+  note "/us/usc/ptI/rule1016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to conform to 25 F.R.Civ.P. and to include chapter 12 cases."
+    hash "63c37daf0774dad69eebcf56b385f8ad4065461a20a964d30761b7382723990b"
+  }
+  note "/us/usc/ptI/rule1016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1016 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "8ec178ae0ebfa9578ac39937fcbf94c8e7cc6c54c46620e72f1e85d2a6d11b6d"
+  }
+  layers {
+    operative "8f04442b2a4e165c117c910b32123756ff04c7b6cc11500c57f5bd9ba197246d"
+    enacted "728b098cae2d2846654fc405a156762b165f38e6e33df85641db30f26c75f341"
+    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+  }
+}

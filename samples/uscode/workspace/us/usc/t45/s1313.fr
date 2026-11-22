@@ -1,0 +1,29 @@
+edition 2
+module "/us/usc/t45/s1313" {
+  within "/us/usc/t45/ch22/schII/ptA"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1313" section {
+    num "1313" "§ 1313."
+    heading "Fees"
+    provision "/us/usc/t45/s1313/a" subsection {
+      num "a" "(a)"
+      heading "Investment banking firm fees"
+      content "The Secretary of Transportation, in consultation with the Secretary of the Treasury, shall agree to pay to investment banking firms and other persons participating with such firms in the public offering the absolute minimum amount in fees necessary to carry out the public offering."
+      hash "91892f4c26e0016dfcf94391ca4cbd4d75b0d10aad7f3b569468a8411a735f79"
+    }
+    provision "/us/usc/t45/s1313/b" subsection {
+      num "b" "(b)"
+      heading "Costs of public offering"
+      content "All costs of the public offering payable by the Secretary of Transportation shall be paid from the proceeds of the public offering."
+      hash "a9e3359d9a93e9957bc7179fc5b29f6c1ddcf27c76ca4269a6371a3049acd24f"
+    }
+    hash "d1a57e18ce9b0ea9d67f37ff4dd972e3772c7b548253035aba10c3e52ea21244"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4013" -> "/us/pl/99/509/tIV/s4013"] ", Oct. 21, 1986, " ["100 Stat. 1897" -> "/us/stat/100/1897"] ".)"
+  layers {
+    operative "d1a57e18ce9b0ea9d67f37ff4dd972e3772c7b548253035aba10c3e52ea21244"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "fd11ab72829152642d53db1bd46c0915c25f099517a223fd62d190917948b48a"
+  }
+}

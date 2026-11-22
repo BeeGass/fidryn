@@ -1,0 +1,80 @@
+edition 2
+module "/us/usc/t45/s1018" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1018" section {
+    num "1018" "§ 1018."
+    heading "Judicial review"
+    provision "/us/usc/t45/s1018/a" subsection {
+      num "a" "(a)"
+      heading "Appeals"
+      chapeau "Notwithstanding any other provision of law, any appeal from—"
+      provision "/us/usc/t45/s1018/a/1" paragraph {
+        num "1" "(1)"
+        content "any decision of the bankruptcy court with respect to the constitutionality of any provision of this chapter; and"
+        hash "9014625171f771c87ac331234173042d0d63fa63ca698ea33c5661d476dad016"
+      }
+      provision "/us/usc/t45/s1018/a/2" paragraph {
+        num "2" "(2)"
+        content "any decision of the court having jurisdiction over the reorganization of the Milwaukee Railroad with respect to the constitutionality of the Milwaukee Railroad Restructuring Act (" ["45 U.S.C. 901" -> "/us/usc/t45/s901"] " et seq.),"
+        hash "b825738c2ad8784179db7eff8e208f628931ee45922702b7eaf44470f03507c6"
+      }
+      continuation "shall be taken to the United States Court of Appeals for the Seventh Circuit."
+      hash "aa99cab50582bc33d28ed66fc478c56afd39f67beafe481762f876273962d436"
+    }
+    provision "/us/usc/t45/s1018/b" subsection {
+      num "b" "(b)"
+      heading "Appellate proceedings"
+      content "If appeals are taken from decisions described in subsection (a) of this section involving section 1005 or 1008" mark "1" 1 " of this title or section 9 or 15 of the Milwaukee Railroad Restructuring Act [" ["45 U.S.C. 908" -> "/us/usc/t45/s908"] " or 915], the court of appeals shall determine such appeals in a consolidated proceeding, sitting en banc."
+      hash "cf511559a1944e10420dec7fc7e6bbd7d09cf3feb7b0d48c031ffe1d1778633a"
+    }
+    provision "/us/usc/t45/s1018/c" subsection {
+      num "c" "(c)"
+      heading "Action in United States Court of Claims"
+      content "Nothing in this chapter or in the Milwaukee Railroad Restructuring Act (" ["45 U.S.C. 901" -> "/us/usc/t45/s901"] " et seq.) shall limit the right of any person to commence an action in the United States Court of Claims " sup "1" " under " ["section 1491 of title 28" -> "/us/usc/t28/s1491"] " (commonly referred to as the Tucker Act)."
+      hash "bbbd2337095f969c747172c82eea6f6961ec520179c37ec338143594d5862e3d"
+    }
+    hash "d8fc10c143ecb79086a8e775f6d70857bb96f84998e16620d68f6112ee227629"
+  }
+  credit "(" ["Pub. L. 96–254, title I, § 124" -> "/us/pl/96/254/tI/s124"] ", as added " ["Pub. L. 96–448, title VII, § 701(a)(1)" -> "/us/pl/96/448/tVII/s701/a/1"] ", Oct. 14, 1980, " ["94 Stat. 1959" -> "/us/stat/94/1959"] "; amended " ["Pub. L. 98–620, title IV, § 402(49)" -> "/us/pl/98/620/tIV/s402/49"] ", Nov. 8, 1984, " ["98 Stat. 3361" -> "/us/stat/98/3361"] ".)"
+  note "/us/usc/t45/s1018/note/editorialNotes/pl.96.254/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This chapter, referred to in subsecs. (a)(1) and (c), was in the original “this title”, meaning title I (§ 101 et seq.) of " ["Pub. L. 96–254" -> "/us/pl/96/254"] ", May 30, 1980, " ["94 Stat. 399" -> "/us/stat/94/399"] ", known as the Rock Island Railroad Transition and Employee Assistance Act, which is classified principally to this chapter. For complete classification of title I to the Code, see Short Title note set out under " ["section 1001 of this title" -> "/us/usc/t45/s1001"] " and Tables."
+    p "The Milwaukee Railroad Restructuring Act, referred to in subsecs. (a)(2) and (c), is " ["Pub. L. 96–101" -> "/us/pl/96/101"] ", Nov. 4, 1979, " ["93 Stat. 736" -> "/us/stat/93/736"] ", which is classified principally to chapter 18 (§ 901 et seq.) of this title. For complete classification of this Act to the Code, see Short Title note set out under " ["section 901 of this title" -> "/us/usc/t45/s901"] " and Tables."
+    p ["Section 1008 of this title" -> "/us/usc/t45/s1008"] ", referred to in subsec. (b), was repealed by " ["Pub. L. 97–468, title II, § 234(a)" -> "/us/pl/97/468/tII/s234/a"] ", Jan. 14, 1983, " ["96 Stat. 2547" -> "/us/stat/96/2547"] "."
+    p "The United States Court of Claims, referred to in subsec. (c), and the United States Court of Customs and Patent Appeals were merged effective Oct. 1, 1982, into a new United States Court of Appeals for the Federal Circuit by " ["Pub. L. 97–164" -> "/us/pl/97/164"] ", Apr. 2, 1982, " ["96 Stat. 25" -> "/us/stat/96/25"] ", which also created a United States Claims Court [now United States Court of Federal Claims] that inherited the trial jurisdiction of the Court of Claims. See sections 48, 171 et seq., 791 et seq., and 1491 et seq. of Title 28, Judiciary and Judicial Procedure."
+    hash "0b99f9f276361898838618fef65554f6735217bd63924552e22fecb1f642ea03"
+  }
+  note "/us/usc/t45/s1018/note/editorialNotes/pl.98.620/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1984—Subsec. (b). " ["Pub. L. 98–620" -> "/us/pl/98/620"] " struck out provision requiring the court to render a final decision no later than 60 days after the filing of the last such appeal."
+    hash "2b80dc03138a5f8b18d12950e8b1e7217bf7c4563d58e08bb1d6005e622ea887"
+  }
+  note "/us/usc/t45/s1018/note/statutoryNotes/pl.98.620/effective-date-of-1984-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1984 Amendment"
+    p "Amendment by " ["Pub. L. 98–620" -> "/us/pl/98/620"] " not applicable to cases pending on Nov. 8, 1984, see " ["section 403 of Pub. L. 98–620" -> "/us/pl/98/620/s403"] ", set out as a note under " ["section 1657 of Title 28" -> "/us/usc/t28/s1657"] ", Judiciary and Judicial Procedure."
+    hash "b3d0854af378192f7a53e70489f9fc3f7946aec91d2ce245380969a27892e6fd"
+  }
+  note "/us/usc/t45/s1018/note/statutoryNotes/pl.96.448/effective-date" enacted {
+    group statutoryNotes
+    topic "effectiveDate"
+    heading "Effective Date"
+    p "Section effective Oct. 14, 1980, see " ["section 710(d) of Pub. L. 96–448" -> "/us/pl/96/448/s710/d"] ", set out as an Effective Date of 1980 Amendment note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
+    hash "f67d1425d768b28826eb4b706b9a4875d473b95186ea59a8be33b9deb52bd84e"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "d8fc10c143ecb79086a8e775f6d70857bb96f84998e16620d68f6112ee227629"
+    enacted "c294e4f0f7a9dcdc0e67a2347164740fd2c129db7ded3191a2c08906dde17601"
+    editorial "358fc2612fc9c5a1049ffca484467b853e7cb1b0afea2b3ec49e3d7203da3fac"
+  }
+}

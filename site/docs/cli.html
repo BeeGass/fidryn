@@ -63,26 +63,34 @@
     <ol>
       <li><a href="/docs/language"><span class="n">&sect;2</span><span class="t">Language</span><span class="d">Modules, queries, rules, duties</span></a></li>
       <li><a href="/docs/cases-and-time"><span class="n">&sect;3</span><span class="t">Cases and time</span><span class="d">Records, valid-at, known-at</span></a></li>
+      <li><a href="/docs/law-modules"><span class="n">&sect;4</span><span class="t">Law modules</span><span class="d">Provisions of law as data</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Run</p>
     <ol>
-      <li><a href="/docs/cli" aria-current="page"><span class="n">&sect;4</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
-      <li><a href="/docs/mill"><span class="n">&sect;5</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
+      <li><a href="/docs/cli" aria-current="page"><span class="n">&sect;5</span><span class="t">CLI</span><span class="d">Every subcommand and flag</span></a></li>
+      <li><a href="/docs/mill"><span class="n">&sect;6</span><span class="t">Mill</span><span class="d">The localhost UI</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Read results</p>
     <ol>
-      <li><a href="/docs/outcomes"><span class="n">&sect;6</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
-      <li><a href="/docs/examples"><span class="n">&sect;7</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+      <li><a href="/docs/outcomes"><span class="n">&sect;7</span><span class="t">Outcomes</span><span class="d">The six kinds and the envelope</span></a></li>
+      <li><a href="/docs/examples"><span class="n">&sect;8</span><span class="t">Examples</span><span class="d">Trust, tax, fifty states</span></a></li>
+      <li><a href="/docs/coverage"><span class="n">&sect;9</span><span class="t">Coverage</span><span class="d">What the sample of the Code holds</span></a></li>
     </ol>
   </div>
   <div class="group">
     <p class="label">Contribute</p>
     <ol>
-      <li><a href="/docs/contributing"><span class="n">&sect;8</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+      <li><a href="/docs/contributing"><span class="n">&sect;10</span><span class="t">Contributing</span><span class="d">Toolchain, tests, commits</span></a></li>
+    </ol>
+  </div>
+  <div class="group">
+    <p class="label">Ahead</p>
+    <ol>
+      <li><a href="/docs/roadmap"><span class="n">&sect;11</span><span class="t">Roadmap</span><span class="d">Destination, today, next</span></a></li>
     </ol>
   </div>
   <div class="group">
@@ -95,24 +103,33 @@
   </div>
 </nav>
   <article class="doc" aria-labelledby="doc-title">
-    <p class="kicker">&sect; 4 &middot; Run</p>
+    <p class="kicker">&sect; 5 &middot; Run</p>
     <h1 id="doc-title">Fidryn CLI</h1>
-    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.16</span> See also</a></li></ol></details>
+    <details class="onpage-inline"><summary>On this page</summary><ol><li class="lvl-2"><a href="#install"><span class="n">5.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">5.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">5.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">5.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">5.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">5.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">5.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">5.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">5.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">5.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">5.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">5.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">5.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">5.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">5.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">5.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">5.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">5.18</span> coverage</a></li><li class="lvl-2"><a href="#changes"><span class="n">5.19</span> changes</a></li><li class="lvl-2"><a href="#see-also"><span class="n">5.20</span> See also</a></li></ol></details>
     <div class="prose">
-<p>The binary name is <code>fidryn</code>. It is the 0.2 reference interpreter: parse a
+<p>The binary name is <code>fidryn</code>. It is the 0.3 reference interpreter: parse a
 <code>.fr</code> module, check it, and evaluate a named query against a case record.
-It is not legal advice and does not file anything unless you opt into live
-HTTP as described under <a href="#file"><code>file</code></a>.</p>
+For <a href="/docs/law-modules">law modules</a> of edition 2 it checks a module or a
+workspace (<a href="#check"><code>check</code></a>), imports the United States Code
+(<a href="#ingest"><code>ingest</code></a>), prints the text of a workspace (<a href="#text"><code>text</code></a>)
+and its coverage ledger (<a href="#coverage"><code>coverage</code></a>), and says what changed
+between two releases (<a href="#changes"><code>changes</code></a>). It is not legal advice and
+does not file anything unless you opt into live HTTP as described under
+<a href="#file"><code>file</code></a>.</p>
 <p>From a clone of this repository:</p>
 <figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>cargo run -p fidryn-cli -- &lt;subcommand&gt; ...</code></pre></figure>
 <p>After install, the same arguments work as <code>fidryn &lt;subcommand&gt; ...</code>.
-<code>fidryn --help</code> and <code>fidryn &lt;subcommand&gt; --help</code> print clap usage.</p>
-<h2 id="install"><span class="hn">4.1</span> Install <a class="anchor" href="#install" aria-label="Link to this section">#</a></h2>
+<code>fidryn --help</code> (<code>-h</code>) and <code>fidryn &lt;subcommand&gt; --help</code> print clap usage,
+as does the subcommand <code>help</code>, as in <code>fidryn help check</code> and
+<code>fidryn ingest help uscode</code>. <code>fidryn --version</code>
+(<code>-V</code>) prints the name and the version of the binary:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> <span class="tk-ty">--version</span></code></pre></figure>
+<h2 id="install"><span class="hn">5.1</span> Install <a class="anchor" href="#install" aria-label="Link to this section">#</a></h2>
 <p>From the repository root:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">cargo</span> install <span class="tk-ty">--path</span> crates/fidryn-cli</code></pre></figure>
 <p>That places <code>fidryn</code> on your Cargo bin path. Workspace <code>rust-version</code> is
 1.98.</p>
-<h2 id="exit-status"><span class="hn">4.2</span> Exit status <a class="anchor" href="#exit-status" aria-label="Link to this section">#</a></h2>
+<h2 id="exit-status"><span class="hn">5.2</span> Exit status <a class="anchor" href="#exit-status" aria-label="Link to this section">#</a></h2>
 <p>Success is exit 0. A command line the argument parser rejects, such as an
 unknown subcommand or flag, a missing required argument, or <code>--budget abc</code>,
 is a usage error: the usage message goes to stderr and the exit status is
@@ -127,7 +144,7 @@ the nested outcome kind is <code>suspended</code>, <code>contingent</code>, <cod
 <code>outsideCompetence</code>, or <code>inconsistent</code>. Unknown queries, invalid
 timestamps, missing files, and check errors are engine or compiler
 failures and exit 1.</p>
-<h2 id="source-checking-and-trust"><span class="hn">4.3</span> Source checking and trust <a class="anchor" href="#source-checking-and-trust" aria-label="Link to this section">#</a></h2>
+<h2 id="source-checking-and-trust"><span class="hn">5.3</span> Source checking and trust <a class="anchor" href="#source-checking-and-trust" aria-label="Link to this section">#</a></h2>
 <p><code>check</code>, <code>inputs</code>, <code>run</code>, <code>explore</code>, <code>review</code>, <code>verify</code>, <code>diff</code> (when a snapshot is a <code>.fr</code>
 file), and <code>render</code> compile through <code>Driver::check_path</code>. That call loads
 the module’s <code>source_manifest</code> (or a <code>sources/</code> fallback) and then
@@ -147,7 +164,7 @@ import in this corpus; it is not byte verification of the artifact. Most
 example manifests under <code>examples/</code> use <code>"digest": "fixture"</code>.</p>
 <p>Pasted source in the <a href="/docs/mill">mill</a> is different: it compiles in memory
 with an empty default manifest and does not read artifact files.</p>
-<h2 id="fmt"><span class="hn">4.4</span> <code>fmt</code> <a class="anchor" href="#fmt" aria-label="Link to this section">#</a></h2>
+<h2 id="fmt"><span class="hn">5.4</span> <code>fmt</code> <a class="anchor" href="#fmt" aria-label="Link to this section">#</a></h2>
 <p>Rewrite a module’s trailing whitespace to stdout. The file on disk is not
 modified.</p>
 <p><strong>Arguments</strong></p>
@@ -161,22 +178,132 @@ modified.</p>
 trailing newline.</p>
 <p><strong>Failure.</strong> Exit 1. Unreadable files print <code>cannot read PATH: ...</code> to
 stderr. Parse errors print a diagnostic (<code>E100 ParseError: ...</code>).</p>
-<h2 id="check"><span class="hn">4.5</span> <code>check</code> <a class="anchor" href="#check" aria-label="Link to this section">#</a></h2>
-<p>Parse, elaborate, and type-check a module, including source-manifest
+<h2 id="check"><span class="hn">5.5</span> <code>check</code> <a class="anchor" href="#check" aria-label="Link to this section">#</a></h2>
+<p>Check a module of either edition, or the workspace of edition 2 modules in
+a directory, as <code>fidryn check --help</code> says. A module of the first edition
+is parsed, elaborated and type-checked, including source-manifest
 authentication as described above.</p>
+<p>A file whose first two words are <code>edition 2</code> is a law module of edition 2,
+which holds provisions of law as data
+(<a href="/docs/law-modules#editions">Law modules</a>). <code>check</code> reads such a module with
+its own parser and runs the checks of one module on it: its shape, its
+addresses, the form of its text, its hashes, its footnote markers and its
+definitions, as
+<a href="/docs/law-modules#what-the-checker-verifies-in-one-module">What the checker verifies in one module</a>
+lists them. The marker is looked for in a regular file only, so a module
+of edition 2 is read from a regular file: an input that is no regular
+file, such as a pipe or <code>/dev/stdin</code>, is read by every command as a file
+of the first edition.</p>
+<p>A directory is a workspace of edition 2 modules, with a manifest,
+<code>workspace.json</code>, at its top (<a href="/docs/law-modules#workspaces">Workspaces</a>).
+<code>check</code> reads every module of it by itself, and then checks the manifest,
+the lock of a generated workspace, where each module stands, the
+containers and their members, and the dependencies of a curated
+workspace, as
+<a href="/docs/law-modules#what-the-checker-verifies-in-a-workspace">What the checker verifies in a workspace</a>
+lists them, and gives every reference and every citation its
+<a href="/docs/law-modules#references">outcome</a>. It does so in two phases, each on
+several threads, and its output is the same for any number of them
+(<a href="/docs/law-modules#how-a-workspace-is-checked">How a workspace is checked</a>).
+It keeps the result of the first phase in a cache, by default a directory
+of the user outside every workspace, so that a module file whose bytes it
+has checked before is not checked again, and its output is the same as
+without the cache, but for the count of the modules read from it, as long
+as nothing but a check wrote the cache
+(<a href="/docs/law-modules#the-cache">The cache</a>). A check trusts its cache, so a
+cache belongs where only people one trusts can write.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
-<tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file</td></tr>
+<tr><td><code>PATH</code></td><td>yes</td><td>path to a <code>.fr</code> file, or to the directory of a workspace</td></tr>
+<tr><td><code>--jobs N</code></td><td>no</td><td>the number of worker threads of the check of a workspace, at least 1; by default as many as the system reports as available</td></tr>
+<tr><td><code>--cache-dir DIR</code></td><td>no</td><td>the directory of the cache of a workspace check; by default the one <code>FIDRYN_CACHE_DIR</code> names, else <code>fidryn</code> in the cache directory of the user</td></tr>
+<tr><td><code>--no-cache</code></td><td>no</td><td>flag; keep no cache: check every module file, and write no entry of a cache</td></tr>
+<tr><td><code>--report FILE</code></td><td>no</td><td>path of the check report of a workspace to write, <code>fidryn.check-report/v0.1</code></td></tr>
+<tr><td><code>--unresolved FILE</code></td><td>no</td><td>path of the list to write of the references and the citations of a workspace whose outcome is not <code>exact</code>, one JSON object to a line</td></tr>
 </tbody></table>
 </div>
+<p><strong>Environment</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>FIDRYN_CACHE_DIR</code></td><td>the directory of the cache of a workspace check when <code>--cache-dir</code> is not given; an empty value is taken as not set</td></tr>
+<tr><td><code>XDG_CACHE_HOME</code></td><td>on systems other than Windows, the cache directory of the user when <code>FIDRYN_CACHE_DIR</code> is not set, if it is an absolute path: the cache is <code>fidryn</code> in it</td></tr>
+<tr><td><code>HOME</code></td><td>on systems other than Windows, when <code>XDG_CACHE_HOME</code> is not an absolute path: the cache is <code>.cache/fidryn</code> in it, if it is an absolute path</td></tr>
+<tr><td><code>LOCALAPPDATA</code></td><td>on Windows, the cache directory of the user when <code>FIDRYN_CACHE_DIR</code> is not set, if it is an absolute path: the cache is <code>fidryn</code> in it</td></tr>
+</tbody></table>
+</div>
+<p>The cache is outside every workspace unless <code>--cache-dir</code> or
+<code>FIDRYN_CACHE_DIR</code> names a directory inside one; such a directory is used
+like any other, and what that means is said under
+<a href="/docs/law-modules#the-cache">The cache</a>. When none of these names a
+directory, or <code>fidryn</code> in the cache directory of the user is the
+workspace's directory or lies inside it, as when <code>XDG_CACHE_HOME</code>, <code>HOME</code>
+or <code>LOCALAPPDATA</code> names a directory inside the workspace, the check keeps
+no cache, as with <code>--no-cache</code>, and says so once on stderr.</p>
+<p><code>--jobs</code>, <code>--cache-dir</code>, <code>--no-cache</code>, <code>--report</code> and <code>--unresolved</code>
+belong to the check of a workspace; given with a <code>.fr</code> file, they are
+refused with exit 1. <code>--cache-dir</code> and <code>--no-cache</code> are not given
+together. The two files are written whether or not the check finds an
+error, and each replaces a file of its name.</p>
 <p><strong>Example</strong></p>
-<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check examples/trust/bryan-revocable-trust.fr</code></pre></figure>
-<p><strong>Success.</strong> Prints <code>ok</code> and exits 0.</p>
+<p>The demo workspace is checked with <code>--no-cache</code>, so that the check writes
+no cache:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check examples/trust/bryan-revocable-trust.fr
+<span class="tk-kw">fidryn</span> check crates/fidryn-check/tests/fixtures/e2/unit.fr
+<span class="tk-kw">fidryn</span> check conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span>
+<span class="tk-kw">fidryn</span> check conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span> <span class="tk-ty">--jobs</span> 2</code></pre></figure>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn check DIR --report report.json --unresolved unresolved.jsonl
+fidryn check DIR --cache-dir /var/cache/fidryn
+FIDRYN_CACHE_DIR=/var/cache/fidryn fidryn check DIR</code></pre></figure>
+<p><strong>Success.</strong> Prints <code>ok</code> and exits 0. For a workspace it prints, before
+<code>ok</code>, one summary line:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>modules: 5; from cache: 0; errors: 0; warnings: 0</code></pre></figure>
+<p><code>from cache</code> counts the modules whose result was read from the cache;
+with a cache that holds nothing yet, or with <code>--no-cache</code>, it is 0.</p>
+<p>A warning, such as <code>W760 ToolchainMismatch</code> when the manifest's
+<code>toolchain</code> is not the running version, or <code>W750 StaleBinding</code> when what a
+binding of a curated module was written against has changed
+(<a href="/docs/law-modules#bindings">Bindings</a>), is printed to stderr, counted in
+<code>warnings</code>, and does not change the exit status. Nor does a reference whose target the check does
+not find: its outcome is counted in the report and listed in the
+unresolved list, and is never a diagnostic. Nor does a cache that cannot
+be written: the check writes no further entry, says so once on stderr, as
+<code>the cache could not be written, and the check went on without it: DIR: ...</code>
+with the cache's directory and the error, and its output is what it would
+have been. When the identity of the running executable, which the keys of
+the cache hold, cannot be read, the check keeps no cache and says so once,
+as <code>the cache could not be used, and the check went on without it: ...</code>;
+so it does when no directory is named for the cache, as
+<code>the cache could not be used, and the check went on without it: no directory is named for it: ...</code>,
+when the one in the cache directory of the user lies inside the
+workspace, as
+<code>the cache could not be used, and the check went on without it: DIR: the directory lies inside the workspace ...</code>,
+and when the cache's directory is the directory of a dependency of
+the workspace, lies inside it or holds it, since nothing is written inside
+a dependency but through a symbolic link below the cache's directory that
+leads into one
+(<a href="/docs/law-modules#depending-on-another-workspace">Depending on another workspace</a>),
+and its output is then that of a check with <code>--no-cache</code>.</p>
 <p><strong>Failure.</strong> Exit 1. Each diagnostic is printed to stderr as
-<code>CODE Title: message</code> (for example
-<code>E310 PropAsGuard: ...</code>). A module that cannot check:</p>
+<code>CODE Title: message</code>, after the file it is in when it is about the text
+of a module (for example
+<code>tests/diagnostics/e310-prop-as-guard.fr: E310 PropAsGuard: ...</code>). A
+module that cannot check:</p>
 <figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check tests/diagnostics/e310-prop-as-guard.fr</code></pre></figure>
-<h2 id="run"><span class="hn">4.6</span> <code>run</code> <a class="anchor" href="#run" aria-label="Link to this section">#</a></h2>
+<p>A module of edition 2 is reported in the same way, as
+<code>FILE: E710 IntegrityMismatch: ...</code>. A diagnostic of a workspace names its
+file under the directory given, as
+<code>DIR/zz/demo/t1/s2.fr: E730 WorkspaceViolation: ...</code>; the summary line is
+printed to stdout, its errors counted, and <code>ok</code> is not. A file of
+<code>--report</code> or <code>--unresolved</code> that cannot be written is reported as
+<code>cannot write FILE: ...</code>, also with exit 1. A manifest or a lock is read
+only from a regular file of at most 64 MiB: a symbolic link, a named pipe,
+a device or a directory in its place, and a larger file, are refused with
+<code>E730</code> before anything is read of them, as are those of a dependency with
+<code>E740</code>. A directory with no <code>workspace.json</code> is refused with <code>E730</code>:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> check conformance/fixtures/workspace</code></pre></figure>
+<p>Every other command exits 1 on a module of edition 2, with
+<code>E100 ParseError: an edition 2 module holds provisions and is not compiled for evaluation; `fidryn check` reads it</code>:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> fmt crates/fidryn-check/tests/fixtures/e2/unit.fr</code></pre></figure>
+<h2 id="run"><span class="hn">5.6</span> <code>run</code> <a class="anchor" href="#run" aria-label="Link to this section">#</a></h2>
 <p>Evaluate one query against one case record at a pair of bitemporal
 instants. <code>run</code> never chooses a completion. It does not search
 <code>admissibleCompletions</code>, pick an interpretation, or fill in missing
@@ -228,7 +355,7 @@ retains checked branch <code>searchEvidence</code>. Nested <code>outcomeDocument
 <code>--valid-at</code> / <code>--known-at</code> parse errors; or an engine failure such as
 <code>UnknownQuery: unknown query ...</code>. Those engine errors are not rewritten
 as <code>outcome.kind = inconsistent</code>.</p>
-<h2 id="explore"><span class="hn">4.7</span> <code>explore</code> <a class="anchor" href="#explore" aria-label="Link to this section">#</a></h2>
+<h2 id="explore"><span class="hn">5.7</span> <code>explore</code> <a class="anchor" href="#explore" aria-label="Link to this section">#</a></h2>
 <p>Evaluate a query under an explicit finite completion space: the case's
 <code>admissibleCompletions</code>, with any completions from <code>--bounds</code> merged in.
 When neither supplies a completion, <code>explore</code> evaluates the case as it
@@ -283,7 +410,7 @@ on stdout. If <code>case.assumptions</code> is nonempty, explore labels the repo
 <code>cannot read</code> / <code>invalid bounds JSON</code> for <code>--bounds</code>; or
 <code>bounds JSON must be AdmissibleCompletions or {interpretations, evidence, choices}: ...</code>.
 Engine failures print <code>kind: message</code> to stderr.</p>
-<h2 id="explain"><span class="hn">4.8</span> <code>explain</code> <a class="anchor" href="#explain" aria-label="Link to this section">#</a></h2>
+<h2 id="explain"><span class="hn">5.8</span> <code>explain</code> <a class="anchor" href="#explain" aria-label="Link to this section">#</a></h2>
 <p>Render a trace as text, JSON, or Graphviz DOT.</p>
 <p><strong>Arguments</strong></p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
@@ -314,7 +441,7 @@ fidryn explain outcome.json --format text</code></pre></figure>
 <p><strong>Success.</strong> Formatted trace on stdout. Text with no nodes is
 <code>trace &lt;hex&gt;</code>. JSON is a canonical <code>TraceDocument</code>. DOT is a <code>digraph</code>.</p>
 <p><strong>Failure.</strong> Exit 1. <code>cannot read PATH: ...</code> or <code>invalid trace JSON PATH: ...</code>.</p>
-<h2 id="verify"><span class="hn">4.9</span> <code>verify</code> <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
+<h2 id="verify"><span class="hn">5.9</span> <code>verify</code> <a class="anchor" href="#verify" aria-label="Link to this section">#</a></h2>
 <p>Check a property of a module. A <code>verify</code> block declares one under its
 name. A <code>for_all</code> or an <code>exists</code> written in a query, in a <code>verify</code> block
 or as a declaration of its own is a property as well. It is named after
@@ -345,7 +472,7 @@ query name such as <code>acting_trustee</code> is invalid.</p>
 <code>unknown NAME: ...</code>, <code>counterexample for NAME: ...</code>,
 <code>`NAME` is a query, not a declared verification property</code>, or
 <code>unknown property NAME</code>.</p>
-<h2 id="diff"><span class="hn">4.10</span> <code>diff</code> <a class="anchor" href="#diff" aria-label="Link to this section">#</a></h2>
+<h2 id="diff"><span class="hn">5.10</span> <code>diff</code> <a class="anchor" href="#diff" aria-label="Link to this section">#</a></h2>
 <p>Compare two snapshots and print canonical JSON with two named
 operations: <code>result</code> (outcomeDocument / compiled query bodies) and
 <code>assurance</code> (executionMode, sourceTrust, assumptions,
@@ -375,7 +502,7 @@ compiled; any other path is read as JSON (an evaluation report, mill
 <p><strong>Failure.</strong> Exit 1. Compile diagnostics for <code>.fr</code> inputs;
 <code>cannot read PATH</code>; <code>invalid snapshot JSON PATH: ...</code>; or
 <code>cannot encode diff: ...</code>.</p>
-<h2 id="render"><span class="hn">4.11</span> <code>render</code> <a class="anchor" href="#render" aria-label="Link to this section">#</a></h2>
+<h2 id="render"><span class="hn">5.11</span> <code>render</code> <a class="anchor" href="#render" aria-label="Link to this section">#</a></h2>
 <p>Interpolate Core fields into a template. Available keys from the compiled
 module are <code>module</code>, <code>version</code>, typed <code>outside_scope</code> and its text
 <code>outside_scope_label</code>. Optional <code>--data DATA.json</code> adds typed values under <code>data</code>.
@@ -397,7 +524,7 @@ closed. A directory named <code>certified</code> does not approve legal content;
 template).</p>
 <p><strong>Failure.</strong> Exit 1. Check diagnostics; <code>cannot read TEMPLATE</code>; or
 <code>missing template key \</code>...``.</p>
-<h2 id="file"><span class="hn">4.12</span> <code>file</code> <a class="anchor" href="#file" aria-label="Link to this section">#</a></h2>
+<h2 id="file"><span class="hn">5.12</span> <code>file</code> <a class="anchor" href="#file" aria-label="Link to this section">#</a></h2>
 <p>Submit a JSON filing packet through an adapter. Dry-run is the default.
 Live HTTP requires both <code>--live</code> and the environment variable
 <code>FIDRYN_ALLOW_LIVE_FILING=1</code>. A successful transport receipt is not a
@@ -438,7 +565,7 @@ the packet echoed; or, for live Massachusetts HTTP, <code>accepted</code> (with
 <p><strong>Failure.</strong> Exit 1. <code>cannot read PACKET</code>; <code>invalid packet JSON</code>; or
 <code>live filing is disabled (set FIDRYN_ALLOW_LIVE_FILING=1 and pass --live)</code>.</p>
 <p>The <a href="/docs/mill">mill</a> has no filing route.</p>
-<h2 id="ui"><span class="hn">4.13</span> <code>ui</code> <a class="anchor" href="#ui" aria-label="Link to this section">#</a></h2>
+<h2 id="ui"><span class="hn">5.13</span> <code>ui</code> <a class="anchor" href="#ui" aria-label="Link to this section">#</a></h2>
 <p>Serve the localhost mill. See <a href="/docs/mill">mill</a> for routes and the HTML
 page. The process binds <code>127.0.0.1</code> only and does not live-file.</p>
 <p><strong>Arguments</strong></p>
@@ -458,36 +585,364 @@ is omitted.</p>
 <p><strong>Failure.</strong> Exit 1.
 <code>127.0.0.1:PORT is already in use. Stop that process or pass --port.</code>
 Other bind or runtime errors are printed to stderr.</p>
-<h2 id="inputs"><span class="hn">4.14</span> <code>inputs</code> <a class="anchor" href="#inputs" aria-label="Link to this section">#</a></h2>
+<h2 id="inputs"><span class="hn">5.14</span> <code>inputs</code> <a class="anchor" href="#inputs" aria-label="Link to this section">#</a></h2>
 <p><code>fidryn inputs MODULE --query QUERY</code> emits JSON Schema for the declared query
 argument object. Aliases, sum constructors, records, nominal entities and
 collections come from checked declarations. Observation schemas and external
 review requests appear as metadata. Unsupported representations refuse instead
 of producing an unconstrained input schema.</p>
-<h2 id="review"><span class="hn">4.15</span> <code>review</code> <a class="anchor" href="#review" aria-label="Link to this section">#</a></h2>
+<h2 id="review"><span class="hn">5.15</span> <code>review</code> <a class="anchor" href="#review" aria-label="Link to this section">#</a></h2>
 <p><code>fidryn review MODULE --query QUERY --case CASE.json --valid-at TIME --known-at TIME</code> emits a portable <code>fidryn.review-bundle/v0.1</code> JSON archive. It retains exact
 source/case/dependency/lock bytes, a labeled normalized manifest, checked report
 and actual trace, source spans, executable digest and rerun arguments. Optional
 <code>--scenario</code>, <code>--budget N</code> and <code>--template FILE</code> select the disclosed evaluation
 or retain reviewer material. Reviewer status is <code>not_assessed</code>; the archive does
 not constitute legal approval. See <a href="https://github.com/BeeGass/fidryn/blob/main/docs/development.md">Development and promotion</a>.</p>
-<h2 id="see-also"><span class="hn">4.16</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
+<h2 id="ingest"><span class="hn">5.16</span> <code>ingest</code> <a class="anchor" href="#ingest" aria-label="Link to this section">#</a></h2>
+<p><code>fidryn ingest uscode ARCHIVE_DIR --out DIR</code> imports the United States
+Code from the archives of one release of the official XML release point
+published by the Office of the Law Revision Counsel, each verified against
+the retrieval record beside them, and writes a generated workspace that
+<code>fidryn check DIR</code> accepts
+(<a href="/docs/law-modules#the-ingester-for-the-united-states-code">The ingester for the United States Code</a>).
+The same archives, the same titles and the same version of the toolchain
+give the same bytes on every run and on every host, for any number of
+workers.</p>
+<p><strong>Arguments</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>ARCHIVE_DIR</code></td><td>yes</td><td>path to the directory of the archives of one release and their retrieval record, <code>retrieval.json</code></td></tr>
+<tr><td><code>--out DIR</code></td><td>yes</td><td>path to the directory of the workspace: one that does not exist, one that holds nothing but entries whose name begins with a dot, or an earlier output of the command</td></tr>
+<tr><td><code>--title T</code></td><td>no</td><td>a title to write, by the publisher's designation, such as <code>1</code> or <code>5a</code>, its letter in either case; may be given more than once; by default every title of the release</td></tr>
+<tr><td><code>--jobs N</code></td><td>no</td><td>the number of worker threads, at least 1; by default as many as the system reports as available</td></tr>
+<tr><td><code>--verify</code></td><td>no</td><td>flag; write nothing, and report every entry under <code>DIR</code> that differs from what the run would write</td></tr>
+</tbody></table>
+</div>
+<p>A run writes <code>workspace.json</code> first, then each module, each file through
+a temporary file that is renamed; it removes the modules of an earlier
+output that it does not write, and writes <code>law.lock.json</code> and then, last,
+<code>coverage.json</code>, the <a href="/docs/law-modules#the-coverage-ledger">coverage ledger</a>
+of the workspace, which <a href="#coverage"><code>coverage</code></a> prints; so a run that is
+stopped leaves a directory the next run accepts. The lock does not list
+the ledger. With <code>--title</code>,
+only the modules of those titles are written, and the lock lists the
+archives and members whose modules the run wrote. The numbering of
+addresses still runs over every member the archive directory holds,
+whichever titles are chosen, so an address does not depend on the
+selection.</p>
+<p>An earlier output of the command is a generated workspace of the prefix
+<code>/us/usc</code> whose <code>.fr</code> files are each a module of edition 2 whose address
+lies below the prefix and which stands at the path of its address. A run
+reads the head of every <code>.fr</code> file of <code>DIR</code>, its marker and the address
+after <code>module</code>, in its first 64 KiB, before it writes anything, and
+removes only such modules.</p>
+<p><code>--verify</code> compares <code>workspace.json</code>, <code>law.lock.json</code>, <code>coverage.json</code>
+and every module file of <code>DIR</code> with what the run would write. Every other
+entry that a run would refuse is extra: a file other than a module and
+those three at the top, a symbolic link or any other entry that is
+neither a file nor a directory, and a <code>.fr</code> file that is no earlier output,
+which is different instead where the run writes a module. Only the entries
+whose name begins with a dot are not looked at. It writes nothing, <code>DIR</code>
+included. A run stopped after the lock and before the ledger leaves a
+workspace that <code>fidryn check</code> accepts, since no check reads the ledger,
+and <code>--verify</code> reports it as
+<code>missing coverage.json</code>, or <code>different coverage.json</code> when the ledger is
+that of an earlier run.</p>
+<p><strong>Example</strong></p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn ingest uscode samples/uscode/archives --out DIR
+fidryn ingest uscode samples/uscode/archives --out DIR --title 1 --jobs 4
+fidryn check DIR
+fidryn ingest uscode samples/uscode/archives --out DIR --verify</code></pre></figure>
+<p><strong>Success.</strong> Prints one line and exits 0:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>ingested: U units, C containers from A archives (release R)</code></pre></figure>
+<p>A noun whose count is 1 is in the singular, as in
+<code>ingested: 1 unit, 1 container from 1 archive (release R)</code>.</p>
+<p>With <code>--verify</code>, prints <code>ok</code> when nothing differs: <code>DIR</code> then holds every
+file the run would write, with the same bytes, and nothing a run would
+refuse, so a run into it is accepted and changes none of its bytes.</p>
+<p><strong>Failure.</strong> Exit 1. A release that is refused, by its retrieval record or
+by a reading rule, is reported with the archive, the member and, for a
+document, the element, the line it starts on and the nearest identifier.
+A title that no member holds is reported, by the designation given,
+before anything is written. A directory that holds anything other than an
+earlier output of the command is refused with what it holds, and nothing
+in it is changed: every <code>.fr</code> file that is no earlier output is named, a
+file of the first edition, a module of another prefix and a module at
+another path among them. With <code>--verify</code>, each path under <code>DIR</code> that differs is
+printed to stdout, relative to <code>DIR</code>, in the byte order of the paths,
+after the word that says how: <code>missing</code>, <code>extra</code> or <code>different</code>. The exit
+status is 1:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>extra notes.txt
+extra us/usc/link
+different us/usc/t99/s1.fr
+extra us/usc/t99/s7.fr
+missing us/usc/t99a.fr</code></pre></figure>
+<h2 id="text"><span class="hn">5.17</span> <code>text</code> <a class="anchor" href="#text" aria-label="Link to this section">#</a></h2>
+<p><code>fidryn text DIR</code> prints the text of the provisions and notes of the
+workspace in <code>DIR</code>: of every provision, container, note, source credit and
+footnote of its modules, read from its module files
+(<a href="/docs/law-modules#workspaces">Workspaces</a>). With <code>ADDRESS</code> it prints the
+provision, container or note at that address and what lies below it: every
+one whose address is <code>ADDRESS</code> or continues it at a segment boundary. With
+<code>ADDRESS</code> and <code>--hashes</code> it prints the two hashes that a binding to that
+provision records instead (<a href="/docs/law-modules#bindings">Bindings</a>). It reads
+the modules and checks nothing else of the workspace, which
+<code>fidryn check DIR</code> does.</p>
+<p><strong>Arguments</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>DIR</code></td><td>yes</td><td>path to the directory of a workspace</td></tr>
+<tr><td><code>ADDRESS</code></td><td>no</td><td>the address of a provision, a container or a note of the workspace; with <code>--hashes</code>, of a provision, or an alias of a unit</td></tr>
+<tr><td><code>--json</code></td><td>no</td><td>flag; print one text record to a line</td></tr>
+<tr><td><code>--hashes</code></td><td>no</td><td>flag; print the two lines that a binding to <code>ADDRESS</code> records; needs <code>ADDRESS</code>, and is not given with <code>--json</code></td></tr>
+</tbody></table>
+</div>
+<p><strong>Example</strong></p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo
+<span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/s2
+<span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo <span class="tk-ty">--json</span>
+<span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/s2 <span class="tk-ty">--hashes</span>
+<span class="tk-kw">fidryn</span> text samples/uscode/workspace /us/usc/t1/s1</code></pre></figure>
+<p><strong>Success.</strong> Exit 0. Without <code>--json</code> it prints the text for a person,
+module by module in the order of their addresses, with a blank line
+between two modules:</p>
+<ul>
+<li>A provision is its address on a line of its own, followed by its status
+in parentheses when it has one; then its number and heading on one line,
+the blocks of its text parts and its children, each indented by two
+spaces for each level of depth. The provision printed first is at depth
+0.</li>
+<li>A table is one line for each row, its cells separated by <code>|</code>. The items
+of quoted content are indented one level further. A footnote marker is
+its shown text in brackets, and an image is <code>[image SOURCE]</code>.</li>
+<li>After the provisions of a unit come its source credit and its footnotes,
+each footnote after its marker in brackets, and then its notes, each its
+address with its layer in parentheses, its heading and its blocks. A
+container is its address, its number and heading, its credit, its
+footnotes and its notes.</li>
+</ul>
+<p>Of the demo workspace, <code>fidryn text conformance/fixtures/workspace/demo /zz/demo/t1</code>
+prints:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>/zz/demo/t1
+  Title 1— Invented Things
+
+/zz/demo/t1/ch1
+  Chapter 1— Widgets
+
+/zz/demo/t1/s1
+  § 1. Definitions
+  In this invented chapter, a widget is a small device.
+
+/zz/demo/t1/s2
+  § 2. Sizes
+  A widget is small or large.
+
+/zz/demo/t1/s3
+  § 3. Colors
+  A widget may be of any color.</code></pre></figure>
+<p>With <code>--json</code> it prints one text record, <code>fidryn.text-record/v0.1</code>, to a
+line, the JSON Schema of which is
+<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/text-record-v0.1.json">schemas/text-record-v0.1.json</a>. The
+records are those of every module, sorted by the bytes of their addresses
+across the whole workspace; for one address the provision or container
+comes first, then the source credit, then the footnotes by ordinal. Each
+is one line of compact JSON with its keys in this order:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Record</th><th>Keys</th></tr></thead><tbody>
+<tr><td>a provision</td><td><code>address</code>, <code>layer</code> (<code>"operative"</code>), <code>kind</code>, <code>status</code> (the word, or <code>null</code>), <code>num</code>, <code>heading</code>, <code>items</code>, where an item is a text part <code>{"part": role, "blocks": [...]}</code> or a child <code>{"child": address}</code>; the top provision of a unit also <code>aliases</code>, <code>within</code>, <code>source</code> and <code>positive_law</code></td></tr>
+<tr><td>a container</td><td><code>address</code>, <code>layer</code> (<code>"operative"</code>), <code>kind</code>, <code>status</code>, <code>num</code>, <code>heading</code>, <code>aliases</code>, <code>within</code>, <code>members</code></td></tr>
+<tr><td>a note</td><td><code>address</code>, <code>layer</code> (<code>"enacted"</code> or <code>"editorial"</code>), <code>group</code>, <code>topics</code>, <code>heading</code>, <code>blocks</code></td></tr>
+<tr><td>a source credit</td><td>the address of its module, <code>record</code> (<code>"credit"</code>), and the keys of a paragraph</td></tr>
+<tr><td>a footnote</td><td>the address of its module, <code>record</code> (<code>"footnote"</code>), <code>ordinal</code>, <code>shown</code>, <code>blocks</code></td></tr>
+</tbody></table>
+</div>
+<p>A text is <code>{"text": plain, "refs": [[start, end, target], ...], "sup": [[start, end], ...], "sub": [[start, end], ...]}</code>, followed by <code>"marks": [[offset, shown, footnote], ...]</code> when it holds a footnote marker. Offsets
+count the Unicode scalar values of the plain text, an end is exclusive, and
+the offset of a marker is the length of the plain text before it. A
+paragraph is a text with the key <code>p</code> in place of <code>text</code>, a subheading one
+with the key <code>subheading</code>. A heading is <code>null</code> or a text, and a number is
+<code>null</code> or <code>[value, shown]</code>, <code>shown</code> the plain string when it is words only
+and a text otherwise. A table is <code>{"table": [[group, [[header, colspan, rowspan, [blocks]], ...]], ...]}</code>, an image <code>{"image": source}</code>, and
+quoted content <code>{"quoted": {"origin": origin, "items": [...]}}</code>, whose
+items are blocks, text parts and levels <code>{"level": kind, "num": ..., "heading": ..., "items": [...]}</code>. The record of <code>/zz/demo/t1/s2</code>:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>{&quot;address&quot;:&quot;/zz/demo/t1/s2&quot;,&quot;layer&quot;:&quot;operative&quot;,&quot;kind&quot;:&quot;section&quot;,&quot;status&quot;:null,&quot;num&quot;:[&quot;2&quot;,&quot;§ 2.&quot;],&quot;heading&quot;:{&quot;text&quot;:&quot;Sizes&quot;,&quot;refs&quot;:[],&quot;sup&quot;:[],&quot;sub&quot;:[]},&quot;items&quot;:[{&quot;part&quot;:&quot;content&quot;,&quot;blocks&quot;:[{&quot;p&quot;:&quot;A widget is small or large.&quot;,&quot;refs&quot;:[],&quot;sup&quot;:[],&quot;sub&quot;:[]}]}],&quot;aliases&quot;:[],&quot;within&quot;:&quot;/zz/demo/t1/ch1&quot;,&quot;source&quot;:&quot;demo01.xml&quot;,&quot;positive_law&quot;:true}</code></pre></figure>
+<p>Both forms depend on the module files alone: neither the host, the
+working directory nor the number of threads the system offers changes a
+byte. <code>conformance/uslm_text.py</code> prints the same records from the
+publisher's XML, independently of the ingester, and the check of the
+sample of the Code compares the two line for line
+(<a href="/docs/law-modules#the-sample">The sample</a>).</p>
+<p>With <code>--hashes</code> it prints exactly two lines and nothing else, the two
+that a person writes into a binding after its <code>release</code>: the tree hash of
+the provision at <code>ADDRESS</code>, or of the top provision of the unit that
+<code>ADDRESS</code> is an alias of, and the hash of the enacted layer of that unit,
+each as 64 lower-case hexadecimal digits. They come from the
+<a href="/docs/law-modules#interfaces">interfaces</a> of the modules, the place the check
+of a workspace takes them from, so a binding that records them is not
+stale against the workspace they were printed from. Of the demo
+workspace, <code>fidryn text conformance/fixtures/workspace/demo /zz/demo/t1/s2 --hashes</code>
+prints:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>provision_hash &quot;238c20bcd64758ed0b7f1e2eed5758d78ff4abda212539e8b9e7a07b7301686f&quot;
+notes_hash &quot;a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff&quot;</code></pre></figure>
+<p><strong>Failure.</strong> Exit 1. Nothing is printed to stdout, and the reason is
+printed to stderr: a directory that holds no workspace (<code>E730</code>), an entry
+that cannot be read or is neither a file nor a directory (<code>E730</code>), a
+module file that is not a module of edition 2 that lowers, each with its
+diagnostics; a text that is no address; and an address at which the
+workspace holds no provision, container or note, as
+<code>the workspace holds no provision, container or note at `/zz/demo/t1/s9` </code>:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/s9</code></pre></figure>
+<p>With <code>--hashes</code>, an address that is no provision and no alias of a unit is
+refused in the same way, saying what it is: the address of a note, of a
+container or of a curated module, an alias of a container, or the address
+of nothing, as
+<code>the workspace holds no provision, container or note at `/zz/demo/t1/s9` </code>.
+The chapter of the demo workspace is a container:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> text conformance/fixtures/workspace/demo /zz/demo/t1/ch1 <span class="tk-ty">--hashes</span></code></pre></figure>
+<p><code>--hashes</code> without <code>ADDRESS</code>, and <code>--hashes</code> with <code>--json</code>, are usage
+errors, exit 2.</p>
+<h2 id="coverage"><span class="hn">5.18</span> <code>coverage</code> <a class="anchor" href="#coverage" aria-label="Link to this section">#</a></h2>
+<p><code>fidryn coverage DIR</code> prints the coverage ledger of the generated workspace
+in <code>DIR</code>, <code>fidryn.coverage/v0.1</code>: its units, containers and provisions,
+its notes, footnotes and images, its references of each layer by outcome,
+the definitions extracted from its provisions by basis and by kind, and
+what its importer counted and did not import
+(<a href="/docs/law-modules#the-coverage-ledger">The coverage ledger</a>). It computes the
+ledger from the modules as their files stand, the manifest and the lock.
+It does not verify the module files against the lock, which is what
+<code>fidryn check DIR</code> is for. Of a workspace whose files are those its run
+wrote, it prints that run's <code>coverage.json</code>, byte for byte.</p>
+<p><strong>Arguments</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>DIR</code></td><td>yes</td><td>path to the directory of a generated workspace</td></tr>
+</tbody></table>
+</div>
+<p><strong>Example</strong></p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> coverage conformance/fixtures/workspace/demo
+<span class="tk-kw">fidryn</span> coverage samples/uscode/workspace</code></pre></figure>
+<p><strong>Success.</strong> Exit 0. It prints the ledger as JSON with two spaces of
+indentation and a final line end, its keys in their order, the JSON Schema
+of which is <a href="https://github.com/BeeGass/fidryn/blob/main/schemas/coverage-v0.1.json">schemas/coverage-v0.1.json</a>.
+Of the demo workspace it prints first:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>{
+  &quot;schema&quot;: &quot;fidryn.coverage/v0.1&quot;,
+  &quot;prefix&quot;: &quot;/zz/demo&quot;,
+  &quot;release&quot;: &quot;42-7&quot;,
+  &quot;totals&quot;: {
+    &quot;units&quot;: 3,
+    &quot;containers&quot;: 2,
+    &quot;provisions&quot;: 3,
+    &quot;units_by_kind&quot;: {
+      &quot;section&quot;: 3
+    },</code></pre></figure>
+<p>The output depends on the files of the workspace alone: neither the host,
+the working directory nor the number of threads the system offers changes
+a byte. The figures of the sample of the Code are on the page
+<a href="/docs/coverage">Coverage</a>.</p>
+<p><strong>Failure.</strong> Exit 1. Nothing is printed to stdout, and the reason is
+printed to stderr: a curated workspace, which has no ledger, as
+<code>DIR holds a curated workspace, and the coverage ledger belongs to a generated workspace, whose lock records what its importer counted</code>;
+a directory that holds no workspace (<code>E730</code>); a generated workspace
+without a lock, with one that cannot be read, or with one whose prefix or
+release is not the manifest's (<code>E730</code>); an entry that cannot be read or is
+neither a file nor a directory (<code>E730</code>); and a module file that is not a
+module of edition 2 that lowers, with its diagnostics. The curated sample
+of the repository is refused:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> coverage samples/uscode/curated</code></pre></figure>
+<h2 id="changes"><span class="hn">5.19</span> <code>changes</code> <a class="anchor" href="#changes" aria-label="Link to this section">#</a></h2>
+<p><code>fidryn changes OLD_DIR NEW_DIR</code> prints the change set between two
+generated workspaces of one prefix, the imports of two releases of one
+corpus: the provisions, notes and containers added, removed, moved or
+amended, by layer (<a href="/docs/law-modules#change-sets">Change sets</a>). With
+<code>--bindings DIR</code> it also lists the bindings of the curated workspace in
+<code>DIR</code> that are stale against <code>NEW_DIR</code>, whatever release that workspace is
+pinned to: it answers what would go stale if the pin moved there. Each
+workspace is read as <code>fidryn check</code> reads it, through phase one and the
+cache. Only the modules whose hashes differ are read again, and the units
+on one side only whose top provision has the kind and the status of a
+provision on the other side only, so that the two could be one moved
+provision.</p>
+<p><strong>Arguments</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table><thead><tr><th>Name</th><th>Required</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>OLD_DIR</code></td><td>yes</td><td>path to the directory of the older generated workspace</td></tr>
+<tr><td><code>NEW_DIR</code></td><td>yes</td><td>path to the directory of the newer generated workspace, of the prefix of <code>OLD_DIR</code></td></tr>
+<tr><td><code>--bindings DIR</code></td><td>no</td><td>path to the directory of a curated workspace whose bindings are judged against <code>NEW_DIR</code>; may be given more than once, and a directory given twice is read once</td></tr>
+<tr><td><code>--json</code></td><td>no</td><td>flag; print the change set as JSON, <code>fidryn.change-set/v0.1</code></td></tr>
+<tr><td><code>--jobs N</code></td><td>no</td><td>the number of worker threads, at least 1; by default as many as the system reports as available</td></tr>
+<tr><td><code>--cache-dir DIR</code></td><td>no</td><td>the directory of the cache of every workspace read; by default the one <a href="#check"><code>check</code></a> keeps, <code>FIDRYN_CACHE_DIR</code> or <code>fidryn</code> in the cache directory of the user</td></tr>
+<tr><td><code>--no-cache</code></td><td>no</td><td>flag; keep no cache: check every module file, and write no entry</td></tr>
+</tbody></table>
+</div>
+<p>The cache is chosen, from the same variables, as by <a href="#check"><code>check</code></a>, and
+every workspace the command reads, the two sides and each <code>--bindings</code>
+directory, shares it; nothing is written into any of them unless the
+cache is named inside one, and <code>fidryn</code> in the cache directory of the user
+is not used when it lies inside one of them. A check trusts its cache, so
+a cache belongs where only people one trusts can write. <code>--cache-dir</code> and
+<code>--no-cache</code> are not given together.</p>
+<p><strong>Example</strong></p>
+<p>Each of these compares a workspace with itself, with <code>--no-cache</code>, so that
+no cache is written; each prints a change set in which nothing changed:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> changes conformance/fixtures/workspace/demo conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span>
+<span class="tk-kw">fidryn</span> changes conformance/fixtures/workspace/demo conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span> <span class="tk-ty">--json</span>
+<span class="tk-kw">fidryn</span> changes samples/uscode/workspace samples/uscode/workspace <span class="tk-ty">--no-cache</span> <span class="tk-ty">--bindings</span> samples/uscode/curated</code></pre></figure>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>fidryn changes OLD_DIR NEW_DIR --bindings CURATED_DIR &gt; message.txt
+fidryn changes OLD_DIR NEW_DIR --json --jobs 8 &gt; changes.json</code></pre></figure>
+<p><strong>Success.</strong> Exit 0. Without <code>--json</code> it prints the change set as the text
+of a commit message: a first line <code>&lt;prefix&gt;: &lt;old release&gt; to &lt;new release&gt;</code>,
+a blank line, one line of counts for each of the four groups, and then
+each list that is not empty under its name, one entry to a line. Of the
+demo workspace compared with itself:</p>
+<figure class="code" data-lang="text"><figcaption><span>text</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code>/zz/demo: 42-7 to 42-7
+
+operative: 0 added, 0 removed, 0 amended_text, 0 amended_structure, 0 moved
+enacted_notes: 0 added, 0 removed, 0 amended, 0 moved
+editorial: 0 added, 0 removed, 0 amended, 0 moved, 0 credits_changed, 0 footnotes_changed
+containers: 0 added, 0 removed, 0 changed</code></pre></figure>
+<p>With <code>--json</code> it prints the change set as pretty JSON, every key present,
+the JSON Schema of which is
+<a href="https://github.com/BeeGass/fidryn/blob/main/schemas/change-set-v0.1.json">schemas/change-set-v0.1.json</a>. Every list
+is sorted, and both forms are the same bytes on every run and for every
+number of workers. <a href="/docs/law-modules#change-sets">Change sets</a> says what puts
+an address into each list and shows the text of one.</p>
+<p>When the cache of a workspace could not be used or could not be written,
+the command says so once on stderr, as <a href="#check"><code>check</code></a> does, with
+<code>the cache could not be used, and the check went on without it: ...</code> or
+<code>the cache could not be written, and the check went on without it: ...</code>,
+and the change set is what it would have been.</p>
+<p><strong>Failure.</strong> Exit 1, with nothing on stdout. A directory that holds no
+workspace, a curated workspace as <code>OLD_DIR</code> or <code>NEW_DIR</code>, a generated one
+as <code>--bindings</code>, and two workspaces of different prefixes are each refused
+with one <code>E730</code> that says which, as
+<code>this is the manifest of a curated workspace, and a change set is made between two generated workspaces</code>.
+<code>conformance/fixtures/workspace</code> holds no <code>workspace.json</code>, and is refused
+as no workspace:</p>
+<figure class="code" data-lang="shell"><figcaption><span>shell</span><button type="button" class="copy" data-copy hidden>Copy</button></figcaption><pre><code><span class="tk-kw">fidryn</span> changes conformance/fixtures/workspace conformance/fixtures/workspace/demo <span class="tk-ty">--no-cache</span></code></pre></figure>
+<p>A workspace that has an error ends the command with its diagnostics, each
+naming its file under the directory given, as <code>fidryn check</code> prints them;
+for a curated workspace of <code>--bindings</code> these are the diagnostics of its
+module files by themselves. When the command keeps no cache because no
+directory is named for one, because the one in the cache directory of the
+user lies inside a workspace it reads, or because the identity of the
+running executable cannot be read, it says so after the diagnostics of a
+failure too, as
+<code>the cache could not be used, and the check went on without it: ...</code>;
+what the checks of the workspaces it read found of their cache is said
+only when the comparison succeeds.</p>
+<h2 id="see-also"><span class="hn">5.20</span> See also <a class="anchor" href="#see-also" aria-label="Link to this section">#</a></h2>
 <ul>
 <li><a href="/docs/getting-started">Getting started</a></li>
 <li><a href="/docs/mill">Mill</a></li>
 </ul>
 
     </div>
-    <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/cases-and-time"><span class="label">Previous &middot; &sect;3</span><span class="t">Cases and time</span></a><a class="next" href="/docs/mill"><span class="label">Next &middot; &sect;5</span><span class="t">Mill</span></a></nav>
+    <nav class="pager" aria-label="Previous and next guide"><a class="prev" href="/docs/law-modules"><span class="label">Previous &middot; &sect;4</span><span class="t">Law modules</span></a><a class="next" href="/docs/mill"><span class="label">Next &middot; &sect;6</span><span class="t">Mill</span></a></nav>
     <p class="doc-meta"><a href="https://github.com/BeeGass/fidryn/blob/main/docs/cli.md">Edit this page on GitHub</a><a href="/docs/cli.md">View as Markdown</a></p>
     <p class="doc-disclaimer">The modules, records, and examples here are research fixtures. They are not legal advice, not operative instruments, and not a complete statement of any jurisdiction&rsquo;s law.</p>
   </article>
-  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">4.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">4.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">4.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">4.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">4.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">4.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">4.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">4.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">4.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">4.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">4.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">4.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">4.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">4.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">4.15</span> review</a></li><li class="lvl-2"><a href="#see-also"><span class="n">4.16</span> See also</a></li></ol></aside>
+  <aside class="onpage" aria-label="On this page"><p class="label">On this page</p><ol><li class="lvl-2"><a href="#install"><span class="n">5.1</span> Install</a></li><li class="lvl-2"><a href="#exit-status"><span class="n">5.2</span> Exit status</a></li><li class="lvl-2"><a href="#source-checking-and-trust"><span class="n">5.3</span> Source checking and trust</a></li><li class="lvl-2"><a href="#fmt"><span class="n">5.4</span> fmt</a></li><li class="lvl-2"><a href="#check"><span class="n">5.5</span> check</a></li><li class="lvl-2"><a href="#run"><span class="n">5.6</span> run</a></li><li class="lvl-2"><a href="#explore"><span class="n">5.7</span> explore</a></li><li class="lvl-2"><a href="#explain"><span class="n">5.8</span> explain</a></li><li class="lvl-2"><a href="#verify"><span class="n">5.9</span> verify</a></li><li class="lvl-2"><a href="#diff"><span class="n">5.10</span> diff</a></li><li class="lvl-2"><a href="#render"><span class="n">5.11</span> render</a></li><li class="lvl-2"><a href="#file"><span class="n">5.12</span> file</a></li><li class="lvl-2"><a href="#ui"><span class="n">5.13</span> ui</a></li><li class="lvl-2"><a href="#inputs"><span class="n">5.14</span> inputs</a></li><li class="lvl-2"><a href="#review"><span class="n">5.15</span> review</a></li><li class="lvl-2"><a href="#ingest"><span class="n">5.16</span> ingest</a></li><li class="lvl-2"><a href="#text"><span class="n">5.17</span> text</a></li><li class="lvl-2"><a href="#coverage"><span class="n">5.18</span> coverage</a></li><li class="lvl-2"><a href="#changes"><span class="n">5.19</span> changes</a></li><li class="lvl-2"><a href="#see-also"><span class="n">5.20</span> See also</a></li></ol></aside>
 </div>
 </main>
 <div class="backdrop" data-drawer-close hidden></div>
 <footer class="site-foot">
-  <p>Fidryn 0.2.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
+  <p>Fidryn 0.3.0 &middot; a research fixture, not legal advice &middot; Bryan Gass</p>
   <nav aria-label="Footer">
     <a href="/docs/">Docs</a>
     <a href="/llms.txt">llms.txt</a>

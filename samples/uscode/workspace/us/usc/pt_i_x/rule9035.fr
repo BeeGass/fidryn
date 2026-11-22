@@ -1,0 +1,55 @@
+edition 2
+module "/us/usc/ptIX/rule9035" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9035" courtRule {
+    num "9035" "Rule 9035."
+    heading "Applying These Rules in a Judicial District in Alabama or North Carolina"
+    content "In a bankruptcy case filed in or transferred to a district in Alabama or North Carolina and in which a United States trustee is not authorized to act, these rules apply to the extent they are not inconsistent with any applicable federal statute."
+    hash "a7599e28f97b2a8ab30af5380bd3d444353d5f847c7866005dcea414be1925e4"
+  }
+  credit "(Added Apr. 30, 1991, eff. Aug. 1, 1991; amended Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9035/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991"
+    p "Section 302(d)(3) of the Bankruptcy Judges, United States Trustees, and Family Farmer Bankruptcy Act of 1986 provides that amendments to the Code relating to United States trustees and quarterly fees required under 28 U.S.C. § 1930(a)(6) do not become effective in any judicial district in the States of Alabama and North Carolina until the district elects to be included in the United States trustee system, or October 1, 1992, whichever occurs first, unless Congress extends the deadline. If the United States trustee system becomes effective in these districts, the transition provisions in the 1986 Act will govern the application of the United States trustee amendments to cases that are pending at that time. See § 302(d)(3)(F). The statute, and not the bankruptcy court, determines whether a United States trustee is authorized to act in a particular case."
+    p "Section 302(d)(3)(I) of the 1986 Act authorizes the Judicial Conference of the United States to promulgate regulations governing the appointment of bankruptcy administrators to supervise the administration of estates and trustees in cases in the districts in Alabama and North Carolina until the provisions of the Act relating to the United States trustee take effect in these districts. Pursuant to this authority, in September 1987, the Judicial Conference promulgated regulations governing the selection and appointment of bankruptcy administrators and regulations governing the establishment, duties, and functions of bankruptcy administrators. Guidelines relating to the bankruptcy administrator program have been prescribed by the Director of the Administrative Office of the United States Courts."
+    p "Many of these rules were amended to implement the United States trustee system in accordance with the 1986 Act. Since the provisions of the 1986 Act relating to the United States trustee system are not effective in cases in Alabama and North Carolina in which a bankruptcy administrator is serving, rules referring to United States trustees are at least partially inconsistent with the provisions of the Bankruptcy Code and title 28 of the United States Code effective in such cases."
+    p "In determining the applicability of these rules in cases in Alabama and North Carolina in which a United States trustee is not authorized to act, the following guidelines should be followed:"
+    p "(1) The following rules do not apply because they are inconsistent with the provisions of the Code or title 28 in these cases: 1002(b), 1007(1), 1009(c), 2002(k), 2007.1(b), 2015(a)(6), 2020, 3015(b), 5005(b), 7004(b)(10), 9003(b), and 9034."
+    p "(2) The following rules are partially inconsistent with the provisions of the Code effective in these cases and, therefore, are applicable with the following modifications:"
+    p "(a) Rule 2001(a) and (c)—The court, rather than the United States trustee, appoints the interim trustee."
+    p "(b) Rule 2003—The duties of the United States trustee relating to the meeting of creditors or equity security holders are performed by the officer determined in accordance with regulations of the Judicial Conference, guidelines of the Director of the Administrative Office, local rules or court orders."
+    p "(c) Rule 2007—The court, rather than the United States trustee, appoints committees in chapter 9 and chapter 11 cases."
+    p "(d) Rule 2008—The bankruptcy administrator, rather than the United States trustee, informs the trustee of how to qualify."
+    p "(e) Rule 2009(c) and (d)—The court, rather than the United States trustee, appoints interim trustees in chapter 7 cases and trustees in chapter 11, 12 and 13 cases."
+    p "(f) Rule 2010—The court, rather than the United States trustee, determines the amount and sufficiency of the trustee’s bond."
+    p "(g) Rule 5010—The court, rather than the United States trustee, appoints the trustee when a case is reopened."
+    p "(3) All other rules are applicable because they are consistent with the provisions of the Code and title 28 effective in these cases, except that any reference to the United States trustee is not applicable and should be disregarded."
+    p "Many of the amendments to the rules are designed to give the United States trustee, a member of the Executive Branch, notice of certain developments and copies of petitions, schedules, pleadings, and other papers. In contrast, the bankruptcy administrator is an officer in the Judicial Branch and matters relating to notice of developments and access to documents filed in the clerk’s office are governed by regulations of the Judicial Conference of the United States, guidelines of the Administrative Office of the United States Courts, local rules, and court orders. Also, requirements for disclosure of connections with the bankruptcy administrator in applications for employment of professional persons, restrictions on appointments of relatives of bankruptcy administrators, effects of erroneously filing papers with the bankruptcy administrator, and other matters not covered by these rules may be governed by regulations of the Judicial Conference, guidelines of the Director of the Administrative Office, local rules, and court orders."
+    p "This rule will cease to have effect if a United States trustee is authorized in every case in the districts in Alabama and North Carolina."
+    hash "791ead4139889e3e3b3c162cee86d3199e73fd0a60bf66b5cda8b373f8ae5c1f"
+  }
+  note "/us/usc/ptIX/rule9035/note/ungrouped/pl.103.394/notes-of-advisory-committee-on-rules-1997-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1997 Amendment"
+    p "Certain statutes that are not codified in title 11 or title 28 of the United States Code, such as § 105 of the Bankruptcy Reform Act of 1994, " ["Pub. L. 103–394" -> "/us/pl/103/394"] ", " ["108 Stat. 4106" -> "/us/stat/108/4106"] ", relate to bankruptcy administrators in the judicial districts of North Carolina and Alabama. This amendment makes it clear that the Bankruptcy Rules do not apply to the extent that they are inconsistent with these federal statutes."
+    p "GAP Report on Rule 9035. No changes to the published draft."
+    hash "738c246df07e53aaa7e3fd3550605a7610d803f7fdc4f15d70676b1ecdeff662"
+  }
+  note "/us/usc/ptIX/rule9035/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9035 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "ac08c616cf19b12816ca094076fc3169159496aea7835821c2ec9a1966fc36b0"
+  }
+  layers {
+    operative "a7599e28f97b2a8ab30af5380bd3d444353d5f847c7866005dcea414be1925e4"
+    enacted "6e81bbf6fbcd40e78a412b4c3d65809879933389d0f70487c387891ca0c2bb00"
+    editorial "9ab0aad3dbb4e898f274f21f57cc9863663ff3130242ee548de7aa3c989ac693"
+  }
+}

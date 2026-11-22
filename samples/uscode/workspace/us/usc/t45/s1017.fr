@@ -1,0 +1,62 @@
+edition 2
+module "/us/usc/t45/s1017" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1017" section {
+    num "1017" "§ 1017."
+    heading "Temporary operating approval"
+    provision "/us/usc/t45/s1017/a" subsection {
+      num "a" "(a)"
+      heading "Use of tracks and facilities by other rail carriers; terms of compensation; continuation of service"
+      content "The Commission may authorize any rail carrier willing to do so voluntarily to use the tracks and facilities of a carrier which, on January 14, 1983, was the subject of a proceeding pending under section 77 of the Bankruptcy Act or under subchapter IV of chapter 11 of title 11. The use of such tracks and facilities shall be under such terms of compensation as the carriers establish between themselves, or if the carriers are unable to agree, under such terms of compensation as the Commission finds to be reasonable. The Commission shall have authority to authorize continued rail service under this section over the lines of any such carrier which has been ordered by the court having jurisdiction over such a carrier to liquidate its properties until the disposition of the properties of the estate of such carrier."
+      hash "f2a569176bed94ac155fd901543af9c3dbbd574217263060b3b11ab00690c877"
+    }
+    provision "/us/usc/t45/s1017/b" subsection {
+      num "b" "(b)"
+      heading "Use of employees"
+      content "In carrying out the provisions of this section, the Commission shall require, to the maximum extent practicable, the use of the employees who would normally have performed work in connection with the traffic subject to the action of the Commission."
+      hash "3b6343b0378e6debfa9a8b4fad88b011a63147492f6e732abc655e4bbb497828"
+    }
+    hash "470ae948cd9de8b277abd48d84b8002114234c8849b314ecf3215182e71082f0"
+  }
+  credit "(" ["Pub. L. 96–254, title I, § 122" -> "/us/pl/96/254/tI/s122"] ", May 30, 1980, " ["94 Stat. 409" -> "/us/stat/94/409"] "; " ["Pub. L. 97–130, § 5(a)" -> "/us/pl/97/130/s5/a"] ", Dec. 29, 1981, " ["95 Stat. 1690" -> "/us/stat/95/1690"] "; " ["Pub. L. 97–468, title II, § 214" -> "/us/pl/97/468/tII/s214"] ", Jan. 14, 1983, " ["96 Stat. 2545" -> "/us/stat/96/2545"] ".)"
+  note "/us/usc/t45/s1017/note/editorialNotes/act.1898-07-01.ch541/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Section 77 of the Bankruptcy Act, referred to in subsec. (a), was classified to section 205 of former Title 11, Bankruptcy. The Bankruptcy Act (" ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ") was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    hash "dedb0636feabfa75f9deb51b23de44b49607eabc6dd43b59ef6b30113b366de3"
+  }
+  note "/us/usc/t45/s1017/note/editorialNotes/pl.97.468/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1983—Subsec. (a). " ["Pub. L. 97–468, § 214(a)" -> "/us/pl/97/468/s214/a"] ", substituted “a carrier which, on January 14, 1983, was the subject of a proceeding pending under section 77 of the Bankruptcy Act or under subchapter IV of chapter 11 of title 11” for “the Rock Island Railroad or the Milwaukee Railroad”, and in last sentence substituted “any such carrier which has been ordered by the court having jurisdiction over such a carrier to liquidate its properties until the disposition of the properties of the estate of such carrier” for “the Rock Island Railroad until the disposition of the properties of the estate of the Rock Island Railroad”."
+    p "Subsec. (c). " ["Pub. L. 97–468, § 214(b)" -> "/us/pl/97/468/s214/b"] ", struck out subsec. (c) which defined “Milwaukee Railroad”."
+    p "1981—Subsec. (a). " ["Pub. L. 97–130" -> "/us/pl/97/130"] " gave the Commission authority to authorize continued rail service under this section over the lines of the Rock Island Railroad until the disposition of the properties of the estate of the Rock Island Railroad."
+    hash "b7b8ea5f67b4c3a6b5ba2398eedccfd4ece27cd5e4b3ba33296f05d44972779b"
+  }
+  note "/us/usc/t45/s1017/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  note "/us/usc/t45/s1017/note/statutoryNotes/pl.97.130/termination-of-applicability-of-amendment-to-interstate-comm" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Termination of Applicability of Amendment to Interstate Commerce Service Order 1498 on May 15, 1982"
+    p ["Pub. L. 97–130, § 5(b)" -> "/us/pl/97/130/s5/b"] ", Dec. 29, 1981, " ["95 Stat. 1691" -> "/us/stat/95/1691"] ", provided that:"
+    quoted "/us/pl/97/130/s5/b" {
+      p "“The applicability of the amendment made by subsection (a) [amending subsec. (a) of this section] to Interstate Commerce Commission Service Order 1498 shall expire at the end of May 15, 1982.”"
+    }
+    hash "e1108795b4e3d9c50406adbe3e1eb6b7de7e9f3366ad8598abc06f2d445c6c1e"
+  }
+  layers {
+    operative "470ae948cd9de8b277abd48d84b8002114234c8849b314ecf3215182e71082f0"
+    enacted "3ac7121cb5d2424a7087850dab9bb3582fb187690e32004f79858b1e3f712659"
+    editorial "07f70a012083108c5fc664116298e1cd25f949fb79a6af8446bdaf7b3e61bf73"
+  }
+}

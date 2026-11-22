@@ -1,0 +1,97 @@
+edition 2
+module "/us/usc/ptI/rule1003" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1003" courtRule {
+    num "1003" "Rule 1003."
+    heading "Involuntary Petition: Transferred Claims; Joining Other Creditors; Additional Time to Join"
+    provision "/us/usc/ptI/rule1003/a" subsection {
+      num "a" "(a)"
+      heading "Transferred Claims."
+      chapeau "An entity that has transferred or acquired a claim for the purpose of commencing an involuntary case under Chapter 7 or Chapter 11 is not a qualified petitioner. A petitioner that has transferred or acquired a claim must attach to the petition and to any copy:"
+      provision "/us/usc/ptI/rule1003/a/1" paragraph {
+        num "1" "(1)"
+        content "all documents evidencing the transfer, whether it was unconditional, for security, or otherwise; and"
+        hash "f9786d70ae91ca51a8e075230606cbc734d2a84f88fa04070070051aafea1934"
+      }
+      provision "/us/usc/ptI/rule1003/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "a signed statement that:"
+        provision "/us/usc/ptI/rule1003/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "affirms that the claim was not transferred for the purpose of commencing the case; and"
+          hash "e3198c6148be8d8421a4c2d4ea55c09a0f216be6a0d2b98bd2f5e2fd6da64afe"
+        }
+        provision "/us/usc/ptI/rule1003/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "sets forth the consideration for the transfer and its terms."
+          hash "cd289b15e621a1644f1d9d699193d6cab9b3a3c31a8a2f521f61b6a4888deb64"
+        }
+        hash "1b1139be26eed0b934514e9fa48fc779d0581f7ee212b4a6498993a0645f554d"
+      }
+      hash "ea8fb5c8b9289718ef5bdc5c6fcb1d8aa8bafe48dfefe3daee15d8259ea4d2bf"
+    }
+    provision "/us/usc/ptI/rule1003/b" subsection {
+      num "b" "(b)"
+      heading "Joining Other Creditors After Filing."
+      chapeau "If an involuntary petition is filed by fewer than 3 creditors and the debtor’s answer alleges the existence of 12 or more creditors as provided in § 303(b), the debtor must attach to the answer:"
+      provision "/us/usc/ptI/rule1003/b/1" paragraph {
+        num "1" "(1)"
+        content "the names and addresses of all creditors; and"
+        hash "92ff0bbffca1dd74fd4ab1c79c420605ef893d7bd806edf329c5338f99565925"
+      }
+      provision "/us/usc/ptI/rule1003/b/2" paragraph {
+        num "2" "(2)"
+        content "a brief statement of the nature and amount of each creditor’s claim."
+        hash "45945d20f3e206eb4cd732d2c36ee5638f6d8aa021ef838b76bb74bc6b218a0d"
+      }
+      hash "c09fb42f042ea4813a28de81c2163a281dda47162023c2c18695f14ed89c2b00"
+    }
+    provision "/us/usc/ptI/rule1003/c" subsection {
+      num "c" "(c)"
+      heading "Additional Time to Join."
+      content "If there appear to be 12 or more creditors, the court must allow a reasonable time for other creditors to join the petition before holding a hearing on it."
+      hash "0c72c61e580fa9320b0ee880612e306a93e8c4cfa7439452327f3029545d124f"
+    }
+    hash "2de77a34a80bed129c7e9b9f14da9bd218af796bc10d31727247107907b36b8c"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a). Official Form No. 11 (Involuntary Case: Creditors’ Petition), is prescribed for use by petitioning creditors to have a debtor’s assets liquidated under chapter 7 of the Code or the business reorganized under chapter 11. It contains the required allegations as specified in § 303(b) of the Code. Official Form 12 is prescribed for use by fewer than all the general partners to obtain relief for the partnership as governed by § 303(b)(3) of the Code and Rule 1004(b)."
+    p "Although the number of copies to be filed is specified in Rule 1002, a local rule may require additional copies."
+    p "Only the original need be signed and verified, but the copies must be conformed to the original. See Rules 1008 and 9011(c). The petition must be filed with the bankruptcy court. This provision implements § 303(b) which provides that an involuntary case is commenced by filing the petition with the court."
+    p "As provided in § 362 of the Code, the filing of the petition acts as a stay of certain acts and proceedings against the debtor, the debtor’s property and property of the estate."
+    p "Subdivision (c) retains the explicitness of former Bankruptcy Rule 104(d) that a transfer of a claim for the purpose of commencing a case under the Code is a ground for disqualification of a party to the transfer as a petitioner."
+    p "Section 303(b) “is not intended to overrule Bankruptcy Rule 104(d), which places certain restrictions on the transfer of claims for the purpose of commencing an involuntary case.” House Report No. 95–595, 95th Cong., 1st Sess. (1977) 322; Senate Report No. 95–989, 95th Cong., 2d Sess. (1978) 33."
+    p "The subdivision requires disclosure of any transfer of the petitioner’s claim as well as a transfer to the petitioner and applies to transfers for security as well as unconditional transfers, Cf. In re 69th & Crandon Bldg. Corp., 97 F.2d 392, 395 (7th Cir.), cert. denied, 305 U.S. 629 (1938), recognizing the right of a creditor to sign a bankruptcy petition notwithstanding a prior assignment of his claim for the purpose of security. This rule does not, however, qualify the requirement of § 303(b)(1) that a petitioning creditor must have a claim not contingent as to liability."
+    p "Subdivision (d). Section 303(c) of the Code permits a creditor to join in the petition at any time before the case is dismissed or relief is ordered. While this rule does not require the court to give all creditors notice of the petition, the list of creditors filed by the debtor affords a petitioner the information needed to enable him to give notice for the purpose of obtaining the co-petitioners required to make the petition sufficient. After a reasonable opportunity has been afforded other creditors to join in an involuntary petition, the hearing on the petition should be held without further delay."
+    p "Subdivision (e). This subdivision implements § 304. A petition for relief under § 304 may only be filed by a foreign representative who is defined in § 101(20) generally as a representative of an estate in a foreign proceeding. The term “foreign proceeding” is defined in § 101(19)."
+    p "Section 304(b) permits a petition filed thereunder to be contested by a party in interest. Subdivision (e)(2) therefore requires that the summons and petition be served on any person against whom the relief permitted by § 304(b) is sought as well as on any other party the court may direct."
+    p "The rules applicable to the procedure when an involuntary petition is filed are made applicable generally when a case ancillary to a foreign proceeding is commenced. These rules include Rule 1010 with respect to issuance and service of a summons, Rule 1011 concerning responsive pleadings and motions, and Rule 1018 which makes various rules in Part VII applicable in proceedings on contested petitions."
+    p "The venue for a case ancillary to a foreign proceeding is provided in [former] 28 U.S.C. § 1474."
+    hash "6da319c7cc64503a305e4d6a6859ad6c1a0cf4f607451a60e2b4720aa4b81e05"
+  }
+  note "/us/usc/ptI/rule1003/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "The subject matter of subdivisions (a), (b), and (e) has been incorporated in Rules 1002, 1010, 1011, and 1018."
+    hash "4136509752514b0209999ef3fdd2bcb7b0907bedc9a88a16d29d86db3cbfb186"
+  }
+  note "/us/usc/ptI/rule1003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1003 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "9c799eb37f9a653634234ff84064bdef8cc4f989b73bd25719d294a5bdd6d305"
+  }
+  layers {
+    operative "2de77a34a80bed129c7e9b9f14da9bd218af796bc10d31727247107907b36b8c"
+    enacted "84c7db8003fd4e8755746e71b09df0e9de882602f83cbe3cc41d381a72f27f7d"
+    editorial "caa51207e3a163409cb6f03a3387d1e5b9cd11b5aee7138d45678942ea3d9917"
+  }
+}

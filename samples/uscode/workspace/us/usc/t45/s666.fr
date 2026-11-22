@@ -1,0 +1,25 @@
+edition 2
+module "/us/usc/t45/s666" {
+  within "/us/usc/t45/ch15"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s666" section {
+    num "666" "§ 666."
+    heading "Court supervision of expenditures; findings; report to Secretary"
+    content "In addition to other duties prescribed by section 77 of the Bankruptcy Act, the court shall maintain supervision of the expenditure of funds obtained pursuant to " ["section 662 of this title" -> "/us/usc/t45/s662"] " for the purpose of assuring that such funds are used solely for purposes set forth in subsection (b) of such section, shall make periodic findings regarding such expenditures, and shall report those findings to the Secretary."
+    hash "e50e6212baf5ebd8eef81401fbd471ef19a2a9c239a509a2b7aecf56f9341cc0"
+  }
+  credit "(" ["Pub. L. 91–663, § 7" -> "/us/pl/91/663/s7"] ", Jan. 8, 1971, " ["84 Stat. 1977" -> "/us/stat/84/1977"] ".)"
+  note "/us/usc/t45/s666/note/editorialNotes/act.1898-07-01.ch541/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Section 77 of the Bankruptcy Act, referred to in text, was classified to section 205 of former Title 11, Bankruptcy. The Bankruptcy Act (" ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ") was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    hash "2b6e966f68b7277f99cefe60b30e18e8c64dfb35d1582eabdca93f3efe0222d9"
+  }
+  layers {
+    operative "e50e6212baf5ebd8eef81401fbd471ef19a2a9c239a509a2b7aecf56f9341cc0"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "479db1e2249cb28120cf3c809816db3be19a93099aa3989b96119f3c1409b894"
+  }
+}

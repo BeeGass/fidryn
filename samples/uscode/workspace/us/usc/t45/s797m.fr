@@ -1,0 +1,36 @@
+edition 2
+module "/us/usc/t45/s797m" {
+  within "/us/usc/t45/ch16/schVII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s797m" section {
+    num "797m" "§ 797m."
+    heading "Arbitration"
+    content "Any dispute or controversy with respect to the interpretation, application, or enforcement of the provisions of this subchapter, except sections 797b, 797c, 797g, and 797l" mark "1" 1 " of this title, or section 1144 of the Northeast Rail Service Act of 1981, and except those matters subject to judicial review under section 1152 of the Northeast Rail Service Act of 1981 [" ["45 U.S.C. 1105" -> "/us/usc/t45/s1105"] "], which have not been resolved within 90 days, may be submitted by either party to an Adjustment Board for a final and binding decision thereon as provided in " ["section 153 of this title" -> "/us/usc/t45/s153"] ", in which event the burden of proof on all issues so presented shall be on the Corporation, or the Association, where appropriate."
+    hash "2705d771cfcaa1914623a6c30bf9628735c0fc0cdf9b6472d6fadb08061ec352"
+  }
+  credit "(" ["Pub. L. 93–236, title VII, § 714" -> "/us/pl/93/236/tVII/s714"] ", as added " ["Pub. L. 97–35, title XI, § 1143(a)" -> "/us/pl/97/35/tXI/s1143/a"] ", Aug. 13, 1981, " ["95 Stat. 668" -> "/us/stat/95/668"] ".)"
+  note "/us/usc/t45/s797m/note/editorialNotes/pl.99.509/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "Section 797l of this title, referred to in text, was repealed by " ["Pub. L. 99–509, title IV, § 4033(a)(2)" -> "/us/pl/99/509/tIV/s4033/a/2"] ", Oct. 21, 1986, " ["100 Stat. 1908" -> "/us/stat/100/1908"] ", and a new section 797l of this title was subsequently added by " ["Pub. L. 104–88, § 327(5)" -> "/us/pl/104/88/s327/5"] "."
+    p "Section 1144 of the Northeast Rail Service Act of 1981, referred to in text, is " ["section 1144 of Pub. L. 97–35" -> "/us/pl/97/35/s1144"] ", title XI, Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"] ", which repealed subchapter V (§ 771 et seq.) of this chapter and sections 910 and 1006 of this title and enacted provisions set out as a note under " ["section 771 of this title" -> "/us/usc/t45/s771"] "."
+    hash "55478c754a222453e1bdaf616ad15f96d6861d75419de2e980bbba971f26e3d7"
+  }
+  note "/us/usc/t45/s797m/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  footnote 1 "1" {
+    p "See References in Text note below."
+  }
+  layers {
+    operative "2705d771cfcaa1914623a6c30bf9628735c0fc0cdf9b6472d6fadb08061ec352"
+    enacted "81a120284a8f00479bf055c3927a34052b67b3f6864a011df48847e304b0c589"
+    editorial "5fefe3af4885db82b6d2f62512fee4caade15ebca4978a15592c8deee3eb26d5"
+  }
+}

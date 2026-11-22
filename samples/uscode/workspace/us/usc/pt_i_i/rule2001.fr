@@ -1,0 +1,82 @@
+edition 2
+module "/us/usc/ptII/rule2001" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2001" courtRule {
+    num "2001" "Rule 2001."
+    heading "Appointing an Interim Trustee Before the Order for Relief in an Involuntary Chapter 7 Case"
+    provision "/us/usc/ptII/rule2001/a" subsection {
+      num "a" "(a)"
+      heading "Appointing an Interim Trustee."
+      content {
+        p "After an involuntary Chapter 7 case commences but before an order for relief, the court may, on a party in interest’s motion, order the United States trustee to appoint an interim trustee under § 303(g). The motion must set forth the need for the appointment and may be granted only after a hearing on notice to:"
+        p "• the debtor;"
+        p "• the petitioning creditors;"
+        p "• the United States trustee; and"
+        p "• other parties in interest as the court orders."
+      }
+      hash "c1ab3b11d3568e0652f60f98c7f2756d826d3127697b9af7fa501b28b9e8e7f9"
+    }
+    provision "/us/usc/ptII/rule2001/b" subsection {
+      num "b" "(b)"
+      heading "Bond Required."
+      content "An interim trustee may be appointed only if the movant furnishes a bond, in an amount that the court approves, to indemnify the debtor for any costs, attorney’s fees, expenses, and damages allowable under § 303(i)."
+      hash "3ccc28d835dc5f3c75e578ee8e7b09b1e4a2b24e8e9ebe8e709ce5caab0b151f"
+    }
+    provision "/us/usc/ptII/rule2001/c" subsection {
+      num "c" "(c)"
+      heading "The Order’s Content."
+      content "The court’s order must state the reason the appointment is needed and specify the trustee’s duties."
+      hash "5d660e15e5199f5c18e2b40706a660b319b38ff691a5f3542e7772330319d668"
+    }
+    provision "/us/usc/ptII/rule2001/d" subsection {
+      num "d" "(d)"
+      heading "The Interim Trustee’s Final Report."
+      chapeau "Unless the court orders otherwise, after the qualification of a trustee selected under § 702, the interim trustee must:"
+      provision "/us/usc/ptII/rule2001/d/1" paragraph {
+        num "1" "(1)"
+        content "promptly deliver to the trustee all the records and property of the estate that are in the interim trustee’s possession or under its control; and"
+        hash "6d01cec97a2dd86688087a83d10f4a52cbfbba7c7fa6f748973625100e5a8c36"
+      }
+      provision "/us/usc/ptII/rule2001/d/2" paragraph {
+        num "2" "(2)"
+        content "within 30 days after the trustee qualifies, file a final report and account."
+        hash "24d1ac7ad5f760be4227327ac0877ba65e945a5371f8c92f20d611b7da4424e2"
+      }
+      hash "cef5effa03fed63618fa21fd825ccaf340543b0ff3927341fa2d7b53ce782de2"
+    }
+    hash "6f4a54d4ea297eabb8b0fcd21d25fb997440b30d4cafd23e00d033737880d787"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is adapted from former Bankruptcy Rule 201. See also former Chapter X Rule 10–201. In conformity with title 11 of the United States Code, this rule substitutes “interim trustee” for “receiver.” Subdivision (a) and (e) of Rule 201 are not included because the provisions contained therein are found in detail in § 303(g) of the Code, or they are inconsistent with § 701 of the Code. Similarly, the provisions in Rule 201(d) relating to a debtor’s counterbond are not included because of their presence in § 303(g)."
+    p "Subdivision (a) makes it clear that the court may not on its own motion order the appointment of an interim trustee before an order for relief is entered. Appointment may be ordered only on motion of a party in interest."
+    p "Subdivision (b) requires those seeking the appointment of an interim trustee to furnish a bond. The bond may be the same one required of petitioning creditors under § 303(e) of the Code to indemnify the debtor for damages allowed by the court under § 303(i)."
+    p "Subdivision (c) requires that the order specify which duties enumerated in § 303(g) shall be performed by the interim trustee. Reference should be made to Rule 2015 for additional duties required of an interim trustee including keeping records and filing periodic reports with the court."
+    p "Subdivision (d) requires turnover of records and property to the trustee selected under § 702 of the Code, after qualification. That trustee may be the interim trustee who becomes the trustee because of the failure of creditors to elect one under § 702(d) or the trustee elected by creditors under § 702(b), (c)."
+    hash "3765bbe1f12572ca51d3be30c1effe1cc372e8e490940ad3d6bf443627acaaa7"
+  }
+  note "/us/usc/ptII/rule2001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to conform to § 303(g) of the Code which provides that the United States trustee appoints the interim trustee. See Rule X–1003. This rule does not apply to the exercise by the court of the power to act sua sponte pursuant to § 105(a) of the Code."
+    hash "33ca7f4a5c91fb4a9a2b9af721112c15846ee666214485ad9440f66801f6f2f5"
+  }
+  note "/us/usc/ptII/rule2001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2001 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "17e1dcdce6b9e00cf62285d789759ebde757e21bfd1a30d6eaafb8395939697b"
+  }
+  layers {
+    operative "6f4a54d4ea297eabb8b0fcd21d25fb997440b30d4cafd23e00d033737880d787"
+    enacted "c2f1f5af5786f6f0897ebd2f5131ca30d8351d254a25e1a74753406ad27cf952"
+    editorial "f23a9f002e0a31303737fe5a8f6a72b414e9cd8c703c525b11b3dae4820eb255"
+  }
+}

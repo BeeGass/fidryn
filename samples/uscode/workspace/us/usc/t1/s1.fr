@@ -1,0 +1,619 @@
+edition 2
+module "/us/usc/t1/s1" {
+  within "/us/usc/t1/ch1"
+  source "usc01.xml"
+  positive_law true
+  provision "/us/usc/t1/s1" section {
+    num "1" "§ 1."
+    heading "Words denoting number, gender, and so forth"
+    content {
+      p "In determining the meaning of any Act of Congress, unless the context indicates otherwise—"
+      p "words importing the singular include and apply to several persons, parties, or things;"
+      p "words importing the plural include the singular;"
+      p "words importing the masculine gender include the feminine as well;"
+      p "words used in the present tense include the future as well as the present;"
+      p "the words “insane” and “insane person” shall include every idiot, insane person, and person non compos mentis;"
+      p "the words “person” and “whoever” include corporations, companies, associations, firms, partnerships, societies, and joint stock companies, as well as individuals;"
+      p "“officer” includes any person authorized by law to perform the duties of the office;"
+      p "“signature” or “subscription” includes a mark when the person making the same intended it as such;"
+      p "“oath” includes affirmation, and “sworn” includes affirmed;"
+      p "“writing” includes printing and typewriting and reproductions of visual symbols by photographing, multigraphing, mimeographing, manifolding, or otherwise."
+    }
+    hash "1cf962468bd0f85b74664dbcf6cf310f4d6b3def9a851394199a2b592f05ecd0"
+  }
+  credit "(" ["July 30, 1947, ch. 388" -> "/us/act/1947-07-30/ch388"] ", " ["61 Stat. 633" -> "/us/stat/61/633"] "; " ["June 25, 1948, ch. 645, § 6" -> "/us/act/1948-06-25/ch645/s6"] ", " ["62 Stat. 859" -> "/us/stat/62/859"] "; " ["Oct. 31, 1951, ch. 655, § 1" -> "/us/act/1951-10-31/ch655/s1"] ", " ["65 Stat. 710" -> "/us/stat/65/710"] "; " ["Pub. L. 112–231, § 2(a)" -> "/us/pl/112/231/s2/a"] ", Dec. 28, 2012, " ["126 Stat. 1619" -> "/us/stat/126/1619"] ".)"
+  note "/us/usc/t1/s1/note/editorialNotes/pl.112.231/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "2012—" ["Pub. L. 112–231" -> "/us/pl/112/231"] ", in fifth clause after opening clause, struck out “and ‘lunatic’ ” before “shall include every” and “lunatic,” before “insane person,”."
+    p "1951—Act Oct. 31, 1951, substituted, in fourth clause after opening clause, “used” for “use”."
+    p "1948—Act June 25, 1948, included “tense”, “whoever”, “signature”, “subscription”, “writing” and a broader definition of “person”."
+    hash "6e0c4fe4823cbd0f3911946b19c977236a8b231c5c8ea78308b3b6c748e8e2e4"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.117.228/short-title-of-2022-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 2022 Amendment"
+    p ["Pub. L. 117–228, § 1" -> "/us/pl/117/228/s1"] ", Dec. 13, 2022, " ["136 Stat. 2305" -> "/us/stat/136/2305"] ", provided that:"
+    quoted "/us/pl/117/228/s1" {
+      p "“This Act [enacting " ["section 1738C of Title 28" -> "/us/usc/t28/s1738C"] ", Judiciary and Judicial Procedure, amending " ["section 7 of this title" -> "/us/usc/t1/s7"] ", repealing " ["section 1738C of Title 28" -> "/us/usc/t28/s1738C"] ", and enacting provisions set out as notes under " ["section 7 of this title" -> "/us/usc/t1/s7"] "] may be cited as the ‘Respect for Marriage Act’.”"
+    }
+    hash "a563414e0fd93114532d90e52b2ec1c0cb9229826542a944c1cf21a13133b8a3"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.112.231/short-title-of-2012-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 2012 Amendment"
+    p ["Pub. L. 112–231, § 1" -> "/us/pl/112/231/s1"] ", Dec. 28, 2012, " ["126 Stat. 1619" -> "/us/stat/126/1619"] ", provided that:"
+    quoted "/us/pl/112/231/s1" {
+      p "“This Act [amending this section and sections 92a, 215, and 215a of Title 12, Banks and Banking] may be cited as the ‘21st Century Language Act of 2012’.”"
+    }
+    hash "04931d0bd2c55a0ec7b3d27d894580f74fbc7ee74707793dc20bc02508a96cbc"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.107.207/short-title-of-2002-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 2002 Amendment"
+    p ["Pub. L. 107–207, § 1" -> "/us/pl/107/207/s1"] ", Aug. 5, 2002, " ["116 Stat. 926" -> "/us/stat/116/926"] ", provided that:"
+    quoted "/us/pl/107/207/s1" {
+      p "“This Act [enacting " ["section 8 of this title" -> "/us/usc/t1/s8"] "] may be cited as the ‘Born-Alive Infants Protection Act of 2002’.”"
+    }
+    hash "d3c8ef351a4a53b613391becad9ea69ff9c4e8b87aadbce20fa31df4d38c9072"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.104.199/short-title-of-1996-amendment" enacted {
+    group statutoryNotes
+    topic "shortTitleOfAmendment"
+    heading "Short Title of 1996 Amendment"
+    p ["Pub. L. 104–199, § 1" -> "/us/pl/104/199/s1"] ", Sept. 21, 1996, " ["110 Stat. 2419" -> "/us/stat/110/2419"] ", provided that:"
+    quoted "/us/pl/104/199/s1" {
+      p "“This Act [enacting " ["section 7 of this title" -> "/us/usc/t1/s7"] " and " ["section 1738C of Title 28" -> "/us/usc/t28/s1738C"] ", Judiciary and Judicial Procedure] may be cited as the ‘Defense of Marriage Act’.”"
+    }
+    hash "6b92a1463c51867f4e4977b1f390c45bf76bef19dd52b69af5b0c873933929e9"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.119.103/references-in-pub-l-119-103" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 119–103" -> "/us/pl/119/103"]
+    p ["Pub. L. 119–103, § 3" -> "/us/pl/119/103/s3"] ", Sept. 2, 2026, " ["140 Stat. 987" -> "/us/stat/140/987"] ", provided that:"
+    quoted "/us/pl/119/103/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Continuing Appropriations and Extensions Act, 2027, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "c7e037ad8e0d852ee4ab89e77229ed0b551abcf8d39eab007dd7419d6efc2293"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.119.86/references-in-pub-l-119-86" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 119–86" -> "/us/pl/119/86"]
+    p ["Pub. L. 119–86, § 3" -> "/us/pl/119/86/s3"] ", Apr. 30, 2026, " ["140 Stat. 773" -> "/us/stat/140/773"] ", provided that:"
+    quoted "/us/pl/119/86/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Homeland Security and Further Additional Continuing Appropriations Act, 2026, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "e197f420ee18fca2291b8b7723b332264b9ecf99e8fdff17969b9c56f0dac321"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.119.75/references-in-pub-l-119-75" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 119–75" -> "/us/pl/119/75"]
+    p ["Pub. L. 119–75, § 3" -> "/us/pl/119/75/s3"] ", Feb. 3, 2026, " ["140 Stat. 174" -> "/us/stat/140/174"] ", provided that:"
+    quoted "/us/pl/119/75/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2026, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "d525787aa51e38952ec6daa0f1c3c85f7eebb6c68240ec40b3c5a263655c7202"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.119.74/references-in-pub-l-119-74" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 119–74" -> "/us/pl/119/74"]
+    p ["Pub. L. 119–74, § 3" -> "/us/pl/119/74/s3"] ", Jan. 23, 2026, " ["140 Stat. 5" -> "/us/stat/140/5"] ", provided that:"
+    quoted "/us/pl/119/74/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Commerce, Justice, Science; Energy and Water Development; and Interior and Environment Appropriations Act, 2026, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "d6c663014c5ad0471d7919c99ed8e4d55187e5fbba033ba7797532ba43d6428f"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.119.60/references-in-pub-l-119-60" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 119–60" -> "/us/pl/119/60"]
+    p ["Pub. L. 119–60, § 3(1)" -> "/us/pl/119/60/s3/1"] ", Dec. 18, 2025, " ["139 Stat. 748" -> "/us/stat/139/748"] ", provided that:"
+    quoted "/us/pl/119/60/s3/1" {
+      p "“In this Act [National Defense Authorization Act for Fiscal Year 2026, see Tables for classification]:"
+      level paragraph {
+        num "1" "“(1)"
+        content "In divisions A through D, the term ‘this Act’ refers to divisions A through D.”"
+      }
+    }
+    hash "97d943c3a94cc7897ac0810c904ed98290624e698cfe2076afe7d725981c0c32"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.119.37/references-in-pub-l-119-37" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 119–37" -> "/us/pl/119/37"]
+    p ["Pub. L. 119–37, § 3" -> "/us/pl/119/37/s3"] ", Nov. 12, 2025, " ["139 Stat. 496" -> "/us/stat/139/496"] ", provided that:"
+    quoted "/us/pl/119/37/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Continuing Appropriations, Agriculture, Legislative Branch, Military Construction and Veterans Affairs, and Extensions Act, 2026, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "b2f1e6a644ecfb0fbcf6bce20300f3a0319d26e5ffd196635b1e502b7559f100"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.119.4/references-in-pub-l-119-4" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 119–4" -> "/us/pl/119/4"]
+    p ["Pub. L. 119–4, § 3" -> "/us/pl/119/4/s3"] ", Mar. 15, 2025, " ["139 Stat. 10" -> "/us/stat/139/10"] ", provided that:"
+    quoted "/us/pl/119/4/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Full-Year Continuing Appropriations and Extensions Act, 2025, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "71abc0ba2aaa6e53bc25504b3fdc4a3b0c0c42b031118c50baa673814aa77593"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.118.159/references-in-pub-l-118-159" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 118–159" -> "/us/pl/118/159"]
+    p ["Pub. L. 118–159, § 3(1)" -> "/us/pl/118/159/s3/1"] ", Dec. 23, 2024, " ["138 Stat. 1799" -> "/us/stat/138/1799"] ", provided that:"
+    quoted "/us/pl/118/159/s3/1" {
+      p "“In this Act [Servicemember Quality of Life Improvement and National Defense Authorization Act for Fiscal Year 2025, see Tables for classification]:"
+      level paragraph {
+        num "1" "“(1)"
+        content "In divisions A through D, the term ‘this Act’ refers to divisions A through D.”"
+      }
+    }
+    hash "0a834469a5def9d29611400d4a6cb8d5064b338c211525679d8ec90e65679751"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.118.158/references-in-pub-l-118-158" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 118–158" -> "/us/pl/118/158"]
+    p ["Pub. L. 118–158, § 3" -> "/us/pl/118/158/s3"] ", Dec. 21, 2024, " ["138 Stat. 1723" -> "/us/stat/138/1723"] ", provided that:"
+    quoted "/us/pl/118/158/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Further Continuing Appropriations Act, 2025, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "61fb568173370031c9026dffd87f42510cc8f89d193d249456811e4e74b1879a"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.118.83/references-in-pub-l-118-83" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 118–83" -> "/us/pl/118/83"]
+    p ["Pub. L. 118–83, § 3" -> "/us/pl/118/83/s3"] ", Sept. 26, 2024, " ["138 Stat. 1524" -> "/us/stat/138/1524"] ", provided that:"
+    quoted "/us/pl/118/83/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Continuing Appropriations and Extensions Act, 2025, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "fbd5a175d08a52d7554c2d39ef874584f3bcfdb4af18269903c00a860cf43305"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.118.47/references-in-pub-l-118-47" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 118–47" -> "/us/pl/118/47"]
+    p ["Pub. L. 118–47, § 3" -> "/us/pl/118/47/s3"] ", Mar. 23, 2024, " ["138 Stat. 461" -> "/us/stat/138/461"] ", provided that:"
+    quoted "/us/pl/118/47/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Further Consolidated Appropriations Act, 2024, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "ac3e2bd7dadd2c8acdba4062def4670535c697828b2b709e0ba59f8324b1c5b8"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.118.42/references-in-pub-l-118-42" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 118–42" -> "/us/pl/118/42"]
+    p ["Pub. L. 118–42, § 3" -> "/us/pl/118/42/s3"] ", Mar. 9, 2024, " ["138 Stat. 26" -> "/us/stat/138/26"] ", provided that:"
+    quoted "/us/pl/118/42/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2024, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "11a3f44b44941b2070f43657a21bc9f21873f0b4e307cd906be4c177a70ea24c"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.117.328/references-in-pub-l-117-328" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 117–328" -> "/us/pl/117/328"]
+    p ["Pub. L. 117–328, § 3" -> "/us/pl/117/328/s3"] ", Dec. 29, 2022, " ["136 Stat. 4461" -> "/us/stat/136/4461"] ", provided that:"
+    quoted "/us/pl/117/328/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2023, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "f9a2d1fa80bb90a2887f56cf92463f21c9fb1ac68094bb03000a96427f3917c9"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.117.229/references-in-pub-l-117-229" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 117–229" -> "/us/pl/117/229"]
+    p ["Pub. L. 117–229, § 3" -> "/us/pl/117/229/s3"] ", Dec. 16, 2022, " ["136 Stat. 2308" -> "/us/stat/136/2308"] ", provided that:"
+    quoted "/us/pl/117/229/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Further Continuing Appropriations and Extensions Act, 2023, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "3066546f3f6c8dbcfbdd90d25899b67c4d05f347b1fc434b6cf6ce59f763c3da"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.117.103/references-in-pub-l-117-103" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 117–103" -> "/us/pl/117/103"]
+    p ["Pub. L. 117–103, § 3" -> "/us/pl/117/103/s3"] ", Mar. 15, 2022, " ["136 Stat. 51" -> "/us/stat/136/51"] ", provided that:"
+    quoted "/us/pl/117/103/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2022, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "7aba7596fdc723a956a6ad3fb4bcbeb604f3ab61ef1dd1b76c3e43c39d9d50d0"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.117.58/references-in-pub-l-117-58" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 117–58" -> "/us/pl/117/58"]
+    p ["Pub. L. 117–58, § 2" -> "/us/pl/117/58/s2"] ", Nov. 15, 2021, " ["135 Stat. 442" -> "/us/stat/135/442"] ", provided that:"
+    quoted "/us/pl/117/58/s2" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Infrastructure Investment and Jobs Act, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "a8f74c6cd1917e6fedf3c69ad08ae54ea9bc8c4f151a412815eb72adc877d373"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.117.43/references-in-pub-l-117-43" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 117–43" -> "/us/pl/117/43"]
+    p ["Pub. L. 117–43, § 3" -> "/us/pl/117/43/s3"] ", Sept. 30, 2021, " ["135 Stat. 344" -> "/us/stat/135/344"] ", provided that:"
+    quoted "/us/pl/117/43/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Extending Government Funding and Delivering Emergency Assistance Act, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "0fc3e0175daaea942d2056a80dd24969751e77f1842adf38e321c44e30b950db"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.116.260/references-in-pub-l-116-260" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 116–260" -> "/us/pl/116/260"]
+    p ["Pub. L. 116–260, § 3" -> "/us/pl/116/260/s3"] ", Dec. 27, 2020, " ["134 Stat. 1185" -> "/us/stat/134/1185"] ", provided that:"
+    quoted "/us/pl/116/260/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2021, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    p ["Pub. L. 116–260, div. K, title VII, § 7034(q)(7)" -> "/us/pl/116/260/dK/tVII/s7034/q/7"] ", Dec. 27, 2020, " ["134 Stat. 1754" -> "/us/stat/134/1754"] ", provided that:"
+    quoted "/us/pl/116/260/dK/tVII/s7034/q/7" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in titles I through VII [of div. K of " ["Pub. L. 116–260" -> "/us/pl/116/260"] ", see Tables for classification] shall be treated as referring only to the provisions of such titles.”"
+    }
+    hash "748b1cb5de970bd08cd3a298e7fb7c7c3c25f7e0ce72714f28dd2a5f4c34eebf"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.116.159/references-in-pub-l-116-159" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 116–159" -> "/us/pl/116/159"]
+    p ["Pub. L. 116–159, § 3" -> "/us/pl/116/159/s3"] ", Oct. 1, 2020, " ["134 Stat. 709" -> "/us/stat/134/709"] ", provided that:"
+    quoted "/us/pl/116/159/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Continuing Appropriations Act, 2021 and Other Extensions Act, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "44d47a9e3391b7d3e967a0372e4d949bed0a4557d56ebe822e22b2a20ecba54f"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.116.136/references-in-pub-l-116-136" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 116–136" -> "/us/pl/116/136"]
+    p ["Pub. L. 116–136, § 3" -> "/us/pl/116/136/s3"] ", Mar. 27, 2020, " ["134 Stat. 285" -> "/us/stat/134/285"] ", provided that:"
+    quoted "/us/pl/116/136/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Coronavirus Aid, Relief, and Economic Security Act or the CARES Act, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "8a8315000fdde91b237e955d5d4fa10142ea4bb600e1095b636b4698474fae89"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.116.127/references-in-pub-l-116-127" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 116–127" -> "/us/pl/116/127"]
+    p ["Pub. L. 116–127, § 3" -> "/us/pl/116/127/s3"] ", Mar. 18, 2020, " ["134 Stat. 178" -> "/us/stat/134/178"] ", provided that:"
+    quoted "/us/pl/116/127/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Families First Coronavirus Response Act, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "53d773de4ab276652c119897951e129335fb6055dd5cf123ba27bd28dacb6d6e"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.116.94/references-in-pub-l-116-94" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 116–94" -> "/us/pl/116/94"]
+    p ["Pub. L. 116–94, § 3" -> "/us/pl/116/94/s3"] ", Dec. 20, 2019, " ["133 Stat. 2536" -> "/us/stat/133/2536"] ", provided that:"
+    quoted "/us/pl/116/94/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Further Consolidated Appropriations Act, 2020, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    p ["Pub. L. 116–94, div. F, title VI, § 612" -> "/us/pl/116/94/dF/tVI/s612"] ", Dec. 20, 2019, " ["133 Stat. 2815" -> "/us/stat/133/2815"] ", provided that:"
+    quoted "/us/pl/116/94/dF/tVI/s612" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in this division [div. F of " ["Pub. L. 116–94" -> "/us/pl/116/94"] ", see Tables for classification] shall be treated as referring only to the provisions of this division.”"
+    }
+    p ["Pub. L. 116–94, div. H, title IV, § 420" -> "/us/pl/116/94/dH/tIV/s420"] ", Dec. 20, 2019, " ["133 Stat. 3017" -> "/us/stat/133/3017"] ", provided that:"
+    quoted "/us/pl/116/94/dH/tIV/s420" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in this division [div. H of " ["Pub. L. 116–94" -> "/us/pl/116/94"] ", see Tables for classification] shall be treated as referring only to the provisions of this division.”"
+    }
+    hash "cea260f696f216af9bb73bd12371c19c76dad1c4edf99dd3f3e1dcf7669feb82"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.116.93/references-in-pub-l-116-93" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 116–93" -> "/us/pl/116/93"]
+    p ["Pub. L. 116–93, § 3" -> "/us/pl/116/93/s3"] ", Dec. 20, 2019, " ["133 Stat. 2318" -> "/us/stat/133/2318"] ", provided that:"
+    quoted "/us/pl/116/93/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2020, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "6f4c0b5660af6dc24b0f616dc312faf55baeb25d79c5d0684b5902d24e56a810"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.116.6/references-in-pub-l-116-6" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 116–6" -> "/us/pl/116/6"]
+    p ["Pub. L. 116–6, § 3" -> "/us/pl/116/6/s3"] ", Feb. 15, 2019, " ["133 Stat. 14" -> "/us/stat/133/14"] ", provided that:"
+    quoted "/us/pl/116/6/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2019, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "742288fb60bce19c1825b07503b7b375fd5a5390102b1308143195c0553e0835"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.115.245/references-in-pub-l-115-245" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 115–245" -> "/us/pl/115/245"]
+    p ["Pub. L. 115–245, § 3" -> "/us/pl/115/245/s3"] ", Sept. 28, 2018, " ["132 Stat. 2981" -> "/us/stat/132/2981"] ", provided that:"
+    quoted "/us/pl/115/245/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Department of Defense and Labor, Health and Human Services, and Education Appropriations Act, 2019 and Continuing Appropriations Act, 2019, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "b3594062ae8c62e363e8e815a303f1e394887a6dffbb15ab4b1957450c6b5a35"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.115.244/references-in-pub-l-115-244" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 115–244" -> "/us/pl/115/244"]
+    p ["Pub. L. 115–244, § 3" -> "/us/pl/115/244/s3"] ", Sept. 21, 2018, " ["132 Stat. 2897" -> "/us/stat/132/2897"] ", provided that:"
+    quoted "/us/pl/115/244/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Energy and Water, Legislative Branch, and Military Construction and Veterans Affairs Appropriations Act, 2019, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "dc7004e5d684f426f4b46365c795745ea1c74c8af8e63f84a0add0cd200524d8"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.115.141/references-in-pub-l-115-141" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 115–141" -> "/us/pl/115/141"]
+    p ["Pub. L. 115–141, § 3" -> "/us/pl/115/141/s3"] ", Mar. 23, 2018, " ["132 Stat. 350" -> "/us/stat/132/350"] ", provided that:"
+    quoted "/us/pl/115/141/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2018, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "321c648b33bc47a086e8646b7d2054ec732906a00fcda1b5aacf231ecc8decd9"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.115.56/references-in-pub-l-115-56" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 115–56" -> "/us/pl/115/56"]
+    p ["Pub. L. 115–56, § 3" -> "/us/pl/115/56/s3"] ", Sept. 8, 2017, " ["131 Stat. 1129" -> "/us/stat/131/1129"] ", provided that:"
+    quoted "/us/pl/115/56/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Continuing Appropriations Act, 2018 and Supplemental Appropriations for Disaster Relief Requirements Act, 2017, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "ae288c8f833bf38d5d69a847613b249636c91dbef5ce65534ee2c2994556a726"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.115.31/references-in-pub-l-115-31" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 115–31" -> "/us/pl/115/31"]
+    p ["Pub. L. 115–31, § 3" -> "/us/pl/115/31/s3"] ", May 5, 2017, " ["131 Stat. 137" -> "/us/stat/131/137"] ", provided that:"
+    quoted "/us/pl/115/31/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2017, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "a1fd150881b63b95a4918746d1ce64110feb458257145a93655dfc858ff1b30a"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.114.113/references-in-pub-l-114-113" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 114–113" -> "/us/pl/114/113"]
+    p ["Pub. L. 114–113, § 3" -> "/us/pl/114/113/s3"] ", Dec. 18, 2015, " ["129 Stat. 2244" -> "/us/stat/129/2244"] ", provided that:"
+    quoted "/us/pl/114/113/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2016, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "d7f9d08b51d50d50eef4ce713f725d60c1267c0eab1655d750451dbea9d0a80e"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.114.94/references-in-pub-l-114-94" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 114–94" -> "/us/pl/114/94"]
+    p ["Pub. L. 114–94, div. A, § 1004" -> "/us/pl/114/94/dA/s1004"] ", Dec. 4, 2015, " ["129 Stat. 1322" -> "/us/stat/129/1322"] ", provided that:"
+    quoted "/us/pl/114/94/dA/s1004" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in this division [see Tables for classification] shall be treated as referring only to the provisions of this division.”"
+    }
+    hash "7605404e8c9f3e0020b16251e5a36af61da2fb23efe16adde6646bcc6ddcf7cd"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.113.235/references-in-pub-l-113-235" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 113–235" -> "/us/pl/113/235"]
+    p ["Pub. L. 113–235, § 3" -> "/us/pl/113/235/s3"] ", Dec. 16, 2014, " ["128 Stat. 2132" -> "/us/stat/128/2132"] ", provided that:"
+    quoted "/us/pl/113/235/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated and Further Continuing Appropriations Act, 2015, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "a5ef12670a08bc3ba3a9a2e017b230efe4769702840fd73b068e247743ecc20c"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.113.76/references-in-pub-l-113-76" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 113–76" -> "/us/pl/113/76"]
+    p ["Pub. L. 113–76, § 3" -> "/us/pl/113/76/s3"] ", Jan. 17, 2014, " ["128 Stat. 7" -> "/us/stat/128/7"] ", provided that:"
+    quoted "/us/pl/113/76/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2014, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "fcfeccc5c6c1c7427a9337a0150286a2823dfe90a5d6eea0a26eeb1af0204f15"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.113.67/references-in-pub-l-113-67" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 113–67" -> "/us/pl/113/67"]
+    p ["Pub. L. 113–67, div. A, § 1(c)" -> "/us/pl/113/67/dA/s1/c"] ", Dec. 26, 2013, " ["127 Stat. 1166" -> "/us/stat/127/1166"] ", provided that:"
+    quoted "/us/pl/113/67/dA/s1/c" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Bipartisan Budget Act of 2013, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "6bdc6bedce521fbbbde53e73a7c9db67420db410bc3aecc424219eeaaea3116f"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.113.6/references-in-pub-l-113-6" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 113–6" -> "/us/pl/113/6"]
+    p ["Pub. L. 113–6, § 3" -> "/us/pl/113/6/s3"] ", Mar. 26, 2013, " ["127 Stat. 199" -> "/us/stat/127/199"] ", provided that:"
+    quoted "/us/pl/113/6/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in division A, B, C, D, or E of this Act [Consolidated and Further Continuing Appropriations Act, 2013, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "9292ffb031675d053c0e8d3a359f7184edc468d38ef66f092e0ac7f003eaf711"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.112.74/references-in-pub-l-112-74" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 112–74" -> "/us/pl/112/74"]
+    p ["Pub. L. 112–74, § 3" -> "/us/pl/112/74/s3"] ", Dec. 23, 2011, " ["125 Stat. 787" -> "/us/stat/125/787"] ", provided that:"
+    quoted "/us/pl/112/74/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2012, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "afe7001064838cc2915ca0f2f9800c3583df742a77cd2da3cdc1f30a1b3b7a42"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.112.55/references-in-pub-l-112-55" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 112–55" -> "/us/pl/112/55"]
+    p ["Pub. L. 112–55, § 3" -> "/us/pl/112/55/s3"] ", Nov. 18, 2011, " ["125 Stat. 552" -> "/us/stat/125/552"] ", provided that:"
+    quoted "/us/pl/112/55/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated and Further Continuing Appropriations Act, 2012, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "47d67b54af2bc42be4efa2d132e86463a48af5965d5a3913a309a85b714280bd"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.112.10/references-in-pub-l-112-10" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 112–10" -> "/us/pl/112/10"]
+    p ["Pub. L. 112–10, div. A, title IX, § 9015" -> "/us/pl/112/10/dA/tIX/s9015"] ", Apr. 15, 2011, " ["125 Stat. 102" -> "/us/stat/125/102"] ", provided that:"
+    quoted "/us/pl/112/10/dA/tIX/s9015" {
+      p "“Any reference to ‘this Act’ in this division [Department of Defense Appropriations Act, 2011, see Tables for classification] shall apply solely to this division.”"
+    }
+    hash "43873f310cb0d4a37e7e299f7d98a28f4cb05cd393f6fe919f80aa2aeac6ba75"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.111.118/references-in-pub-l-111-118" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 111–118" -> "/us/pl/111/118"]
+    p ["Pub. L. 111–118, § 3" -> "/us/pl/111/118/s3"] ", Dec. 19, 2009, " ["123 Stat. 3409" -> "/us/stat/123/3409"] ", provided that:"
+    quoted "/us/pl/111/118/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Department of Defense Appropriations Act, 2010, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "d0513e63a29c0ff0cd4a31d76f92e11e3a64cc7394696aa1fbf5cb43905553d4"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.111.117/references-in-pub-l-111-117" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 111–117" -> "/us/pl/111/117"]
+    p ["Pub. L. 111–117, § 3" -> "/us/pl/111/117/s3"] ", Dec. 16, 2009, " ["123 Stat. 3035" -> "/us/stat/123/3035"] ", provided that:"
+    quoted "/us/pl/111/117/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2010, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "ef759a0009384ec09cb0352387ce7a42a01e36af088bdc09d5336e39d7f1fbaf"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.111.8/references-in-pub-l-111-8" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 111–8" -> "/us/pl/111/8"]
+    p ["Pub. L. 111–8, § 3" -> "/us/pl/111/8/s3"] ", Mar. 11, 2009, " ["123 Stat. 525" -> "/us/stat/123/525"] ", provided that:"
+    quoted "/us/pl/111/8/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Omnibus Appropriations Act, 2009, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "ad4c0546fecca1f1d41280f0a39d453d2491251baa52401729f69af3393b810f"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.111.5/references-in-pub-l-111-5" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 111–5" -> "/us/pl/111/5"]
+    p ["Pub. L. 111–5, § 4" -> "/us/pl/111/5/s4"] ", Feb. 17, 2009, " ["123 Stat. 116" -> "/us/stat/123/116"] ", provided that:"
+    quoted "/us/pl/111/5/s4" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [American Recovery and Reinvestment Act of 2009, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "c17203a523485a713d9a6352ce46c8dc0e166ebd1e2a85ae546f8455df5d786b"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.110.329/references-in-pub-l-110-329" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 110–329" -> "/us/pl/110/329"]
+    p ["Pub. L. 110–329, § 3" -> "/us/pl/110/329/s3"] ", Sept. 30, 2008, " ["122 Stat. 3574" -> "/us/stat/122/3574"] ", provided that:"
+    quoted "/us/pl/110/329/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ or ‘this joint resolution’ contained in any division of this Act [Consolidated Security, Disaster Assistance, and Continuing Appropriations Act, 2009, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "b80638265751f331ec95f2221ab4a8ad811d9afa242cf849eab4ed9edcfdf05f"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.110.161/references-in-pub-l-110-161" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 110–161" -> "/us/pl/110/161"]
+    p ["Pub. L. 110–161, § 3" -> "/us/pl/110/161/s3"] ", Dec. 26, 2007, " ["121 Stat. 1845" -> "/us/stat/121/1845"] ", provided that:"
+    quoted "/us/pl/110/161/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2008, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "9456c6d53b54fb23a697f1f7d56725a82077020289e3c2f99020a04e5145a0f6"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.110.116/references-in-pub-l-110-116" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 110–116" -> "/us/pl/110/116"]
+    p ["Pub. L. 110–116, § 2" -> "/us/pl/110/116/s2"] ", Nov. 13, 2007, " ["121 Stat. 1295" -> "/us/stat/121/1295"] ", provided that:"
+    quoted "/us/pl/110/116/s2" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [see Tables for classification] shall be treated as referencing only to the provisions of that division.”"
+    }
+    hash "91d7f4d9e349047a9334f4f3447e054364599146826b69598e9cbee04b9acff3"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.109.289/references-in-pub-l-109-289" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 109–289" -> "/us/pl/109/289"]
+    p ["Pub. L. 109–289, div. A, title VIII, § 8112" -> "/us/pl/109/289/dA/tVIII/s8112"] ", Sept. 29, 2006, " ["120 Stat. 1299" -> "/us/stat/120/1299"] ", provided that:"
+    quoted "/us/pl/109/289/dA/tVIII/s8112" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in this division [Department of Defense Appropriations Act, 2007, see Tables for classification] shall be referring only to the provisions of this division.”"
+    }
+    hash "4e7fcc4b16f8521fcf7521cbb8220a2f0e2d121017c2c0d46ea1bde2357a96f7"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.109.148/references-in-pub-l-109-148" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 109–148" -> "/us/pl/109/148"]
+    p ["Pub. L. 109–148, div. B, title V, § 5002" -> "/us/pl/109/148/dB/tV/s5002"] ", Dec. 30, 2005, " ["119 Stat. 2813" -> "/us/stat/119/2813"] ", provided that:"
+    quoted "/us/pl/109/148/dB/tV/s5002" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in either division A [Department of Defense Appropriations Act, 2006, see Tables for classification] or division B [Emergency Supplemental Appropriations Act to Address Hurricanes in the Gulf of Mexico and Pandemic Influenza, 2006, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "3f4a48db642e91e37809ce85c72d1886d3ec23dcd4d34131f6e5581071ee2fcd"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.109.115/references-in-pub-l-109-115" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 109–115" -> "/us/pl/109/115"]
+    p ["Pub. L. 109–115, div. A, title VIII, § 847" -> "/us/pl/109/115/dA/tVIII/s847"] ", Nov. 30, 2005, " ["119 Stat. 2507" -> "/us/stat/119/2507"] ", provided that:"
+    quoted "/us/pl/109/115/dA/tVIII/s847" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in this division [Transportation, Treasury, Housing and Urban Development, the Judiciary, and Independent Agencies Appropriations Act, 2006, see Tables for classification] shall be treated as referring only to the provisions of this division.”"
+    }
+    hash "f0c652a398b7a68eb6cacbb1b19cb2c1db0003f031f67f959577ae27b3d78c24"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.108.447/references-in-pub-l-108-447" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 108–447" -> "/us/pl/108/447"]
+    p ["Pub. L. 108–447, § 3" -> "/us/pl/108/447/s3"] ", Dec. 8, 2004, " ["118 Stat. 2810" -> "/us/stat/118/2810"] ", provided that:"
+    quoted "/us/pl/108/447/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2005, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "ddadf49a97fa06ba0bc1be44b695be7f4ccfeaa8f64761cb868a62f230a1eec7"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.108.199/references-in-pub-l-108-199" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 108–199" -> "/us/pl/108/199"]
+    p ["Pub. L. 108–199, § 3" -> "/us/pl/108/199/s3"] ", Jan. 23, 2004, " ["118 Stat. 4" -> "/us/stat/118/4"] ", provided that:"
+    quoted "/us/pl/108/199/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this Act [Consolidated Appropriations Act, 2004, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "c40bb7ed3598143cb270864472b1ab4888bf3591c487b697253ae331c6118ae8"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.108.7/references-in-pub-l-108-7" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "References in " ["Pub. L. 108–7" -> "/us/pl/108/7"]
+    p ["Pub. L. 108–7, § 3" -> "/us/pl/108/7/s3"] ", Feb. 20, 2003, " ["117 Stat. 12" -> "/us/stat/117/12"] ", provided that:"
+    quoted "/us/pl/108/7/s3" {
+      p "“Except as expressly provided otherwise, any reference to ‘this Act’ contained in any division of this joint resolution [Consolidated Appropriations Resolution, 2003, see Tables for classification] shall be treated as referring only to the provisions of that division.”"
+    }
+    hash "fba105fb6907e2ee5e434d979cc5fdb52d13ad2bc6fb2a4a473fdcee22066ec8"
+  }
+  note "/us/usc/t1/s1/note/statutoryNotes/pl.86.70/continental-united-states" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Continental United States"
+    p ["Pub. L. 86–70, § 48" -> "/us/pl/86/70/s48"] ", June 25, 1959, " ["73 Stat. 154" -> "/us/stat/73/154"] ", provided that:"
+    quoted "/us/pl/86/70/s48" {
+      p "“Whenever the phrase ‘continental United States’ is used in any law of the United States enacted after the date of enactment of this Act [June 25, 1959], it shall mean the 49 States on the North American Continent and the District of Columbia, unless otherwise expressly provided.”"
+    }
+    hash "5be2ad5fc1cea5471fab6e97924dac2757270d71a094bb5d0ac0dd5358783f25"
+  }
+  layers {
+    operative "1cf962468bd0f85b74664dbcf6cf310f4d6b3def9a851394199a2b592f05ecd0"
+    enacted "4804a0f1c445daa80494d62ca7126e5bd726ebc956cd477f40e6c11c03636072"
+    editorial "ceccd181ebd8b4c2e36094f2b0e94a67465b2916dc91b89eb56ba8f7f1b0603c"
+  }
+}

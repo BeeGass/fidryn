@@ -1,0 +1,280 @@
+edition 2
+module "/us/usc/ptVIII/rule8015" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8015" courtRule {
+    num "8015" "Rule 8015."
+    heading "Form and Length of a Brief; Form of an Appendix or Other Paper"
+    provision "/us/usc/ptVIII/rule8015/a" subsection {
+      num "a" "(a)"
+      heading "Paper Copies of a Brief."
+      chapeau "If a paper copy of a brief may or must be filed, the following provisions apply:"
+      provision "/us/usc/ptVIII/rule8015/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Reproduction."
+        provision "/us/usc/ptVIII/rule8015/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "Printing. The brief may be reproduced by any process that yields a clear black image on light paper. The paper must be opaque and unglazed. Only one side of the paper may be used."
+          hash "7eaf565b7095ebfff36c4371c49885b94dee183f7b6ddb8fb40e2e1ced57e4a2"
+        }
+        provision "/us/usc/ptVIII/rule8015/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "Text. Text must be reproduced with a clarity that equals or exceeds the output of a laser printer."
+          hash "577c6dc377288558aac822c21d46a687b86077ccb64100760146611402969873"
+        }
+        provision "/us/usc/ptVIII/rule8015/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "Other Reproductions. Photographs, illustrations, and tables may be reproduced by any method that results in a good copy of the original. A glossy finish is acceptable if the original is glossy."
+          hash "e4dd6e44980374d7002231bf1a9d30d1881e79d88327af22a5555d6762e143bf"
+        }
+        hash "b8309cd7386226da746a18fab598551bdaf38b3238172da3175754b07b8fd0b9"
+      }
+      provision "/us/usc/ptVIII/rule8015/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Cover. The front cover of the brief must contain:"
+        provision "/us/usc/ptVIII/rule8015/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "the number of the case centered at the top;"
+          hash "02ca36a85e2892c48e6734824634d4f96a22a3d3c876c6541eb8901ec1cc1791"
+        }
+        provision "/us/usc/ptVIII/rule8015/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "the name of the court;"
+          hash "25f97f2712963e1c21fc62dbd47c8b83295e34f0771aa2b15b17f5ce1d47cf56"
+        }
+        provision "/us/usc/ptVIII/rule8015/a/2/C" subparagraph {
+          num "C" "(C)"
+          content "the title of the case as prescribed by Rule 8003(d)(2) or 8004(c)(2);"
+          hash "43173f4095fe11b421fb3c6827852fc8a4cb71cbce83880e74504d6189559194"
+        }
+        provision "/us/usc/ptVIII/rule8015/a/2/D" subparagraph {
+          num "D" "(D)"
+          content "the nature of the proceeding and the name of the court below;"
+          hash "38ae282c0b88d2f810ce56aef6f69e3769ba1658ea37bea407cf414c1cbe6728"
+        }
+        provision "/us/usc/ptVIII/rule8015/a/2/E" subparagraph {
+          num "E" "(E)"
+          content "the title of the brief, identifying the party or parties for whom the brief is filed; and"
+          hash "fa63c8d0113d8b6f09de532ac83ebc7281dc53a68da1ba1ade004de8561a5288"
+        }
+        provision "/us/usc/ptVIII/rule8015/a/2/F" subparagraph {
+          num "F" "(F)"
+          content "the name, office address, telephone number, and email address of counsel representing the party for whom the brief is filed."
+          hash "979f82434fded47f03a570abe98ec71af3b87b15f73625d9cde24a5c1fa0964f"
+        }
+        hash "2cc18a361844fa82932ee2aa17ef45cb2fa52eac249f1cdc1e7c6ba726275b4b"
+      }
+      provision "/us/usc/ptVIII/rule8015/a/3" paragraph {
+        num "3" "(3)"
+        content "Binding. The brief must be bound in any manner that is secure, does not obscure the text, and permits the brief to lie reasonably flat when open."
+        hash "391eeb7ea82d732e1e94be7bd53ebc06520969e1aaec962be39c7636030f4c7a"
+      }
+      provision "/us/usc/ptVIII/rule8015/a/4" paragraph {
+        num "4" "(4)"
+        content "Paper Size, Line Spacing, and Margins. The brief must be on 8½”-by-11” paper. The text must be double-spaced, but quotations more than two lines long may be indented and single-spaced. Headings and footnotes may be single-spaced. Margins must be at least one inch on all four sides. Page numbers may be placed in the margins, but no text may appear there."
+        hash "50f0d15ab81be0a08709287ea99311910207e7077d1001a7b3b9ce6e1085361d"
+      }
+      provision "/us/usc/ptVIII/rule8015/a/5" paragraph {
+        num "5" "(5)"
+        chapeau "Typeface. Either a proportionally spaced or monospaced face may be used."
+        provision "/us/usc/ptVIII/rule8015/a/5/A" subparagraph {
+          num "A" "(A)"
+          content "Proportional Spacing. A proportionally spaced face must include serifs, but sans-serif type may be used in headings and captions. A proportionally spaced face must be 14-point or larger."
+          hash "97edc1a5b76ed40a09fb4367d148177c335af60e82b6c0f5a0643b964b4767d5"
+        }
+        provision "/us/usc/ptVIII/rule8015/a/5/B" subparagraph {
+          num "B" "(B)"
+          content "Monospacing. A monospaced face may not contain more than 10½ characters per inch."
+          hash "e708d3f899afaa24f891c3dcf953ef3a60600829ab9332777e35e6cc12773697"
+        }
+        hash "a6cb123ae3251698d88d6e4cd914308b25860f6816e192f38ad68eede10c87dc"
+      }
+      provision "/us/usc/ptVIII/rule8015/a/6" paragraph {
+        num "6" "(6)"
+        content "Type Styles. The brief must be set in plain, roman style, although italics or boldface may be used for emphasis. Case names must be italicized or underlined."
+        hash "f434f1a7824592d217b8e3935c6921ae43507646087fe3a5d6428af263a75c37"
+      }
+      provision "/us/usc/ptVIII/rule8015/a/7" paragraph {
+        num "7" "(7)"
+        chapeau "Length."
+        provision "/us/usc/ptVIII/rule8015/a/7/A" subparagraph {
+          num "A" "(A)"
+          content "Page Limitation. A principal brief must not exceed 30 pages, or a reply brief 15 pages, unless it complies with (B)."
+          hash "8bc7f0ddca8a475153caebe074195c2828e61f008f2c562448b33115be1b3dd5"
+        }
+        provision "/us/usc/ptVIII/rule8015/a/7/B" subparagraph {
+          num "B" "(B)"
+          chapeau "Type-Volume Limitation."
+          provision "/us/usc/ptVIII/rule8015/a/7/B/i" clause {
+            num "i" "(i)"
+            content {
+              p "Principal Brief. A principal brief is acceptable if it contains a certificate under (h) and:"
+              p "• contains no more than 13,000 words; or"
+              p "• uses a monospaced face and contains no more than 1,300 lines of text."
+            }
+            hash "bcc4ed27ab56b74c4df553ade4273a56b421f0069b4fd1a9cbfa01488e576e60"
+          }
+          provision "/us/usc/ptVIII/rule8015/a/7/B/ii" clause {
+            num "ii" "(ii)"
+            content "Reply Brief. A reply brief is acceptable if it includes a certificate under (h) and contains no more than half the type volume specified in item (i)."
+            hash "2bdefd425b9c76f47095db1624a7118e0c02e6a6924fcefc9f9c47cb937b751e"
+          }
+          hash "a6c1c7607f50e0d1794c6f78692eb22310f6fafc0bd8e4daf0621d893585b9b3"
+        }
+        hash "cade6c276fab8421c4717c094bc62d01accd23af12a11e6433b7b36b8947fdbd"
+      }
+      hash "34b4d994469b257a168f2d82f17aef8080980157cb6076944552b749c9260f33"
+    }
+    provision "/us/usc/ptVIII/rule8015/b" subsection {
+      num "b" "(b)"
+      heading "Brief Filed Electronically."
+      content "A brief filed electronically must comply with (a)—except for (a)(1), (a)(3), and the paper requirement of (a)(4)."
+      hash "dec229fb7735f914ced3c38fafb777e625d1d9205656cde0b41f28e551a8f114"
+    }
+    provision "/us/usc/ptVIII/rule8015/c" subsection {
+      num "c" "(c)"
+      heading "Paper Copies of an Appendix."
+      chapeau "A paper copy of an appendix must comply with (a)(1), (2), (3), and (4), with the following exceptions:"
+      provision "/us/usc/ptVIII/rule8015/c/1" paragraph {
+        num "1" "(1)"
+        content "an appendix may include a legible photocopy of any document found in the record or of a printed decision; and"
+        hash "b7aabcb2e065d65c8f905e35199ffbce100929dd3685484929ad17fad77347a7"
+      }
+      provision "/us/usc/ptVIII/rule8015/c/2" paragraph {
+        num "2" "(2)"
+        content "when necessary for including odd-sized documents such as technical drawings, an appendix may be a size other than 8½” by 11”, and need not lie reasonably flat when opened."
+        hash "76a50b1c7c5c3f6ad27cc167ae2b0d500841a9954fc545957a65cef0313e96ca"
+      }
+      hash "8edee3ddb380bf215c0bcaa096506499e4df51a6666e6030b6cb67f4a4dc0e24"
+    }
+    provision "/us/usc/ptVIII/rule8015/d" subsection {
+      num "d" "(d)"
+      heading "Appendix Filed Electronically."
+      content "An appendix filed electronically must comply with (a)(2) and (4)—except for the paper requirement of (a)(4)."
+      hash "bcaa45bd3db2b608cfd1c8b8d8f4d8da15a5ee8b6eefe74c527390dab7cdffb0"
+    }
+    provision "/us/usc/ptVIII/rule8015/e" subsection {
+      num "e" "(e)"
+      heading "Other Documents."
+      provision "/us/usc/ptVIII/rule8015/e/1" paragraph {
+        num "1" "(1)"
+        content "Motion. Rule 8013(f) governs the form of a motion, response, or reply."
+        hash "7d3efe323472bc08de9333096726bde5ec98ede3e00e2b6c515698637b97d95a"
+      }
+      provision "/us/usc/ptVIII/rule8015/e/2" paragraph {
+        num "2" "(2)"
+        chapeau "Paper Copies of Other Documents. A paper copy of any other document—except one submitted under Rule 8014(f)—must comply with (a), with the following exceptions:"
+        provision "/us/usc/ptVIII/rule8015/e/2/A" subparagraph {
+          num "A" "(A)"
+          content "a cover is not necessary if the caption and signature page together contain the information required by (a)(2); and"
+          hash "188a8c45fb22bde436304c925a5403fe8181340eb3960a0896ed305868ceaa51"
+        }
+        provision "/us/usc/ptVIII/rule8015/e/2/B" subparagraph {
+          num "B" "(B)"
+          content "the length limits of (a)(7) do not apply."
+          hash "c7ceaa46fea7a16167beacef47435166c28ab838fb49ca8e65fcad1f207a3bfc"
+        }
+        hash "1d901600612203403371fa629848fb2ebd6a5aa960b2a2447b46af09ae66238a"
+      }
+      provision "/us/usc/ptVIII/rule8015/e/3" paragraph {
+        num "3" "(3)"
+        content "Document Filed Electronically. Any other document filed electronically—except a document submitted under Rule 8014(f)—must comply with the requirements of (2)."
+        hash "5eb12e90344fbc2bc40c23ee59a1934d22757220f2aeea061324590307d89dae"
+      }
+      hash "c115d8564d6eb4f7fb33ddf85e461c49a0dee005f06915ae353b9f0115510e79"
+    }
+    provision "/us/usc/ptVIII/rule8015/f" subsection {
+      num "f" "(f)"
+      heading "Local Variation."
+      content "A district court or BAP must accept documents that comply with the form requirements of this rule and the length limits set by this Part VIII. By local rule or order in a particular case, a district court or BAP may accept documents that do not meet all the form requirements of this rule or the length limits set by this Part VIII."
+      hash "437698dc166479ac87cca70f21570b4ae82c37ffc53fa4940a8ee7dab2ce40de"
+    }
+    provision "/us/usc/ptVIII/rule8015/g" subsection {
+      num "g" "(g)"
+      heading "Items Excluded from Length."
+      content {
+        p "In computing any length limit, headings, footnotes, and quotations count toward the limit, but the following items do not:"
+        p "• cover page;"
+        p "• disclosure statement under Rule 8012;"
+        p "• table of contents;"
+        p "• table of citations;"
+        p "• statement regarding oral argument;"
+        p "• addendum containing statutes, rules, or regulations;"
+        p "• certificate of counsel;"
+        p "• signature block;"
+        p "• proof of service; and"
+        p "• any item specifically excluded by these rules or by local rule."
+      }
+      hash "1a364033eb0e4b27d76ee78b6808c53ad80fb46e63b25799d0c4cf044f960917"
+    }
+    provision "/us/usc/ptVIII/rule8015/h" subsection {
+      num "h" "(h)"
+      heading "Certificate of Compliance."
+      provision "/us/usc/ptVIII/rule8015/h/1" paragraph {
+        num "1" "(1)"
+        content "Briefs and Documents That Require a Certificate. A brief submitted under Rule 8015(a)(7)(B), 8016(d)(2), or 8017(b)(4)—and a document submitted under Rule 8013(f)(3)(A), 8013(f)(3)(C), or 8022(b)(1)—must include a certificate by the attorney, or an unrepresented party, that the document complies with the type-volume limitation. The individual preparing the certificate may rely on the word or line count of the word-processing system used to prepare the document. The certificate must state the number of words—or the number of lines of monospaced type—in the document."
+        hash "f623161bf702a9b3ff79f3247c0d5bd8f7e4021b923a3aba60ee871164268bb9"
+      }
+      provision "/us/usc/ptVIII/rule8015/h/2" paragraph {
+        num "2" "(2)"
+        content "Using the Official Form. A certificate of compliance that conforms substantially to Form 417C satisfies the certificate requirement."
+        hash "cb7983b131c9355a004f831def5d6d94edb369a9d2d98754cfd1a1802e303c34"
+      }
+      hash "9c4dbb7412ec16204eb071561b4b755f0ba9db8397224a0fa8749b5872356017"
+    }
+    hash "1f12fe244101d56817af319bb22c7e67fe05d5d202f838748b1e1b66f7de013b"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 26, 2018, eff. Dec. 1, 2018; Apr. 27, 2020, eff. Dec. 1, 2020; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8015, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Mar. 26, 2009, eff. Dec. 1, 2009, related to motion for rehearing, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "a120eb322b7056627c9e43820159bb74a9d2404481e180d3502a6db2719822f9"
+  }
+  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived primarily from F.R.App.P. 32. Former Rule 8010(c) prescribed page limits for principal briefs and reply briefs. Those limits are now addressed by subdivision (a)(7) of this rule. In addition, the rule incorporates most of the detail of F.R.App.P. 32 regarding the appearance and format of briefs, appendices, and other documents, along with new provisions that apply when those documents are filed electronically."
+    p "Subdivision (a) prescribes the form requirements for briefs that are filed in paper form. It incorporates F.R.App.P. 32(a), except it does not include color requirements for brief covers, it requires the cover of a brief to include counsel’s e-mail address, and cross-references to the appropriate bankruptcy rules are substituted for references to the Federal Rules of Appellate Procedure."
+    p "Subdivision (a)(7) decreases the length of briefs, as measured by the number of pages, that was permitted by former Rule 8010(c). Page limits are reduced from 50 to 30 pages for a principal brief and from 25 to 15 for a reply brief in order to achieve consistency with F.R.App.P. 32(a)(7). But as permitted by the appellate rule, subdivision (a)(7) also permits the limits on the length of a brief to be measured by a word or line count, as an alternative to a page limit. Basing the calculation of brief length on either of the type-volume methods specified in subdivision (a)(7)(B) will result in briefs that may exceed the designated page limits in (a)(7)(A) and that may be approximately as long as allowed by the prior page limits."
+    p "Subdivision (b) adapts for briefs that are electronically filed subdivision (a)’s form requirements. With the use of electronic filing, the method of reproduction, method of binding, and use of paper become irrelevant. But information required on the cover, formatting requirements, and limits on brief length remain the same."
+    p "Subdivisions (c) and (d) prescribe the form requirements for appendices. Subdivision (c), applicable to paper appendices, is derived from F.R.App.P. 32(b), and subdivision (d) adapts those requirements for electronically filed appendices."
+    p "Subdivision (e), which is based on F.R.App.P. 32(c), addresses the form required for documents—in paper form or electronically filed—that these rules do not otherwise cover."
+    p "Subdivision (f), like F.R.App.P. 32(e), provides assurance to lawyers and parties that compliance with this rule’s form requirements will allow a brief or other document to be accepted by any district court or BAP. A court may, however, by local rule or, under Rule 8028 by order in a particular case, choose to accept briefs and documents that do not comply with all of this rule’s requirements. The decision whether to accept a brief that appears not to be in compliance with the rules must be made by the court. Under Rule 8011(a)(3), the clerk may not refuse to accept a document for filing solely because it is not presented in proper form as required by these rules or any local rule or practice."
+    p "Under Rule 8011(e), the party filing the document or, if represented, its counsel must sign all briefs and other submissions. If the document is filed electronically, an electronic signature must be provided in accordance with Rule 8011(e)."
+    p "Changes Made After Publication and Comment. In subdivision (f), “or order in a particular case” was deleted as unnecessary. The discussion in the Committee Note about brief lengths was revised, and the discussion of subdivision (f) was expanded."
+    hash "50d8d5b1ae569899621751514949f1161f1ba99f8a9a4fb8071256b620177973"
+  }
+  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2018-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2018 Amendment"
+    p "The rule is amended to conform to recent amendments to F.R.App.P. 32, which reduced the word limits generally allowed for briefs. When Rule 32(a)(7)(B)’s type-volume limits for briefs were adopted in 1998, the word limits were based on an estimate of 280 words per page. Amended F.R.App.P. 32 applies a conversion ratio of 260 words per page and reduces the word limits accordingly. Rule 8015(a)(7) adopts the same reduced word limits for briefs prepared by computer."
+    p "In a complex case, a party may need to file a brief that exceeds the type-volume limitations specified in these rules, such as to include unusually voluminous information explaining relevant background or legal provisions or to respond to multiple briefs by opposing parties or amici. The Committee expects that courts will accommodate those situations by granting leave to exceed the type-volume limitations as appropriate."
+    p "Subdivision (f) is amended to make clear a court’s ability (by local rule or order in a case) to increase the length limits for briefs and other documents. Subdivision (f) already established this authority as to the length limits in Rule 8015(a)(7); the amendment makes clear that this authority extends to all length limits in Part VIII of the Bankruptcy Rules."
+    p "A new subdivision (g) is added to set out a global list of items excluded from length computations, and the list of exclusions in former subdivision (a)(7)(B)(iii) is deleted. The certificate-of-compliance provision formerly in subdivision (a)(7)(C) is relocated to a new subdivision (h) and now applies to filings under all type-volume limits (other than Rule 8014(f)’s word limit)—including the new word limits in Rules 8013, 8016, 8017, and 8022. Conforming amendments are made to Official Form 417C."
+    hash "efbc35ade1748b241a3fe1e8667747da9f1e6f05f8e2cae4801857cbafc96481"
+  }
+  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2020-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2020 Amendment"
+    p "The amendment to subdivision (g) is made to reflect recent amendments to Rule 8011(d) that eliminated the requirement of proof of service when filing and service are completed using a court’s electronic-filing system. Because each item listed in Rule 8015(g) will not always be required, the initial article is deleted. The word “corporate” is deleted before “disclosure statement” to reflect a concurrent change in the title of Rule 8012."
+    hash "00dd759bf23384ad1142f9540d1479ba158786cf634841c4fe0f4ad3216e4174"
+  }
+  note "/us/usc/ptVIII/rule8015/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8015 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "9b1d77e21f7433bb746aeb1ad6296c710efd0973433eda116b2e7f8542f1e166"
+  }
+  layers {
+    operative "1f12fe244101d56817af319bb22c7e67fe05d5d202f838748b1e1b66f7de013b"
+    enacted "6b39bb26e152cb478d230155ae8cc64a6cb5b9cd153c59a72f7ed418397ff90e"
+    editorial "9bd3e91f90a7aba65330077820eaec12523711029e53abd6638d77c2dfe5e86a"
+  }
+}

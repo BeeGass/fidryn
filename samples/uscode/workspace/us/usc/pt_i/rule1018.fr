@@ -1,0 +1,84 @@
+edition 2
+module "/us/usc/ptI/rule1018" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1018" courtRule {
+    num "1018" "Rule 1018."
+    heading "Contesting a Petition in an Involuntary or Chapter 15 Case; Vacating an Order for Relief; Applying Part VII Rules"
+    provision "/us/usc/ptI/rule1018/a" subsection {
+      num "a" "(a)"
+      heading "Applying Part VII Rules."
+      chapeau "Unless the court orders or a Part I rule provides otherwise, Rules 7005, 7008–10, 7015–16, 7024–26, 7028–37, 7052, 7054, 7056, and 7062—together with any other Part VII rules as the court may order—apply to the following:"
+      provision "/us/usc/ptI/rule1018/a/1" paragraph {
+        num "1" "(1)"
+        content "a proceeding that contests either an involuntary petition or a Chapter 15 petition for recognition; and"
+        hash "07920456ffeb156098a8db39c4233bba0655cec192e95c837de4b17a55da4a48"
+      }
+      provision "/us/usc/ptI/rule1018/a/2" paragraph {
+        num "2" "(2)"
+        content "a proceeding to vacate an order for relief."
+        hash "337036d1529fbbca1177baa0b3676a8ff862c4811022d10d15299a2fd1ae1e84"
+      }
+      hash "6ac79109a9ff08c701334004b5a779118cfabed976f3a0f25586aaa4d9c67f78"
+    }
+    provision "/us/usc/ptI/rule1018/b" subsection {
+      num "b" "(b)"
+      heading "References to an “Adversary Proceeding.”"
+      content "Any reference to an “adversary proceeding” in the rules listed in (a) is a reference to the proceedings listed in (a)(1)–(2)."
+      hash "ce4753fb7784878df6bb5c36e19861f05aa86b699b2602bf18a14c0a5f8aa055"
+    }
+    provision "/us/usc/ptI/rule1018/c" subsection {
+      num "c" "(c)"
+      heading "“Complaint” Means “Petition.”"
+      content "For the proceedings described in (a), a reference to the “complaint” in the Federal Rules of Civil Procedure must be read as a reference to the petition."
+      hash "a209dcd1710e6c1a0726bca27cd5c5337905f72ce1a5e6e5ed75206637186f33"
+    }
+    hash "6960b6e4b6205f343abe83d0b29d9c77f9e0c8e3f49adb9a875544042eb74e97"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "The rules in Part VII to which this rule refers are adaptations of the Federal Rules of Civil Procedure for the purpose of governing the procedure in adversary proceedings in cases under the Code. See the Note accompanying Rule 7001 infra. Because of the special need for dispatch and expedition in the determination of the issues in an involuntary petition, see Acme Harvester Co. v. Beekman Lumber Co., 222 U.S. 300, 309 (1911), the objective of some of the Federal Rules of Civil Procedure and their adaptations in Part VII to facilitate the settlement of multiple controversies involving many persons in a single lawsuit is not compatible with the exigencies of bankruptcy administration. See United States F. & G. Co. v. Bray, 225 U.S. 205, 218 (1912). For that reason Rules 7013, 7014 and 7018–7023 will rarely be appropriate in a proceeding on a contested petition."
+    p "Certain terms used in the Federal Rules of Civil Procedure have altered meanings when they are made applicable in cases under the Code by these rules. See Rule 9002 infra. This Rule 1018 requires that the terms “adversary proceedings” when used in the rules in Part VII and “complaint” when used in the Federal Rules of Civil Procedure be given altered meanings when they are made applicable to proceedings relating to a contested petition or proceedings to vacate any order for relief. A motion to vacate an order for relief, whether or not made on a petition that was or could have been contested, is governed by the rules in Part VII referred to in this Rule 1018."
+    hash "64d342f48eabb5ed847fe9df39e89acb529e456dc57500a02e9dc2454c6a0d9b"
+  }
+  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Rule 1018 is amended to include within its terms a petition commencing an ancillary case when it is contested. This provision was formerly included in Rule 1003(e)(4)."
+    p "Although this rule does not contain an explicit authorization for the entry of an order for relief when a debtor refuses to cooperate in discovery relating to a contested involuntary petition, the court has ample power under Rule 37(b) F.R.Civ.P., as incorporated by Rule 7037, to enter an order for relief under appropriate circumstances. Rule 37(b) authorizes the court to enter judgment by default or an order that “facts shall be taken as established.”"
+    hash "6eee44b237e582c48ab14a97ed1889e85ce405eb7bacb60f6fbf23ed4d3db8c5"
+  }
+  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010 Amendment"
+    p "The rule is amended to reflect the enactment of chapter 15 of the Code in 2005. As to chapter 15 cases, the rule applies to contests over the petition for recognition and not to all matters that arise in the case. Thus, proceedings governed by § 1519(e) and § 1521(e) of the Code must comply with Rules 7001(7) and 7065, which provide that actions for injunctive relief are adversary proceedings governed by Part VII of the rules. The rule is also amended to clarify that it applies to contests over an involuntary petition, and not to matters merely “relating to” a contested involuntary petition. Matters that may arise in a chapter 15 case or an involuntary case, other than contests over the petition itself, are governed by the otherwise applicable rules."
+    p "Other changes are stylistic."
+    p "Changes Made After Publication. No changes since publication."
+    hash "d8638859bd9ff4267db7fbc52c46b1848458b7f64d3f48ff64af74e441d7e3cc"
+  }
+  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1018 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "13ef0eec31ffabdba31487b41f646891c1fa0b923556c09ba9235502333b3d10"
+  }
+  note "/us/usc/ptI/rule1018/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subd. (c), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "4a5b3ce3a7c86d7de86c2e153ec9c78d61c958627ab8a418fac667eee16b8232"
+  }
+  layers {
+    operative "6960b6e4b6205f343abe83d0b29d9c77f9e0c8e3f49adb9a875544042eb74e97"
+    enacted "3f7fe6f65ec49abd0597d8c1391fa696cbf08795d6814eb1d3c2c671795c0912"
+    editorial "daf4fb3dbb07cf0cb23425f0bb1131dcb7b1f048db5aebba2cad71b21d70efc4"
+  }
+}

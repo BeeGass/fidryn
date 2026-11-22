@@ -1,0 +1,226 @@
+edition 2
+module "/us/usc/ptIII/rule3007" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3007" courtRule {
+    num "3007" "Rule 3007."
+    heading "Objecting to a Claim"
+    provision "/us/usc/ptIII/rule3007/a" subsection {
+      num "a" "(a)"
+      heading "Time and Manner of Serving the Objection."
+      provision "/us/usc/ptIII/rule3007/a/1" paragraph {
+        num "1" "(1)"
+        content "Time to Serve. An objection to a claim and a notice of the objection must be filed and served at least 30 days before a scheduled hearing on the objection or any deadline for the claim holder to request a hearing."
+        hash "a3aca040e6e3acdeac683237cca84a941936ba7657d7c45e101ed1d6cfae4c7d"
+      }
+      provision "/us/usc/ptIII/rule3007/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Whom to Serve; Manner of Service."
+        provision "/us/usc/ptIII/rule3007/a/2/A" subparagraph {
+          num "A" "(A)"
+          chapeau "Serving the Claim Holder. The notice—substantially conforming to Form 420B—and objection must be served by mail on the person the claim holder most recently designated to receive notices on the claim holder’s original or latest amended proof of claim, at the address so indicated. If the objection is to a claim of:"
+          provision "/us/usc/ptIII/rule3007/a/2/A/i" clause {
+            num "i" "(i)"
+            content "the United States or one of its officers or agencies, service must also be made as if it were a summons and complaint under Rule 7004(b)(4) or (5); or"
+            hash "4d153b618266d37ae8ef7925586132ebee9dc54d62833e03f9e0c7c03437441b"
+          }
+          provision "/us/usc/ptIII/rule3007/a/2/A/ii" clause {
+            num "ii" "(ii)"
+            content "an insured depository institution as defined in section 3 of the Federal Deposit Insurance Act, service must also be made under Rule 7004(h)."
+            hash "5268a2b8d4fa8d84da287790588169670e2970fc843201c87a6c283bd38a9775"
+          }
+          hash "96739c44e5c84d4be564d5e603fb4b492e7eeea186419510d003ceaad8f1580e"
+        }
+        provision "/us/usc/ptIII/rule3007/a/2/B" subparagraph {
+          num "B" "(B)"
+          content {
+            p "Serving Others. The notice and objection must also be served, by mail (or other permitted means), on:"
+            p "• the debtor or debtor in possession;"
+            p "• the trustee; and"
+            p "• if applicable, the entity that filed the proof of claim under Rule 3005."
+          }
+          hash "a6c720d67547e1a4154c8c057085e5bc2363541073016b88fd0d2703f9171c6b"
+        }
+        hash "c85dd7f31d642775af9b6a501d25182755d275740ca9fbb7500c89e3ba067cc2"
+      }
+      hash "3a2cd2b7aeba5c8394f6679bd646268252f9c43a73ea1cc2f847fc5180e477e8"
+    }
+    provision "/us/usc/ptIII/rule3007/b" subsection {
+      num "b" "(b)"
+      heading "Demanding Relief That Requires an Adversary Proceeding Not Permitted."
+      content "In objecting to a claim, a party in interest must not include a demand for a type of relief specified in Rule 7001 but may include the objection in an adversary proceeding."
+      hash "fc4c9b683926aea6f42bbb97a5f2a466bda7571cd953d9e20e9930a6c7700292"
+    }
+    provision "/us/usc/ptIII/rule3007/c" subsection {
+      num "c" "(c)"
+      heading "Limit on Omnibus Objections."
+      content "Unless the court orders otherwise or (d) permits, objections to more than one claim may not be joined in a single objection."
+      hash "9c9fbc3915fbef354d3c6e27d3c614d54eac96d0a08fe570c5ee74674af3aff5"
+    }
+    provision "/us/usc/ptIII/rule3007/d" subsection {
+      num "d" "(d)"
+      heading "Omnibus Objection."
+      chapeau "Subject to (e), objections to more than one claim may be joined in a single objection if:"
+      provision "/us/usc/ptIII/rule3007/d/1" paragraph {
+        num "1" "(1)"
+        content "all the claims were filed by the same entity; or"
+        hash "bebbcb7d945989bef5ad642d989ab81ce5d6bafd4a0ab833612b0cfc9bc05dc3"
+      }
+      provision "/us/usc/ptIII/rule3007/d/2" paragraph {
+        num "2" "(2)"
+        chapeau "the objections are based solely on grounds that the claims should be disallowed, in whole or in part, because they:"
+        provision "/us/usc/ptIII/rule3007/d/2/A" subparagraph {
+          num "A" "(A)"
+          content "duplicate other claims;"
+          hash "eade36615dbd1b644566c98fc30cf6f10a24a246099d9e301e4e81bd5b9d8d76"
+        }
+        provision "/us/usc/ptIII/rule3007/d/2/B" subparagraph {
+          num "B" "(B)"
+          content "were filed in the wrong case;"
+          hash "7e1a59a36d6228292996940fa90badd2750ec5e2912418c2af7164d49c4eb7c4"
+        }
+        provision "/us/usc/ptIII/rule3007/d/2/C" subparagraph {
+          num "C" "(C)"
+          content "have been amended by later proofs of claim;"
+          hash "11cfe6ada2e8491a148067cafa0c34b81709a8c18abca68a7d483b29c6e3354b"
+        }
+        provision "/us/usc/ptIII/rule3007/d/2/D" subparagraph {
+          num "D" "(D)"
+          content "were not timely filed;"
+          hash "fab86b964b78f5bfb67bcb6f86b667cbbabbc513ddc260434c90d38bebe40e1f"
+        }
+        provision "/us/usc/ptIII/rule3007/d/2/E" subparagraph {
+          num "E" "(E)"
+          content "have been satisfied or released during the case in accordance with the Code, applicable rules, or a court order;"
+          hash "feb4a04a0682c976fe4543f41909a5f9821b4f70cadc6419782f578c44ab1fbe"
+        }
+        provision "/us/usc/ptIII/rule3007/d/2/F" subparagraph {
+          num "F" "(F)"
+          content "were presented in a form that does not comply with applicable rules and the objection states that the objector is therefore unable to determine a claim’s validity;"
+          hash "9ed77689afe1fb48c0587f23c63b15a148ca5420f3d1423466c600da47f053b3"
+        }
+        provision "/us/usc/ptIII/rule3007/d/2/G" subparagraph {
+          num "G" "(G)"
+          content "are interests, not claims; or"
+          hash "1b87b491710dd1833c311ad6aee6644c8ed5fc0668b81e362de1500486997da6"
+        }
+        provision "/us/usc/ptIII/rule3007/d/2/H" subparagraph {
+          num "H" "(H)"
+          content "assert a priority in an amount that exceeds the maximum amount allowable under § 507."
+          hash "8cabf28355a501a0a7f58e59a10be17e3336cb370b40539fe8342586c5ff004c"
+        }
+        hash "b14bca2764c1974634ae2952013c54e68ab5cf46dc95f8744c7359759cafe8c1"
+      }
+      hash "76e0bc0f4abaf9a7757265efa23b4e95126386ee8d1b758062c45871242e47cf"
+    }
+    provision "/us/usc/ptIII/rule3007/e" subsection {
+      num "e" "(e)"
+      heading "Required Content of an Omnibus Objection."
+      chapeau "An omnibus objection must:"
+      provision "/us/usc/ptIII/rule3007/e/1" paragraph {
+        num "1" "(1)"
+        content "state in a conspicuous place that claim holders can find their names and claims in the objection;"
+        hash "3ac4875cd8154b39bf2aea85cf95146040e818be7b6ad165f256adf9c4ddac06"
+      }
+      provision "/us/usc/ptIII/rule3007/e/2" paragraph {
+        num "2" "(2)"
+        content "list the claim holders alphabetically, provide a cross-reference to claim numbers, and, if appropriate, list claim holders by category of claims;"
+        hash "762d4a7bcb8a6ffbff957125317bb09d064d0236426984fc5fd8f42e81973ee1"
+      }
+      provision "/us/usc/ptIII/rule3007/e/3" paragraph {
+        num "3" "(3)"
+        content "state for each claim the grounds for the objection and provide a cross-reference to the pages where pertinent information about the grounds appears;"
+        hash "35b73cd791e596c96830812201ea4ce873e7147949e70adff01c4f580db9ceff"
+      }
+      provision "/us/usc/ptIII/rule3007/e/4" paragraph {
+        num "4" "(4)"
+        content "state in the title the objector’s identity and the grounds for the objections;"
+        hash "0fc40c37a480681e3b9f4b134f985c9dbc1736f1dba006693f6d01f90655ac16"
+      }
+      provision "/us/usc/ptIII/rule3007/e/5" paragraph {
+        num "5" "(5)"
+        content "be numbered consecutively with other omnibus objections filed by the same objector; and"
+        hash "5aec3b1ed7abd4d370ef5379549e411bd864f736ceaedcd4553f2f9c81b5db50"
+      }
+      provision "/us/usc/ptIII/rule3007/e/6" paragraph {
+        num "6" "(6)"
+        content "contain objections to no more than 100 claims."
+        hash "4f5932990a01af4489b4f7135918f97ea60d3c56f6231533ba9963e68b2940c1"
+      }
+      hash "11a9ca2a4c1ce2346d303746a34bc924544f699a5876293501ca3f5ffd872d4f"
+    }
+    provision "/us/usc/ptIII/rule3007/f" subsection {
+      num "f" "(f)"
+      heading "Finality of an Order When Objections Are Joined."
+      content "When objections are joined, the finality of an order regarding any claim must be determined as though the claim had been subject to an individual objection."
+      hash "41aa477f47db1690bb2ec762d6a97a785bc61657a4fe25832ea4c0ffaf198638"
+    }
+    hash "667d674f37e3a021189331d16a94022cb86e173aedce16b17a4c4cfc34140add"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 30, 2007, eff. Dec. 1, 2007; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 14, 2021, eff. Dec. 1, 2021; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from § 47a(8) of the Act and former Bankruptcy Rule 306. It prescribes the manner in which an objection to a claim shall be made and notice of the hearing thereon given to the claimant. The requirement of a writing does not apply to an objection to the allowance of a claim for the purpose of voting for a trustee or creditors’ committee in a chapter 7 case. See Rule 2003."
+    p "The contested matter initiated by an objection to a claim is governed by rule 9014, unless a counterclaim by the trustee is joined with the objection to the claim. The filing of a counterclaim ordinarily commences an adversary proceeding subject to the rules in Part VII."
+    p "While the debtor’s other creditors may make objections to the allowance of a claim, the demands of orderly and expeditious administration have led to a recognition that the right to object is generally exercised by the trustee. Pursuant to § 502(a) of the Code, however, any party in interest may object to a claim. But under § 704 the trustee, if any purpose would be served thereby, has the duty to examine proofs of claim and object to improper claims."
+    p "By virtue of the automatic allowance of a claim not objected to, a dividend may be paid on a claim which may thereafter be disallowed on objection made pursuant to this rule. The amount of the dividend paid before the disallowance in such event would be recoverable by the trustee in an adversary proceeding."
+    hash "893b8b663f65acaa05f5d2bdfa0c36e58709cd8265bbbe906bdee1460f5a6286"
+  }
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "The words “with the court” are deleted as unnecessary. See Rules 5005(a) and 9001(3)."
+    hash "df3f0877f4df580e50671a9c7c6f62d1d89778a3fbebd8c89d3dfc78021369e9"
+  }
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2007-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2007 Amendment"
+    p "The rule is amended in a number of ways. First, the amendment prohibits a party in interest from including in a claim objection a request for relief that requires an adversary proceeding. A party in interest may, however, include an objection to the allowance of a claim in an adversary proceeding. Unlike a contested matter, an adversary proceeding requires the service of a summons and complaint, which puts the defendant on notice of the potential for an affirmative recovery. Permitting the plaintiff in the adversary proceeding to include an objection to a claim would not unfairly surprise the defendant as might be the case if the action were brought as a contested matter that included an action to obtain relief of a kind specified in Rule 7001."
+    p "The rule as amended does not require that a party include an objection to the allowance of a claim in an adversary proceeding. If a claim objection is filed separately from a related adversary proceeding, the court may consolidate the objection with the adversary proceeding under Rule 7042."
+    p "The rule also is amended to authorize the filing of a pleading that joins objections to more than one claim. Such filings present a significant opportunity for the efficient administration of large cases, but the rule includes restrictions on the use of these omnibus objections to ensure the protection of the due process rights of the claimants."
+    p "Unless the court orders otherwise, objections to more than one claim may be joined in a single pleading only if all of the claims were filed by the same entity, or if the objections are based solely on the grounds set out in subdivision (d) of the rule. Objections of the type listed in subdivision (d) often can be resolved without material factual or legal disputes. Objections to multiple claims permitted under the rule must comply with the procedural requirements set forth in subdivision (e). Among those requirements is the requirement in subdivision (e)(5) that these omnibus objections be consecutively numbered. Since these objections may not join more than 100 objections in any one omnibus objection, there may be a need for several omnibus objections to be filed in a particular case. Consecutive numbering of each omnibus objection and the identification of the objector in the title of the objection is essential to keep track of the objections on the court’s docket. For example, the objections could be titled Debtor in Possession’s First Omnibus Objection to Claims, Debtor in Possession’s Second Omnibus Objection to Claims, Creditors’ Committee’s First Omnibus Objection to Claims, and so on. Titling the objections in this manner should avoid confusion and aid in tracking the objections on the docket."
+    p "Subdivision (f) provides that an order resolving an objection to any particular claim is treated, for purposes of finality, as if the claim had been the subject of an individual objection. A party seeking to appeal any such order is neither required, nor permitted, to await the court’s resolution of all other joined objections. The rule permits the joinder of objections for convenience, and that convenience should not impede timely review of a court’s decision with respect to each claim. Whether the court’s action as to a particular objection is final, and the consequences of that finality, are not addressed by this amendment. Moreover, use of an omnibus objection generally does not preclude the objecting party from raising a subsequent objection to the claim on other grounds. See Restatement (Second) of Judgments § 26(1)(d) (1982) (generally applicable rule barring multiple actions based on same transaction or series of transactions is overridden when a statutory scheme permits splitting of claims)."
+    p "Changes Made After Publication. There were several changes made to the rule after its publication. The Advisory Committee declined to follow Mr. Sabino’s suggestion, concluding that the rule as proposed includes sufficient flexibility, and that expanding the flexibility might lead to excessive deviation from the appropriate format for omnibus claims objections. The Advisory Committee also declined to follow Mr. Horsley’s suggestion because the deadline for filing a proof of claim varies based on the nature of the creditor (governmental units have different deadlines from other creditors) as well as on the chapter under which the case is pending. The Advisory Committee rejected Judge Grant’s suggestion that a party proposing an omnibus claims objection be required to demonstrate some special cause to allow the joinder of the objections. The Advisory Committee concluded that the rule includes sufficient protections for claimants such that omnibus objections should be allowed without the need for a special showing by the claims objector that joinder is proper."
+    p "The Advisory Committee did accept several of Judge Grant’s suggestions, and the rule was amended by deleting the grounds for objection to claims based on the filing of a superceding proof of claim under proposed subdivision (d)(3) and the transfer of claims under proposed subdivision (d)(4). Subdivision (d)(3) now permits objections to claims that have been amended by a subsequently filed proof of claim and the paragraphs within subdivision (d) have been renumbered to reflect the deletion. The Committee Note also no longer includes any reliance on § 502(j) for the statement indicating that a subsequent claim objection can be filed to a claim that was previously included in an omnibus claim objection."
+    hash "718c998753ce59f6f3ba5c79b7f621cbdf593daea8dee33c89f593c78fbdd779"
+  }
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017 Amendment"
+    p "Subdivision (a) is amended to specify the manner in which an objection to a claim and notice of the objection must be served. It clarifies that Rule 7004 does not apply to the service of most claim objections. Instead, a claimant must be served by first-class mail addressed to the person whom the claimant most recently designated on its proof of claim to receive notices, at the address so indicated. If, however, the claimant is the United States, an officer or agency of the United States, or an insured depository institution, service must also be made according to the method prescribed by the appropriate provision of Rule 7004. The service methods for the depository institutions are statutorily mandated, and the size and dispersal of the decision-making and litigation authority of the federal government necessitate service on the appropriate United States attorney’s office and the Attorney General, as well as the person designated on the proof of claim."
+    p "As amended, subdivision (a) no longer requires that a hearing be scheduled or held on every objection. The rule requires the objecting party to provide notice and an opportunity for a hearing on the objection, but, by deleting from the subdivision references to “the hearing,” it permits local practices that require a claimant to timely request a hearing or file a response in order to obtain a hearing. The official notice form served with a copy of the objection will inform the claimant of any actions it must take. However, while a local rule may require the claimant to respond to the objection to a proof of claim, the court will still need to determine if the claim is valid, even if the claimant does not file a response to a claim objection or request a hearing."
+    hash "29494506e947da3c71044b6db4ab6fa0f18956857acc01dfaff64fa668d775bc"
+  }
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2021-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2021 Amendment"
+    p "Subdivision (a)(2)(A)(ii) is amended to clarify that the special service method required by Rule 7004(h) must be used for service of objections to claims only on insured depository institutions as defined in section 3 of the Federal Deposit Insurance Act, 12 U.S.C. § 1813. Rule 7004(h) was enacted by Congress as part of the Bankruptcy Reform Act of 1994. It applies only to insured depository institutions that are insured by the Federal Deposit Insurance Corporation and does not include credit unions, which are instead insured by the National Credit Union Administration. A credit union, therefore, may be served with an objection to a claim according to Rule 3007(a)(2)(A)—by first-class mail sent to the person designated for receipt of notice on the credit union’s proof of claim."
+    hash "cedaa7d85cc7d4b9e15846646205363fc81b44f79173bb8db1afec1af70a9388"
+  }
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3007 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "0578f85d6fc86b8bcb65690204a0021dca07604271da952fe272ef01a92c2518"
+  }
+  note "/us/usc/ptIII/rule3007/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "Section 3 of the Federal Deposit Insurance Act, referred to in subd. (a)(2)(A)(ii), is classified to " ["section 1813 of Title 12" -> "/us/usc/t12/s1813"] ", Banks and Banking."
+    hash "0f78c3df1afb6d20e47185512358a2f6a5bafdb40ca992ff9fdca23dff1f8f53"
+  }
+  layers {
+    operative "667d674f37e3a021189331d16a94022cb86e173aedce16b17a4c4cfc34140add"
+    enacted "9013b71cc173cc3d252ddf65ccb322896bc2a9dd3b415b5996126bac77f7af8d"
+    editorial "1f220efa6f456e19fd137f6d741c2c69fe620f8c29b62cd46db201d93c2dca83"
+  }
+}

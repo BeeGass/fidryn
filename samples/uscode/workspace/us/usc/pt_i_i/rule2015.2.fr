@@ -1,0 +1,53 @@
+edition 2
+module "/us/usc/ptII/rule2015.2" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2015.2" courtRule {
+    num "2015.2" "Rule 2015.2."
+    heading "Transferring a Patient in a Health Care Business Case"
+    content {
+      p "Unless the court orders otherwise, if the debtor is a health care business, the trustee may transfer a patient to another health care business under § 704(a)(12) only if the trustee gives at least 14 days’ notice of the transfer to:"
+      p "• any patient-care ombudsman;"
+      p "• the patient; and"
+      p "• any family member or other contact person whose name and address have been given to the trustee or the debtor in order to provide information about the patient’s health care."
+      p "The notice is subject to applicable nonbankruptcy law concerning patient privacy."
+    }
+    hash "c1f8b77d9377c141eabab2dd9994341e0101acf140a70f14539df2a7007d37e6"
+  }
+  credit "(Added Apr. 23, 2008, eff. Dec. 1, 2008; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2015.2/note/ungrouped/nolaw/committee-notes-on-rules-2008" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008"
+    p "This rule is new. Section 704(a)(12), added to the Code by the 2005 amendments, authorizes the trustee to relocate patients when a health care business debtor’s facility is in the process of being closed. The Code permits the trustee to take this action without the need for any court order, but the notice required by this rule will enable a patient care ombudsman appointed under § 333, or a patient who contends that the trustee’s actions violate § 704(a)(12), to have those issues resolved before the patient is transferred."
+    p "This rule also permits the court to enter an order dispensing with or altering the notice requirement in proper circumstances. For example, a facility could be closed immediately, or very quickly, such that 10 days’ notice would not be possible in some instances. In that event, the court may shorten the time required for notice."
+    p "Notices given under this rule are subject to the provisions of applicable federal and state law that relate to the protection of patients’ privacy, such as the Health Insurance Portability and Accountability Act of 1996, Pub. L. No. 104–191 (HIPAA)."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "01169a311878e7a2af99108b2b584e2d4bb8daaf5e231521c0db957710f9011d"
+  }
+  note "/us/usc/ptII/rule2015.2/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "418f26ecb55d01b0fe0d0182c10b387c9b27391be22597f66ca33b48a2abe8c7"
+  }
+  note "/us/usc/ptII/rule2015.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2015.2 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "b484359a35c0173c1e4d84c1c160383b5399bdc879418b6b87348d6c4bc71614"
+  }
+  layers {
+    operative "c1f8b77d9377c141eabab2dd9994341e0101acf140a70f14539df2a7007d37e6"
+    enacted "b2a2871c3bd8207bfc19fb1c11f604d2ae24eee28d0fdf7dd03be0753b2019b2"
+    editorial "a7a87ea82ce26b6544cc3c69e822448f599834e4961f55d5c8be47261511261c"
+  }
+}

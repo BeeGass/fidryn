@@ -1,0 +1,177 @@
+edition 2
+module "/us/usc/t45/s1323" {
+  within "/us/usc/t45/ch22/schII/ptB"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1323" section {
+    num "1323" "§ 1323."
+    heading "Board of Directors"
+    chapeau "The Board of Directors of the Corporation shall be comprised as follows:"
+    provision "/us/usc/t45/s1323/1" paragraph {
+      num "1" "(1)"
+      content "Except as provided in paragraph (3), with respect to the period ending June 30, 1987, the board shall remain as it exists on October 21, 1986, with any vacancies being filled by directors nominated and elected by the remainder of the members of the board."
+      hash "51a001be7ed05c919211029871040f38d5050d09bd4b5c8f68ebe467892895e2"
+    }
+    provision "/us/usc/t45/s1323/2" paragraph {
+      num "2" "(2)"
+      provision "/us/usc/t45/s1323/2/A" subparagraph {
+        num "A" "(A)"
+        chapeau "Except as provided in paragraph (3), with respect to the period beginning July 1, 1987, the board shall consist of—"
+        provision "/us/usc/t45/s1323/2/A/i" clause {
+          num "i" "(i)"
+          content "3 directors appointed by the Secretary of Transportation;"
+          hash "5e1b848050eb6f4e28267f8236560dc7865b9beaa21bd0655bc39d5a86bb3246"
+        }
+        provision "/us/usc/t45/s1323/2/A/ii" clause {
+          num "ii" "(ii)"
+          content "the Chief Executive Officer and the Chief Operating Officer of the Corporation; and"
+          hash "39dea1d487d0f5c3fdd062f31af477940cb23c860e53b725b28824452beda12e"
+        }
+        provision "/us/usc/t45/s1323/2/A/iii" clause {
+          num "iii" "(iii)"
+          chapeau "8 directors appointed from among persons knowledgeable in business affairs by the special court trustees named under subparagraph (C), in consultation with the Secretary of Transportation and the Chairman of the Board of Directors of the Corporation, and recognizing the need for and importance of—"
+          provision "/us/usc/t45/s1323/2/A/iii/I" subclause {
+            num "I" "(I)"
+            content "continuity in the direction of the Corporation’s business and affairs;"
+            hash "0494385d33a07daf8f0c50fc507cc1eafd8b3eb9c261364c8491b8f33aa7bbf4"
+          }
+          provision "/us/usc/t45/s1323/2/A/iii/II" subclause {
+            num "II" "(II)"
+            content "preserving the value of the investment of the United States in the Corporation;"
+            hash "a74c1502ea64b6d84aa4126b44d9654ceedd2bb196e3151eb0d8747c4d3bc24b"
+          }
+          provision "/us/usc/t45/s1323/2/A/iii/III" subclause {
+            num "III" "(III)"
+            content "preserving essential rail service provided by the Corporation; and"
+            hash "59771240daa2d04c0d274ca71456a90d77b7c69c3841071c81a56a3f1902095a"
+          }
+          provision "/us/usc/t45/s1323/2/A/iii/IV" subclause {
+            num "IV" "(IV)"
+            content "providing for the sale of the United States shares."
+            hash "5d9a5b03eeed82d424360efe0eb2b9d72b2a61985006e2a65f4fbd73d25a21b6"
+          }
+          hash "08dc03ff18aa44f24e5d22653ba7535b74240e5fe4483594d5428bfbe9abe0ca"
+        }
+        hash "a3d98edc9ce1bfbd40836d98f9d36fe4f34537fd9645c796ea9c03a9da21063c"
+      }
+      provision "/us/usc/t45/s1323/2/B" subparagraph {
+        num "B" "(B)"
+        content "The Secretary of Transportation and the special court trustees may appoint directors under subparagraph (A) from among existing directors of the Corporation."
+        hash "60451be7beb57551e03d7649e317d61ebe0c2a6b6ef0ccbd8ea7ba2d63c9b52e"
+      }
+      provision "/us/usc/t45/s1323/2/C" subparagraph {
+        num "C" "(C)"
+        provision "/us/usc/t45/s1323/2/C/i" clause {
+          num "i" "(i)"
+          content "If more than 50 percent of the interest of the United States in the Corporation has not been sold before June 1, 1987, the special court established under " ["section 719 of this title" -> "/us/usc/t45/s719"] " shall, on that date, name 3 trustees from among persons knowledgeable in business affairs to make the appointments required by subparagraph (A)(iii). The Corporation shall compensate the special court trustees in an amount to be specified by the special court, not to exceed the amount paid by the Corporation to its directors for comparable services."
+          hash "5fc9c2cbece2f342372728f705a7b2bfa48182ab1cd979961dee207aa9b02ed4"
+        }
+        provision "/us/usc/t45/s1323/2/C/ii" clause {
+          num "ii" "(ii)"
+          content "No person shall be eligible to be appointed as a special court trustee under this subparagraph who, at any time during the 30 months immediately preceding such appointment, was an officer, employee, or director of the United States Railway Association, the Corporation, or the Department of Transportation."
+          hash "d0ff55261162a42ec97f9aacd0941595eddecc4e81fcfbf2cc1030094391aa85"
+        }
+        hash "444d300dbc081a0ac703932bab7ec0dfe0a9ca9bcafd7dfe5438755a95d08dbb"
+      }
+      hash "11f48e14a589b9ed11c69d33d7f518e14a7fe80a9f44f7e998d6cee264c64900"
+    }
+    provision "/us/usc/t45/s1323/3" paragraph {
+      num "3" "(3)"
+      provision "/us/usc/t45/s1323/3/A" subparagraph {
+        num "A" "(A)"
+        content "After the sale date, one director shall be elected by the public shareholders of the Corporation for each increment of 12.5 percent of the interest of the United States in the Corporation that has been sold through public offering."
+        hash "c371bdab76bc1df437c882a2c1c8e803c1478996ff85d5965dc3ceefe242d125"
+      }
+      provision "/us/usc/t45/s1323/3/B" subparagraph {
+        num "B" "(B)"
+        chapeau "With respect to the period ending June 30, 1987—"
+        provision "/us/usc/t45/s1323/3/B/i" clause {
+          num "i" "(i)"
+          chapeau "the first director elected under this paragraph shall replace the member of the board who became a director most recently from among—"
+          provision "/us/usc/t45/s1323/3/B/i/I" subclause {
+            num "I" "(I)"
+            content "directors appointed by the United States Railway Association, or elected under paragraph (1) to replace such a director, and"
+            hash "d8752304f255d16f32dd85bbf85ec83eaa1c319f0b3c7727fc61cf9f35804e08"
+          }
+          provision "/us/usc/t45/s1323/3/B/i/II" subclause {
+            num "II" "(II)"
+            content "directors appointed by the Secretary of Transportation, or elected under paragraph (1) to replace such a director;"
+            hash "2ec6706e363075fbe9754b7d367375b96215053d87c63bc9f677a336d23ab326"
+          }
+          hash "6e385cb1853cbaef9af33929a53ecf4d90eb14d642d75d54b247dc7e59f259b4"
+        }
+        provision "/us/usc/t45/s1323/3/B/ii" clause {
+          num "ii" "(ii)"
+          content "the second director elected under this paragraph shall replace the member of the Board who became a director most recently from among directors described in clause (i)(I) or (II), whichever group the first director replaced under this subparagraph was not a member of; and"
+          hash "1e3aee4fc0754624bdb92201c31fcccaeeb6ca4fe9d6a0ba92057f6d10365318"
+        }
+        provision "/us/usc/t45/s1323/3/B/iii" clause {
+          num "iii" "(iii)"
+          content "subsequent directors elected under this paragraph shall replace members alternately from the groups described in clause (i)(I) and (II)."
+          hash "23ee94d8efaac851866e755ae8ae0a1eaf0dbf122183af0203d9ba05ae88c9d9"
+        }
+        hash "aa528e0042a692e75331376f0a22bb2b56757792a43cd84f854a25f8009dd3a9"
+      }
+      provision "/us/usc/t45/s1323/3/C" subparagraph {
+        num "C" "(C)"
+        content "With respect to the period beginning July 1, 1987, directors elected under this paragraph shall replace directors appointed by the special court trustees under paragraph (2)(A)(iii), in the order designated by the special court trustees in a list to be issued at the time of such original appointments."
+        hash "11b04bd9957d1cee4e2cb19dba783b561039811e5891cc6e6f2c3458eeb6591a"
+      }
+      provision "/us/usc/t45/s1323/3/D" subparagraph {
+        num "D" "(D)"
+        chapeau "With respect to the period beginning on the first date more than 50 percent of the interest of the United States in the Corporation has been sold through public offering and ending when 100 percent of such interest has been sold—"
+        provision "/us/usc/t45/s1323/3/D/i" clause {
+          num "i" "(i)"
+          content "all remaining members of the board referred to in paragraph (2)(A)(iii), and"
+          hash "eff06fbeea3eb050b3fd039d2da9e1f25ddc92fb1710bbbf28f8f4cdde3d6d32"
+        }
+        provision "/us/usc/t45/s1323/3/D/ii" clause {
+          num "ii" "(ii)"
+          content "with respect to the period ending June 30, 1987, all remaining members of the board, except 3 members appointed by the Secretary of Transportation and the Chief Executive Officer and the Chief Operating Officer of the Corporation,"
+          hash "1594131f1c8c9def098c98f4039d4da178651313271390e6f701dfb59d86d173"
+        }
+        continuation "shall be replaced by directors elected by the public shareholders of the Corporation."
+        hash "afc48979a19c8a0f107269674d5923621bdae1057fa831ba2537c3de0e889248"
+      }
+      provision "/us/usc/t45/s1323/3/E" subparagraph {
+        num "E" "(E)"
+        content "After 100 percent of the interest of the United States in the Corporation has been sold, any remaining directors appointed by the Secretary of Transportation, the United States Railway Association, or the special court trustees referred to under paragraph (2)(A)(iii), shall be replaced by directors elected by the public shareholders of the Corporation."
+        hash "84b39bcd2fe6f4f2240a247c35d8223793a57b1cd2733997851c310675ce8833"
+      }
+      provision "/us/usc/t45/s1323/3/F" subparagraph {
+        num "F" "(F)"
+        content "Nothing in this paragraph shall be construed to prohibit any director referred to in this section from being elected as a director by the public shareholders of the Corporation."
+        hash "59e364eb26781a02ddd6bc013b899badcd54948dbfdb77a2bf598ae635c4e60f"
+      }
+      hash "f7e8b112afe480be8777f2e0dce8abcdec9d41bdd9649810adfd9c5cd263f664"
+    }
+    provision "/us/usc/t45/s1323/4" paragraph {
+      num "4" "(4)"
+      provision "/us/usc/t45/s1323/4/A" subparagraph {
+        num "A" "(A)"
+        content "No director appointed or elected under this section shall be a special court trustee or an employee of the United States, except as elected by the public shareholders of the Corporation."
+        hash "66d63d0b5edb68c041dbbb7db321e67e64700c95a700804cd80dbbed939338c6"
+      }
+      provision "/us/usc/t45/s1323/4/B" subparagraph {
+        num "B" "(B)"
+        content "No director appointed or elected under this section shall be an employee of the Corporation, except as provided in paragraph (2)(A)(ii) or as elected by the public shareholders of the Corporation."
+        hash "6deea541f6d091ca7cddb9e9b4d7e475181953aa11408b0b0a7bb7049fbc4123"
+      }
+      hash "47c01036a33ce6a7f2faa0b5505911bef965e59b428bed2cdaf1df20259a65e5"
+    }
+    hash "eacd7e8f1e0d4c6e9fe3ac67f0b6517e0bafe2bfdcbbfc1f97266618a2dcd5b7"
+  }
+  credit "(" ["Pub. L. 99–509, title IV, § 4023" -> "/us/pl/99/509/tIV/s4023"] ", Oct. 21, 1986, " ["100 Stat. 1901" -> "/us/stat/100/1901"] ".)"
+  note "/us/usc/t45/s1323/note/statutoryNotes/nolaw/abolition-of-special-court-regional-rail-reorganization-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Special Court, Regional Rail Reorganization Act of 1973, and Transfer of Functions"
+    p "Special court abolished and all jurisdiction and functions transferred to United States District Court for District of Columbia, see " ["section 719(b)(2) of this title" -> "/us/usc/t45/s719/b/2"] "."
+    hash "b36896cd25152a2ad11f070c8b08b800c6cb73145cec88413adfe814d660133f"
+  }
+  layers {
+    operative "eacd7e8f1e0d4c6e9fe3ac67f0b6517e0bafe2bfdcbbfc1f97266618a2dcd5b7"
+    enacted "9b09c9711dddaebdc47e7f0b113426b11774cc3f46c4a470d26c7235abf2614b"
+    editorial "b479ed4d8759877d57e4440c72c6deb6363e1b9a6f74a9fe72b591c863960066"
+  }
+}

@@ -1,0 +1,129 @@
+edition 2
+module "/us/usc/t45/s131...146" {
+  alias "/us/usc/t45/s131"
+  alias "/us/usc/t45/s132"
+  alias "/us/usc/t45/s133"
+  alias "/us/usc/t45/s134"
+  alias "/us/usc/t45/s135"
+  alias "/us/usc/t45/s136"
+  alias "/us/usc/t45/s137"
+  alias "/us/usc/t45/s138"
+  alias "/us/usc/t45/s139"
+  alias "/us/usc/t45/s140"
+  alias "/us/usc/t45/s141"
+  alias "/us/usc/t45/s142"
+  alias "/us/usc/t45/s143"
+  alias "/us/usc/t45/s144"
+  alias "/us/usc/t45/s145"
+  alias "/us/usc/t45/s146"
+  within "/us/usc/t45/ch7"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s131...146" section {
+    num "131 to 146" "§§ 131 to 146."
+    heading "Repealed. " ["May 20, 1926, ch. 347, § 14" -> "/us/act/1926-05-20/ch347/s14"] ", " ["44 Stat. 587" -> "/us/stat/44/587"]
+    status repealed
+    hash "8ba7543fe4110913a4d902e35a767bdbe76f5e162e38cb5f82237b23ee4a606c"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 131, " ["act Feb. 28, 1920, ch. 91, § 300" -> "/us/act/1920-02-28/ch91/s300"] ", " ["41 Stat. 469" -> "/us/stat/41/469"] ", defined terms for purposes of this chapter. See section 151 et seq. of this title."
+    hash "01cf62c4a238b4a0686144eae2b6976f5abc8d753e3db7e69fd3d133f957ffeb"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 132, " ["act Feb. 28, 1920, ch. 91, § 301" -> "/us/act/1920-02-28/ch91/s301"] ", " ["41 Stat. 469" -> "/us/stat/41/469"] ", related to disputes between carriers and their officers, agents, and employees. See section 151 et seq. of this title."
+    hash "9276c36024b2544ab35e52f0fb564af2cf172727f8f03cd85e1a34137e24cab1"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 133, " ["act Feb. 28, 1920, ch. 91, § 302" -> "/us/act/1920-02-28/ch91/s302"] ", " ["41 Stat. 469" -> "/us/stat/41/469"] ", related to establishment of railroad boards of labor adjustment. See section 151 et seq. of this title."
+    hash "9cadfb7fd4ab53ff75101e1ffa4da03558ad76d2baf20064d2ab0b008713fcbe"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 134, " ["act Feb. 28, 1920, ch. 91, § 303" -> "/us/act/1920-02-28/ch91/s303"] ", " ["41 Stat. 469" -> "/us/stat/41/469"] ", related to duty of boards to hear and decide disputes. See section 151 et seq. of this title."
+    hash "7aeeab181f140a68f7033db47cff3352ad36ac00f1d95815cfd56483a892c5bd"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/5" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 135, " ["act Feb. 28, 1920, ch. 91, § 304" -> "/us/act/1920-02-28/ch91/s304"] ", " ["41 Stat. 470" -> "/us/stat/41/470"] ", related to establishment and composition of Railroad Labor Board. See section 151 et seq. of this title."
+    hash "bfa56bfe1fc83ce09d113505024f12db3028a2479043e1b2887081292aea83d0"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/6" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 136, " ["act Feb. 28, 1920, ch. 91, § 305" -> "/us/act/1920-02-28/ch91/s305"] ", " ["41 Stat. 470" -> "/us/stat/41/470"] ", related to selection of members of board by President. See section 151 et seq. of this title."
+    hash "2c1cd6fa1a05ebd7f293c45db2a0f52bb9dae448c0ab76f8d2dec2880b6e52fe"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/7" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 137, " ["act Feb. 28, 1920, ch. 91, § 306" -> "/us/act/1920-02-28/ch91/s306"] ", " ["41 Stat. 470" -> "/us/stat/41/470"] ", related to effect of subsequent ineligibility of certain members. See section 151 et seq. of this title."
+    hash "4a5f6d9f5420dae382ec8ab2a3b821e7f819efa7973798265ff300259ec80ef0"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/8" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 138, " ["act Feb. 28, 1920, ch. 91, § 306" -> "/us/act/1920-02-28/ch91/s306"] ", " ["41 Stat. 470" -> "/us/stat/41/470"] ", related to terms of office, salary, and removal from office of board members. See section 151 et seq. of this title."
+    hash "c286dc020e860537f97cc62843b7fee8ae66c99ca12cf897e7bb6e414666511a"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/9" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 139, " ["act Feb. 28, 1920, ch. 91, § 307" -> "/us/act/1920-02-28/ch91/s307"] ", " ["41 Stat. 470" -> "/us/stat/41/470"] ", related to disputes within jurisdiction of board. See section 151 et seq. of this title."
+    hash "bf90f6995bc1d7bc1695895b8adc35a36bea6f8fa32ff620d426bfe73cc1c6e3"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/10" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 140, " ["act Feb. 28, 1920, ch. 91, § 308" -> "/us/act/1920-02-28/ch91/s308"] ", " ["41 Stat. 472" -> "/us/stat/41/472"] ", related to certain powers and duties of board. See section 151 et seq. of this title."
+    hash "b1599c168d91bb0eb04bff28134e88dbf573dc822ed3eb3aefa1641c1d6e5926"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/11" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 141, " ["act Feb. 28, 1920, ch. 91, § 309" -> "/us/act/1920-02-28/ch91/s309"] ", " ["41 Stat. 472" -> "/us/stat/41/472"] ", related to right to hearing by a party in dispute. See section 151 et seq. of this title."
+    hash "e3dd010800d206d152338dc00a0c3223a13a98bcb856b84b70e253355dfb491e"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/12" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 142, " ["act Feb. 28, 1920, ch. 91, § 310" -> "/us/act/1920-02-28/ch91/s310"] ", " ["41 Stat. 472" -> "/us/stat/41/472"] ", related to certain procedural powers of board. See section 151 et seq. of this title."
+    hash "a4a9a2735896d379bee927e400911dae4785fa4647cf70a795a53633560c19f7"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/13" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 143, " ["act Feb. 28, 1920, ch. 91, § 311" -> "/us/act/1920-02-28/ch91/s311"] ", " ["41 Stat. 472" -> "/us/stat/41/472"] ", related to access to books, accounts, and records. See section 151 et seq. of this title."
+    hash "db856c41b8b722d7b4fd45add54df8b70a6903bac38805aa21e221dd9795df0d"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/14" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 144, " ["act Feb. 28, 1920, ch. 91, § 313" -> "/us/act/1920-02-28/ch91/s313"] ", " ["41 Stat. 473" -> "/us/stat/41/473"] ", related to determination of violations of decisions of board. See section 151 et seq. of this title."
+    hash "079a098a8804cc3c2d9fa31015de8b89676c9fcd688581d14c3196b203cd0b1c"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/15" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 145, " ["act Feb. 28, 1920, ch. 91, § 314" -> "/us/act/1920-02-28/ch91/s314"] ", " ["41 Stat. 473" -> "/us/stat/41/473"] ", related to appointment and salary of Secretary of Board. See section 151 et seq. of this title."
+    hash "13df2b1dafa9de42aa981a8e73410c0e296d0a46877fd2df884857d2abb4777a"
+  }
+  note "/us/usc/t45/s131...146/note/ungrouped/act.1920-02-28.ch91/noheading/16" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 146, " ["act Feb. 28, 1920, ch. 91, § 316" -> "/us/act/1920-02-28/ch91/s316"] ", " ["41 Stat. 474" -> "/us/stat/41/474"] ", related to jurisdiction of adjustment or labor board as excluding mediation board. See section 151 et seq. of this title."
+    hash "f3651e33f7ec6f32e3bc0fd6f1b11ee8015559cdae342e26a5935787f9784b12"
+  }
+  layers {
+    operative "8ba7543fe4110913a4d902e35a767bdbe76f5e162e38cb5f82237b23ee4a606c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1eacdaeb9a5c9a04f07c68b5bdc8579b53c8c233003a1c0e50f6c24e35722a0a"
+  }
+}

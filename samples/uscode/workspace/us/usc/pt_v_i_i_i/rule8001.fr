@@ -1,0 +1,69 @@
+edition 2
+module "/us/usc/ptVIII/rule8001" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8001" courtRule {
+    num "8001" "Rule 8001."
+    heading "Scope; Definition of “BAP”; Sending Documents Electronically"
+    provision "/us/usc/ptVIII/rule8001/a" subsection {
+      num "a" "(a)"
+      heading "Scope."
+      content "These Part VIII rules govern the procedure in a United States district court and in a bankruptcy appellate panel on appeal from a bankruptcy court’s judgment, order, or decree. They also govern certain procedures on appeal to a United States court of appeals under 28 U.S.C. § 158(d)."
+      hash "c5dd38262f7cea95cc54bb012891d47828a6b6480c3e45a1627e4090b8ecc228"
+    }
+    provision "/us/usc/ptVIII/rule8001/b" subsection {
+      num "b" "(b)"
+      heading "Definition of “BAP.”"
+      content "“BAP” means a bankruptcy appellate panel established by a circuit judicial council and authorized to hear appeals from a bankruptcy court under 28 U.S.C. § 158."
+      hash "837d99234ba22e9d083a228d036cfa5652e5ffe15a80a4a3c73022640641754d"
+    }
+    provision "/us/usc/ptVIII/rule8001/c" subsection {
+      num "c" "(c)"
+      heading "Requirement to Send Documents Electronically."
+      chapeau "Under these Part VIII rules, a document must be sent electronically, unless:"
+      provision "/us/usc/ptVIII/rule8001/c/1" paragraph {
+        num "1" "(1)"
+        content "it is sent by or to an individual who is not represented by counsel; or"
+        hash "db7e0fe9ed922fc350e738de9c5fd02bab1f40b202279c4fb773941ba250d51a"
+      }
+      provision "/us/usc/ptVIII/rule8001/c/2" paragraph {
+        num "2" "(2)"
+        content "the court’s local rules permit or require mailing or delivery by other means."
+        hash "fad9412eec333e624d4bb383f3130b78d9d22ace97d26d86e8045da53ff1737c"
+      }
+      hash "7c544dd1dcb1c463be07dbb56f359116b1a8058ac678ebac2ac7635702e424f8"
+    }
+    hash "4c57ce78cddc2c8957bad5546c4e61042176d08b7cfd5789036c4f549c63026e"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8001/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8001, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 11, 1997, eff. Dec. 1, 1997; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009, related to manner of taking appeal, voluntary dismissal, and certification to court of appeals, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "12a5324fdbe9f981d7ba497a712b10dcfb7ffc6d0340897f27b081e1af8956fa"
+  }
+  note "/us/usc/ptVIII/rule8001/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "These Part VIII rules apply to appeals under 28 U.S.C. § 158(a) from bankruptcy courts to district courts and BAPs. The Federal Rules of Appellate Procedure generally govern bankruptcy appeals to courts of appeals."
+    p "Eight of the Part VIII rules do, however, relate to appeals to courts of appeals. Rule 8004(e) provides that the authorization by a court of appeals of a direct appeal of a bankruptcy court’s interlocutory order or decree constitutes a grant of leave to appeal. Rule 8006 governs the procedure for certification under 28 U.S.C. § 158(d)(2) of a direct appeal from a judgment, order, or decree of a bankruptcy court to a court of appeals. Rule 8007 addresses stays pending a direct appeal to a court of appeals. Rule 8008 authorizes a bankruptcy court to issue an indicative ruling while an appeal is pending in a court of appeals. Rules 8009 and 8010 govern the record on appeal in a direct appeal to a court of appeals. Rule 8025 governs the granting of a stay of a district court or BAP judgment pending an appeal to the court of appeals. And Rule 8028 authorizes the court of appeals to suspend applicable Part VIII rules in a particular case, subject to certain enumerated exceptions."
+    p "These rules take account of the evolving technology in the federal courts for the electronic filing, storage, and transmission of documents. Except as applied to pro se parties, the Part VIII rules require documents to be sent electronically, unless applicable court rules or orders expressly require or permit another means of sending a particular document."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "928807ac4a9be1b44fd92a08c66d5f8561401a4558d063af45c29714ad1351a9"
+  }
+  note "/us/usc/ptVIII/rule8001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8001 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "a83ca839ed8b9c360b52cc1ada24f57f214549f5a97dec467a89cace5a605910"
+  }
+  layers {
+    operative "4c57ce78cddc2c8957bad5546c4e61042176d08b7cfd5789036c4f549c63026e"
+    enacted "d8c1ac0d36d5dbe785a1bb00983193dccb61272c26dd839bf288dec3c3d269fe"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

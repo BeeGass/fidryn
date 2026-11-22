@@ -1,0 +1,42 @@
+edition 2
+module "/us/usc/t45/s664" {
+  within "/us/usc/t45/ch15"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s664" section {
+    num "664" "§ 664."
+    heading "Issuance of obligations to Secretary of the Treasury"
+    provision "/us/usc/t45/s664/a" subsection {
+      num "a" "(a)"
+      heading "Forms and denominations; maturity dates; terms and conditions; interest rate; purchase and sale of obligations by Secretary of the Treasury; authorization of appropriations"
+      content "To enable the Secretary to carry out his rights and responsibilities under " ["section 662 of this title" -> "/us/usc/t45/s662"] ", he is authorized to issue to the Secretary of the Treasury notes or other obligations in such forms and denominations, bearing such maturities, and subject to such terms and conditions, as may be prescribed by the Secretary with the approval of the Secretary of the Treasury. Such notes or other obligations shall bear interest at a rate determined by the Secretary of the Treasury, taking into consideration the current average market yield on outstanding marketable obligations of the United States of comparable maturities during the month preceding the issuance of the notes or other obligations. The Secretary of the Treasury shall purchase any notes and other obligations issued hereunder and for that purpose he is authorized to use as a public debt transaction the proceeds from the sale of any securities issued under chapter 31 of title 31, and the purposes for which securities may be issued under that chapter are extended to include any purchase of such notes and obligations. The Secretary of the Treasury may at any time sell any of the notes or other obligations acquired by him under this subsection. All redemptions, purchases, and sales by the Secretary of the Treasury of such notes or other obligations shall be treated as public debt transactions of the United States. There are authorized to be appropriated to the Secretary such sums as may be necessary to pay the principal and interest on the notes or obligations issued by him to the Secretary of the Treasury."
+      hash "a70fde86de7366d07d13f09d92c6e081b9580e7199d9b7096861685a5e2f9f8f"
+    }
+    provision "/us/usc/t45/s664/b" subsection {
+      num "b" "(b)"
+      heading "Revocation of guarantee; legal effect of guarantee; validity and incontestability of guaranteed certificate"
+      content "Any guarantee made by the Secretary under this chapter shall not be terminated, canceled, or otherwise revoked, except as provided by the terms and conditions prescribed by the Secretary under " ["section 662(d) of this title" -> "/us/usc/t45/s662/d"] "; shall be conclusive evidence that such guarantee complies fully with the provisions of this chapter, and of the approval and legality of the principal amount, interest rate, and all other terms of the certificates and the guarantee; and shall be valid and incontestable in the hands of a holder of a guaranteed certificate except for fraud or material misrepresentation on the part of such holder."
+      hash "fce54abb2eb9df91eb53e252678adbac282bfb6a9242a9b6b9857b98194e1174"
+    }
+    provision "/us/usc/t45/s664/c" subsection {
+      num "c" "(c)"
+      heading "Enforcement by Attorney General of rights accruing to United States because of guarantee"
+      content "The Attorney General shall take such action as may be appropriate to enforce any right accruing to the United States by reason of its having paid money or incurred expenses as a result of making such guarantees."
+      hash "5fc5d64aab61e3cd581cd3f0546111e2a05318cf5e364718b8ab5a7dd40ebd04"
+    }
+    hash "2ec40cdf8ac0ec983c144479b4ebb2bd5cde056db63f196b99d0c21ab7555f41"
+  }
+  credit "(" ["Pub. L. 91–663, § 5" -> "/us/pl/91/663/s5"] ", Jan. 8, 1971, " ["84 Stat. 1976" -> "/us/stat/84/1976"] ".)"
+  note "/us/usc/t45/s664/note/editorialNotes/pl.97.258/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "In subsec. (a), “chapter 31 of title 31” and “that chapter” substituted for “the Second Liberty Bond Act, as amended” and “that Act, as amended,”, respectively, on authority of " ["Pub. L. 97–258, § 4(b)" -> "/us/pl/97/258/s4/b"] ", Sept. 13, 1982, " ["96 Stat. 1067" -> "/us/stat/96/1067"] ", the first section of which enacted Title 31, Money and Finance."
+    hash "e5853890bfeee282397f8592963f937f0b202ef10ebfae28c0cd0f20076eebd0"
+  }
+  layers {
+    operative "2ec40cdf8ac0ec983c144479b4ebb2bd5cde056db63f196b99d0c21ab7555f41"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "1ada7ea9b79453bbeaf76bf90737ecd8f0c07e4eec14d9b0d245f2bf23f8031f"
+  }
+}

@@ -1,0 +1,130 @@
+edition 2
+module "/us/usc/t45/s771...780" {
+  alias "/us/usc/t45/s771"
+  alias "/us/usc/t45/s772"
+  alias "/us/usc/t45/s773"
+  alias "/us/usc/t45/s774"
+  alias "/us/usc/t45/s775"
+  alias "/us/usc/t45/s776"
+  alias "/us/usc/t45/s777"
+  alias "/us/usc/t45/s778"
+  alias "/us/usc/t45/s779"
+  alias "/us/usc/t45/s780"
+  within "/us/usc/t45/ch16/schV"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s771...780" section {
+    num "771 to 780" "§§ 771 to 780."
+    heading "Repealed. " ["Pub. L. 97–35, title XI, § 1144(a)(1)" -> "/us/pl/97/35/tXI/s1144/a/1"] ", Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"]
+    status repealed
+    hash "b1d882a44779da0a38b398ec607e62998b0db63e36b01e22262740d66fc66933"
+  }
+  note "/us/usc/t45/s771...780/note/ungrouped/pl.93.236/noheading" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 771, " ["Pub. L. 93–236, title V, § 501" -> "/us/pl/93/236/tV/s501"] ", Jan. 2, 1974, " ["87 Stat. 1012" -> "/us/stat/87/1012"] "; " ["Pub. L. 94–210, title VI" -> "/us/pl/94/210/tVI"] ", §§ 607(i), 613, Feb. 5, 1976, " ["90 Stat. 97" -> "/us/stat/90/97"] ", 112; " ["Pub. L. 94–248, § 5" -> "/us/pl/94/248/s5"] ", Mar. 25, 1976, " ["90 Stat. 286" -> "/us/stat/90/286"] "; " ["Pub. L. 94–555, title II, § 207(a)" -> "/us/pl/94/555/tII/s207/a"] ", Oct. 19, 1976, " ["90 Stat. 2621" -> "/us/stat/90/2621"] "; " ["Pub. L. 96–448, title V, § 508(d)" -> "/us/pl/96/448/tV/s508/d"] ", Oct. 14, 1980, " ["94 Stat. 1957" -> "/us/stat/94/1957"] ", set forth provisions defining terms applicable to employee protection rights."
+    hash "dd44dcf29081731a30a45af39ebb2e7cc97f10de253160b2af36a4e3d3cfd788"
+  }
+  note "/us/usc/t45/s771...780/note/ungrouped/pl.93.236/noheading/2" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 772, " ["Pub. L. 93–236, title V, § 502" -> "/us/pl/93/236/tV/s502"] ", Jan. 2, 1974, " ["87 Stat. 1013" -> "/us/stat/87/1013"] "; " ["Pub. L. 94–210, title VI, § 614" -> "/us/pl/94/210/tVI/s614"] ", Feb. 5, 1976, " ["90 Stat. 112" -> "/us/stat/90/112"] ", set forth provisions respecting employment offers."
+    hash "652bb2b9ed7aa6cfffd231178227e5e55896a66cc346e7cc35de34eae3850993"
+  }
+  note "/us/usc/t45/s771...780/note/ungrouped/pl.93.236/noheading/3" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 773, " ["Pub. L. 93–236, title V, § 503" -> "/us/pl/93/236/tV/s503"] ", Jan. 2, 1974, " ["87 Stat. 1014" -> "/us/stat/87/1014"] ", related to assignment of work."
+    hash "3d11e58e329f8ced249ca1f12a75f0eeb9260e0b706de38ff12f6a6891c12b42"
+  }
+  note "/us/usc/t45/s771...780/note/ungrouped/pl.93.236/noheading/4" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 774, " ["Pub. L. 93–236, title V, § 504" -> "/us/pl/93/236/tV/s504"] ", Jan. 2, 1974, " ["87 Stat. 1014" -> "/us/stat/87/1014"] "; " ["Pub. L. 94–210, title VI, § 615" -> "/us/pl/94/210/tVI/s615"] ", Feb. 5, 1976, " ["90 Stat. 113" -> "/us/stat/90/113"] "; " ["Pub. L. 94–555, title II" -> "/us/pl/94/555/tII"] ", §§ 207(b), 208, Oct. 19, 1976, " ["90 Stat. 2622" -> "/us/stat/90/2622"] "; " ["Pub. L. 96–448, title V, § 506" -> "/us/pl/96/448/tV/s506"] ", Oct. 14, 1980, " ["94 Stat. 1956" -> "/us/stat/94/1956"] ", set forth provisions respecting collective bargaining agreements."
+    hash "24c396570241ddbd89e1d00110a310ca3c8522c407b6fe619c4d8f95819cf71b"
+  }
+  note "/us/usc/t45/s771...780/note/ungrouped/pl.93.236/noheading/5" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 775, " ["Pub. L. 93–236, title V, § 505" -> "/us/pl/93/236/tV/s505"] ", Jan. 2, 1974, " ["87 Stat. 1015" -> "/us/stat/87/1015"] "; " ["Pub. L. 94–210, title VI, § 616(a)" -> "/us/pl/94/210/tVI/s616/a"] "–(g), Feb. 5, 1976, " ["90 Stat. 115" -> "/us/stat/90/115"] ", 116; " ["Pub. L. 94–555, title II" -> "/us/pl/94/555/tII"] ", §§ 209, 210, Oct. 19, 1976, " ["90 Stat. 2623" -> "/us/stat/90/2623"] "; " ["Pub. L. 96–448, title V" -> "/us/pl/96/448/tV"] ", §§ 501–503, Oct. 14, 1980, " ["94 Stat. 1948–1954" -> "/us/stat/94/1948-1954"] ", set forth provisions relating to employee protection programs."
+    hash "5d5a7ba574153ab952bf6f28c46f1cf1475c68af0bb16620ecd5a8a31e0367c9"
+  }
+  note "/us/usc/t45/s771...780/note/ungrouped/pl.93.236/noheading/6" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 776, " ["Pub. L. 93–236, title V, § 506" -> "/us/pl/93/236/tV/s506"] ", Jan. 2, 1974, " ["87 Stat. 1019" -> "/us/stat/87/1019"] ", related to contracting out of work."
+    hash "cc386b6f82ccfcf5d23fbec2549df5070f63cbb1fde089f8164fb8f09e75a40c"
+  }
+  note "/us/usc/t45/s771...780/note/ungrouped/pl.93.236/noheading/7" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 777, " ["Pub. L. 93–236, title V, § 507" -> "/us/pl/93/236/tV/s507"] ", Jan. 2, 1974, " ["87 Stat. 1020" -> "/us/stat/87/1020"] "; " ["Pub. L. 96–448, title V, § 508(e)" -> "/us/pl/96/448/tV/s508/e"] ", Oct. 14, 1980, " ["94 Stat. 1957" -> "/us/stat/94/1957"] ", related to arbitration of disputes or controversies."
+    hash "89cc32cdf73bd5c12065c3ce6ee2277cdf61e18274ddcf5a2868beb8aa215ad4"
+  }
+  note "/us/usc/t45/s771...780/note/ungrouped/pl.93.236/noheading/8" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 778, " ["Pub. L. 93–236, title V, § 508" -> "/us/pl/93/236/tV/s508"] ", Jan. 2, 1974, " ["87 Stat. 1020" -> "/us/stat/87/1020"] "; " ["Pub. L. 94–210, title VI, § 617" -> "/us/pl/94/210/tVI/s617"] ", Feb. 5, 1976, " ["90 Stat. 117" -> "/us/stat/90/117"] ", related to duties of acquiring and selling railroads."
+    hash "2cb2d204ba0ee09f0685facbdc616d12fde517d383e2f09b1a3a03a08a5fc465"
+  }
+  note "/us/usc/t45/s771...780/note/ungrouped/pl.93.236/noheading/9" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 779, " ["Pub. L. 93–236, title V, § 509" -> "/us/pl/93/236/tV/s509"] ", Jan. 2, 1974, " ["87 Stat. 1020" -> "/us/stat/87/1020"] "; " ["Pub. L. 94–210, title VI, § 616(h)" -> "/us/pl/94/210/tVI/s616/h"] ", Feb. 5, 1976, " ["90 Stat. 116" -> "/us/stat/90/116"] "; " ["Pub. L. 94–555, title II, § 207(c)" -> "/us/pl/94/555/tII/s207/c"] ", Oct. 19, 1976, " ["90 Stat. 2622" -> "/us/stat/90/2622"] "; " ["Pub. L. 96–448, title V, § 504" -> "/us/pl/96/448/tV/s504"] ", Oct. 14, 1980, " ["94 Stat. 1955" -> "/us/stat/94/1955"] ", set forth provisions respecting benefit payments."
+    hash "7d9be5de68ed5e4f913443b92179bd3790200fea37f9c36f80c5c39dc6aa6628"
+  }
+  note "/us/usc/t45/s771...780/note/ungrouped/pl.93.236/noheading/10" editorial {
+    group ungrouped
+    topic "removalDescription"
+    p "Section 780, " ["Pub. L. 93–236, title V, § 510" -> "/us/pl/93/236/tV/s510"] ", as added " ["Pub. L. 96–448, title V, § 505" -> "/us/pl/96/448/tV/s505"] ", Oct. 14, 1980, " ["94 Stat. 1956" -> "/us/stat/94/1956"] ", related to railroad hiring."
+    hash "394a9e202d380ed19effb10013b3f83fdfbdc878aad0956e2050d7f7bdf4f4e1"
+  }
+  note "/us/usc/t45/s771...780/note/statutoryNotes/pl.97.35/effective-date-of-repeal-continuation-of-benefits-after-repe" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Effective Date of Repeal; Continuation of Benefits After Repeal; Law Governing Disputes; Prerequisites to Disbursement of Benefits"
+    p ["Pub. L. 97–35, title XI, § 1144(a)(2)" -> "/us/pl/97/35/tXI/s1144/a/2"] "–(4), Aug. 13, 1981, " ["95 Stat. 669" -> "/us/stat/95/669"] ", provided that:"
+    quoted "/us/pl/97/35/tXI/s1144/a/2" {
+      level paragraph {
+        num "2" "“(2)"
+        chapeau "Notwithstanding the repeal made by paragraph (1) of this subsection [repealing this subchapter]—"
+        level subparagraph {
+          num "A" "“(A)"
+          content "benefits accrued as of the effective date of this subsection as a result of events that occurred wholly prior to October 1, 1981, shall be disbursed except as provided in paragraph (3); and"
+        }
+        level subparagraph {
+          num "B" "“(B)"
+          content "any dispute or controversy regarding such benefits shall be determined under the terms of the law in effect on the date the claim arose."
+        }
+      }
+      level paragraph {
+        num "3" "“(3)"
+        content "Benefits shall not be disbursed under paragraph (2)(A) unless the employee has filed a claim for such benefits within 90 days after the date of repeal; except that, with respect to a claim which is the subject of or is based upon any arbitration decision issued after the date of repeal, such 90-day period shall not commence until such arbitration decision is issued to the employee and the employee’s representative; and no benefits shall be disbursed unless appropriations for such purposes are or become available."
+      }
+      level paragraph {
+        num "4" "“(4)"
+        content "The provisions of this subsection shall take effect on the first day of the first month beginning after the date of enactment of this subtitle [Aug. 13, 1981].”"
+      }
+    }
+    hash "35a91f5cd5680307be8a48cf8e975d76ed490da34c76f8628c4b29e94dac10cd"
+  }
+  note "/us/usc/t45/s771...780/note/statutoryNotes/pl.96.448/employee-protection-payments-under-former-provisions-reimbur" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Employee Protection Payments Under Former Provisions; Reimbursement"
+    p ["Pub. L. 96–448, title V, § 507" -> "/us/pl/96/448/tV/s507"] ", Oct. 14, 1980, " ["94 Stat. 1956" -> "/us/stat/94/1956"] ", provided that notwithstanding any other provision of law, the Consolidated Rail Corporation and other employers with employees protected under this subchapter, until the effective date of " ["Pub. L. 96–448" -> "/us/pl/96/448"] " [probably means Oct. 1, 1980, see " ["section 710 of Pub. L. 96–448" -> "/us/pl/96/448/s710"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy], continue to make payments for employee protection under such Act, [probably means this subchapter] in accordance with the provisions of such Act [probably means this subchapter], which were in effect on Jan. 1, 1979, and that notwithstanding any other provision of law, such Corporation and employers be reimbursed for such payments in accordance with former " ["section 779(a) of this title" -> "/us/usc/t45/s779/a"] "."
+    hash "d96a9cfcb0344a6ad29771597ae799cc72f727001fa4c94b4f92925155c0d6ee"
+  }
+  note "/us/usc/t45/s771...780/note/statutoryNotes/pl.96.254/conrail-employee-protection" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Conrail Employee Protection"
+    p ["Pub. L. 96–254, title II, § 214" -> "/us/pl/96/254/tII/s214"] ", May 30, 1980, " ["94 Stat. 417" -> "/us/stat/94/417"] ", provided that the Consolidated Railroad Corporation make payments in accordance with this subchapter, and the United States Railway Association not, as a result of such payments, withhold any funds from the Corporation, and that this provision take effect as of Mar. 1, 1980, and remain in effect until the expiration of the 45-day period beginning on May 30, 1980, and after the expiration of such 45-day period, payments by the Consolidated Rail Corporation under this subchapter and funding of the Corporation by the United States Railway Association be governed by applicable law."
+    hash "061310b931130e5afe530c0718614abe20f5340c1fa8e4335d323ae3b8fa2b34"
+  }
+  layers {
+    operative "b1d882a44779da0a38b398ec607e62998b0db63e36b01e22262740d66fc66933"
+    enacted "a1025af231b327cd5a90dea145634e7db249f42abae726437b9cfdac258b29e5"
+    editorial "eeee1287512461cecbf61acf104536395b7a1c12a1491764231af4d61ae54185"
+  }
+}

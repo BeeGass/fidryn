@@ -1,0 +1,41 @@
+edition 2
+module "/us/usc/ptII" {
+  within "/us/usc/t11a/~courtRules.1"
+  source "usc11a.xml"
+  positive_law false
+  container "/us/usc/ptII" part {
+    num "II" "PART II—"
+    heading "OFFICERS AND ADMINISTRATION; NOTICES; MEETINGS; EXAMINATIONS; ELECTIONS AND APPOINTMENTS; FINAL REPORT; COMPENSATION"
+    member "/us/usc/ptII/rule2001"
+    member "/us/usc/ptII/rule2002"
+    member "/us/usc/ptII/rule2003"
+    member "/us/usc/ptII/rule2004"
+    member "/us/usc/ptII/rule2005"
+    member "/us/usc/ptII/rule2006"
+    member "/us/usc/ptII/rule2007"
+    member "/us/usc/ptII/rule2007.1"
+    member "/us/usc/ptII/rule2007.2"
+    member "/us/usc/ptII/rule2008"
+    member "/us/usc/ptII/rule2009"
+    member "/us/usc/ptII/rule2010"
+    member "/us/usc/ptII/rule2011"
+    member "/us/usc/ptII/rule2012"
+    member "/us/usc/ptII/rule2013"
+    member "/us/usc/ptII/rule2014"
+    member "/us/usc/ptII/rule2015"
+    member "/us/usc/ptII/rule2015.1"
+    member "/us/usc/ptII/rule2015.2"
+    member "/us/usc/ptII/rule2015.3"
+    member "/us/usc/ptII/rule2016"
+    member "/us/usc/ptII/rule2017"
+    member "/us/usc/ptII/rule2018"
+    member "/us/usc/ptII/rule2019"
+    member "/us/usc/ptII/rule2020"
+    hash "2f7a7b653ea0bcb6a06b05a9860d11dd63da38d8764b11bbdc1d2337b4d23447"
+  }
+  layers {
+    operative "2f7a7b653ea0bcb6a06b05a9860d11dd63da38d8764b11bbdc1d2337b4d23447"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

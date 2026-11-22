@@ -1,0 +1,30 @@
+edition 2
+module "/us/usc/t45/ch16/schVII" {
+  within "/us/usc/t45/ch16"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch16/schVII" subchapter {
+    num "VII" "SUBCHAPTER VII—"
+    heading "PROTECTION OF EMPLOYEES"
+    member "/us/usc/t45/s797"
+    member "/us/usc/t45/s797a"
+    member "/us/usc/t45/s797b"
+    member "/us/usc/t45/s797c"
+    member "/us/usc/t45/s797d"
+    member "/us/usc/t45/s797e"
+    member "/us/usc/t45/s797f"
+    member "/us/usc/t45/s797g"
+    member "/us/usc/t45/s797h"
+    member "/us/usc/t45/s797i"
+    member "/us/usc/t45/s797j"
+    member "/us/usc/t45/s797k"
+    member "/us/usc/t45/s797l"
+    member "/us/usc/t45/s797m"
+    hash "2655765de199d1567d8010e948ea138161917f6dbfa88eb1263e9b1346108109"
+  }
+  layers {
+    operative "2655765de199d1567d8010e948ea138161917f6dbfa88eb1263e9b1346108109"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

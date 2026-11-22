@@ -1,0 +1,76 @@
+edition 2
+module "/us/usc/t45/s1007" {
+  within "/us/usc/t45/ch19"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1007" section {
+    num "1007" "§ 1007."
+    heading "Election"
+    provision "/us/usc/t45/s1007/a" subsection {
+      num "a" "(a)"
+      heading "Assistance received under employee protection agreement; waiver of other employee protection benefits; exception"
+      content "Any employee who receives any assistance under an employee protection agreement entered into or benefit schedule prescribed under " ["section 1005 of this title" -> "/us/usc/t45/s1005"] " or any new career training assistance under " ["section 1014 of this title" -> "/us/usc/t45/s1014"] " shall be deemed to waive any employee protection benefits otherwise available to such employee under the Bankruptcy Act, subtitle IV of title 49 or any applicable contract or agreement (other than as provided in the agreement entered into in Washington, District of Columbia, on March 4, 1980, entitled “Labor Protective Agreement Between Railroads Parties Hereto Involved in Midwest Rail Restructuring and Employees of Such Railroads Represented by the Rail Labor Organizations Operating Through the Railway Labor Executives’ Association”)."
+      hash "bbd9ace704551c2c40c4bcd455a7ad71adf54351aeaee9f1135c27ac2bab9967"
+    }
+    provision "/us/usc/t45/s1007/b" subsection {
+      num "b" "(b)"
+      heading "Filing of statement"
+      content "Any employee of the Rock Island Railroad who is entitled to receive assistance under this chapter shall, no later than 120 days after the effective date of any agreement entered into under " ["section 1005(a) of this title" -> "/us/usc/t45/s1005/a"] " or of any benefit schedule prescribed under " ["section 1005(b) of this title" -> "/us/usc/t45/s1005/b"] ", as the case may be, file a statement with the Board indicating whether such employee elects to receive (1) assistance under this chapter; or (2) any employee protection benefits otherwise available to such employee under the Bankruptcy Act, subtitle IV of title 49, or any applicable contract or agreement."
+      hash "658112d347389ab1da38e2365f4d2a8566f4626297f1713615449e46bfeb7d27"
+    }
+    provision "/us/usc/t45/s1007/c" subsection {
+      num "c" "(c)"
+      heading "Effect on priority, timing, etc., of employee protection payments"
+      content "With regard to any employee who elects benefits under subsection (b)(2) of this section, nothing in this chapter shall be deemed to determine or otherwise affect the priority, status, or timing of payment of, or the liability for any claim for, employee protection which might have existed in the absence of this chapter."
+      hash "c59b097e299a26e08cc8e4bb1a782e1ff2e73e7ea3a760a7daf7ac7a1b8efee7"
+    }
+    provision "/us/usc/t45/s1007/d" subsection {
+      num "d" "(d)"
+      heading "Limitation on assistance eligibility"
+      chapeau "An employee shall not be eligible to receive any assistance (other than moving expenses) under an employee protection agreement entered into or benefit schedule prescribed under " ["section 1005 of this title" -> "/us/usc/t45/s1005"] " or any new career training assistance under " ["section 1014 of this title" -> "/us/usc/t45/s1014"] "—"
+      provision "/us/usc/t45/s1007/d/1" paragraph {
+        num "1" "(1)"
+        content "during any period in which such employee is employed by any rail carrier providing temporary service over any lines of the Rock Island Railroad; or"
+        hash "4244384d4f4a9743cb8bd7d0166eaf915f33afc232f6daab2e9cc84bda29a86b"
+      }
+      provision "/us/usc/t45/s1007/d/2" paragraph {
+        num "2" "(2)"
+        content "at any time after the date such employee receives an offer of employment, in his craft and for which such employee is qualified, from a rail carrier acquiring lines of the Rock Island Railroad."
+        hash "ddfa2c0d029f6706e55542eb18aeda57362dd13da739689f8abead1903a692a3"
+      }
+      hash "bd5dc4297a48a3557afebc97ee275caf0dd43e1cac38386bb4c6a0b7a961f337"
+    }
+    hash "c73f22346b312a1e87cbddbb44ea186dc8dd8650a0ca912e40eecf15b136a182"
+  }
+  credit "(" ["Pub. L. 96–254, title I, § 108" -> "/us/pl/96/254/tI/s108"] ", May 30, 1980, " ["94 Stat. 402" -> "/us/stat/94/402"] "; " ["Pub. L. 96–448, title VII, § 701(b)(2)" -> "/us/pl/96/448/tVII/s701/b/2"] ", Oct. 14, 1980, " ["94 Stat. 1960" -> "/us/stat/94/1960"] "; " ["Pub. L. 97–468, title II, § 232" -> "/us/pl/97/468/tII/s232"] ", Jan. 14, 1983, " ["96 Stat. 2547" -> "/us/stat/96/2547"] ".)"
+  note "/us/usc/t45/s1007/note/editorialNotes/act.1898-07-01.ch541/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Bankruptcy Act, referred to in subsecs. (a) and (b), is " ["act July 1, 1898, ch. 541" -> "/us/act/1898-07-01/ch541"] ", " ["30 Stat. 544" -> "/us/stat/30/544"] ", which was classified generally to former Title 11, Bankruptcy. The Act was repealed effective Oct. 1, 1979, by " ["Pub. L. 95–598" -> "/us/pl/95/598"] ", §§ 401(a), 402(a), Nov. 6, 1978, " ["92 Stat. 2682" -> "/us/stat/92/2682"] ", section 101 of which enacted revised Title 11. For current provisions relating to railroad reorganization, see subchapter IV (§ 1161 et seq.) of chapter 11 of Title 11."
+    p "This chapter, referred to in subsecs. (b) and (c), was in the original “this title”, meaning title I (§ 101 et seq.) of " ["Pub. L. 96–254" -> "/us/pl/96/254"] ", May 30, 1980, " ["94 Stat. 399" -> "/us/stat/94/399"] ", known as the Rock Island Railroad Transition and Employee Assistance Act, which is classified principally to this chapter. For complete classification of title I to the Code, see Short Title note set out under " ["section 1001 of this title" -> "/us/usc/t45/s1001"] " and Tables."
+    hash "25be7e3ea53f5cb1b6a9652bca443cd41c2a433bb29bfcc94b844bdf2d3ab3e0"
+  }
+  note "/us/usc/t45/s1007/note/editorialNotes/pl.97.468/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1983—Subsec. (a). " ["Pub. L. 97–468, § 232(1)" -> "/us/pl/97/468/s232/1"] ", substituted “entered into or benefit schedule prescribed” for “or arrangement entered into”."
+    p "Subsec. (b). " ["Pub. L. 97–468, § 232(2)" -> "/us/pl/97/468/s232/2"] ", substituted “120 days after the effective date of any agreement entered into under " ["section 1005(a) of this title" -> "/us/usc/t45/s1005/a"] " or of any benefit schedule prescribed under " ["section 1005(b) of this title" -> "/us/usc/t45/s1005/b"] ", as the case may be” for “April 1, 1981”."
+    p "Subsec. (d). " ["Pub. L. 97–468, § 232(1)" -> "/us/pl/97/468/s232/1"] ", substituted “entered into or benefit schedule prescribed” for “or arrangement entered into”."
+    p "1980—Subsec. (a). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " inserted reference to the agreement entered into in Washington on Mar. 4, 1980, and included the title of the agreement."
+    hash "bbed37f1a2740fb737fad698e962d9c0c47c5571d8ab1e9b6d6b0af2c79b7261"
+  }
+  note "/us/usc/t45/s1007/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1980 Amendment"
+    p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 14, 1980, see " ["section 710(d) of Pub. L. 96–448" -> "/us/pl/96/448/s710/d"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
+    hash "5bd57dc238e4804a5a01c5250e2074da2589039fa458d2c6ff972282781779c6"
+  }
+  layers {
+    operative "c73f22346b312a1e87cbddbb44ea186dc8dd8650a0ca912e40eecf15b136a182"
+    enacted "138ffe4f21bc64395cebaae1574c2fc63935b64ad3526d7dfbceda12403bb7e8"
+    editorial "d4d7deceb20d1a7892c10a71908267ff282fb30cb05df23357ad157cd23055b6"
+  }
+}

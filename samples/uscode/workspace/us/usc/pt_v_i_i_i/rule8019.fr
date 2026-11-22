@@ -1,0 +1,105 @@
+edition 2
+module "/us/usc/ptVIII/rule8019" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8019" courtRule {
+    num "8019" "Rule 8019."
+    heading "Oral Argument"
+    provision "/us/usc/ptVIII/rule8019/a" subsection {
+      num "a" "(a)"
+      heading "Party’s Statement."
+      content "Any party may file, or a district court or BAP may require, a statement explaining why oral argument should, or need not, be permitted."
+      hash "1d70c414d930c2291840c87597bc35734b283ae6b3deff723dfd29920d52b366"
+    }
+    provision "/us/usc/ptVIII/rule8019/b" subsection {
+      num "b" "(b)"
+      heading "Presumption of Oral Argument; Exceptions."
+      chapeau "Oral argument must be allowed in every case unless the district judge—or each BAP judge assigned to hear the appeal—examines the briefs and record and determines that oral argument is unnecessary because:"
+      provision "/us/usc/ptVIII/rule8019/b/1" paragraph {
+        num "1" "(1)"
+        content "the appeal is frivolous;"
+        hash "646e8f4559fd301836653bbe076f63b7ddaf7a6fa08c2d379442b4114cba4ffb"
+      }
+      provision "/us/usc/ptVIII/rule8019/b/2" paragraph {
+        num "2" "(2)"
+        content "the dispositive issue or issues have been authoritatively decided; or"
+        hash "9534aeb0a159339824dcfbb2488d53a1f46ce9e482bc58e741b0192296a2a070"
+      }
+      provision "/us/usc/ptVIII/rule8019/b/3" paragraph {
+        num "3" "(3)"
+        content "the facts and legal arguments are adequately presented in the briefs and record, and the decisional process would not be significantly aided by oral argument."
+        hash "43b6cae1a5fa519c0a5b4b0a591049e46e1acf4eabbedc91db3ab2caf4ffc7f6"
+      }
+      hash "f32b6202148a6a9c0aa6b4e84fa4e54b8b9476de55b16c85a89cf8764f340211"
+    }
+    provision "/us/usc/ptVIII/rule8019/c" subsection {
+      num "c" "(c)"
+      heading "Notice of Oral Argument; Motion to Postpone."
+      content "The district court or BAP must advise all parties of the date, time, and place for oral argument and the time allowed for each side. A motion to postpone the argument or to allow longer argument must be filed reasonably before the hearing date."
+      hash "7dead0a3a98f9c8dfc9b65038a4810403dd342cb71ebbe718471406e0dceaeb6"
+    }
+    provision "/us/usc/ptVIII/rule8019/d" subsection {
+      num "d" "(d)"
+      heading "Order and Content of the Argument."
+      content "The appellant opens and concludes the argument. Counsel must not read at length from briefs, the record, or authorities."
+      hash "8691450f86eb982f866c2703a2ec301c7a36ed03491bd752622e3c9b3de66b54"
+    }
+    provision "/us/usc/ptVIII/rule8019/e" subsection {
+      num "e" "(e)"
+      heading "Cross-Appeals and Separate Appeals."
+      content "If there is a cross-appeal, Rule 8016(b) determines which party is the appellant and which is the appellee for the purposes of oral argument. Unless the district court or BAP orders otherwise, a cross-appeal or separate appeal must be argued when the initial appeal is argued. Separate parties should avoid duplicative argument."
+      hash "b3f0afceb05261c91d1373cc5cfe3713d1d1df7651eb15e33d08f5cfa4c85829"
+    }
+    provision "/us/usc/ptVIII/rule8019/f" subsection {
+      num "f" "(f)"
+      heading "Nonappearance of a Party."
+      content "If the appellee fails to appear for argument, the district court or BAP may hear the appellant’s argument. If the appellant fails to appear for argument, the district court or BAP may hear the appellee’s argument. If neither party appears, the case will be decided on the briefs unless the district court or BAP orders otherwise."
+      hash "0c8bb45714c1b4234c61d0143eb729c9e2e4563b707456dcec3ed8ff55a5732b"
+    }
+    provision "/us/usc/ptVIII/rule8019/g" subsection {
+      num "g" "(g)"
+      heading "Submission on Briefs."
+      content "The parties may agree to submit a case for decision on the briefs, but the district court or BAP may order that the case be argued."
+      hash "3242d64bd5f4141f121aadcd79ad3ba0a4c925a92f133e3eb5e2757419af022d"
+    }
+    provision "/us/usc/ptVIII/rule8019/h" subsection {
+      num "h" "(h)"
+      heading "Use of Physical Exhibits at Argument; Removal."
+      content "An attorney intending to use physical exhibits other than documents at the argument must arrange to place them in the courtroom on the day of the argument before the court convenes. After the argument, the attorney must remove the exhibits from the courtroom unless the district court or BAP orders otherwise. The clerk may destroy or dispose of them if the attorney does not reclaim them within a reasonable time after the clerk gives notice to do so."
+      hash "5811ef971bdb0e616e18b3a880bc00f8070459efa363adde0505588df05cd2f2"
+    }
+    hash "df43ad6f8e682011ad35d0f7a5b9d7726e803185d4b460a5329a95258a20c697"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8019/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8019, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987, related to suspension of rules in Part VIII, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "73bdbb7e243a58f38bcca28f3cd8af5754a642bc86f3a5e3695deea91ec6a763"
+  }
+  note "/us/usc/ptVIII/rule8019/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule generally retains the provisions of former Rule 8012 and adds much of the additional detail of F.R.App.P. 34. By incorporating the more detailed provisions of the appellate rule, Rule 8019 promotes national uniformity regarding oral argument in bankruptcy appeals."
+    p "Subdivision (a), like F.R.App.P. 34(a)(1), now allows a party to submit a statement explaining why oral argument is or is not needed. It also authorizes a court to require this statement. Former Rule 8012 only authorized statements explaining why oral argument should be allowed."
+    p "Subdivision (b) retains the reasons set forth in former Rule 8012 for the district court or BAP to conclude that oral argument is not needed."
+    p "The remainder of this rule adopts the provisions of F.R.App.P. 34(b)–(g), with one exception. Rather than requiring the district court or BAP to hear appellant’s argument if the appellee does not appear, subdivision (f) authorizes the district court or BAP to go forward with the argument in the appellee’s absence. Should the court decide, however, to postpone the oral argument in that situation, it would be authorized to do so."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "cc0b8f668550375923020135181102f317d3450819380339c51d95e87b79e6bd"
+  }
+  note "/us/usc/ptVIII/rule8019/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8019 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "999683faf6670af349d0501b3a1daf2d64a11e7f6236936d3e5df7a6dd3154c9"
+  }
+  layers {
+    operative "df43ad6f8e682011ad35d0f7a5b9d7726e803185d4b460a5329a95258a20c697"
+    enacted "e9ae0f18652c5a21f749ed54370d5ef194b6da933c1adc1f7b5d388d37fb56d2"
+    editorial "8406643165c1e6a0c1babe581c07642b3ad49e77784d8477067174f0e49f814d"
+  }
+}

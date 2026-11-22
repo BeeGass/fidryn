@@ -1,0 +1,142 @@
+edition 2
+module "/us/usc/t45/s1104" {
+  within "/us/usc/t45/ch20"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s1104" section {
+    num "1104" "§ 1104."
+    heading "Definitions"
+    chapeau "As used in this subtitle, unless the context otherwise requires, the term:"
+    provision "/us/usc/t45/s1104/1" paragraph {
+      num "1" "(1)"
+      content "“Amtrak” means the National Railroad Passenger Corporation created under chapter 243 of title 49."
+      hash "7622977114eae6566cbf914eaee9a7274ea03bbdf35901c8306104ec1255ba80"
+    }
+    provision "/us/usc/t45/s1104/2" paragraph {
+      num "2" "(2)"
+      content "“Commission” means the Interstate Commerce Commission."
+      hash "6e3ec41df03e7bd67357632574c1d064a5cb4e8bd952449fcc35add890fa721a"
+    }
+    provision "/us/usc/t45/s1104/3" paragraph {
+      num "3" "(3)"
+      content "“Commuter authority” means any State, local, or regional authority, corporation, or other entity established for purposes of providing commuter service, and includes the Metropolitan Transportation Authority, the Connecticut Department of Transportation, the Maryland Department of Transportation, the Southeastern Pennsylvania Transportation Authority, the New Jersey Transit Corporation, the Massachusetts Bay Transportation Authority, the Port Authority Trans-Hudson Corporation, any successor agencies, and any entity created by one or more such agencies for the purpose of operating, or contracting for the operation of, commuter service."
+      hash "25fd71ee1dada9a1fdc7b24bd4829cb099283a7d65c47d98049d491dec7a1bcd"
+    }
+    provision "/us/usc/t45/s1104/4" paragraph {
+      num "4" "(4)"
+      content "“Commuter service” means short-haul rail passenger service operated in metropolitan and suburban areas, whether within or across the geographical boundaries of a State, usually characterized by reduced fare, multiple-ride, and commutation tickets, and by morning and evening peak period operations."
+      hash "cf8d4efccb64df784bca8d85ed9c1878c09f1e99c81390b8f89d8564fc4f79c2"
+    }
+    provision "/us/usc/t45/s1104/5" paragraph {
+      num "5" "(5)"
+      content "“Conrail” means the Consolidated Rail Corporation created under title III of the Regional Rail Reorganization Act of 1973 (" ["45 U.S.C. 741" -> "/us/usc/t45/s741"] " et seq.)."
+      hash "6cb10159804a8e64c304d12189a9b0ee50181d10a92eefbdc9528574e93a1bdb"
+    }
+    provision "/us/usc/t45/s1104/6" paragraph {
+      num "6" "(6)"
+      content "“Rail carrier” means a common carrier engaged in interstate or foreign commerce by rail subject to subtitle IV of title 49."
+      hash "2356c0c5e5c936444c608fe694355d7fc77614b601590c8eaae2c415edde98f7"
+    }
+    provision "/us/usc/t45/s1104/7" paragraph {
+      num "7" "(7)"
+      content "“Secretary” means the Secretary of Transportation."
+      hash "4e6cb201dab0074c57ba2880b5e0eabbcab4ae6736c6bb923eccfad1acbc3448"
+    }
+    provision "/us/usc/t45/s1104/8" paragraph {
+      num "8" "(8)"
+      content "“Special court” means the judicial panel established under section 209(b)(1) of the Regional Rail Reorganization Act of 1973 (" ["45 U.S.C. 719(b)(1)" -> "/us/usc/t45/s719/b/1"] ") or, with respect to any proceedings that arise or continue after the panel is abolished pursuant to section 209(b)(2) of such Act [" ["45 U.S.C. 719(b)(2)" -> "/us/usc/t45/s719/b/2"] "], the United States District Court for the District of Columbia."
+      hash "554912b59095d5ec2d80ac3006b2dc5ce7cefc16f8a3ced8b7e8743daf962c96"
+    }
+    hash "5a65d93b6e2abfca8e7d123a03ffe5c72bf96613b27d89904ddf22d97fac811d"
+  }
+  credit "(" ["Pub. L. 97–35, title XI, § 1135(a)" -> "/us/pl/97/35/tXI/s1135/a"] ", Aug. 13, 1981, " ["95 Stat. 645" -> "/us/stat/95/645"] "; " ["Pub. L. 104–317, title VI, § 605(c)(3)" -> "/us/pl/104/317/tVI/s605/c/3"] ", Oct. 19, 1996, " ["110 Stat. 3859" -> "/us/stat/110/3859"] ".)"
+  note "/us/usc/t45/s1104/note/editorialNotes/pl.97.35/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "This subtitle, referred to in text, is subtitle E (§§ 1131–1169) of title XI of " ["Pub. L. 97–35" -> "/us/pl/97/35"] ", Aug. 13, 1981, " ["95 Stat. 643" -> "/us/stat/95/643"] ", known as the Northeast Rail Service Act of 1981. For complete classification of this subtitle to the Code, see Short Title note set out under " ["section 1101 of this title" -> "/us/usc/t45/s1101"] " and Tables."
+    p "The Regional Rail Reorganization Act of 1973, referred to in par. (5), is " ["Pub. L. 93–236" -> "/us/pl/93/236"] ", Jan. 2, 1974, " ["87 Stat. 985" -> "/us/stat/87/985"] ". Title III of the Regional Rail Reorganization Act of 1973 is classified generally to subchapter III (§ 741 et seq.) of chapter 16 of this title. For complete classification of this Act to the Code, see Short Title note set out under " ["section 701 of this title" -> "/us/usc/t45/s701"] " and Tables."
+    hash "6c44f8891a3775d64b03b84542effc79f51ab974ffb01d32ac537b3ee1d1017d"
+  }
+  note "/us/usc/t45/s1104/note/editorialNotes/pl.103.272/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "In par. (1), “chapter 243 of title 49” substituted for “title III of the Rail Passenger Service Act (" ["45 U.S.C. 541" -> "/us/usc/t45/s541"] " et seq.)” on authority of " ["Pub. L. 103–272, § 6(b)" -> "/us/pl/103/272/s6/b"] ", July 5, 1994, " ["108 Stat. 1378" -> "/us/stat/108/1378"] ", the first section of which enacted subtitles II, III, and V to X of Title 49, Transportation."
+    hash "24a94810e6bebd951259dc6b6d1f2feb7174635a665de38be467f12402f07827"
+  }
+  note "/us/usc/t45/s1104/note/editorialNotes/pl.104.317/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1996—Par. (8). " ["Pub. L. 104–317" -> "/us/pl/104/317"] " amended par. generally. Prior to amendment, par. read as follows: “ ‘Special court’ means the judicial panel established under section 209 of the Regional Rail Reorganization Act of 1973 (" ["45 U.S.C. 719" -> "/us/usc/t45/s719"] ").”"
+    hash "d2bceec9e864a16d9e0356373b29505215d28cb8896e286b1fefce54f0bfc45f"
+  }
+  note "/us/usc/t45/s1104/note/statutoryNotes/pl.104.317/effective-date-of-1996-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1996 Amendment"
+    p "Amendment by " ["Pub. L. 104–317" -> "/us/pl/104/317"] " effective 90 days after Oct. 19, 1996, and except as otherwise provided, applicable proceedings that arise or continue after such effective date, see " ["section 605(e) of Pub. L. 104–317" -> "/us/pl/104/317/s605/e"] ", set out as a note under " ["section 719 of this title" -> "/us/usc/t45/s719"] "."
+    hash "ee82237079a54380bde1bf8742436788cb8f7e82843247c438f1bc716c550c19"
+  }
+  note "/us/usc/t45/s1104/note/statutoryNotes/pl.104.88/abolition-of-interstate-commerce-commission-and-transfer-of" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of Interstate Commerce Commission and Transfer of Functions"
+    p "Interstate Commerce Commission abolished and functions of Commission transferred, except as otherwise provided in " ["Pub. L. 104–88" -> "/us/pl/104/88"] ", to Surface Transportation Board effective Jan. 1, 1996, by " ["section 1302 of Title 49" -> "/us/usc/t49/s1302"] ", Transportation, and " ["section 101 of Pub. L. 104–88" -> "/us/pl/104/88/s101"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] ". References to Interstate Commerce Commission deemed to refer to Surface Transportation Board, a member or employee of the Board, or Secretary of Transportation, as appropriate, see " ["section 205 of Pub. L. 104–88" -> "/us/pl/104/88/s205"] ", set out as a note under " ["section 1301 of Title 49" -> "/us/usc/t49/s1301"] "."
+    hash "04cef30710e4013529296b7ceb2d04067f7b8b6e3aac69433b414e47c59b7065"
+  }
+  definition "/us/usc/t45/s1104/1" {
+    term "Amtrak"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/2" {
+    term "Commission"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/3" {
+    term "Commuter authority"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/4" {
+    term "Commuter service"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/5" {
+    term "Conrail"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/6" {
+    term "Rail carrier"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/7" {
+    term "Secretary"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  definition "/us/usc/t45/s1104/8" {
+    term "Special court"
+    kind means
+    words "As used in this subtitle, unless the context otherwise requires"
+    basis unresolved
+  }
+  layers {
+    operative "5a65d93b6e2abfca8e7d123a03ffe5c72bf96613b27d89904ddf22d97fac811d"
+    enacted "49fb76befceb72038b593e89a5036cfd87dbbe240621be86942550cd4f5f5d02"
+    editorial "ce5d58760cd2a1945b785ba4ca5613fa6d8ad5d37f47da3ec0615b9317cb78dc"
+  }
+}

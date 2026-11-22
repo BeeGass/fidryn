@@ -1,0 +1,212 @@
+edition 2
+module "/us/usc/ptVII/rule7001" {
+  within "/us/usc/ptVII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVII/rule7001" courtRule {
+    num "7001" "Rule 7001."
+    heading "Types of Adversary Proceedings"
+    chapeau "An adversary proceeding is governed by the rules in this Part VII. The following are adversary proceedings:"
+    provision "/us/usc/ptVII/rule7001/a" subsection {
+      num "a" "(a)"
+      content "a proceeding to recover money or property—except a proceeding to compel the debtor to deliver property to the trustee, a proceeding by an individual debtor to recover tangible personal property under § 542(a), or a proceeding under § 554(b), § 725, Rule 2017, or Rule 6002;"
+      hash "c3e8105a3665bc96a1fe2c8d0d0140e8b6a7e7960a2cb9492596ace1a4d9a620"
+    }
+    provision "/us/usc/ptVII/rule7001/b" subsection {
+      num "b" "(b)"
+      content "a proceeding to determine the validity, priority, or extent of a lien or other interest in property—except a proceeding under Rule 3012 or Rule 4003(d);"
+      hash "9b4c13d080d87cb7e431a52a518b071fc015a78ce9fb43114e965b8087677837"
+    }
+    provision "/us/usc/ptVII/rule7001/c" subsection {
+      num "c" "(c)"
+      content "a proceeding to obtain authority under § 363(h) to sell both the estate’s interest in property and that of a co-owner;"
+      hash "f62418afc86aaefea0ab74b29880f32e264f1970484895c5dabfd29bc69dee8b"
+    }
+    provision "/us/usc/ptVII/rule7001/d" subsection {
+      num "d" "(d)"
+      content "a proceeding to revoke or object to a discharge—except an objection under § 727(a)(8) or (a)(9), or § 1328(f);"
+      hash "74e862d6e1e7af941a19f25d3d2c18329b2081da318f4465fd28792202c8e1be"
+    }
+    provision "/us/usc/ptVII/rule7001/e" subsection {
+      num "e" "(e)"
+      content "a proceeding to revoke an order confirming a plan in a Chapter 11, 12, or 13 case;"
+      hash "fa48c9469aec582d8a4b76fe1626eada6f497e624c1d31da158967dbf316188d"
+    }
+    provision "/us/usc/ptVII/rule7001/f" subsection {
+      num "f" "(f)"
+      content "a proceeding to determine whether a debt is dischargeable;"
+      hash "fdb7e52f4346e49c9bd0df88a30f13f506bd52c90ebc283224682d9395073932"
+    }
+    provision "/us/usc/ptVII/rule7001/g" subsection {
+      num "g" "(g)"
+      content "a proceeding to obtain an injunction or other equitable relief—except when the relief is provided in a Chapter 9, 11, 12, or 13 plan;"
+      hash "7e2eb7a441e8e6dbb03c6b40905399c9b0d84e126f5b798d4867073efdb826f2"
+    }
+    provision "/us/usc/ptVII/rule7001/h" subsection {
+      num "h" "(h)"
+      content "a proceeding to subordinate an allowed claim or interest—except when subordination is provided in a Chapter 9, 11, 12, or 13 plan;"
+      hash "bdbd8e33f2209c98ad13792530f1f3756535af4d06e8117f4b8e2370314cba61"
+    }
+    provision "/us/usc/ptVII/rule7001/i" subsection {
+      num "i" "(i)"
+      content "a proceeding to obtain a declaratory judgment related to any proceeding described in (a)–(h); and"
+      hash "dfa311a3d31a417224aad068c09d8ba8fb85003106e9d6ccc5c783c6cde21706"
+    }
+    provision "/us/usc/ptVII/rule7001/j" subsection {
+      num "j" "(j)"
+      content "a proceeding to determine a claim or cause of action removed under 28 U.S.C. § 1452."
+      hash "b348d62c794bc9aa24341fa8f7dfd28a5215e7b43a1ab847ff27d081e021642a"
+    }
+    hash "2a2915ae04a31ae307a7bb56c8dbc61edc1cecdac5088b5d217bf199903cef40"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 28, 2010, eff. Dec. 1, 2010; Apr. 27, 2017, eff. Dec. 1, 2017; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "The rules in Part VII govern the procedural aspects of litigation involving the matters referred to in this Rule 7001. Under Rule 9014 some of the Part VII rules also apply to contested matters."
+    p "These Part VII rules are based on the premise that to the extent possible practice before the bankruptcy courts and the district courts should be the same. These rules either incorporate or are adaptations of most of the Federal Rules of Civil Procedure. Although the Part VII rules of the former Bankruptcy Rules also relied heavily on the F.R.Civ.P., the former Part VII rules departed from the civil practice in two significant ways: a trial or pretrial conference had to be scheduled as soon as the adversary proceeding was filed and pleadings had to be filed within periods shorter than those established by the F.R.Civ.P. These departures from the civil practice have been eliminated."
+    p "The content and numbering of these Part VII rules correlates to the content and numbering of the F.R.Civ.P. Most, but not all, of the F.R.Civ.P. have a comparable Part VII rule. When there is no Part VII rule with a number corresponding to a particular F.R.Civ.P., Parts V and IX of these rules must be consulted to determine if one of the rules in those parts deals with the subject. The list below indicates the F.R.Civ.P., or subdivision thereof, covered by a rule in either Part V or Part IX."
+    table {
+      head {
+        th "F.R.Civ.P."
+        th "Rule in Part V or IX"
+      }
+      body {
+        td "6"
+        td "9006"
+      }
+      body {
+        td "7(b)"
+        td "9013"
+      }
+      body {
+        td "10(a)"
+        td "9004(b)"
+      }
+      body {
+        td "11"
+        td "9011"
+      }
+      body {
+        td "38,39"
+        td "9015(a)–(e)"
+      }
+      body {
+        td "47–51"
+        td "9015(f)"
+      }
+      body {
+        td "43,44,44.1"
+        td "9017"
+      }
+      body {
+        td "45"
+        td "9016"
+      }
+      body {
+        td "58"
+        td "9021"
+      }
+      body {
+        td "59"
+        td "9023"
+      }
+      body {
+        td "60"
+        td "9024"
+      }
+      body {
+        td "61"
+        td "9005"
+      }
+      body {
+        td "63"
+        td "9028"
+      }
+      body {
+        td "77(a),(b),(c)"
+        td "5001"
+      }
+      body {
+        td "77(d)"
+        td "9022(d)"
+      }
+      body {
+        td "79(a)–(d)"
+        td "5003"
+      }
+      body {
+        td "81(c)"
+        td "9027"
+      }
+      body {
+        td "83"
+        td "9029"
+      }
+      body {
+        td "92"
+        td "9030"
+      }
+    }
+    p "Proceedings to which the rules in Part VII apply directly include those brought to avoid transfers by the debtor under §§ 544, 545, 547, 548 and 549 of the Code; subject to important exceptions, proceedings to recover money or property; proceedings on bonds under Rules 5008(d) and 9025; proceedings under Rule 4004 to determine whether a discharge in a chapter 7 or 11 case should be denied because of an objection grounded on § 727 and proceedings in a chapter 7 or 13 case to revoke a discharge as provided in §§ 727(d) or 1328(e); and proceedings initiated pursuant to § 523(c) of the Code to determine the dischargeability of a particular debt. Those proceedings were classified as adversary proceedings under former Bankruptcy Rule 701."
+    p "Also included as adversary proceedings are proceedings to revoke an order of confirmation of a plan in a chapter 11 or 13 case as provided in §§ 1144 and 1330, to subordinate under § 510(c), other than as part of a plan, an allowed claim or interest, and to sell under § 363(h) both the interest of the estate and a co-owner in property."
+    p "Declaratory judgments with respect to the subject matter of the various adversary proceedings are also adversary proceedings."
+    p "Any claim or cause of action removed to a bankruptcy court pursuant to [former] 28 U.S.C. § 1478 is also an adversary proceeding."
+    p "Unlike former Bankruptcy Rule 701, requests for relief from an automatic stay do not commence an adversary proceeding. Section 362(e) of the Code and Rule 4001 establish an expedited schedule for judicial disposition of requests for relief from the automatic stay. The formalities of the adversary proceeding process and the time for serving pleadings are not well suited to the expedited schedule. The motion practice prescribed in Rule 4001 is best suited to such requests because the court has the flexibility to fix hearing dates and other deadlines appropriate to the particular situation."
+    p "Clause (1) contains important exceptions. A person with an interest in property in the possession of the trustee or debtor in possession may seek to recover or reclaim that property under § 554(b) or § 725 of the Code. Since many attempts to recover or reclaim property under these two sections do not generate disputes, application of the formalities of the Part VII Rules is not appropriate. Also excluded from adversary proceedings is litigation arising from an examination under Rule 2017 of a debtor’s payments of money or transfers of property to an attorney representing the debtor in a case under the Code or an examination of a superseded administration under Rule 6002."
+    p "Exemptions and objections thereto are governed by Rule 4003. Filing of proofs of claim and the allowances thereof are governed by Rules 3001–3005, and objections to claims are governed by Rule 3007. When an objection to a claim is joined with a demand for relief of the kind specified in this Rule 7001, the matter becomes an adversary proceeding. See Rule 3007."
+    hash "8f33b99f21ec74bb31f271e80e5b0e64781f4042a4c06f96ee85637b6f87650e"
+  }
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Another exception is added to clause (1). A trustee may proceed by motion to recover property from the debtor."
+    hash "965a5cdcb341037d6aad4937fcd09db5085274c852ae8158872114102568a25e"
+  }
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Clauses (5) and (8) are amended to include chapter 12 plans."
+    hash "f05306c84b12984fc04e456b7da584de7c0da18caa65b39bc889550a33b396b5"
+  }
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "This rule is amended to recognize that an adversary proceeding is not necessary to obtain injunctive or other equitable relief that is provided for in a plan under circumstances in which substantive law permits the relief. Other amendments are stylistic."
+    p "GAP Report on Rule 7001. No changes since publication, except for stylistic changes."
+    hash "c9bf6882617af052ea5380f23586fa9af370270b49afdc3bc1ea537a2bedd683"
+  }
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-2010-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2010 Amendment"
+    p "Paragraph (4) of the rule is amended to create an exception for objections to discharge under §§ 727(a)(8), (a)(9), and 1328(f) of the Code. Because objections to discharge on these grounds typically present issues more easily resolved than other objections to discharge, the more formal procedures applicable to adversary proceedings, such as commencement by a complaint, are not required. Instead, objections on these three grounds are governed by Rule 4004(d). In an appropriate case, however, Rule 9014(c) allows the court to order that additional provisions of Part VII of the rules apply to these matters."
+    p "Changes Made After Publication. The proposed addition of subsection (b) was deleted, and the content of that provision was moved to Rule 4004(d). The exception in paragraph (4) of the rule was revised to refer to objections to discharge under §§ 727(a)(8), (a)(9), and 1328(f) of the Code. The redesignation of the existing rule as subdivision (a) was also deleted. The Committee Note was revised to reflect these changes."
+    hash "c37fc951dea84b6037237716bdff19c8e04858b49619c1e82b6d7864fb684693"
+  }
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-2017-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2017 Amendment"
+    p "Subdivision (2) is amended to provide that the determination of the amount of a secured claim under Rule 3012, like a proceeding by the debtor to avoid a lien on or other transfer of exempt property under Rule 4003(d), does not require an adversary proceeding. The determination of the amount of a secured claim may be sought by motion or through a chapter 12 or chapter 13 plan in accordance with Rule 3012. An adversary proceeding continues to be required for lien avoidance not governed by Rule 4003(d)."
+    hash "071aac12a7288be685bb50c2271d2d4a68a0f257e522f6727df74e6a00c9060c"
+  }
+  note "/us/usc/ptVII/rule7001/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 7001 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    p "Additionally, the following substantive changes have been made."
+    p "Paragraph (a) is amended to create an exception for certain turnover proceedings under § 542(a) of the Code. An individual debtor may need to obtain the prompt return from a third party of tangible personal property—such as an automobile or tools of the trade—in order to produce income to fund a plan or to regain the use of property that may be exempted. As noted by Justice Sotomayor in her concurrence in City of Chicago v. Fulton, 141 S. Ct. 585, 592–95 (2021), the more formal procedures applicable to adversary proceedings can be too time-consuming in such a situation. Instead, the debtor can now proceed by motion to require turnover of such property under § 542(a), and the procedures of Rule 9014 will apply. In an appropriate case, however, Rule 9014(c) allows the court to order that additional provisions of Part VII of the rules will apply to the matter."
+    hash "f3259f54d641d7badb47f1c397080810064add7dfc576d3ddc91f1ab5b087858"
+  }
+  layers {
+    operative "2a2915ae04a31ae307a7bb56c8dbc61edc1cecdac5088b5d217bf199903cef40"
+    enacted "c5d9f63d895ad97aa6668618aff6d4ddf0d37951d65169eda9cf15b8df4f166d"
+    editorial "c3152dd321ac608edae9646abc59a87ada446bb14421eacf2990b33f1c51eab3"
+  }
+}

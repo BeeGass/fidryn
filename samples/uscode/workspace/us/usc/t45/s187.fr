@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s187" {
+  within "/us/usc/t45/ch8/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s187" section {
+    num "187" "§ 187."
+    heading "Separability"
+    content "If any provision of this subchapter or application thereof to any person or circumstance is held invalid, the remainder of such sections and the application of such provision to other persons or circumstances shall not be affected thereby."
+    hash "2da0f90690de5d9932faa15de9782e806a954b478c00733c815ce89574df5bf6"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 207" -> "/us/act/1926-05-20/ch347/s207"] ", as added " ["Apr. 10, 1936, ch. 166" -> "/us/act/1936-04-10/ch166"] ", " ["49 Stat. 1191" -> "/us/stat/49/1191"] ".)"
+  layers {
+    operative "2da0f90690de5d9932faa15de9782e806a954b478c00733c815ce89574df5bf6"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "f63636b9ca92dd94fb29e7da0412824903b91f6cb3c600559415a876faa268b5"
+  }
+}

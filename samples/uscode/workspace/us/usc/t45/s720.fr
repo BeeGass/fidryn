@@ -1,0 +1,114 @@
+edition 2
+module "/us/usc/t45/s720" {
+  within "/us/usc/t45/ch16/schII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s720" section {
+    num "720" "§ 720."
+    heading "Obligations of Association"
+    provision "/us/usc/t45/s720/a" subsection {
+      num "a" "(a)"
+      heading "General"
+      content "To carry out the purposes of this chapter, the Association is authorized to issue bonds, debentures, trust certificates, securities, or other obligations (herein cited as “obligations”) in accordance with this section. Such obligations shall have such maturities and bear such rate or rates of interest as are determined by the Association with the approval of the Secretary of the Treasury. Such obligations shall be redeemable at the option of the Association prior to maturity in the manner stipulated in each such obligation, and may be purchased by the Association in the open market at a price which is reasonable."
+      hash "08c5c3fda4c69db68a8a110755fd9296a28859e28c86b76426a6e72229e0be8c"
+    }
+    provision "/us/usc/t45/s720/b" subsection {
+      num "b" "(b)"
+      heading "Maximum obligational authority"
+      chapeau "The aggregate principal amount (exclusive of interest or additions to principal on account of accrual of interest) of obligations issued by the Association under this section which may be outstanding at any one time shall not exceed $395,000,000. No obligations or proceeds thereof shall be issued or made available after February 5, 1976, except—"
+      provision "/us/usc/t45/s720/b/1" paragraph {
+        num "1" "(1)"
+        content "to meet existing or potential commitments for loans under " ["section 721 of this title" -> "/us/usc/t45/s721"] " made or applied for prior to January 1, 1976; and"
+        hash "77e172fe057dcd26020ea50b33c1af62018afaa40a515c85fb22646b19b39e65"
+      }
+      provision "/us/usc/t45/s720/b/2" paragraph {
+        num "2" "(2)"
+        content "for the purpose of providing loans pursuant to subsections (g) and (h) of " ["section 721 of this title" -> "/us/usc/t45/s721"] "."
+        hash "bc5e6503488a4fe171413f7cc176ce3462cad024401d06b0cb6a3ba5b7c317be"
+      }
+      hash "26539362218be9fe3ebf464ffccb1ea0c8158285e40f1fcc973bfe764a5d93a4"
+    }
+    provision "/us/usc/t45/s720/c" subsection {
+      num "c" "(c)"
+      heading "Guarantees"
+      content "The Secretary shall guarantee the payment of principal and interest on all obligations issued by the Association in accordance with this chapter and which the Association requests be guaranteed. All guarantees entered into by the Secretary under this section shall constitute general obligations of the United States for the payment of which its full faith and credit are pledged."
+      hash "dc468db18a3c75ad9a420503a345caeb7274169b6637be767f538cb6b809bd8e"
+    }
+    provision "/us/usc/t45/s720/d" subsection {
+      num "d" "(d)"
+      heading "Validity"
+      content "No obligation issued by the Association under this section shall be terminated, canceled, or otherwise revoked, except in accordance with lawful terms and conditions prescribed by the Association. Such an obligation shall be conclusive evidence that it is in compliance with this section, has been approved, and is legal as to principal, interest, and other terms. An obligation of the Association shall be valid and incontestable in the hands of a holder, except as to fraud, duress, mutual mistake of fact, or material misrepresentation by or involving such holder."
+      hash "36365f3e31794e9b2dddf905b7012d72f78fd44055b500150049722eb1cff61d"
+    }
+    provision "/us/usc/t45/s720/e" subsection {
+      num "e" "(e)"
+      heading "The Secretary of the Treasury"
+      content "If at any time the moneys available to the Secretary are insufficient to enable him to discharge his responsibilities under subsection (c) of this section or under subsection (a) of " ["section 746 of this title" -> "/us/usc/t45/s746"] ", he shall issue notes or other obligations to the Secretary of the Treasury in such forms and denominations, bearing such maturities, and subject to such terms and conditions as may be prescribed by the Secretary of the Treasury. Such obligations shall bear interest at a rate to be determined by the Secretary of the Treasury taking into consideration the current average market yield on outstanding marketable obligations of the United States of comparable maturities during the month preceding the issuance of such obligations. The Secretary of the Treasury is authorized and directed to purchase any such obligations and for such purposes is authorized to use as a public debt transaction the proceeds from the sale of any securities issued under chapter 31 of title 31. The purposes for which securities may be issued under such chapter are extended to include any purchase of notes or other obligations issued under this subsection. At any time, the Secretary of the Treasury may sell any such obligations, and all sales, purchases, and redemptions of such obligations by the Secretary of the Treasury shall be treated as public debt transactions of the United States."
+      hash "f5cc90a1f2161a8a027ed1563f16e8226589bd8f14d93fa9da51d67e717ef353"
+    }
+    provision "/us/usc/t45/s720/f" subsection {
+      num "f" "(f)"
+      heading "Authorization for appropriations"
+      content "There are hereby authorized to be appropriated to the Secretary such amounts as are necessary to discharge the obligations of the United States arising under this section."
+      hash "2f6e1e21a917e18c4d8a28b6c7a0ad92fa0b66f8bb745856f81e64396ba954e4"
+    }
+    provision "/us/usc/t45/s720/g" subsection {
+      num "g" "(g)"
+      heading "Lawful investments"
+      content "All obligations issued by the Association shall be lawful investments and may be accepted as security for all fiduciary, trust, and public funds, the investment or deposit of which shall be under the authority and control of the United States or any officer or officers thereof. All such obligations issued pursuant to this section shall be exempt securities within the meaning of laws administered by the Securities and Exchange Commission."
+      hash "ab84577f63b1511df5cd5d73d1f42e7f16bb4a0c3264cda9bcd73bb8147ef55c"
+    }
+    hash "1b3aec80f00cff6f967493b593fe7ef2b092ccc4e363211f290e77a963d6bec7"
+  }
+  credit "(" ["Pub. L. 93–236, title II, § 210" -> "/us/pl/93/236/tII/s210"] ", Jan. 2, 1974, " ["87 Stat. 1000" -> "/us/stat/87/1000"] "; " ["Pub. L. 94–210, title VI" -> "/us/pl/94/210/tVI"] ", §§ 604, 607(k), Feb. 5, 1976, " ["90 Stat. 88" -> "/us/stat/90/88"] ", 97; " ["Pub. L. 94–555, title II, § 203(e)" -> "/us/pl/94/555/tII/s203/e"] ", Oct. 19, 1976, " ["90 Stat. 2620" -> "/us/stat/90/2620"] "; " ["Pub. L. 96–448, title VII, § 703(f)(3)" -> "/us/pl/96/448/tVII/s703/f/3"] ", Oct. 14, 1980, " ["94 Stat. 1965" -> "/us/stat/94/1965"] ".)"
+  note "/us/usc/t45/s720/note/editorialNotes/pl.97.258/codification" editorial {
+    group editorialNotes
+    topic "codification"
+    heading "Codification"
+    p "In subsec. (e), “chapter 31 of title 31” and “such chapter” substituted for “the Second Liberty Bond Act, as amended” and “such Act”, respectively, on authority of " ["Pub. L. 97–258, § 4(b)" -> "/us/pl/97/258/s4/b"] ", Sept. 13, 1982, " ["96 Stat. 1067" -> "/us/stat/96/1067"] ", the first section of which enacted Title 31, Money and Finance."
+    hash "1e76b8c7bb4b2a19f6ceee4c8c2abde73973a790cdf51d8c8997ca97983bfabe"
+  }
+  note "/us/usc/t45/s720/note/editorialNotes/pl.96.448/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "1980—Subsec. (e). " ["Pub. L. 96–448" -> "/us/pl/96/448"] " inserted “or under subsection (a) of " ["section 746 of this title" -> "/us/usc/t45/s746"] "” after “subsection (c) of this section”."
+    p "1976—Subsec. (b). " ["Pub. L. 94–555" -> "/us/pl/94/555"] " inserted “(exclusive of interest or additions to principal on account of accrual of interest)” after “aggregate principal amount”, and raised maximum amount allowed for outstanding obligations issued by Association to $395,000,000."
+    p ["Pub. L. 94–210, § 604" -> "/us/pl/94/210/s604"] ", substituted provisions authorizing $275,000,000 as maximum of aggregate amount of obligations outstanding at any one time and provisions relating to availability or issuance after Feb. 5, 1976, for provisions authorizing $1,500,000,000 as maximum of aggregate amount of obligations outstanding at any one time and provisions relating to limitations on amounts issued to Corporation and available for rehabilitation and modernization of rail properties."
+    p "Subsec. (c). " ["Pub. L. 94–210, § 607(k)" -> "/us/pl/94/210/s607/k"] ", inserted provisions relating to guarantees as general obligations of the United States and pledge of full faith and credit for payment."
+    hash "187601c13652d3f72f4aca4b544d71cc50b77bc58559ca856f32b56a1bc08c0e"
+  }
+  note "/us/usc/t45/s720/note/statutoryNotes/pl.96.448/effective-date-of-1980-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1980 Amendment"
+    p "Amendment by " ["Pub. L. 96–448" -> "/us/pl/96/448"] " effective Oct. 1, 1980, see " ["section 710(a) of Pub. L. 96–448" -> "/us/pl/96/448/s710/a"] ", set out as a note under " ["section 1170 of Title 11" -> "/us/usc/t11/s1170"] ", Bankruptcy."
+    hash "8414357495bccb2db0922b729682e002ff9e6cb677e7f522f2d91447135103eb"
+  }
+  note "/us/usc/t45/s720/note/statutoryNotes/pl.94.555/effective-date-of-1976-amendment" enacted {
+    group statutoryNotes
+    topic "effectiveDateOfAmendment"
+    heading "Effective Date of 1976 Amendment"
+    p "Amendment by " ["Pub. L. 94–555" -> "/us/pl/94/555"] " effective Oct. 1, 1976, see " ["section 303 of Pub. L. 94–555" -> "/us/pl/94/555/s303"] ", set out as a note under " ["section 702 of this title" -> "/us/usc/t45/s702"] "."
+    hash "bbcf4d13b2bad24ed28d87ac343046c23afd6c40f613f4c216556bcc67fdfb78"
+  }
+  note "/us/usc/t45/s720/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  note "/us/usc/t45/s720/note/statutoryNotes/pl.94.210/applicability-of-national-environmental-policy-act" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Applicability of National Environmental Policy Act"
+    p "Application of National Environmental Policy Act to actions of Commission not affected by title VI of " ["Pub. L. 94–210" -> "/us/pl/94/210"] ", see " ["section 619 of Pub. L. 94–210" -> "/us/pl/94/210/s619"] ", set out as a note under " ["section 791 of this title" -> "/us/usc/t45/s791"] "."
+    hash "7ce373698c822f6cf7cb1f07e93f5e378a6239d819a9e93ab08ae9f21b104a45"
+  }
+  layers {
+    operative "1b3aec80f00cff6f967493b593fe7ef2b092ccc4e363211f290e77a963d6bec7"
+    enacted "487b390c10da207cba4d8350676b17978eb2138be59f55cf9bc51b7c44b2e894"
+    editorial "c23571327abf2e4739333a3ce4abd5431a01a5fecae5e62857bfa28c04d40466"
+  }
+}

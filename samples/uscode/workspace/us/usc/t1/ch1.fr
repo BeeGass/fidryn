@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/t1/ch1" {
+  within "/us/usc/t1"
+  source "usc01.xml"
+  positive_law true
+  container "/us/usc/t1/ch1" chapter {
+    num "1" "CHAPTER 1—"
+    heading "RULES OF CONSTRUCTION"
+    member "/us/usc/t1/s1"
+    member "/us/usc/t1/s2"
+    member "/us/usc/t1/s3"
+    member "/us/usc/t1/s4"
+    member "/us/usc/t1/s5"
+    member "/us/usc/t1/s6"
+    member "/us/usc/t1/s7"
+    member "/us/usc/t1/s8"
+    hash "b6ce4c82fcdd1fd486b877211cd412ea7c828216d5e10abd62c59e5ca3657207"
+  }
+  note "/us/usc/t1/ch1/note/editorialNotes/pl.107.207/amendments" editorial {
+    group editorialNotes
+    topic "amendments"
+    heading "Amendments"
+    p "2002—" ["Pub. L. 107–207, § 2(b)" -> "/us/pl/107/207/s2/b"] ", Aug. 5, 2002, " ["116 Stat. 926" -> "/us/stat/116/926"] ", added item 8."
+    p "1996—" ["Pub. L. 104–199, § 3(b)" -> "/us/pl/104/199/s3/b"] ", Sept. 21, 1996, " ["110 Stat. 2420" -> "/us/stat/110/2420"] ", added item 7."
+    hash "0adc1f5054bc06b262e0d2f6aa4edd283e9fd836f67a12218be98ef11847e7fe"
+  }
+  layers {
+    operative "b6ce4c82fcdd1fd486b877211cd412ea7c828216d5e10abd62c59e5ca3657207"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d6220c162715807f0c5c4be3baa0c985b0ffde5367a91e88b6f4f2e2db40c2e9"
+  }
+}

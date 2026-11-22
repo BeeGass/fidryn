@@ -1,0 +1,44 @@
+edition 2
+module "/us/usc/t1/s202" {
+  within "/us/usc/t1/ch3"
+  source "usc01.xml"
+  positive_law true
+  provision "/us/usc/t1/s202" section {
+    num "202" "§ 202."
+    heading "Preparation and publication of Codes and Supplements"
+    chapeau "There shall be prepared and published under the supervision of the Committee on the Judiciary of the House of Representatives—"
+    provision "/us/usc/t1/s202/a" subsection {
+      num "a" "(a)"
+      heading "Cumulative Supplements to Code of Laws of United States for each session of Congress.—"
+      content "A supplement for each session of the Congress to the then current edition of the Code of Laws of the United States, cumulatively embracing the legislation of the then current supplement, and correcting errors in such edition and supplement;"
+      hash "45c6601b19b6942ea89cea2e64b69d781895fb6c113adaf2853083489dcd42b8"
+    }
+    provision "/us/usc/t1/s202/b" subsection {
+      num "b" "(b)"
+      heading "Cumulative Supplement to District of Columbia Code for each session of Congress.—"
+      content "A supplement for each session of the Congress to the then current edition of the Code of the District of Columbia, cumulatively embracing the legislation of the then current supplement, and correcting errors in such edition and supplement;"
+      hash "1cd7d1fc976401bfeeabc43668d7c96a713bec350b4239d8da658f81fb384226"
+    }
+    provision "/us/usc/t1/s202/c" subsection {
+      num "c" "(c)"
+      heading "New editions of Codes and Supplements.—"
+      content "New editions of the Code of Laws of the United States and of the Code of the District of Columbia, correcting errors and incorporating the then current supplement. In the case of each code new editions shall not be published oftener than once in each five years. Copies of each such edition shall be distributed in the same manner as provided in the case of supplements to the code of which it is a new edition. Supplements published after any new edition shall not contain the legislation of supplements published before such new edition."
+      hash "7c1b6bbb4e00951c32eeb01a7879fa4be96b1aff71b8e7e25e28e0e08612bd57"
+    }
+    hash "8dac234dbf25d02bfaa27c9d5a9e22b25cf9270a983f15fef16c86739c1b6564"
+  }
+  credit "(" ["July 30, 1947, ch. 388" -> "/us/act/1947-07-30/ch388"] ", " ["61 Stat. 637" -> "/us/stat/61/637"] ".)"
+  note "/us/usc/t1/s202/note/statutoryNotes/pl.94.386/cross-references" enacted {
+    group statutoryNotes
+    topic "crossReferences"
+    heading "Cross References"
+    p "Council of the District of Columbia, functions respecting, see " ["section 2 of Pub. L. 94–386" -> "/us/pl/94/386/s2"] ", Aug. 14, 1976, " ["90 Stat. 1170" -> "/us/stat/90/1170"] ", set out as a note under " ["section 285b of Title 2" -> "/us/usc/t2/s285b"] ", The Congress."
+    p "Office of the Law Revision Counsel, functions respecting preparation, revision, publication, etc., see " ["section 285b of Title 2" -> "/us/usc/t2/s285b"] "."
+    hash "b03c9f7b2e9bc9112e1cbaebde5d7400f3ac1d9eca50621a9fd12aca5ff33125"
+  }
+  layers {
+    operative "8dac234dbf25d02bfaa27c9d5a9e22b25cf9270a983f15fef16c86739c1b6564"
+    enacted "2df5c71eb7018249c8127e8de8125a3d538a448c68cde29960b4e9d62c2da2f4"
+    editorial "134162c38548a657479d908bb6beee6cbab4a1fca3ff09065c3f43f6d6827e32"
+  }
+}

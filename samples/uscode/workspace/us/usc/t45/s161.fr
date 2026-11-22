@@ -1,0 +1,28 @@
+edition 2
+module "/us/usc/t45/s161" {
+  within "/us/usc/t45/ch8/schI"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s161" section {
+    num "161" "§ 161."
+    heading "Effect of partial invalidity of chapter"
+    content "If any provision of this chapter, or the application thereof to any person or circumstance, is held invalid, the remainder of the chapter, and the application of such provision to other persons or circumstances, shall not be affected thereby."
+    hash "488f2fc6a2f19ad3e6a032c4dd0c29bf44ef02f21163f80397a8840b68d7ed2b"
+  }
+  credit "(" ["May 20, 1926, ch. 347, § 11" -> "/us/act/1926-05-20/ch347/s11"] ", " ["44 Stat. 587" -> "/us/stat/44/587"] ".)"
+  note "/us/usc/t45/s161/note/statutoryNotes/act.1934-06-21.ch691/separability-repeal-of-inconsistent-provisions" enacted {
+    group statutoryNotes
+    topic "separability"
+    heading "Separability; Repeal of Inconsistent Provisions"
+    p ["Act June 21, 1934, ch. 691, § 8" -> "/us/act/1934-06-21/ch691/s8"] ", " ["48 Stat. 1197" -> "/us/stat/48/1197"] ", provided that:"
+    quoted "/us/act/1934-06-21/ch691/s8" {
+      p "“If any section, subsection, sentence, clause, or phrase of this Act [amending sections 151 to 158, 160, and 162 of this title] is for any reason held to be unconstitutional, such decision shall not affect the validity of the remaining portions of this Act. All Acts or parts of Acts inconsistent with the provisions of this Act are hereby repealed.”"
+    }
+    hash "3d8a8dfff41f59e0f203ef9a1c6748c489b953b2097d5c1ad2c3bf67788314db"
+  }
+  layers {
+    operative "488f2fc6a2f19ad3e6a032c4dd0c29bf44ef02f21163f80397a8840b68d7ed2b"
+    enacted "31fb0dee3cc098ea5929ae3570babc0fd0385b16c45ad51a91f6cc8880fb282c"
+    editorial "cd6221004c3bc91baa9eaf08861e446fbb5906883601a83b85dc6e2d7ad2c6be"
+  }
+}

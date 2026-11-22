@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/s667" {
+  within "/us/usc/t45/ch15"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s667" section {
+    num "667" "§ 667."
+    heading "Audit by Comptroller General; report to Congress"
+    content "The Comptroller General of the United States, or any of his duly authorized representatives, shall have access to such information, books, records, and documents as he determines necessary effectively to audit financial transactions and operations carried out by the Secretary in the administration of this chapter. The Comptroller General shall make such reports to the Congress on the results of any such audits as are appropriate."
+    hash "0f75525107890f815bd625248b67dead483c25637ad4aab326be997eb33f452d"
+  }
+  credit "(" ["Pub. L. 91–663, § 8" -> "/us/pl/91/663/s8"] ", Jan. 8, 1971, " ["84 Stat. 1977" -> "/us/stat/84/1977"] ".)"
+  layers {
+    operative "0f75525107890f815bd625248b67dead483c25637ad4aab326be997eb33f452d"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "9ada7eb0b17b3749ec6ac5e26bb24629772411a1b1c1983321f8d4855f72ef36"
+  }
+}

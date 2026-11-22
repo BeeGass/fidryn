@@ -9,7 +9,7 @@ Fidryn is released under the MIT License: see [LICENSE](LICENSE). [Licensing](LI
 
 ## Status
 
-Fidryn 0.2 is a research interpreter. It checks and runs modules (`.fr`
+Fidryn 0.3 is a research interpreter. It checks and runs modules (`.fr`
 files) built from queries; functions; calculations; rules; observations;
 judgments that use a concurrence policy; decisions, which run through a
 query's `RunDecision` goal; duties, which run only through the built-in
@@ -25,6 +25,28 @@ declarations only from a package under `packages/`. A module that does
 not pass the checker cannot be run.
 [Implementation status](docs/implementation-status.md) lists what works
 and what does not, with the test or code that shows each one.
+
+Fidryn 0.3 also reads law modules, files of edition 2 that hold provisions
+of law as data and are checked, never evaluated
+([Law modules](docs/law-modules.md)). `fidryn ingest uscode` imports the
+United States Code from the official XML release point published by the
+Office of the Law Revision Counsel, each archive verified against its
+retrieval record, into a generated workspace in which every provision and
+note has an address and hashes; `fidryn check` checks such a workspace,
+gives every reference in it an outcome, and judges the bindings of a
+curated workspace, written by hand, against the provisions they name;
+`fidryn changes` says what changed between two releases; and
+`fidryn coverage` counts what a generated workspace holds. The repository holds a
+sample of three titles of the Code, imported and checked by
+`cargo xtask ci`, whose figures are on the page
+[Coverage](docs/coverage.md). Once `fidryn` is installed, as
+[Quick start](#quick-start) shows, check the sample, then read one of its
+sections:
+
+```sh
+fidryn check samples/uscode/workspace --no-cache
+fidryn text samples/uscode/workspace /us/usc/t1/s1
+```
 
 Nothing in this repository is legal advice. The modules under `examples/`
 and the programs under `tests/` exist to exercise the interpreter. None of
@@ -74,11 +96,14 @@ The guides are indexed in [docs/README.md](docs/README.md).
 | --- | --- |
 | Check and run a first module | [Getting started](docs/getting-started.md) |
 | Write `.fr` | [Language](docs/language.md) |
+| Read, check and compare law modules | [Law modules](docs/law-modules.md) |
 | Use every subcommand | [CLI](docs/cli.md) |
 | Supply facts and evidence | [Cases and time](docs/cases-and-time.md) |
 | Interpret `Determinate` vs `Suspended` | [Outcomes](docs/outcomes.md) |
 | Browse fixtures | [Examples](docs/examples.md) |
+| See what the sample of the Code holds | [Coverage](docs/coverage.md) |
 | Change the interpreter | [Contributing](docs/contributing.md) |
+| See where the project is going | [Roadmap](docs/roadmap.md) |
 
 ## CLI at a glance
 
@@ -86,7 +111,7 @@ The binary name is `fidryn`. Full flags are in [docs/cli.md](docs/cli.md).
 
 ```text
 fidryn fmt PATH
-fidryn check PATH
+fidryn check PATH [--jobs N] [--cache-dir DIR | --no-cache] [--report FILE] [--unresolved FILE]
 fidryn inputs PATH --query NAME
 fidryn run PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME [--arg KEY=VALUE] [--scenario] [--budget N]
 fidryn explore PATH --query NAME --case RECORD.json [--bounds BOUNDS.json] --valid-at TIME --known-at TIME
@@ -97,6 +122,10 @@ fidryn render PATH --template TEMPLATE [--data DATA.json]
 fidryn review PATH --query NAME --case RECORD.json --valid-at TIME --known-at TIME [--scenario] [--budget N] [--template TEMPLATE]
 fidryn file PACKET.json [--adapter dry-run|ma-corporations] [--live] [--endpoint URL]
 fidryn ui [--port N] [--no-open]
+fidryn ingest uscode ARCHIVE_DIR --out DIR [--title T]... [--jobs N] [--verify]
+fidryn text DIR [ADDRESS] [--json | --hashes]
+fidryn coverage DIR
+fidryn changes OLD_DIR NEW_DIR [--bindings DIR]... [--json] [--jobs N] [--cache-dir DIR | --no-cache]
 ```
 
 Every subcommand also takes `--source-root PATH`, the root for source
@@ -135,18 +164,20 @@ Catalog: [docs/examples.md](docs/examples.md) and
 | --- | --- |
 | `fidryn-syntax` | Lexer, parser, Rowan CST, formatter |
 | `fidryn-hir` | Names, imports, elaboration |
-| `fidryn-check` | Types, effects, import authentication |
+| `fidryn-check` | Types, effects, import authentication; lowering and the checks of one module of edition 2. Depends on `fidryn-provision` for the model of law modules |
 | `fidryn-core` | IR, values, outcomes, legal state |
 | `fidryn-eval` | Worklist evaluator |
 | `fidryn-handlers` | CaseFile, Explore, Skeptical |
 | `fidryn-verify` | Determinacy search |
 | `fidryn-kernel` | Covering-certificate checks |
 | `fidryn-solve` | Streamed finite-domain search |
-| `fidryn-driver` | Compile and run session |
+| `fidryn-driver` | Compile and run session; the check of a workspace of edition 2 modules, in two phases on several threads with a cache of the first, the writer of a generated one, and the change set between two generated ones. Depends on `fidryn-provision` for the files of a workspace and the interfaces of its modules |
 | `fidryn-trace` | Outcome JSON and traces |
 | `fidryn-render` | Constrained templates |
 | `fidryn-adapt` | Filing adapters |
-| `fidryn-cli` | `fidryn` binary and mill |
+| `fidryn-provision` | The model of law modules and the rules over it, among them addresses, file paths, text normalization, hashes, text records, the coverage ledger of a generated workspace, the canonical text of a module, the interface of a module, the index of addresses that gives each reference its outcome, and the comparison of two versions of a module. Depends on no other crate of the workspace |
+| `fidryn-ingest-uscode` | Reads the archives of the official XML release point published by the Office of the Law Revision Counsel, checked against their retrieval record, into law modules of the model of `fidryn-provision`. Of the workspace crates, depends on `fidryn-provision` only, and only `fidryn-cli` depends on it |
+| `fidryn-cli` | `fidryn` binary and mill, `fidryn ingest uscode`, which writes a generated workspace from the archives of one release with the ingester and the writer of `fidryn-driver`, `fidryn text`, which prints the text of the modules of a workspace, `fidryn coverage`, which prints the coverage ledger of a generated workspace, and `fidryn changes`, which prints what changed between two generated workspaces |
 
 Pipeline and APIs: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). What is
 actually implemented: [docs/implementation-status.md](docs/implementation-status.md).

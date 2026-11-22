@@ -1,0 +1,39 @@
+edition 2
+module "/us/usc/ptIII/rule3013" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3013" courtRule {
+    num "3013" "Rule 3013."
+    heading "Determining Classes of Creditors and Equity Security Holders"
+    content "For purposes of a plan and its acceptance, the court may—on motion after hearing on notice as the court orders—determine classes of creditors and equity security holders under §§ 1122, 1222(b)(1), and 1322(b)(1)."
+    hash "9c6ca117cac0bfb968e9c847dc3c588c85994f7676e4f72729a5361bfdcf6708"
+  }
+  credit "(As amended Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Sections 1122 and 1322(b)(1) set the standards for classifying claims and interests but provide that such classification is accomplished in the plan. This rule does not change the standards; rather it recognizes that it may be desirable or necessary to establish proper classification before a plan can be formulated. It provides for a court hearing on such notice as the court may direct."
+    hash "eab9d36f0794dab886fc51b261b568164d0e9d1b7dbc19eb249f94df807e24cf"
+  }
+  note "/us/usc/ptIII/rule3013/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "This rule is amended to include chapter 12 cases."
+    hash "17321bc9f0ad00ebcaf61e0b76f142892c3c0e0af3c9eab69d2e7fb74bebad30"
+  }
+  note "/us/usc/ptIII/rule3013/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3013 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "a5da1d47fb17d6d093f4832f86a9b4f2411ce15fd3caa4f8a6f7d4bfda6b424f"
+  }
+  layers {
+    operative "9c6ca117cac0bfb968e9c847dc3c588c85994f7676e4f72729a5361bfdcf6708"
+    enacted "4211102b3191e15d85d868c7ced0ab6b764c7102299a035838c613d17a178e67"
+    editorial "5294806948e70538b2d93f4a344b817f7f741f982f11569a0c200b5fd3fc0df0"
+  }
+}

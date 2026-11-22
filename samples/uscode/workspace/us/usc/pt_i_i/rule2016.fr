@@ -1,0 +1,177 @@
+edition 2
+module "/us/usc/ptII/rule2016" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2016" courtRule {
+    num "2016" "Rule 2016."
+    heading "Compensation for Services Rendered; Reimbursing Expenses"
+    provision "/us/usc/ptII/rule2016/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      provision "/us/usc/ptII/rule2016/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Application. If an entity seeks from the estate interim or final compensation for services or reimbursement of necessary expenses, the entity must file an application showing:"
+        provision "/us/usc/ptII/rule2016/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "in detail the amounts requested and the services rendered, time spent, and expenses incurred;"
+          hash "c9ba83b6d5c5528884166901b091cf1916376f532b1aa8bd8cf323078cc6a8e2"
+        }
+        provision "/us/usc/ptII/rule2016/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "all payments previously made or promised for services rendered or to be rendered in connection with the case;"
+          hash "27bbb13d861100f757c8dac889b1d7d044608d2961f148b7d0f793da8c1c9940"
+        }
+        provision "/us/usc/ptII/rule2016/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "the source of the paid or promised compensation;"
+          hash "9e1bcc5d473b35e6a1df2810042f72c749c95065cfd12d44dd438724e4974b98"
+        }
+        provision "/us/usc/ptII/rule2016/a/1/D" subparagraph {
+          num "D" "(D)"
+          content "whether any previous compensation has been shared;"
+          hash "c7c5879653dab5658fdbec2be1a5c01507ac778d486b36b95d2350d41480c43b"
+        }
+        provision "/us/usc/ptII/rule2016/a/1/E" subparagraph {
+          num "E" "(E)"
+          content "whether an agreement or understanding exists between the applicant and any other entity for sharing compensation for services rendered or to be rendered in connection with the case; and"
+          hash "c311f40d58aa783cbf990114cf4731dd91863d71215e6a6c81bae68d04aa976a"
+        }
+        provision "/us/usc/ptII/rule2016/a/1/F" subparagraph {
+          num "F" "(F)"
+          content "the particulars of any compensation sharing or agreement or understanding to share, except with a member or regular associate of a law or accounting firm."
+          hash "5ee424a5e32550979da369f413f839b6747dfc265208efa1d784b21bd35124b2"
+        }
+        hash "acc9f225279a4a1485818f23f82781f760d1e93f5e3d523bf18ac33d204e651a"
+      }
+      provision "/us/usc/ptII/rule2016/a/2" paragraph {
+        num "2" "(2)"
+        content "Application for Services Rendered or to be Rendered by an Attorney or Accountant. The requirements of (a) apply to an application for compensation for services rendered by an attorney or accountant, even though a creditor or other entity files the application."
+        hash "b6c2f87a280f7f019f13a4d243dd1511756740f059f75209549b2469c82c352b"
+      }
+      provision "/us/usc/ptII/rule2016/a/3" paragraph {
+        num "3" "(3)"
+        content "Copy to the United States Trustee. Except in a Chapter 9 case, the applicant must send a copy of the application to the United States trustee."
+        hash "192696c2999034672549df6bc0e0ca5f52728c5aca816bd0d8f6b368d0b410a7"
+      }
+      hash "e9a322b62d1f9d5943f92b13c074195378516e69c15c0ac6daddbbc468b967fe"
+    }
+    provision "/us/usc/ptII/rule2016/b" subsection {
+      num "b" "(b)"
+      heading "Disclosing Compensation Paid or Promised to the Debtor’s Attorney."
+      provision "/us/usc/ptII/rule2016/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "Basic Requirements. Within 14 days after the order for relief—or at another time as the court orders—every debtor’s attorney (whether or not applying for compensation) must file and send to the United States trustee the statement required by § 329. The statement must:"
+        provision "/us/usc/ptII/rule2016/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "show whether the attorney has shared or agreed to share compensation with any other entity; and"
+          hash "fb1947fad63a52b41e8f9599b7ee96f5e94d2d1899bfa6b66d21519c478079a3"
+        }
+        provision "/us/usc/ptII/rule2016/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "if so, the particulars of any sharing or agreement to share, except with a member or regular associate of the attorney’s law firm."
+          hash "f385babf866d0245b1410e84512ce32ca0bc93c7fd47b805bff303db33b4403f"
+        }
+        hash "8a28a36df9fb650b81864b14d55db7ae352cb80694404ed2f472990276a03e98"
+      }
+      provision "/us/usc/ptII/rule2016/b/2" paragraph {
+        num "2" "(2)"
+        content "Supplemental Statement. Within 14 days after any payment or agreement to pay not previously disclosed, the attorney must file and send to the United States trustee a supplemental statement."
+        hash "abbfb89a00e47357bda264b461e3bb44c821e8efc4f2f6ca5ddc91b0d9cedc4e"
+      }
+      hash "010bea3965d29fd0d0148fbf4bb1294d1bb9423a57065f1e8ac1855bd51fa9c3"
+    }
+    provision "/us/usc/ptII/rule2016/c" subsection {
+      num "c" "(c)"
+      heading "Disclosing Compensation Paid or Promised to a Bankruptcy-Petition Preparer."
+      provision "/us/usc/ptII/rule2016/c/1" paragraph {
+        num "1" "(1)"
+        chapeau "Basic Requirements. Before a petition is filed, every bankruptcy-petition preparer for a debtor must deliver to the debtor the declaration under penalty of perjury required by § 110(h)(2). The declaration must:"
+        provision "/us/usc/ptII/rule2016/c/1/A" subparagraph {
+          num "A" "(A)"
+          content "disclose any fee, and its source, received from or on behalf of the debtor within 12 months before the petition’s filing, together with all unpaid fees charged to the debtor;"
+          hash "35f9502bbdea229ffe056e848e9bcbd1d5490c87fac57d033bb0e5e4a24a1f09"
+        }
+        provision "/us/usc/ptII/rule2016/c/1/B" subparagraph {
+          num "B" "(B)"
+          content "describe the services performed and the documents prepared or caused to be prepared by the bankruptcy-petition preparer; and"
+          hash "975bdc2683b68f7c65d8dd9b33923f4df6f621deb5a01bfc4a1bcc0fce0b05e0"
+        }
+        provision "/us/usc/ptII/rule2016/c/1/C" subparagraph {
+          num "C" "(C)"
+          content "be filed with the petition."
+          hash "fcaa9c05f97caa6aaf27c4eb4fbc4ff7ce84ff2993682df216d312bc5acd0d75"
+        }
+        hash "fd627b9001905d9d1d20b4eb61ff16d819318b5caffb1630ba7a00bf2c933c9f"
+      }
+      provision "/us/usc/ptII/rule2016/c/2" paragraph {
+        num "2" "(2)"
+        content "Supplemental Statement. Within 14 days after any later payment or agreement to pay not previously disclosed, the bankruptcy-petition preparer must file a supplemental statement."
+        hash "2a67f4919da0407d5f1d833f0551f0b273519d8ab585fe98df6d61ba369a843a"
+      }
+      hash "7feac8803d7ec233180eb6e2ddc51cda03660cb1d7444237058958f46891b1c8"
+    }
+    hash "51295b1171b1d14f4a2b361a72d3adccdf300b8a0901617a4420475b17ce6acd"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Mar. 27, 2003, eff. Dec. 1, 2003; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule is derived from former Rule 219. Many of the former rule’s requirements are, however, set forth in the Code. Section 329 requires disclosure by an attorney of transactions with the debtor, § 330 sets forth the bases for allowing compensation, and § 504 prohibits sharing of compensation. This rule implements those various provisions."
+    p "Subdivision (a) includes within its provisions a committee, member thereof, agent, attorney or accountant for the committee when compensation or reimbursement of expenses is sought from the estate."
+    p "Regular associate of a law firm is defined in Rule 9001(9) to include any attorney regularly employed by, associated with, or counsel to that law firm. Firm is defined in Rule 9001(6) to include a partnership or professional corporation."
+    hash "9976dc7e986a98993a0b5f2a22324de79640d54f8bea9f7915a81241438e6819"
+  }
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (a) is amended to change “person” to “entity”. There are occasions in which a governmental unit may be entitled to file an application under this rule. The requirement that the application contain a “detailed statement of services rendered, time expended and expenses incurred” gives to the court authority to ensure that the application is both comprehensive and detailed. No amendments are made to delineate further the requirements of the application because the amount of detail to be furnished is a function of the nature of the services rendered and the complexity of the case."
+    p "Subdivision (b) is amended to require that the attorney for the debtor file the § 329 statement before the meeting of creditors. This will assist the parties in conducting the examination of the debtor. In addition, the amended rule requires the attorney to supplement the § 329 statement if an undisclosed payment is made to the attorney or a new or amended agreement is entered into by the debtor and the attorney."
+    hash "729127ab9b0343d432887657d28c9572ceea6e628df093bea4b4f469498598d9"
+  }
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is amended to enable the United States trustee to perform the duty to monitor applications for compensation and reimbursement filed under § 330 of the Code. See 28 U.S.C. § 586(a)(3)(A)."
+    p "Subdivision (b) is amended to give the United States trustee the information needed to determine whether to request appropriate relief based on excessive fees under § 329(b) of the Code. See Rule 2017."
+    p "The words “with the court” are deleted in subdivisions (a) and (b) as unnecessary. See Rules 5005(a) and 9001(3)."
+    hash "9f09be2ecd052a4a40d9378f56d648ed3df03768f53bc2f60a20d4d3c0c7011c"
+  }
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/committee-notes-on-rules-2003-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2003 Amendment"
+    p "This rule is amended by adding subdivision (c) to implement § 110(h)(1) [now 110(h)(2)] of the Code."
+    p "Changes Made After Publication and Comments. No changes since publication."
+    hash "0d74bcab4e8699c6cf4a75f69dfa04c60b66924c6cff8ad3199c26dbcd1f1c0a"
+  }
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    p "Subdivision (c) is amended to reflect the 2005 amendment to § 110(h)(1) of the Bankruptcy Code which now requires that the declaration be filed with the petition. The statute previously required that the petition preparer file the declaration within 10 days after the filing of the petition. The amendment to the rule also corrects the cross reference to § 110(h)(1), which was redesignated as subparagraph (h)(2) of § 110 by the 2005 amendment to the Code."
+    p "Other changes are stylistic."
+    hash "81ed2d83b471c60dc74a25b20f81248401d1d2aaa2fa3aee16c569a2936a6f44"
+  }
+  note "/us/usc/ptII/rule2016/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2016 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "8505012701c328f1dab8cd86f83127c00e21deba09f5e89a2e079c96a0a90259"
+  }
+  layers {
+    operative "51295b1171b1d14f4a2b361a72d3adccdf300b8a0901617a4420475b17ce6acd"
+    enacted "e87ed9963c20c3f4164b0e69c98e9bd1351a6489f25c9c1a24aa96c1c78a1e01"
+    editorial "0096cec247aab72f0e6ec4d2e086229000628957761cba375ece119394cb0f77"
+  }
+}

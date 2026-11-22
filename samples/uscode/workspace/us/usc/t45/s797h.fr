@@ -1,0 +1,36 @@
+edition 2
+module "/us/usc/t45/s797h" {
+  within "/us/usc/t45/ch16/schVII"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s797h" section {
+    num "797h" "§ 797h."
+    heading "Employee and personal injury claims"
+    provision "/us/usc/t45/s797h/a" subsection {
+      num "a" "(a)"
+      heading "Liability for employee claims"
+      content "In all cases of claims, prior to April 1, 1976, by employees, arising under the collective bargaining agreements of the railroads in reorganization in the Region, and subject to " ["section 153 of this title" -> "/us/usc/t45/s153"] ", the Corporation, the National Railroad Passenger Corporation, or an acquiring carrier, as the case may be, shall assume responsibility for the processing of any such claims, and payment of those which are sustained or settled on or subsequent to the date of conveyance, under " ["section 743(b)(1) of this title" -> "/us/usc/t45/s743/b/1"] ", and shall be entitled to direct reimbursement from the Association pursuant to " ["section 721(h) of this title" -> "/us/usc/t45/s721/h"] ", to the extent that such claims are determined by the Association to be the obligation of a railroad in reorganization in the Region. Any liability of an estate of a railroad in reorganization to its employees which is assumed, processed, and paid pursuant to this subsection by the Corporation, the National Railroad Passenger Corporation, or an acquiring carrier shall remain the preconveyance obligation of the estate of such railroad for purposes of " ["section 721(h)(1) of this title" -> "/us/usc/t45/s721/h/1"] ". The Corporation, the National Railroad Passenger Corporation, an acquiring carrier, or the Association, as the case may be, shall be entitled to a direct claim as a current expense of administration, in accordance with the provisions of " ["section 721(h) of this title" -> "/us/usc/t45/s721/h"] " (other than paragraph (4)(A) thereof), for reimbursement (including costs and expenses of processing such claims) from the estate of the railroad in reorganization on whose behalf such obligations are discharged or paid. In those cases in which claims for employees were sustained or settled prior to such date of conveyance, it shall be the obligation of the employees to seek satisfaction against the estate of the railroads in reorganization which were their former employers."
+      hash "21491917f33250ca9d3215805e5690bcdbfcb44df4dd150de39cedd04fee52a6"
+    }
+    provision "/us/usc/t45/s797h/b" subsection {
+      num "b" "(b)"
+      heading "Assumption of personal injury claims"
+      content "All cases or claims by employees or their personal representatives for personal injuries or death against a railroad in reorganization in the Region arising prior to the date of conveyance of rail properties, pursuant to " ["section 743 of this title" -> "/us/usc/t45/s743"] ", shall be assumed by the Corporation or an acquiring railroad, as the case may be. The Corporation or the acquiring railroad shall process and pay any such claims that are sustained or settled, and shall be entitled to direct reimbursement from the Association pursuant to " ["section 721(h) of this title" -> "/us/usc/t45/s721/h"] ", to the extent that such claims are determined by the Association or its successor authority to be the obligation of such railroad. Any liability of an estate of a railroad in reorganization which is assumed, processed, and paid, pursuant to this subsection, by the Corporation or an acquiring railroad shall remain the preconveyance obligation of the estate of such railroad for purposes of " ["section 721(h)(1) of this title" -> "/us/usc/t45/s721/h/1"] ". The Corporation, an acquiring railroad, or the Association, as the case may be, shall be entitled to a direct claim as a current expense of administration, in accordance with the provisions of " ["section 721(h) of this title" -> "/us/usc/t45/s721/h"] " (other than paragraph (4)(A) thereof), for reimbursement (including costs and expenses of processing such claims) from the estate of the railroad in reorganization on whose behalf such obligations were discharged or paid."
+      hash "06314c01c51d21beb8adad7c87620f41db964c76c2ce2ca27b5e7bc561164b7c"
+    }
+    hash "cf7da284a03394a463d67db38997d1c009d2a4f57a6336a6486b90cbac1aeaa0"
+  }
+  credit "(" ["Pub. L. 93–236, title VII, § 709" -> "/us/pl/93/236/tVII/s709"] ", as added " ["Pub. L. 97–35, title XI, § 1143(a)" -> "/us/pl/97/35/tXI/s1143/a"] ", Aug. 13, 1981, " ["95 Stat. 666" -> "/us/stat/95/666"] ".)"
+  note "/us/usc/t45/s797h/note/statutoryNotes/nolaw/abolition-of-united-states-railway-association-and-transfer" enacted {
+    group statutoryNotes
+    topic "miscellaneous"
+    heading "Abolition of United States Railway Association and Transfer of Functions and Securities"
+    p "See " ["section 1341 of this title" -> "/us/usc/t45/s1341"] "."
+    hash "cd850284f13614ffb2ee8fa50fe039a8021d217044da0d43075361bd126dc4fd"
+  }
+  layers {
+    operative "cf7da284a03394a463d67db38997d1c009d2a4f57a6336a6486b90cbac1aeaa0"
+    enacted "9edff6fbbe9f2b18d20e6cbf90a4665f21a0de2e161e6cea0d199a1aa81b9e89"
+    editorial "14095894a9bd7894a1a7880357ab53346e633a7d014004274aa2f6e414e8943d"
+  }
+}

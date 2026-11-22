@@ -1,0 +1,41 @@
+edition 2
+module "/us/usc/ptIX/rule9017" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9017" courtRule {
+    num "9017" "Rule 9017."
+    heading "Evidence"
+    content "The Federal Rules of Evidence and Fed. R. Civ. P. 43, 44, and 44.1 apply in a bankruptcy case."
+    hash "fdd9cc888e5c63ffdcfa299172dc499fff4bcb2bf4ad236df283fa84d8a26177"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9017/note/ungrouped/pl.95.598/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Sections 251 and 252 of " ["Public Law 95–598" -> "/us/pl/95/598"] ", amended Rule 1101 of the Federal Rules of Evidence to provide that the Federal Rules of Evidence apply in bankruptcy courts and to any case or proceeding under the Code. Rules 43, 44 and 44.1 of the F.R.Civ.P., which supplement the Federal Rules of Evidence, are by this rule made applicable to cases under the Code."
+    p "Examples of bankruptcy rules containing matters of an evidentiary nature are: Rule 2011, evidence of debtor retained in possession; Rule 3001(f), proof of claim constitutes prima facie evidence of the amount and validity of a claim; and Rule 5007(c), sound recording of court proceedings constitutes the record of the proceedings."
+    hash "f59ef6ee6254bbe998c14addaae051322c4f7673112ac449d75638225652cf52"
+  }
+  note "/us/usc/ptIX/rule9017/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9017 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "922bb7c6fc56a400c895a2609e3fb8cd8fcdc0db8f3d492a598562ed3518e35a"
+  }
+  note "/us/usc/ptIX/rule9017/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Evidence, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    p "The Federal Rules of Civil Procedure, referred to in text, are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "70da5e331bd49da0bf3fb1d3738800bf91a68c76fe994e0084ee3bdf082fbaa7"
+  }
+  layers {
+    operative "fdd9cc888e5c63ffdcfa299172dc499fff4bcb2bf4ad236df283fa84d8a26177"
+    enacted "320209bc5310dfcce5a55d99f70d1765ae4dd08904a266405ea3cefda0391234"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

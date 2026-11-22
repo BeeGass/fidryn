@@ -69,13 +69,13 @@ mod tests {
             toc: Vec::new(),
             sections: vec![
                 Section {
-                    number: "6.3".to_owned(),
+                    number: "7.3".to_owned(),
                     id: "outcome-kinds".to_owned(),
                     heading: "Outcome kinds".to_owned(),
                     text: "outcome is tagged by kind.".to_owned(),
                 },
                 Section {
-                    number: "6.3.1".to_owned(),
+                    number: "7.3.1".to_owned(),
                     id: "determinate".to_owned(),
                     heading: "Determinate".to_owned(),
                     text: "One answer.".to_owned(),
@@ -104,9 +104,9 @@ mod tests {
             concat!(
                 r#"[{"u":"/docs/","n":"","h":"Fidryn documentation","p":"Documentation","t":"Start here."},"#,
                 r##"{"u":"/docs/#for-users","n":"","h":"For users","p":"Documentation","t":"Guides."},"##,
-                r#"{"u":"/docs/outcomes","n":"§6","h":"Outcomes","p":"Outcomes","t":"This guide explains the six honest results."},"#,
-                r##"{"u":"/docs/outcomes#outcome-kinds","n":"6.3","h":"Outcome kinds","p":"Outcomes","t":"outcome is tagged by kind."},"##,
-                r##"{"u":"/docs/outcomes#determinate","n":"6.3.1","h":"Determinate","p":"Outcomes","t":"One answer."}]"##,
+                r#"{"u":"/docs/outcomes","n":"§7","h":"Outcomes","p":"Outcomes","t":"This guide explains the six honest results."},"#,
+                r##"{"u":"/docs/outcomes#outcome-kinds","n":"7.3","h":"Outcome kinds","p":"Outcomes","t":"outcome is tagged by kind."},"##,
+                r##"{"u":"/docs/outcomes#determinate","n":"7.3.1","h":"Determinate","p":"Outcomes","t":"One answer."}]"##,
                 "\n"
             )
         );
@@ -131,14 +131,20 @@ mod tests {
             .iter()
             .find(|e| e["u"] == "/docs/outcomes#outcome-kinds")
             .expect("outcome kinds section");
-        assert_eq!(kinds["n"], "6.3");
+        assert_eq!(kinds["n"], "7.3");
         assert_eq!(kinds["h"], "Outcome kinds");
         assert_eq!(kinds["p"], "Outcomes");
         let page = entries
             .iter()
             .find(|e| e["u"] == "/docs/outcomes")
             .expect("outcomes page");
-        assert_eq!(page["n"], "§6");
+        assert_eq!(page["n"], "§7");
+        let reference = entries
+            .iter()
+            .find(|e| e["u"] == "/docs/law-modules#limits")
+            .expect("the section Limits of the reference");
+        assert_eq!(reference["p"], "Law modules");
+        assert_eq!(reference["h"], "Limits");
         for entry in &entries {
             let t = entry["t"].as_str().unwrap();
             assert!(t.chars().count() <= 300, "{t}");

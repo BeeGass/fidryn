@@ -1,0 +1,24 @@
+edition 2
+module "/us/usc/ptIV" {
+  within "/us/usc/t11a/~courtRules.1"
+  source "usc11a.xml"
+  positive_law false
+  container "/us/usc/ptIV" part {
+    num "IV" "PART IV—"
+    heading "THE DEBTOR’S DUTIES AND BENEFITS"
+    member "/us/usc/ptIV/rule4001"
+    member "/us/usc/ptIV/rule4002"
+    member "/us/usc/ptIV/rule4003"
+    member "/us/usc/ptIV/rule4004"
+    member "/us/usc/ptIV/rule4005"
+    member "/us/usc/ptIV/rule4006"
+    member "/us/usc/ptIV/rule4007"
+    member "/us/usc/ptIV/rule4008"
+    hash "70b8e54fa7fa674704528ab604280294859b89504d9faa39c1f27d0ff8079773"
+  }
+  layers {
+    operative "70b8e54fa7fa674704528ab604280294859b89504d9faa39c1f27d0ff8079773"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

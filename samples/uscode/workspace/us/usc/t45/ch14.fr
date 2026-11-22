@@ -1,0 +1,25 @@
+edition 2
+module "/us/usc/t45/ch14" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch14" chapter {
+    num "14" "CHAPTER 14—"
+    heading "RAIL PASSENGER SERVICE"
+    member "/us/usc/t45/ch14/schI"
+    member "/us/usc/t45/ch14/schII"
+    member "/us/usc/t45/ch14/schIII"
+    member "/us/usc/t45/ch14/schIV"
+    member "/us/usc/t45/ch14/schV"
+    member "/us/usc/t45/ch14/schVI"
+    member "/us/usc/t45/ch14/schVII"
+    member "/us/usc/t45/ch14/schVIII"
+    member "/us/usc/t45/ch14/schIX"
+    hash "81b9d658d94b077b841681996d8a10bd7be0e4bde8df55d639fbf8c0c6eb8968"
+  }
+  layers {
+    operative "81b9d658d94b077b841681996d8a10bd7be0e4bde8df55d639fbf8c0c6eb8968"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

@@ -12,7 +12,7 @@ use std::process::{Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 
-pub const MARKDOWN_ROOTS: [&str; 9] = [
+pub const MARKDOWN_ROOTS: [&str; 10] = [
     "README.md",
     "LICENSING.md",
     "CHANGELOG.md",
@@ -21,6 +21,7 @@ pub const MARKDOWN_ROOTS: [&str; 9] = [
     "examples",
     "packages",
     "conformance",
+    "samples",
     "site/README.md",
 ];
 
@@ -182,25 +183,43 @@ pub fn broken_links(root: &Path, file: &str, markdown: &str) -> Vec<String> {
     problems
 }
 
+/// The first line of `text` that is not blank.
+fn first_line(text: &str) -> Option<&str> {
+    text.lines().find(|line| !line.trim().is_empty())
+}
+
+/// Whether the first line of `source` that is not blank is the marker of
+/// edition 2.
+fn is_edition_2(source: &str) -> bool {
+    first_line(source).is_some_and(|line| line.trim() == "edition 2")
+}
+
+/// The untagged and `fidryn` blocks that are complete modules: those whose
+/// first line that is not blank begins a module of the first edition or is
+/// the marker of edition 2.
 pub fn complete_modules(markdown: &str) -> Vec<(usize, String)> {
     fenced_blocks(markdown)
         .into_iter()
         .filter(|block| matches!(block.info.trim(), "" | "fidryn"))
         .filter(|block| {
-            block
-                .text
-                .lines()
-                .find(|line| !line.trim().is_empty())
-                .is_some_and(|line| line.starts_with("module "))
+            first_line(&block.text).is_some_and(|line| line.starts_with("module "))
+                || is_edition_2(&block.text)
         })
         .map(|block| (block.line, block.text))
         .collect()
 }
 
+/// A module of edition 2 gets the checks of one module; any other is
+/// compiled as `fidryn check` compiles it.
 pub fn module_problems(file: &str, markdown: &str) -> Vec<String> {
     let mut problems = Vec::new();
     for (line, source) in complete_modules(markdown) {
-        if let Err(diagnostics) = fidryn_cli::compile_source(&source, &SourceManifest::default()) {
+        let checked = if is_edition_2(&source) {
+            fidryn_check::e2::check_source(&source).map(|_| ())
+        } else {
+            fidryn_cli::compile_source(&source, &SourceManifest::default()).map(|_| ())
+        };
+        if let Err(diagnostics) = checked {
             let shown: Vec<String> = diagnostics.iter().map(ToString::to_string).collect();
             problems.push(format!(
                 "{file}:{line}: module does not pass `fidryn check`: {}",
@@ -412,12 +431,25 @@ fn run_with_timeout(mut command: Command, timeout: Duration) -> std::io::Result<
 }
 
 pub fn check_commands(root: &Path, fidryn: &Path) -> Result<()> {
+    // A command that keeps the cache of a workspace check keeps it in a
+    // directory of this run, removed at its end, and never in the cache
+    // directory of the user who runs it.
+    let cache = std::env::temp_dir().join(format!("fidryn-docs-cache-{}", std::process::id()));
+    let ran = run_commands(root, fidryn, &cache);
+    let _ = fs::remove_dir_all(&cache);
+    ran
+}
+
+fn run_commands(root: &Path, fidryn: &Path, cache: &Path) -> Result<()> {
     let mut problems = Vec::new();
     for file in markdown_files(root)? {
         let markdown = read_document(root, &file)?;
         for command in doc_commands(&markdown) {
             let mut process = Command::new(fidryn);
-            process.current_dir(root).args(&command.args);
+            process
+                .current_dir(root)
+                .env("FIDRYN_CACHE_DIR", cache)
+                .args(&command.args);
             let ran = run_with_timeout(process, COMMAND_TIMEOUT)
                 .with_context(|| format!("run {}", fidryn.display()))?;
             match ran {
@@ -536,6 +568,31 @@ mod tests {
             module("Docs.Ok", "query q() -> Int { return 7 }")
         );
         assert!(module_problems("docs/x.md", &good).is_empty());
+    }
+
+    #[test]
+    fn the_documentation_check_reads_edition_2_blocks() {
+        let unit = include_str!("../../crates/fidryn-check/tests/fixtures/e2/unit.fr");
+        let changed = unit.replacen("a small device", "a small devise", 1);
+        assert_ne!(changed, unit);
+        let md = format!(
+            "An invented module of edition 2:\n\n```fidryn\n{unit}```\n\n\
+             The same, with one letter changed:\n\n```fidryn\n\n{changed}```\n"
+        );
+        assert_eq!(complete_modules(&md).len(), 2);
+        let second = md[..md.rfind("```fidryn").expect("a second block")]
+            .matches('\n')
+            .count()
+            + 1;
+        let problems = module_problems("docs/x.md", &md);
+        assert_eq!(problems.len(), 1, "{problems:?}");
+        assert!(
+            problems[0].starts_with(&format!(
+                "docs/x.md:{second}: module does not pass `fidryn check`: E710"
+            )),
+            "{}",
+            problems[0]
+        );
     }
 
     fn words(items: &[&str]) -> Vec<String> {

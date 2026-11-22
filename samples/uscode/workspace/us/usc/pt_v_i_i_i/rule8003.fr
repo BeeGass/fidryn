@@ -1,0 +1,185 @@
+edition 2
+module "/us/usc/ptVIII/rule8003" {
+  within "/us/usc/ptVIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptVIII/rule8003" courtRule {
+    num "8003" "Rule 8003."
+    heading "Appeal as of Right—How Taken; Docketing the Appeal"
+    provision "/us/usc/ptVIII/rule8003/a" subsection {
+      num "a" "(a)"
+      heading "Filing a Notice of Appeal."
+      provision "/us/usc/ptVIII/rule8003/a/1" paragraph {
+        num "1" "(1)"
+        content "Time to File. An appeal under 28 U.S.C. § 158(a)(1) or (2) from a bankruptcy court’s judgment, order, or decree to a district court or a BAP may be taken only by filing a notice of appeal with the bankruptcy clerk within the time allowed by Rule 8002."
+        hash "66d64ef54654fa4ef04eaef051bd5a5c9414776ebfc9252eb94cf3e6cfe55e59"
+      }
+      provision "/us/usc/ptVIII/rule8003/a/2" paragraph {
+        num "2" "(2)"
+        content "Failure to Take Any Other Step. An appellant’s failure to take any step other than timely filing a notice of appeal does not affect the appeal’s validity, but is ground only for the district court or BAP to act as it considers appropriate, including dismissing the appeal."
+        hash "e43c0531410e376a17927b0f2ce3000aee1e1380126cf6226a7d27e64b7ea043"
+      }
+      provision "/us/usc/ptVIII/rule8003/a/3" paragraph {
+        num "3" "(3)"
+        chapeau "Content of the Notice of Appeal. A notice of appeal must:"
+        provision "/us/usc/ptVIII/rule8003/a/3/A" subparagraph {
+          num "A" "(A)"
+          content "conform substantially to Form 417A;"
+          hash "3492eb86938ccd66539284ecd2cd7685ffdac4bd5865952a79f3114fc6e813c6"
+        }
+        provision "/us/usc/ptVIII/rule8003/a/3/B" subparagraph {
+          num "B" "(B)"
+          content "be accompanied by the judgment—or the appealable order or decree—from which the appeal is taken; and"
+          hash "96a311e4dd891b922822ca55fef9544761516e7420205dd85eb98cf9bb3ef35f"
+        }
+        provision "/us/usc/ptVIII/rule8003/a/3/C" subparagraph {
+          num "C" "(C)"
+          content "be accompanied by the prescribed filing fee."
+          hash "1992d0c6259e0d0b14a2a0af7aeb422c32014e778fe5c609ef8ecd9b4e8e4b27"
+        }
+        hash "c562a2440ebb4de1dca89030126fec652df26846068e17fbd7efe6838cfd6c94"
+      }
+      provision "/us/usc/ptVIII/rule8003/a/4" paragraph {
+        num "4" "(4)"
+        content "Merger. The notice of appeal encompasses all orders that, for purposes of appeal, merge into the identified judgment or appealable order or decree. It is not necessary to identify those orders in the notice of appeal."
+        hash "e7b6b709c04f4294ac1be350211388b147a379e5fd5e6a49cb472c6fb11d4f00"
+      }
+      provision "/us/usc/ptVIII/rule8003/a/5" paragraph {
+        num "5" "(5)"
+        chapeau "Final Judgment. The notice of appeal encompasses the final judgment, whether or not that judgment is set out in a separate document under Rule 7058, if the notice identifies:"
+        provision "/us/usc/ptVIII/rule8003/a/5/A" subparagraph {
+          num "A" "(A)"
+          content "an order that adjudicates all remaining claims and the rights and liabilities of all remaining parties; or"
+          hash "4bdcecb8bddb98dc24731ac2cdcb9ca66047ece5ee320bb03442fbfb94649dc0"
+        }
+        provision "/us/usc/ptVIII/rule8003/a/5/B" subparagraph {
+          num "B" "(B)"
+          content "an order described in Rule 8002(b)(1)."
+          hash "4a4a0622b6aada42948805ed385575748b5a4d8310ae9ed6e8b58ab9649ae9ed"
+        }
+        hash "679ef85a2471f28a200d1c29d934230f1715f340d8ea383be20b2129ab12d032"
+      }
+      provision "/us/usc/ptVIII/rule8003/a/6" paragraph {
+        num "6" "(6)"
+        content "Limited Appeal. An appellant may identify only part of a judgment or appealable order or decree by expressly stating that the notice of appeal is so limited. Without such an express statement, specific identifications do not limit the scope of the notice of appeal."
+        hash "44b2b8bed3702d682d7ce54209184474266a612e8cc8ca61bbcfab433ded1252"
+      }
+      provision "/us/usc/ptVIII/rule8003/a/7" paragraph {
+        num "7" "(7)"
+        content "Impermissible Ground for Dismissal. An appeal must not be dismissed for failure to properly identify the judgment or appealable order or decree if the notice of appeal was filed after entry of the judgment or appealable order or decree and identifies an order that merged into that judgment or appealable order or decree."
+        hash "96fe5f48098fa5ccd83f42122b314a6023c89537c12d3320cf7772ef778f9d94"
+      }
+      provision "/us/usc/ptVIII/rule8003/a/8" paragraph {
+        num "8" "(8)"
+        content "Clerk’s Request for Additional Copies of the Notice of Appeal. On the bankruptcy clerk’s request, the appellant must provide enough copies of the notice of appeal to enable the clerk to comply with (c)."
+        hash "516d0d1acd8139ebbdf6a431cb720b9c6cc636470d1aa50bc1a2400276826af5"
+      }
+      hash "7492ea6901ab506b26ed919a40f08df413be21dfd218dbd016edb83345d1a482"
+    }
+    provision "/us/usc/ptVIII/rule8003/b" subsection {
+      num "b" "(b)"
+      heading "Joint or Consolidated Appeals."
+      provision "/us/usc/ptVIII/rule8003/b/1" paragraph {
+        num "1" "(1)"
+        content "Joint Notice of Appeal. When two or more parties are entitled to appeal from a bankruptcy court’s judgment, order, or decree and their interests make joinder practicable, they may file a joint notice of appeal. They may then proceed on appeal as a single appellant."
+        hash "dd6789a0cf0d9228cc1793ab05ec6f1e81b224f8878fd7f0243ed481b028b50f"
+      }
+      provision "/us/usc/ptVIII/rule8003/b/2" paragraph {
+        num "2" "(2)"
+        content "Consolidating Appeals. When parties have separately filed timely notices of appeal, the district court or BAP may join or consolidate the appeals."
+        hash "00e7d9f5262263c0dbbb20ebe258a308f8d147c091bfac708a1fc0a6c8062929"
+      }
+      hash "ad302a5edfa857182c0866b7d49c1bea4dfa7a18455dfb9dd38c269a8aa35faa"
+    }
+    provision "/us/usc/ptVIII/rule8003/c" subsection {
+      num "c" "(c)"
+      heading "Serving the Notice of Appeal."
+      provision "/us/usc/ptVIII/rule8003/c/1" paragraph {
+        num "1" "(1)"
+        content "Serving Parties; Sending to the United States Trustee. The bankruptcy clerk must serve the notice of appeal by sending a copy to counsel of record for each party to the appeal—excluding the appellant’s counsel—and send it to the United States trustee. If a party is proceeding pro se, the clerk must send the notice to the party’s last known address. The clerk must note, on each copy, the date when the notice of appeal was filed."
+        hash "b8582e2fab044901c577f8379fffe9cb381f8091608d0872e1a4a1779c90907f"
+      }
+      provision "/us/usc/ptVIII/rule8003/c/2" paragraph {
+        num "2" "(2)"
+        content "Failure to Serve the Notice of Appeal. The bankruptcy clerk’s failure to serve notice on a party or send notice to the United States trustee does not affect the appeal’s validity."
+        hash "8184de8fdaf6c222f306506214dadb416b2b286d3088b2de8a0b6a2f624e7a90"
+      }
+      provision "/us/usc/ptVIII/rule8003/c/3" paragraph {
+        num "3" "(3)"
+        content "Entry of Service on the Docket. The clerk must note on the docket the names of the parties served and the date and method of service."
+        hash "01609fac8a35101f99a97891283205893d1ea19fc864dea5277514f427abd047"
+      }
+      hash "32476ff260daf62742e681bf2daf594de7aa6a2c84835c520ef49b6917e84004"
+    }
+    provision "/us/usc/ptVIII/rule8003/d" subsection {
+      num "d" "(d)"
+      heading "Sending the Notice of Appeal to the District Court or BAP; Docketing the Appeal."
+      provision "/us/usc/ptVIII/rule8003/d/1" paragraph {
+        num "1" "(1)"
+        content "Where to Send the Notice of Appeal. If a BAP has been established to hear appeals from that district—and an appellant has not elected to have the appeal heard in the district court—the bankruptcy clerk must promptly send the notice of appeal to the BAP clerk. Otherwise, the bankruptcy clerk must promptly send it to the district clerk."
+        hash "7cc6a416ad4f1f68870a9302dbce6f4bb17fef28986ef3f0d2601a233d24f133"
+      }
+      provision "/us/usc/ptVIII/rule8003/d/2" paragraph {
+        num "2" "(2)"
+        chapeau "Docketing the Appeal. Upon receiving the notice of appeal, the district or BAP clerk must:"
+        provision "/us/usc/ptVIII/rule8003/d/2/A" subparagraph {
+          num "A" "(A)"
+          content "docket the appeal under the title of the bankruptcy case and the title of any adversary proceeding; and"
+          hash "350dc8ab2e972b8a09de962447d3f0a3eb5bd51485e98ed30b8c2db2cefdba80"
+        }
+        provision "/us/usc/ptVIII/rule8003/d/2/B" subparagraph {
+          num "B" "(B)"
+          content "identify the appellant, adding the appellant’s name if necessary."
+          hash "deef5145ea83df3448b96fc0675dc2d916a53800873861d80e41fce41989dcf6"
+        }
+        hash "5af5a4987117a1f8dcdef314257e06acd8a506022a760be08833b35df1b4b605"
+      }
+      hash "ee29473feff6d6d30139c4f0dc53ae5a22d8832748b52636d288911033877520"
+    }
+    hash "da623e2dccd8906f81499b11f4f27f4c1c15a0985ce3e7d55866d6c13d9591e5"
+  }
+  credit "(Added Apr. 25, 2014, eff. Dec. 1, 2014; amended Apr. 24, 2023, eff. Dec. 1, 2023; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/prior-rule" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Prior Rule"
+    p "A prior Rule 8003, Apr. 25, 1983, eff. Aug. 1, 1983, as amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009, related to leave to appeal, prior to revision of Part VIII, Apr. 25, 2014, eff. Dec. 1, 2014."
+    hash "1287a63a4cdde1ba70beacdf921267d733eef7beea3acd2a4903ca25184141f4"
+  }
+  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/committee-notes-on-rules-2014" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2014"
+    p "This rule is derived from several former Bankruptcy Rule and Appellate Rule provisions. It addresses appeals as of right, joint and consolidated appeals, service of the notice of appeal, and the timing of the docketing of an appeal in the district court or BAP."
+    p "Subdivision (a) incorporates, with stylistic changes, much of the content of former Rule 8001(a) regarding the taking of an appeal as of right under 28 U.S.C. § 158(a)(1) or (2). The rule now requires that the judgment, order, or decree being appealed be attached to the notice of appeal."
+    p "Subdivision (b), which is an adaptation of F.R.App.P. 3(b), permits the filing of a joint notice of appeal by multiple appellants that have sufficiently similar interests that their joinder is practicable. It also allows the district court or BAP to consolidate appeals taken separately by two or more parties."
+    p "Subdivision (c) is derived from former Rule 8004 and F.R.App.P. 3(d). Under Rule 8001(c), the former rule’s requirement that service of the notice of appeal be accomplished by mailing is generally modified to require that the bankruptcy clerk serve counsel by electronic means. Service on pro se parties must be made by sending the notice to the address most recently provided to the court."
+    p "Subdivision (d) modifies the provision of former Rule 8007(b), which delayed the docketing of an appeal by the district court or BAP until the record was complete and the bankruptcy clerk transmitted it. The new provision, adapted from F.R.App.P. 3(d) and 12(a), requires the bankruptcy clerk to promptly transmit the notice of appeal to the clerk of the district court or BAP. Upon receipt of the notice of appeal, the district or BAP clerk must docket the appeal. Under this procedure, motions filed in the district court or BAP prior to completion and transmission of the record can generally be placed on the docket of an already pending appeal."
+    p "Changes Made After Publication and Comment. In subdivision (d)(2), the direction for docketing a bankruptcy appeal was changed to reflect the fact that many bankruptcy appeals have dual titles—the bankruptcy case itself and the adversary proceeding that is the subject of the appeal. Stylistic changes were made to subdivision (c)(1). Conforming changes were made to the Committee Note."
+    hash "31b38c303f9a08d8268045a9be7c2ed144a772238956d55cb93fa9589afccd76"
+  }
+  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/committee-notes-on-rules-2023-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2023 Amendment"
+    p "Subdivision (a) is amended to conform to recent amendments to Fed. R. App. P. 3(c), which clarified that the designation of a particular interlocutory order in a notice of appeal does not prevent the appellate court from reviewing all orders that merged into the judgment or appealable order or decree. These amendments reflect that a notice of appeal is supposed to be a simple document that provides notice that a party is appealing and invokes the jurisdiction of the appellate court. It therefore must state who is appealing, what is being appealed, and to what court the appeal is being taken. It is the role of the briefs, not the notice of appeal, to focus the issues on appeal."
+    p "Subdivision (a)(3)(B) is amended in an effort to avoid the misconception that it is necessary or appropriate to identify each and every order of the bankruptcy court that the appellant may wish to challenge on appeal. It requires the attachment of “the judgment—or the appealable order or decree—from which the appeal is taken”—and the phrase “or the part of it” is deleted. In most cases, because of the merger principle, it is appropriate to identify and attach only the judgment or the appealable order or decree from which the appeal as of right is taken."
+    p "Subdivision (a)(4) now calls attention to the merger principle. The general merger rule can be stated simply: an appeal from a final judgment or appealable order or decree permits review of all rulings that led up to the judgment, order, or decree. Because this general rule is subject to some exceptions and complications, the amendment does not attempt to codify the merger principle but instead leaves its details to case law. The amendment does not change the principle established in Budinich v. Becton Dickinson & Co., 486 U.S. 196, 202–03 (1988), that “a decision on the merits is a ‘final decision’ . . . whether or not there remains for adjudication a request for attorney’s fees attributable to the case.”"
+    p "Sometimes a party who is aggrieved by a final judgment will make a motion in the bankruptcy court instead of immediately filing a notice of appeal. Rule 8002(b)(1) permits a party who makes certain motions to await disposition of those motions before appealing. But some courts treat a notice of appeal that identifies only the order disposing of such a motion as limited to that order, rather than bringing the final judgment before the appellate court for review. To reduce the unintended loss of appellate rights in this situation, subdivision (a)(5) is added. This amendment does not alter the requirement of Rule 8002(b)(3) (requiring a notice of appeal or an amended notice of appeal if a party intends to challenge an order disposing of certain motions)."
+    p "Subdivision (a)(6) is added to enable deliberate limitations of the notice of appeal. It allows an appellant to identify only part of a judgment or appealable order or decree by expressly stating that the notice of appeal is so limited. Without such an express statement, however, specific identifications do not limit the scope of the notice of appeal."
+    p "On occasion, a party may file a notice of appeal after a judgment or appealable order or decree but identify only a previously nonappealable order that merged into that judgment or appealable order or decree. To deal with this situation, subdivision (a)(7) is added to provide that an appeal must not be dismissed for failure to properly identify the judgment or appealable order or decree if the notice of appeal was filed after entry of the judgment or appealable order or decree and identifies an order that merged into the judgment, order, or decree from which the appeal is taken. In this situation, a court should act as if the notice had properly identified the judgment or appealable order or decree. In determining whether a notice of appeal was filed after the entry of judgment, Rules 8002(a)(2) and (b)(2) apply."
+    hash "9e69f576e0298a22c4a639a092a155a707d04e5c260df9f653f19a2f4ee0bfb7"
+  }
+  note "/us/usc/ptVIII/rule8003/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 8003 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "30f2cbff571870788f8701ad11527cfafe39c885d56bd468f6b31cc22767cb9a"
+  }
+  layers {
+    operative "da623e2dccd8906f81499b11f4f27f4c1c15a0985ce3e7d55866d6c13d9591e5"
+    enacted "9e47fce134f3a2d8f05ed00d355ad556ea5d2dc8c5092a45da00f62b7d1d9244"
+    editorial "66f6d9de0700c4ea6c79236c3cd37bd9847c40f38dfb1b612589a431caaddcf8"
+  }
+}

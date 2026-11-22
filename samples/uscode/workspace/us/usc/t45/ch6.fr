@@ -1,0 +1,18 @@
+edition 2
+module "/us/usc/t45/ch6" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch6" chapter {
+    num "6" "CHAPTER 6—"
+    heading "MEDIATION, CONCILIATION, AND ARBITRATION IN CONTROVERSIES BETWEEN CARRIERS AND EMPLOYEES"
+    member "/us/usc/t45/s101...125"
+    member "/us/usc/t45/s126"
+    hash "9ca7ed68207b6943948a0ec4104e6354344bb1ae6e5af8aee9c8ed3b45cd1453"
+  }
+  layers {
+    operative "9ca7ed68207b6943948a0ec4104e6354344bb1ae6e5af8aee9c8ed3b45cd1453"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

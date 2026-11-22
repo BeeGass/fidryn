@@ -1,0 +1,63 @@
+edition 2
+module "/us/usc/ptIX/rule9004" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9004" courtRule {
+    num "9004" "Rule 9004."
+    heading "General Requirements of Form"
+    provision "/us/usc/ptIX/rule9004/a" subsection {
+      num "a" "(a)"
+      heading "Legibility; Abbreviations."
+      content "A petition, pleading, schedule, or other document must be clearly legible. Commonly used English abbreviations are acceptable."
+      hash "42ec54415edec5567c4b0b38a879cd5b707b22a701e29e94786333fb3a69b022"
+    }
+    provision "/us/usc/ptIX/rule9004/b" subsection {
+      num "b" "(b)"
+      heading "Caption."
+      chapeau "A document presented for filing must contain a caption that sets forth:"
+      provision "/us/usc/ptIX/rule9004/b/1" paragraph {
+        num "1" "(1)"
+        content "the court’s name;"
+        hash "cd3ed9558fc5d8c3319bddeb5fb2b180315117dc97eaa8871a349a5f6f57c88e"
+      }
+      provision "/us/usc/ptIX/rule9004/b/2" paragraph {
+        num "2" "(2)"
+        content "the case’s title;"
+        hash "68a8b8c20bb064fd3c293ee45e7f4e9ed4c332e6a461fb3370df88deb8cab0c4"
+      }
+      provision "/us/usc/ptIX/rule9004/b/3" paragraph {
+        num "3" "(3)"
+        content "the case number and, if appropriate, adversary-proceeding number; and"
+        hash "9c6e79e12cfde41fe63d37edf8b9fd18f1772cd061bd90c30bb98287ee563894"
+      }
+      provision "/us/usc/ptIX/rule9004/b/4" paragraph {
+        num "4" "(4)"
+        content "a brief designation of the document’s character."
+        hash "5493c21b70593834c643096dee3d35e84c0a6b57e3468da1b895c39f59cd6ad9"
+      }
+      hash "9cac38447aea090a86ac2c4f1623f904b7890a71d0b5b55f78f93bffd1fbc037"
+    }
+    hash "0aeea3c06fa0a97b157b5eb953cc1d46fa6513afca1d30c9a207edc715a31076"
+  }
+  credit "(As amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9004/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (b). Additional requirements applicable to the caption for a petition are found in Rule 1005, to the caption for notices to creditors in Rule 2002(m), and to the caption for a pleading or other paper filed in an adversary proceeding in Rule 7010. Failure to comply with this or any other rule imposing a merely formal requirement does not ordinarily result in the loss of rights. See Rule 9005."
+    hash "cf73569f617cbeeae73fca8c504cf9459438679a1ff2c7f414ea4b0b1a89f19d"
+  }
+  note "/us/usc/ptIX/rule9004/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9004 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "275d00acadb8b20fe29352f2b832033d7d708e2f6b66571714dd245837c1c361"
+  }
+  layers {
+    operative "0aeea3c06fa0a97b157b5eb953cc1d46fa6513afca1d30c9a207edc715a31076"
+    enacted "12748040b87ae5778adb9ee4b275e48639b7de222963ee5a866d3b361e7ef5df"
+    editorial "7424425484156cb33d7e54622a74d4e9e7dda7b20dac6b931a21df90aab41aea"
+  }
+}

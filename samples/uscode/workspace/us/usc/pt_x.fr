@@ -1,0 +1,17 @@
+edition 2
+module "/us/usc/ptX" {
+  within "/us/usc/t11a/~courtRules.1"
+  source "usc11a.xml"
+  positive_law false
+  container "/us/usc/ptX" part {
+    num "X" "[PART X—"
+    heading "UNITED STATES TRUSTEES] (Abrogated Apr. 30, 1991, eff. Aug. 1, 1991)"
+    status repealed
+    hash "9856995fec0fe688ea573aa37c33a97133d3cad13dbd9f8c8b826da99116b02c"
+  }
+  layers {
+    operative "9856995fec0fe688ea573aa37c33a97133d3cad13dbd9f8c8b826da99116b02c"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

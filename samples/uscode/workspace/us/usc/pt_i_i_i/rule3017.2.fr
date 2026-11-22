@@ -1,0 +1,52 @@
+edition 2
+module "/us/usc/ptIII/rule3017.2" {
+  within "/us/usc/ptIII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIII/rule3017.2" courtRule {
+    num "3017.2" "Rule 3017.2."
+    heading "Setting Dates in a Case Under Subchapter V of Chapter 11 in Which There Is No Disclosure Statement"
+    chapeau "In a case under Subchapter V of Chapter 11 in which § 1125 does not apply, the court must set:"
+    provision "/us/usc/ptIII/rule3017.2/a" subsection {
+      num "a" "(a)"
+      content "a time within which the holders of claims and interests may accept or reject the plan;"
+      hash "8e422b0711549d8f8a78676748666b0c529edf25b3cb6e6427b5c9f25be5ca1b"
+    }
+    provision "/us/usc/ptIII/rule3017.2/b" subsection {
+      num "b" "(b)"
+      content "a date on which an equity security holder or a creditor whose claim is based on a security must be the record holder of the security in order to be eligible to accept or reject the plan;"
+      hash "c2b921c54cf6a8991b548d6d01b21a4ea5c00e409ce778c8b803da28970907d8"
+    }
+    provision "/us/usc/ptIII/rule3017.2/c" subsection {
+      num "c" "(c)"
+      content "a date for the hearing on confirmation; and"
+      hash "655f5705b31e709c32876aca4446fc3b1f5e8df26eeec8dd6b76030059632a93"
+    }
+    provision "/us/usc/ptIII/rule3017.2/d" subsection {
+      num "d" "(d)"
+      content "a date for sending the plan, notice of the time within which the holders of claims and interests may accept or reject it, and notice of the date for the hearing on confirmation."
+      hash "42a42361b6d7951e6ce322544c34e1bf9526a59d2e0e07522cf8429e5404a062"
+    }
+    hash "223bd62a5d2a42b983341032f6e7f9f1a519b6b3c9bbd4346e5f02a7253971db"
+  }
+  credit "(Added Apr. 11, 2022, eff. Dec. 1, 2022; amended Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIII/rule3017.2/note/ungrouped/nolaw/committee-notes-on-rules-2022" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022"
+    p "The rule is added in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. Because there generally will not be a disclosure statement in a subchapter V case, see § 1181(b) of the Code, the rule is added to authorize the court in such a case to act at a time other than when a disclosure statement is approved to set certain times and dates."
+    hash "2d90a5f3525bf12c662c26ca01dcf784720b9ddeb350f6d9ac9eb4c867ac9210"
+  }
+  note "/us/usc/ptIII/rule3017.2/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 3017.2 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "18a06e6727eda6ca9d99f70c3cf1f9a2c91a6337f604ebabd60f138d93669484"
+  }
+  layers {
+    operative "223bd62a5d2a42b983341032f6e7f9f1a519b6b3c9bbd4346e5f02a7253971db"
+    enacted "9a2bc28a77543b7e61cb73e7b0ed2a4f7557a0bbd0a574f666e4adb992518852"
+    editorial "c6948dcaf956cfab37021cb1d64a4bd107514f885bcaa4bd4f6327b8943b8e28"
+  }
+}

@@ -1,0 +1,375 @@
+edition 2
+module "/us/usc/ptIX/rule9006" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9006" courtRule {
+    num "9006" "Rule 9006."
+    heading "Computing and Extending Time; Motions"
+    provision "/us/usc/ptIX/rule9006/a" subsection {
+      num "a" "(a)"
+      heading "Computing Time."
+      chapeau "The following rules apply in computing any time period specified in these rules, in the Federal Rules of Civil Procedure, in any local rule or court order, or in any statute that does not specify a method of computing time."
+      provision "/us/usc/ptIX/rule9006/a/1" paragraph {
+        num "1" "(1)"
+        chapeau "Period Stated in Days or a Longer Unit. When the period is stated in days or a longer unit of time:"
+        provision "/us/usc/ptIX/rule9006/a/1/A" subparagraph {
+          num "A" "(A)"
+          content "exclude the day of the event that triggers the period;"
+          hash "a15e5426807c7aaf610b9adc399ddcc7c6d2431988f2a05b44f8c773eeee1d36"
+        }
+        provision "/us/usc/ptIX/rule9006/a/1/B" subparagraph {
+          num "B" "(B)"
+          content "count every day, including intermediate Saturdays, Sundays, and legal holidays; and"
+          hash "e50af44a0c070297bdb54980178346ac3c140f91c64668261ffb099cb11f9107"
+        }
+        provision "/us/usc/ptIX/rule9006/a/1/C" subparagraph {
+          num "C" "(C)"
+          content "include the last day of the period, but if the last day is a Saturday, Sunday, or legal holiday, the period continues to run until the end of the next day that is not a Saturday, Sunday, or legal holiday."
+          hash "9028e71cff927e98a91fe727fb9554503d95255de8c22efa7cdb3620adccfb4d"
+        }
+        hash "0ae249efffc5f7f7054df8d57fb4369085b94faa5d61a33749022c9c3ce348fe"
+      }
+      provision "/us/usc/ptIX/rule9006/a/2" paragraph {
+        num "2" "(2)"
+        chapeau "Period Stated in Hours. When the period is stated in hours:"
+        provision "/us/usc/ptIX/rule9006/a/2/A" subparagraph {
+          num "A" "(A)"
+          content "begin counting immediately on the occurrence of the event that triggers the period;"
+          hash "ccc9d1df29f4d1da02116cd3dabb3a56066d85f8a69f4e4dee589fe79cc0cb91"
+        }
+        provision "/us/usc/ptIX/rule9006/a/2/B" subparagraph {
+          num "B" "(B)"
+          content "count every hour, including hours during intermediate Saturdays, Sundays, and legal holidays; and"
+          hash "c974a7f9126ec0d1e8dfb5bcb3642348e86dfc0edaf6109d96d27d472c637934"
+        }
+        provision "/us/usc/ptIX/rule9006/a/2/C" subparagraph {
+          num "C" "(C)"
+          content "if the period would end on a Saturday, Sunday, or legal holiday, then continue the period until the same time on the next day that is not a Saturday, Sunday, or legal holiday."
+          hash "c40b89d22437612532323442de931695b8445cbd3d8eab1900da2b3513129cc9"
+        }
+        hash "b1407c9c896adace5f2100947b23ee16a4638f6563eecb52443132a54085ff9b"
+      }
+      provision "/us/usc/ptIX/rule9006/a/3" paragraph {
+        num "3" "(3)"
+        chapeau "Inaccessibility of the Clerk’s Office When a Filing Is Due. Unless the court orders otherwise, if the clerk’s office is inaccessible:"
+        provision "/us/usc/ptIX/rule9006/a/3/A" subparagraph {
+          num "A" "(A)"
+          content "on the last day for filing under (1), then the time for filing is extended to the first accessible day that is not a Saturday, Sunday, or legal holiday; or"
+          hash "38b451fc1fded267fa678b63ce9c28210dd36a319474009c33fcb138b3612ead"
+        }
+        provision "/us/usc/ptIX/rule9006/a/3/B" subparagraph {
+          num "B" "(B)"
+          content "during the last hour for filing under (2), then the time for filing is extended to the same time on the first accessible day that is not a Saturday, Sunday, or legal holiday."
+          hash "eb552cc4628425b46931119cfb5d19ef5e881c49f3050044323ad1446fadad6c"
+        }
+        hash "3b14b625b66d1f0564a49413872cec3bdc712323745010189c8198f6a997651a"
+      }
+      provision "/us/usc/ptIX/rule9006/a/4" paragraph {
+        num "4" "(4)"
+        chapeau "“Last Day” Defined. Unless a different time is set by statute, local rule, or order in a case, the last day ends:"
+        provision "/us/usc/ptIX/rule9006/a/4/A" subparagraph {
+          num "A" "(A)"
+          content "for electronic filing, at midnight in the court’s time zone; and"
+          hash "cef44b195e4883874aa997fc746aab56e099fa431cabc29e45eb0b0f33f2fb9b"
+        }
+        provision "/us/usc/ptIX/rule9006/a/4/B" subparagraph {
+          num "B" "(B)"
+          content "for filing by other means, when the clerk’s office is scheduled to close."
+          hash "46a060de3a2a6f797fdf7f9b7b2cef9e6eb5585886311d740f45806638a0b732"
+        }
+        hash "470505dc5d98135c2ab7471254638cc5aa5ccc818731fba563f7f5ad751d938a"
+      }
+      provision "/us/usc/ptIX/rule9006/a/5" paragraph {
+        num "5" "(5)"
+        content "“Next Day” Defined. The “next day” is determined by continuing to count forward when the period is measured after an event, and backward when measured before an event."
+        hash "581c5a457eb746648583e8e542529b305a0cb6b083829d786d1ee8863cdda95f"
+      }
+      provision "/us/usc/ptIX/rule9006/a/6" paragraph {
+        num "6" "(6)"
+        chapeau "“Legal Holiday” Defined. “Legal holiday” means:"
+        provision "/us/usc/ptIX/rule9006/a/6/A" subparagraph {
+          num "A" "(A)"
+          content "the day set aside by statute for observing New Year’s Day, Birthday of Martin Luther King Jr., Washington’s Birthday, Memorial Day, Juneteenth National Independence Day, Independence Day, Labor Day, Columbus Day, Veteran’s Day, Thanksgiving Day, or Christmas Day;"
+          hash "bea0b6a0fff78ef1e8f5aabd32e0d443c49b3b33dbcfb2596d16b1710b332988"
+        }
+        provision "/us/usc/ptIX/rule9006/a/6/B" subparagraph {
+          num "B" "(B)"
+          content "any day declared a holiday by the President or Congress; and"
+          hash "43c0626da9d7a4ff018cfb9ebe667b9f17b779f98a8e292df7d22d7d50399a93"
+        }
+        provision "/us/usc/ptIX/rule9006/a/6/C" subparagraph {
+          num "C" "(C)"
+          content "for periods that are measured after an event, any other day declared a holiday by the state where the district court is located. (In this rule, “state” includes the District of Columbia and any United States commonwealth or territory.)"
+          hash "f6376041dadf3ed4e7bcb75df6628aa63e38b9eb7f1cd94cf712284a0aa3509b"
+        }
+        hash "11c7ddb7c7206a4c7db389439bb1707f489bfa3c897b3cb2464ae0f924cc73dc"
+      }
+      hash "3596ffdca78701942aa66752f2bb494059c4fb7a91b5bc94112cb33004324883"
+    }
+    provision "/us/usc/ptIX/rule9006/b" subsection {
+      num "b" "(b)"
+      heading "Extending Time."
+      provision "/us/usc/ptIX/rule9006/b/1" paragraph {
+        num "1" "(1)"
+        chapeau "In General. This paragraph (1) applies when these rules, a notice given under these rules, or a court order requires or allows an act to be performed at or within a specified period. Except as provided in (2) and (3), the court may—at any time and for cause—extend the time to act if:"
+        provision "/us/usc/ptIX/rule9006/b/1/A" subparagraph {
+          num "A" "(A)"
+          content "with or without a motion or notice, a request to extend is made before the period (or a previously extended period) expires; or"
+          hash "154629f2b697f2a5fef7386a8c5ee30f01aecde73f4cc32aa7acf6814073058b"
+        }
+        provision "/us/usc/ptIX/rule9006/b/1/B" subparagraph {
+          num "B" "(B)"
+          content "on motion made after the specified period expires, the failure to act within that period resulted from excusable neglect."
+          hash "38283368bad385d81a32aac3f1056494b6c3b6bf86de7d3effd0c9a234f3f72e"
+        }
+        hash "9d0bf95f84b991234f2c8633a18a0dc53bf6a4b16e89c32d5303f2719237dbd7"
+      }
+      provision "/us/usc/ptIX/rule9006/b/2" paragraph {
+        num "2" "(2)"
+        content "Exceptions. The court must not extend the time to act under Rules 1007(d), 2003(a) and (d), 7052, 9023, and 9024."
+        hash "6279c46d43dfa2fff91fec2964ab9baec22365524f555ad9337897cc117621ff"
+      }
+      provision "/us/usc/ptIX/rule9006/b/3" paragraph {
+        num "3" "(3)"
+        chapeau "Extensions Governed by Other Rules. The court may extend the time to:"
+        provision "/us/usc/ptIX/rule9006/b/3/A" subparagraph {
+          num "A" "(A)"
+          content "act under Rules 1006(b)(2), 1017(e), 3002(c), 4003(b), 4004(a), 4007(c), 4008(a), 8002, and 9033—but only as permitted by those rules; and"
+          hash "d7fa69f1bf97dc9f2482eddbf43660c606bcc352ab24ab227dd189950e93d6c9"
+        }
+        provision "/us/usc/ptIX/rule9006/b/3/B" subparagraph {
+          num "B" "(B)"
+          content "file the certificate required by Rule 1007(b)(7), and the schedules and statements in a small business case under § 1116(3)—but only as permitted by Rule 1007(c)."
+          hash "cf42e24be0fc30272e97170810e5c30a3a3bbf61edf4f82470067ed2994fc7bb"
+        }
+        hash "fcf11f9a30cee5942c4213933163228ca4c935ce807e06cb82f7a597d0101d56"
+      }
+      hash "1cc6e689b079e5e325082e173b66e651b8b36be1a47e9436233e2c066eb9ec7c"
+    }
+    provision "/us/usc/ptIX/rule9006/c" subsection {
+      num "c" "(c)"
+      heading "Reducing Time."
+      provision "/us/usc/ptIX/rule9006/c/1" paragraph {
+        num "1" "(1)"
+        content "When Permitted. When a rule, notice given under a rule, or court order requires or allows an act to be done within a specified time, the court may—for cause and with or without a motion or notice—reduce the time."
+        hash "62e9c8ebe4b2460a50553922152784f85c82bbc1a006e40b3ebc233a1003be19"
+      }
+      provision "/us/usc/ptIX/rule9006/c/2" paragraph {
+        num "2" "(2)"
+        content "When Not Permitted. The court may not reduce the time to act under Rule 2002(a)(7), 2003(a), 3002(c), 3014, 3015, 4001(b)(2) or (c)(2), 4003(a), 4004(a), 4007(c), 4008(a), 8002, or 9033(b). Also, the court may not reduce the time set by Rule 1007(c) to file the certificate required by Rule 1007(b)(7)."
+        hash "7ae6297115a28200dbd798efb8e4b251e6a5f345aae0ce5ce14c5b085908bc2b"
+      }
+      hash "417cabb5751d81e48c9009f050d91d77e8ad6075581eef0cc4c0e793920cbe11"
+    }
+    provision "/us/usc/ptIX/rule9006/d" subsection {
+      num "d" "(d)"
+      heading "Time to Serve a Motion and a Response."
+      provision "/us/usc/ptIX/rule9006/d/1" paragraph {
+        num "1" "(1)"
+        content "In General. A written motion (other than one that may be heard ex parte) and notice of any hearing must be served at least 7 days before the hearing date, unless the court or these rules set a different period. Any affidavit supporting the motion must be served with it. An order to change the period may be granted for cause on ex parte application."
+        hash "992b18ab973ef46383f3066a4e94af4e509ba77b96681e8facdec5dbcae3fd89"
+      }
+      provision "/us/usc/ptIX/rule9006/d/2" paragraph {
+        num "2" "(2)"
+        content "Response. Except as provided in Rule 9023, any written response must be served at least 1 day before the hearing, unless the court allows otherwise."
+        hash "3d61b5ff0579d9b6171f8eba6c8f9c2f917fca2e7e94330b844ebfd881934f64"
+      }
+      hash "92cb563168aaf3a783385fffe8aa4e2940a2851c46af08991f6fb8a9fd2ef132"
+    }
+    provision "/us/usc/ptIX/rule9006/e" subsection {
+      num "e" "(e)"
+      heading "Service Complete on Mailing."
+      content "Service by mail of process, any other document, or notice is complete upon mailing."
+      hash "e7a2ce60467ae95216e8a7efbdc79fa44fe25a76bbfa05422dc550cabd5db292"
+    }
+    provision "/us/usc/ptIX/rule9006/f" subsection {
+      num "f" "(f)"
+      heading "Additional Time After Certain Service."
+      content "When a party may or must act within a specified time after being served and service is made by mail or under Fed. R. Civ. P. 5(b)(2)(D) (leaving with the clerk) or (F) (other means consented to), 3 days are added after the period would otherwise expire under (a)."
+      hash "6392342d4500e8d948dc81d8e783d1e82f94b45e6cc0d207f584e91e27628feb"
+    }
+    provision "/us/usc/ptIX/rule9006/g" subsection {
+      num "g" "(g)"
+      heading "Grain-Storage Facility."
+      content "This rule does not limit the court’s authority under § 557 to issue an order governing procedures in a case in which the debtor owns or operates a grain-storage facility."
+      hash "4eef872879f7a0a1255843e361bafece4f40493ea7e7927440631c65e6c24b81"
+    }
+    hash "6cc42b54e8fa8308fd63d41e10ac4b25dbdba8e30fd35a7d3de83788e3992620"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 25, 1989, eff. Aug. 1, 1989; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 23, 1996, eff. Dec. 1, 1996; Apr. 26, 1999, eff. Dec. 1, 1999; Apr. 23, 2001, eff. Dec. 1, 2001; Apr. 25, 2005, eff. Dec. 1, 2005; Apr. 23, 2008, eff. Dec. 1, 2008; Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 16, 2013, eff. Dec. 1, 2013; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 24, 2023, eff. Dec. 1, 2023; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Subdivision (a). This rule is an adaptation of Rule 6 F.R.Civ.P. It governs the time for acts to be done and proceedings to be had in cases under the Code and any litigation arising therein."
+    p "Subdivision (b) is patterned after Rule 6(b) F.R.Civ.P. and Rule 26(b) F.R.App.P."
+    p "Paragraph (1) of this subdivision confers on the court discretion generally to authorize extensions of time for doing acts required or allowed by these rules or orders of court. The exceptions to this general authority to extend the time are contained in paragraphs (2) and (3)."
+    p "In the interest of prompt administration of bankruptcy cases certain time periods may not be extended. Paragraph (2) lists the rules which establish time periods which may not be extended: Rule 1007(d), time for filing a list of 20 largest creditors; Rule 1017(b)(3), 30 day period for sending notice of dismissal for failure to pay the filing fee; Rule 1019(2), 20 day period for notice of conversion to a chapter 7 case; Rule 2003(a), meeting of creditors not more than 40 days after order for relief; Rule 2003(d), 10 days for filing a motion for resolution of an election dispute; Rule 3014, time for the § 1111(b)(2) election; Rule 4001(b), expiration of stay 30 days following the commencement of final hearing; Rule 7052(b), 10 day period to move to amend findings of fact; Rule 9015(f), 20 day period to move for judgment notwithstanding the verdict; Rule 9023, 10 day period to move for a new trial; and Rule 9024, time to move for relief from judgment."
+    p "Many rules which establish a time for doing an act also contain a specific authorization and standard for granting an extension of time and, in some cases, limit the length of an extension. In some instances it would be inconsistent with the objective of the rule and sound administration of the case to permit extension under Rule 9006(b)(1), but with respect to the other rules it is appropriate that the power to extend time be supplemented by Rule 9006(b)(1). Unless a rule which contains a specific authorization to extend time is listed in paragraph (3) of this subdivision, an extension of the time may be granted under paragraph (1) of this subdivision. If a rule is included in paragraph (3) an extension may not be granted under paragraph (1). The following rules are listed in paragraph (3): Rule 1006(b)(2), time for paying the filing fee in installments; Rule 3002(c), 90 day period for filing a claim in a chapter 7 or 13 case; Rule 4003(b), 30 days for filing objections to a claim of exemptions; Rule 4004(a), 60 day period to object to a discharge; Rule 4007(b), 60 day period to file a dischargeability complaint; and Rule 8002, 10 days for filing a notice of appeal."
+    p "Subdivision (c). Paragraph (1) of this subdivision authorizes the reduction of the time periods established by these rules or an order of the court. Excluded from this general authority are the time periods established by the rules referred to in paragraph (2) of the subdivision: Rule 2002 (a) and (b), 20 day and 25 day notices of certain hearings and actions in the case; Rule 2003(a), meeting of creditors to be not less than 20 days after the order for relief; Rule 3002(c), 90 days for filing a claim in a chapter 7 or 13 case; Rule 3014, time for § 1111(b)(2) election; Rule 3015, 10 day period after filing of petition to file a chapter 13 plan; Rule 4003(a), 15 days for a dependent to claim exemptions; Rule 4004(a), 60 day period to object to a discharge; Rule 4007(c), 60 day period to file a dischargeability complaint; and Rule 8002, 10 days for filing a notice of appeal. Reduction of the time periods fixed in the rules referred to in this subdivision would be inconsistent with the purposes of those rules and would cause harmful uncertainty."
+    p "Subdivision (d) is derived from Rule 6(d) F.R.Civ.P. The reference is to Rule 9023 instead of to Rule 59(c) F.R.Civ.P. because Rule 9023 incorporates Rule 59 F.R.Civ.P. but excepts therefrom motions to reconsider orders allowing and disallowing claims."
+    p "Subdivision (f) is new and is the same as Rule 6(e) F.R.Civ.P."
+    hash "a06bd8ff7d7fd0d73f0830f3cc006417bbc904d521d4015dce4c4a3e8c5966eb"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (a) is amended to conform to the 1984 amendments to Rule 6 F.R.Civ.P."
+    p "Subdivision (b). The reference to Rule 4001(b) in paragraph (3) is deleted because of the amendments made to Rule 4001. Rule 9033, which is new, contains specific provisions governing the extension of time to file objections to proposed findings of fact and conclusions of law. Rule 9033 is added to the rules referred to in paragraph (3)."
+    p "Subdivision (c). Rule 4001(b)(2) and (c)(2) provide that a final hearing on a motion to use cash collateral or a motion for authority to obtain credit may be held no earlier than 15 days after the filing of the motion. These two rules are added to paragraph (2) to make it clear that the 15 day period may not be reduced. Rule 9033 is also added to paragraph (2)."
+    p "Subdivision (g) is new. Under § 557 of the Code, as enacted by the 1984 amendments, the court is directed to expedite grain storage facility cases. This subdivision makes it clear this rule does not limit the court’s authority under § 557."
+    p "The original Advisory Committee Note to this rule included the 25 day notice period of Rule 2002(b) as a time period which may not be reduced under Rule 9006(c)(2). This was an error."
+    hash "4983c0642423542c5ee8f3e65821356d64aa761824a8c9a9c598cb0682d0521d"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1989-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1989 Amendment"
+    p "Prior to 1987, subdivision (a) provided that intermediate weekends and legal holidays would not be counted in the computation of a time period if the prescribed or allowed time was less than 7 days. This rule was amended in 1987 to conform to Fed. R. Civ. P. 6(a) which provides for the exclusion of intermediate weekends and legal holidays if the time prescribed or allowed is less than 11 days. An undesirable result of the 1987 amendment was that 10-day time periods prescribed in the interest of prompt administration of bankruptcy cases were extended to at least 14 calendar days."
+    p "As a result of the present amendment, 10-day time periods prescribed or allowed will no longer be extended to at least 14 calendar days because of intermediate weekends and legal holidays."
+    hash "c9e6690b71d252a04a1a1db0e62448ac09807d29786ca08ab624ccdb19857d4b"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "As a result of the 1989 amendment to this rule, the method of computing time under subdivision (a) is not the same as the method of computing time under Rule 6(a) F.R.Civ.P. Subdivision (a) is amended to provide that it governs the computation of time periods prescribed by the Federal Rules of Civil Procedure when the Bankruptcy Rules make a civil rule applicable to a bankruptcy case or proceeding."
+    p "Subdivision (b)(2) is amended because of the deletion of Rule 1019(2). Reference to Rule 9015(f) is deleted because of the abrogation of Rule 9015 in 1987."
+    p "Subdivision (b)(3) is amended to limit the enlargement of time regarding dismissal of a chapter 7 case for substantial abuse in accordance with Rule 1017(e)."
+    hash "bff5c5862afaf5914d573da753c0c4bf4f9c159e9e1f433a4cf67a5a2452ddb5"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1996-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1996 Amendment"
+    p "Subdivision (c)(2) is amended to conform to the abrogation of Rule 2002(a)(4) and the renumbering of Rule 2002(a)(8) to Rule 2002(a)(7)."
+    p "GAP Report on Rule 9006. No changes since publication, except for a stylistic change."
+    hash "6f0da55ed62064e515299c2fc064da6d35efe54f2b244e0d784a2afef8f0dcb8"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-1999-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—1999 Amendment"
+    p "Rule 9006(b)(2) is amended to conform to the abrogation of Rule 1017(b)(3)."
+    p "GAP Report on Rule 9006. The proposed amendment to Rule 9006(b)(2) has been added as a technical change to conform to the abrogation of Rule 1017(b)(3). The proposed amendment to Rule 9006(c)(2), providing that the time under Rule 1019(6) to file a request for payment of an administrative expense after a case is converted to chapter 7 could not be reduced by the court, was deleted. The proposed amendments to Rule 1019(6) have been changed so that the court will fix the time for filing the request for payment. Since the court will fix the time limit, the court should have the power to reduce it. See GAP Report to Rule 1019(6)."
+    hash "e88f0eeffd14ed3402587276f19c57cd63d3900e07b191722daa5a2601b53002"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2001-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2001 Amendment"
+    p "Rule 5(b) F. R. Civ. P., which is made applicable in adversary proceedings by Rule 7005, is being restyled and amended to authorize service by electronic means—or any other means not otherwise authorized under Rule 5(b)—if consent is obtained from the person served. The amendment to Rule 9006(f) is intended to extend the three-day “mail rule” to service under Rule 5(b)(2)(D), including service by electronic means. The three-day rule also will apply to service under Rule 5(b)(2)(C) F. R. Civ. P. when the person served has no known address and the paper is served by leaving a copy with the clerk of the court."
+    p "Changes Made After Publication and Comments. No changes were made."
+    hash "69dceddf3167b1fd1bbdb1bf3c6399f9dbaf356ff00f0b1c067cc2a057492009"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2005-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2005 Amendment"
+    p "Rule 9006(f) is amended, consistent with a corresponding amendment to Rule 6(e) of the F.R. Civ. P., to clarify the method of counting the number of days to respond after service either by mail or under Civil Rule 5(b)(2)(C) or (D). Three days are added after the prescribed period expires. If, before the application of Rule 9006(f), the prescribed period is less than 8 days, intervening Saturdays, Sundays, and legal holidays are excluded from the calculation under Rule 9006(a). Some illustrations may be helpful."
+    p "Under existing Rule 9006(a), assuming that there are no legal holidays and that a response is due in seven days, if a paper is filed on a Monday, the seven day response period commences on Tuesday and concludes on Wednesday of the next week. Adding three days to the end of the period would extend it to Saturday, but because the response period ends on a weekend, the response day would be the following Monday, two weeks after the filing of the initial paper. If the paper is filed on a Tuesday, the seven-day response period would end on the following Thursday, and the response time would also be the following Monday. If the paper is mailed on a Wednesday, the initial seven-day period would expire nine days later on a Friday, but the response would again be due on the following Monday because of Rule 9006(f). If the paper is mailed on a Thursday, however, the seven day period ends on Monday, eleven days after the mailing of the service because of the exclusion of the two intervening Saturdays and Sundays. The response is due three days later on the following Thursday. If the paper is mailed on a Friday, the seven day period would conclude on a Tuesday, and the response is due three days later on a Friday."
+    p "No other change in the system of counting time is intended."
+    p "Other changes are stylistic."
+    p "Changes Made After Publication and Comment. The phrase “would otherwise expire under Rule 9006(a)” was added to the end of the rule to clarify further that the three day extension is to be added to the end of the period that is established under the counting provisions of Rule 9006(a). This also maintains a parallel construction with Civil Rule 6(e) in which the same addition to the rule was made after the public comment period."
+    hash "90e133e9b867617a50ed790c0e18bfc05332bf929e9706abf6ca3042b54fba6e"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subdivision (b)(3) is amended to implement § 1116(3) of the Code, as amended by the 2005 amendments, which places specific limits on the extension of time for filing schedules and statements of financial affairs in a small business case."
+    p "Subdivisions (b)(3) and (c)(2) are amended to provide that enlargement or reduction of the time to file the statement of completion of a personal financial management course required by Rule 1007(b)(7) are governed by Rule 1007(c). Likewise, the amendments to subdivisions (b)(3) and (c)(2) recognize that the enlargement of time to file a reaffirmation agreement is governed by Rule 4008(a), and that reduction of the time provided under that rule is not permitted."
+    p "Other amendments are stylistic."
+    p "Changes Made After Publication. Subdivision (b)(3) was amended to provide that Rule 9006 does not govern the enlargement of time to file a reaffirmation agreement, the statement required under Rule 1007(b)(7), or the time to file schedules and statements of financial affairs in small business cases. The title of subdivision (b)(3) was also amended to more accurately describe the operation of the provision. Subdivision (c)(2) was amended to recognize that the court may not reduce the time under Rule 1007(c) to file the statement required by Rule 1007(b)(7)."
+    hash "d40b00255db8fca4a4517d524d7979aadb120d20ee2b75fa8051b1986e124fed"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "Subdivision (a). Subdivision (a) has been amended to simplify and clarify the provisions that describe how deadlines are computed. Subdivision (a) governs the computation of any time period found in a Federal Rule of Bankruptcy Procedure, a Federal Rule of Civil Procedure, a statute, a local rule, or a court order. In accordance with Bankruptcy Rule 9029(a), a local rule may not direct that a deadline be computed in a manner inconsistent with subdivision (a)."
+    p "The time-computation provisions of subdivision (a) apply only when a time period must be computed. They do not apply when a fixed time to act is set. The amendments thus carry forward the approach taken in Violette v. P.A. Days, Inc., 427 F.3d 1015, 1016 (6th Cir. 2005) (holding that Civil Rule 6(a) “does not apply to situations where the court has established a specific calendar day as a deadline”), and reject the contrary holding of In re American Healthcare Management, Inc., 900 F.2d 827, 832 (5th Cir. 1990) (holding that Bankruptcy Rule 9006(a) governs treatment of date-certain deadline set by court order). If, for example, the date for filing is “no later than November 1, 2007,” subdivision (a) does not govern. But if a filing is required to be made “within 10 days” or “within 72 hours,” subdivision (a) describes how that deadline is computed."
+    p "Subdivision (a) does not apply when computing a time period set by a statute if the statute specifies a method of computing time. See, e.g., 11 U.S.C. § 527(a)(2) (debt relief agencies must provide a written notice to an assisted person “not later than 3 business days” after providing bankruptcy assistance services)."
+    p "Subdivision (a)(1). New subdivision (a)(1) addresses the computation of time periods that are stated in days. It also applies to time periods that are stated in weeks, months, or years. See, e.g., Federal Rule of Civil Procedure 60(c)(1) made applicable to bankruptcy cases under Rule 9024. Subdivision (a)(1)(B)’s directive to “count every day” is relevant only if the period is stated in days (not weeks, months, or years)."
+    p "Under former Rule 9006(a), a period of eight days or more was computed differently than a period of less than eight days. Intermediate Saturdays, Sundays, and legal holidays were included in computing the longer periods, but excluded in computing the shorter periods. Former Rule 9006(a) thus made computing deadlines unnecessarily complicated and led to counterintuitive results."
+    p "Under new subdivision (a)(1), all deadlines stated in days (no matter the length) are computed in the same way. The day of the event that triggers the deadline is not counted. All other days—including intermediate Saturdays, Sundays, and legal holidays—are counted, with only one exception: If the period ends on a Saturday, Sunday, or legal holiday, then the deadline falls on the next day that is not a Saturday, Sunday, or legal holiday. An illustration is provided below in the discussion of subdivision (a)(5). Subdivision (a)(3) addresses filing deadlines that expire on a day when the clerk’s office is inaccessible."
+    p "Where subdivision (a) formerly referred to the “act, event, or default” that triggers the deadline, new subdivision (a) refers simply to the “event” that triggers the deadline; this change in terminology is adopted for brevity and simplicity, and is not intended to change meaning."
+    p "Periods previously expressed as less than eight days will be shortened as a practical matter by the decision to count intermediate Saturdays, Sundays, and legal holidays in computing all periods. Many of those periods have been lengthened to compensate for the change. See, e.g., Rules 2008 (trustee’s duty to notify court of acceptance of the appointment within five days is extended to seven days); 6004(b) (time for filing and service of objection to proposed use, sale or lease of property extended from five days prior to the hearing to seven days prior to the hearing); and 9006(d) (time for giving notice of a hearing extended from five days prior to the hearing to seven days)."
+    p "Most of the 10-day periods were adjusted to meet the change in computation method by setting 14 days as the new period. See, e.g., Rules 1007(h) (10-day period to file supplemental schedule for property debtor becomes entitled to acquire after the commencement of the case is extended to 14 days); 3020(e) (10-day stay of order confirming a chapter 11 plan extended to 14 days); 8002(a) (10-day period in which to file notice of appeal extended to 14 days). A 14-day period also has the advantage that the final day falls on the same day of the week as the event that triggered the period—the14th day after a Monday, for example, is a Monday. This advantage of using week-long periods led to adopting seven-day periods to replace some of the periods set at less than 10 days, 21-day periods to replace 20-day periods, and 28-day periods to replace 25-day periods. Thirty-day and longer periods, however, were generally retained without change."
+    p "Subdivision (a)(2). New subdivision (a)(2) addresses the computation of time periods that are stated in hours. No such deadline currently appears in the Federal Rules of Bankruptcy Procedure. But some statutes contain deadlines stated in hours, as do some court orders issued in expedited proceedings."
+    p "Under subdivision (a)(2), a deadline stated in hours starts to run immediately on the occurrence of the event that triggers the deadline. The deadline generally ends when the time expires. If, however, the time period expires at a specific time (say, 2:17 p.m.) on a Saturday, Sunday, or legal holiday, then the deadline is extended to the same time (2:17 p.m.) on the next day that is not a Saturday, Sunday, or legal holiday. Periods stated in hours are not to be “rounded up” to the next whole hour. Subdivision (a)(3) addresses situations when the clerk’s office is inaccessible during the last hour before a filing deadline expires."
+    p "Subdivision (a)(2)(B) directs that every hour be counted. Thus, for example, a 72-hour period that commences at 10:23 a.m. on Friday, November 2, 2007, will run until 9:23 a.m. on Monday, November 5; the discrepancy in start and end times in this example results from the intervening shift from daylight saving time to standard time."
+    p "Subdivision (a)(3). When determining the last day of a filing period stated in days or a longer unit of time, a day on which the clerk’s office is not accessible because of the weather or another reason is treated like a Saturday, Sunday, or legal holiday. When determining the end of a filing period stated in hours, if the clerk’s office is inaccessible during the last hour of the filing period computed under subdivision (a)(2) then the period is extended to the same time on the next day that is not a weekend, holiday, or day when the clerk’s office is inaccessible."
+    p "Subdivision (a)(3)’s extensions apply “[u]nless the court orders otherwise.” In some circumstances, the court might not wish a period of inaccessibility to trigger a full 24-hour extension; in those instances, the court can specify a briefer extension."
+    p "The text of the rule no longer refers to “weather or other conditions” as the reason for the inaccessibility of the clerk’s office. The reference to “weather” was deleted from the text to underscore that inaccessibility can occur for reasons unrelated to weather, such as an outage of the electronic filing system. Weather can still be a reason for inaccessibility of the clerk’s office. The rule does not attempt to define inaccessibility. Rather, the concept will continue to develop through caselaw. See, e.g., William G. Phelps, When Is Office of Clerk of Court Inaccessible Due to Weather or Other Conditions for Purpose of Computing Time Period for Filing Papers under Rule 6(a) of Federal Rules of Civil Procedure, 135 A.L.R. Fed. 259 (1996) (collecting cases). In addition, many local provisions address inaccessibility for purposes of electronic filing. See, e.g., D. Kan. Rule 5.4.11 (“A Filing User whose filing is made untimely as the result of a technical failure may seek appropriate relief from the court.”)."
+    p "Subdivision (a)(4). New subdivision (a)(4) defines the end of the last day of a period for purposes of subdivision (a)(1). Subdivision (a)(4) does not apply in computing periods stated in hours under subdivision (a)(2), and does not apply if a different time is set by a statute, local rule, or order in the case. A local rule may provide, for example, that papers filed in a drop box after the normal hours of the clerk’s office are filed as of the day that is date-stamped on the papers by a device in the drop box."
+    p "28 U.S.C. § 452 provides that “[a]ll courts of the United States shall be deemed always open for the purpose of filing proper papers, issuing and returning process, and making motions and orders.” A corresponding provision exists in Rule 5001(a). Some courts have held that these provisions permit an after-hours filing by handing the papers to an appropriate official. See, e.g., Casalduc v. Diaz, 117 F.2d 915, 917 (1st Cir. 1941). Subdivision (a)(4) does not address the effect of the statute on the question of after-hours filing; instead, the rule is designed to deal with filings in the ordinary course without regard to Section 452."
+    p "Subdivision (a)(5). New subdivision (a)(5) defines the “next” day for purposes of subdivisions (a)(1)(C) and (a)(2)(C). The Federal Rules of Bankruptcy Procedure contain both forward-looking time periods and backward-looking time periods. A forward-looking time period requires something to be done within a period of time after an event. See, e.g., Rules 1007(c) ([“]the schedules, statements, and other documents shall be filed by the debtor within 14 days of the entry of the order for relief”); 1019(5)(B)(ii) (“the trustee, not later than 30 days after conversion of the case, shall file and transmit to the United States trustee a final report and account”); and 7012(a) (“If a complaint is duly served, the defendant shall serve an answer within 30 days after the issuance of the summons, except when a different time is prescribed by the court.”)."
+    p "A backward-looking time period requires something to be done within a period of time before an event. See, e.g., Rules 6004(b) (“an objection to a proposed use, sale, or lease of property shall be filed and served not less than seven days before the date set for the proposed action”); 9006(d) (“A written motion, other than one which may be heard ex parte, and notice of any hearing shall be served not later than seven days before the time specified for such hearing”). In determining what is the “next” day for purposes of subdivisions (a)(1)(C) and (a)(2)(C), one should continue counting in the same direction—that is, forward when computing a forward-looking period and backward when computing a backward-looking period. If, for example, a filing is due within 10 days after an event, and the tenth day falls on Saturday, September 1, 2007, then the filing is due on Tuesday, September 4, 2007 (Monday, September 3, is Labor Day). But if a filing is due 10 days before an event, and the tenth day falls on Saturday, September 1, then the filing is due on Friday, August 31."
+    p "Subdivision (a)(6). New subdivision (a)(6) defines “legal holiday” for purposes of the Federal Rules of Bankruptcy Procedure, including the time-computation provisions of subdivision (a). Subdivision (a)(6) continues to include within the definition of “legal holiday” days that are declared a holiday by the President or Congress."
+    p "For forward-counted periods—i.e., periods that are measured after an event—subdivision (a)(6)(C) includes certain state holidays within the definition of legal holidays, and defines the term “state”—for purposes of subdivision (a)(6)—to include the District of Columbia and any commonwealth or territory of the United States. Thus, for purposes of subdivision (a)(6)’s definition of “legal holiday,” “state” includes the District of Columbia, Guam, American Samoa, the U.S. Virgin Islands, the Commonwealth of Puerto Rico, and the Commonwealth of the Northern Mariana Islands."
+    p "However, state legal holidays are not recognized in computing backward-counted periods. For both forward- and backward-counted periods, the rule thus protects those who may be unsure of the effect of state holidays. For forward-counted deadlines, treating state holidays the same as federal holidays extends the deadline. Thus, someone who thought that the federal courts might be closed on a state holiday would be safeguarded against an inadvertent late filing. In contrast, for backward-counted deadlines, not giving state holidays the treatment of federal holidays allows filing on the state holiday itself rather than the day before. Take, for example, Monday, April 21, 2008 (Patriot’s Day, a legal holiday in the relevant state). If a filing is due 14 days after an event, and the fourteenth day is April 21, then the filing is due on Tuesday, April 22 because Monday, April 21 counts as a legal holiday. But if a filing is due 14 days before an event, and the fourteenth day is April 21, the filing is due on Monday, April 21; the fact that April 21 is a state holiday does not make April 21 a legal holiday for purposes of computing this backward-counted deadline. But note that if the clerk’s office is inaccessible on Monday, April 21, then subdivision (a)(3) extends the April 21 filing deadline forward to the next accessible day that is not a Saturday, Sunday or legal holiday—no earlier than Tuesday, April 22."
+    p "Changes Made After Publication. The reference to Rule 6(a)(1) in subdivision (a)(3)(A) at line 50 of the rule as it was published was corrected by referring instead to Rule 9006(a)(1)."
+    p "The Standing Committee changed Rule 9006(a)(6) to exclude state holidays from the definition of “legal holiday” for purposes of computing backward-counted periods; conforming changes were made to the Committee Note to subdivision (a)(6). In addition, the term “possession” was deleted from the definition of “state” in subdivision (a)(6), and a conforming change was made to the Committee Note."
+    p "[Subdivision (d).] The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadline in the rule is amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    p "Subdivision (f) is amended to conform to the changes made to Rule 5(b)(2) of the Federal Rules of Civil Procedure as a part of the Civil Rules Restyling Project. As a part of that project, subparagraphs (b)(2)(C) and (D) of that rule were rewritten as subparagraphs (b)(2)(D), (E), and (F). The cross reference to those rules contained in subdivision (f) of this rule is corrected by this amendment."
+    hash "3ac12d2e62c2001c2e5cb9179d98fd41dab7e3b58d95a02d346ca2011ac9fd6a"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2013-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2013 Amendment"
+    p "The title of this rule is amended to draw attention to the fact that it prescribes time limits for the service of motion papers. These time periods apply unless another Bankruptcy Rule or a court order, including a local rule, prescribes different time periods. Rules 9013 and 9014 should also be consulted regarding motion practice. Rule 9013 governs the form of motions and the parties who must be served. Rule 9014 prescribes the procedures applicable to contested matters, including the method of serving motions commencing contested matters and subsequent papers. Subdivision (d) is amended to apply to any written response to a motion, rather than just to opposing affidavits. The caption of the subdivision is amended to reflect this change. Other changes are stylistic."
+    p "Changes Made After Publication and Comment. No changes were made after publication and comment."
+    hash "9a019d367165e6704ae05656014cccd7a24380d0a624afd16d5e372dc421ac33"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2016 Amendment"
+    p "Subdivision (f) is amended to remove service by electronic means under Civil Rule 5(b)(2)(E) from the modes of service that allow three added days to act after being served."
+    p "Rule 9006(f) and Civil Rule 6(d) contain similar provisions providing additional time for actions after being served by mail or by certain modes of service that are identified by reference to Civil Rule 5(b)(2). Rule 9006(f)—like Civil Rule 6(d)—is amended to remove the reference to service by electronic means under Rule 5(b)(2)(E). The amendment also adds clarifying parentheticals identifying the forms of service under Rule 5(b)(2) for which three days will still be added."
+    p "Civil Rule 5(b)—made applicable in bankruptcy proceedings by Rules 7005 and 9014(b)—was amended in 2001 to allow service by electronic means with the consent of the person served. Although electronic transmission seemed virtually instantaneous even then, electronic service was included in the modes of service that allow three added days to act after being served. There were concerns that the transmission might be delayed for some time, and particular concerns that incompatible systems might make it difficult or impossible to open attachments. Those concerns have been substantially alleviated by advances in technology and widespread skill in using electronic transmission."
+    p "A parallel reason for allowing the three added days was that electronic service was authorized only with the consent of the person to be served. Concerns about the reliability of electronic transmission might have led to refusals of consent; the three added days were calculated to alleviate these concerns."
+    p "Diminution of the concerns that prompted the decision to allow the three added days for electronic transmission is not the only reason for discarding this indulgence. Many rules have been changed to ease the task of computing time by adopting 7-, 14-, 21-, and 28-day periods that allow “day-of-the-week” counting. Adding three days at the end complicated the counting, and increased the occasions for further complication by invoking the provisions that apply when the last day is a Saturday, Sunday, or legal holiday."
+    p "Electronic service after business hours, or just before or during a weekend or holiday, may result in a practical reduction in the time available to respond. Extensions of time may be warranted to prevent prejudice."
+    p "Eliminating Rule 5(b) subparagraph (2)(E) from the modes of service that allow three added days means that the three added days cannot be retained by consenting to service by electronic means. Consent to electronic service in registering for electronic case filing, for example, does not count as consent to service “by any other means” of delivery under subparagraph (F)."
+    p "Subdivision (f) is also amended to conform to a corresponding amendment of Civil Rule 6(d). The amendment clarifies that only the party that is served by mail or under the specified provisions of Civil Rule 5—and not the party making service—is permitted to add three days to any prescribed period for taking action after service is made."
+    hash "f843a4d6157666986250d2af8943feae74e8712a05c93d613463d7b7a49a1c0f"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/pl.117.17/committee-notes-on-rules-2023-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2023 Amendment"
+    p "The amendment adds “Juneteenth National Independence Day” to the list of legal holidays. See Juneteenth National Independence Day Act, " ["P.L. 117–17" -> "/us/pl/117/17"] " (2021) (amending 5 U.S.C. § 6103(a))."
+    hash "531da9eed429d05914a4793fce95e37dc2f6bccf01a6f16e1c81e0d406eccaee"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9006 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    p "Additionally, the following substantive changes have been made."
+    p "The amendments to Rule 9006(b)(3)(B) and (c)(2) reflect the amendment to Rule 1007(b)(7) that replaces the requirement for submission of a statement showing that the debtor has completed a course on personal financial management with the requirement that the debtor provide the certificate of course completion issued by the approved provider of that course."
+    hash "c63ed1dfe09b7f78f0f3d7a6f214d4e88581213d783dfec85edc9499e5588173"
+  }
+  note "/us/usc/ptIX/rule9006/note/ungrouped/nolaw/references-in-text" enacted {
+    group ungrouped
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Federal Rules of Civil Procedure, referred to in subds. (a) and (f), are set out in the Appendix to Title 28, Judiciary and Judicial Procedure."
+    hash "fe4e74fdca0be0f636b315d664412c1c89fb70aa3e221f9ab64cd0726e07a41a"
+  }
+  layers {
+    operative "6cc42b54e8fa8308fd63d41e10ac4b25dbdba8e30fd35a7d3de83788e3992620"
+    enacted "6a60440fafa8a9a3e3afb4d664a1135cfa4ebae9e727e68b63efa214dbb29a56"
+    editorial "60f61c260fc5b869bb9591687922ac2e5311460acc51347c000864ce7d01da83"
+  }
+}

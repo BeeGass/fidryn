@@ -1,0 +1,77 @@
+edition 2
+module "/us/usc/ptII/rule2012" {
+  within "/us/usc/ptII"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptII/rule2012" courtRule {
+    num "2012" "Rule 2012."
+    heading "Substituting a Trustee in a Chapter 11 or 12 Case; Successor Trustee in a Pending Proceeding"
+    provision "/us/usc/ptII/rule2012/a" subsection {
+      num "a" "(a)"
+      heading "Substituting a Trustee."
+      chapeau "The trustee is automatically substituted for the debtor in possession as a party in any pending action, proceeding, or matter if:"
+      provision "/us/usc/ptII/rule2012/a/1" paragraph {
+        num "1" "(1)"
+        content "the trustee is appointed in a Chapter 11 case (other than under Subchapter V); or"
+        hash "7a2c14d439f7d8d19b05cc0f9bb0938cf5bea056285e13a7589bfa274294e8dd"
+      }
+      provision "/us/usc/ptII/rule2012/a/2" paragraph {
+        num "2" "(2)"
+        content "the debtor is removed as debtor in possession in a Chapter 12 case or in a case under Subchapter V of Chapter 11."
+        hash "12ee6b779724a6509eeaa8dd723920413bd6d808b5dd3eec0aacaab7d26fa9a7"
+      }
+      hash "a2330bd3940850f4ea91f26c6256737c74b3fd9d0bba944cbb105abbdeab957e"
+    }
+    provision "/us/usc/ptII/rule2012/b" subsection {
+      num "b" "(b)"
+      heading "Successor Trustee."
+      content "If a trustee dies, resigns, is removed, or otherwise ceases to hold office while a bankruptcy case is pending, the successor trustee is automatically substituted as a party in any pending action, proceeding, or matter. The successor trustee must prepare, file, and send to the United States trustee an accounting of the estate’s prior administration."
+      hash "4937401b6da8eb41a7df31cf763d6caf9e2ff7ebad4f31d694bfaaafac90dd4f"
+    }
+    hash "06dcd535a7bd7dfb3daf676d48a17869bc4eb052a8982b01b4eeb08763c4b764"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 11, 2022, eff. Dec. 1, 2022; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptII/rule2012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "Paragraph (1) of this rule implements § 325 of the Code. It provides that a pending action or proceeding continues without abatement and that the trustee’s successor is automatically substituted as a party whether it be another trustee or the debtor returned to possession, as such party."
+    p "Paragraph (2) places it within the responsibility of a successor trustee to file an accounting of the prior administration of the estate. If an accounting is impossible to obtain from the prior trustee because of death or lack of cooperation, prior reports submitted in the earlier administration may be updated."
+    hash "762a598ce7ca6af425403bad48844d4454c38a2068a375d03048726c28f6c7f5"
+  }
+  note "/us/usc/ptII/rule2012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (a) is new. The subdivision provides for the substitution of a trustee appointed in a chapter 11 case for the debtor in possession in any pending litigation."
+    p "The original provisions of the rule are now in sub­division (b)."
+    hash "85e62e38fb8fc89c2bc06dae251977dded3f45f677c2861114e39cc25143c28e"
+  }
+  note "/us/usc/ptII/rule2012/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "Subdivision (a) is amended to include any chapter 12 case in which the debtor is removed as debtor in possession pursuant to § 1204(a) of the Code."
+    p "Subdivision (b) is amended to require that the accounting of the prior administration which must be filed with the court is also transmitted to the United States trustee who is responsible for supervising the administration of cases and trustees. See 28 U.S.C. § 586(a)(3). Because a court order is not required for the appointment of a successor trustee, requiring the court to fix a time for filing the accounting is inefficient and unnecessary. The United States trustee has supervisory powers over trustees and may require the successor trustee to file the accounting within a certain time period. If the successor trustee fails to file the accounting within a reasonable time, the United States trustee or a party in interest may take appropriate steps including a request for an appropriate court order. See 28 U.S.C. § 586(a)(3)(G). The words “with the court” are deleted in subdivision (b)(2) as unnecessary. See Rules 5005(a) and 9001(3)."
+    hash "c4f344d5eb87719a2651f3388544f70cc5eac0ab056855719ec19667f3539b07"
+  }
+  note "/us/usc/ptII/rule2012/note/ungrouped/nolaw/committee-notes-on-rules-2022-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2022 Amendment"
+    p "The rule is amended in response to the enactment of the Small Business Reorganization Act of 2019, Pub. L. No. 116–54, " ["133 Stat. 1079" -> "/us/stat/133/1079"] ". That law gives a small business debtor the option of electing to be a debtor under subchapter V of chapter 11. Subdivision (a) of the rule is amended to include any case under that subchapter in which the debtor is removed as debtor in possession under § 1185 of the Code."
+    hash "0f5559100cf00366ed9afca267f24c2844e65625e5641764b4e0a6554962e44d"
+  }
+  note "/us/usc/ptII/rule2012/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 2012 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "38ef3c430c98384c3d0f5ced3d7e90247009c22145df5b2bf0ab4b0a8f4eb068"
+  }
+  layers {
+    operative "06dcd535a7bd7dfb3daf676d48a17869bc4eb052a8982b01b4eeb08763c4b764"
+    enacted "c106097b7f5f1966bdeafed83e5efad6b7a855b571e87cd3e93de63c0c7993e2"
+    editorial "80d02a190cd3d787a86332a7bd9f8c00e7a602192bfe62900405c9b098b88bb8"
+  }
+}

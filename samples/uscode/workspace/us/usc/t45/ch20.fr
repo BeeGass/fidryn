@@ -1,0 +1,32 @@
+edition 2
+module "/us/usc/t45/ch20" {
+  within "/us/usc/t45"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch20" chapter {
+    num "20" "CHAPTER 20—"
+    heading "NORTHEAST RAIL SERVICE"
+    member "/us/usc/t45/s1101"
+    member "/us/usc/t45/s1102"
+    member "/us/usc/t45/s1103"
+    member "/us/usc/t45/s1104"
+    member "/us/usc/t45/s1105"
+    member "/us/usc/t45/s1106"
+    member "/us/usc/t45/s1107"
+    member "/us/usc/t45/s1108"
+    member "/us/usc/t45/s1109"
+    member "/us/usc/t45/s1110"
+    member "/us/usc/t45/s1111"
+    member "/us/usc/t45/s1112"
+    member "/us/usc/t45/s1113"
+    member "/us/usc/t45/s1114"
+    member "/us/usc/t45/s1115"
+    member "/us/usc/t45/s1116"
+    hash "e488b7c5ee2df51cbbd50765f4c43dcaa1ee5c148e19cf16ed7d9c1393a2ef5f"
+  }
+  layers {
+    operative "e488b7c5ee2df51cbbd50765f4c43dcaa1ee5c148e19cf16ed7d9c1393a2ef5f"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

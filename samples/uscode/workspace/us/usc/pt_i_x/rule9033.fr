@@ -1,0 +1,96 @@
+edition 2
+module "/us/usc/ptIX/rule9033" {
+  within "/us/usc/ptIX"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptIX/rule9033" courtRule {
+    num "9033" "Rule 9033."
+    heading "Proposed Findings of Fact and Conclusions of Law"
+    provision "/us/usc/ptIX/rule9033/a" subsection {
+      num "a" "(a)"
+      heading "Service."
+      content "When a bankruptcy court issues proposed findings of fact and conclusions of law, the clerk must promptly serve a copy, by mail, on every party and must note the date of mailing on the docket."
+      hash "acf2821c249192f2aa32317f5b7063d198bf1234f6ec1f1a0d1d096fe534ad26"
+    }
+    provision "/us/usc/ptIX/rule9033/b" subsection {
+      num "b" "(b)"
+      heading "Objections; Time to File."
+      provision "/us/usc/ptIX/rule9033/b/1" paragraph {
+        num "1" "(1)"
+        content "Time to File. Within 14 days after being served, a party may file and serve objections. They must identify each proposed finding or conclusion objected to and state the grounds for objecting. A party may respond to another party’s objections within 14 days after being served with a copy."
+        hash "00394c7d2b5ea800761345d1f6e0a3a6d668f4de4b6847ef8b806aaad72c0e9e"
+      }
+      provision "/us/usc/ptIX/rule9033/b/2" paragraph {
+        num "2" "(2)"
+        content "Ordering a Transcript. Unless the district judge orders otherwise, a party filing objections must promptly order a transcript of the record, or the parts of it that all parties agree are—or the bankruptcy judge considers to be—sufficient."
+        hash "35e238a31f4baad7734c06de45f4d04009bd768f2d21e819aaf2db162b7cef8a"
+      }
+      provision "/us/usc/ptIX/rule9033/b/3" paragraph {
+        num "3" "(3)"
+        content "Extending the Time. On request made before the time to file objections expires, the bankruptcy judge may, for cause, extend any party’s time to file for no more than 21 days after the time otherwise expires. But a request made within 21 days after that time expires may be granted upon a showing of excusable neglect."
+        hash "a0c623192cc5466efa4bf38a80a526fba5d54693219457fd9b36764424650604"
+      }
+      hash "1a0508e6601241e7a2ac02d61e5c05634cf56e79adb6ef779e320b384b51728f"
+    }
+    provision "/us/usc/ptIX/rule9033/c" subsection {
+      num "c" "(c)"
+      heading "Review by the District Judge."
+      chapeau "The district judge:"
+      provision "/us/usc/ptIX/rule9033/c/1" paragraph {
+        num "1" "(1)"
+        content "must review de novo—on the record or after receiving additional evidence—any part of the bankruptcy judge’s findings of fact or conclusions of law to which specific written objection has been made under (b); and"
+        hash "c894a50ba29dd32a0bb4261d7411f75af44c299abaffa0089c700ecda97e9ff3"
+      }
+      provision "/us/usc/ptIX/rule9033/c/2" paragraph {
+        num "2" "(2)"
+        content "may accept, reject, or modify the proposed findings of fact or conclusions of law, take additional evidence, or remand the matter to the bankruptcy judge with instructions."
+        hash "b9bfb45587ab27a6dba3d10ecbfb46c7f2ecf0082062db0c9cce6547087c8817"
+      }
+      hash "8b9b942cb289d6841a85b346c4525332051ca92a05d3a0deb0884eff80ade5b1"
+    }
+    hash "656f016921b1c7871c60db4517e98954162224cd22f96efaa98ece3ccfc7a413"
+  }
+  credit "(Added Mar. 30, 1987, eff. Aug. 1, 1987; amended Mar. 26, 2009, eff. Dec. 1, 2009; Apr. 28, 2016, eff. Dec. 1, 2016; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptIX/rule9033/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987"
+    p ["Section 157(c)(1) of title 28" -> "/us/usc/t28/s157/c/1"] " requires a bankruptcy judge to submit proposed findings of fact and conclusions of law to the district court when the bankruptcy judge has heard a non-core proceeding. This rule, which is modeled on Rule 72 F.R.Civ.P., provides the procedure for objecting to, and for review by, the district court of specific findings and conclusions."
+    p "Subdivision (a) requires the clerk to serve a copy of the proposed findings and conclusions on the parties. The bankruptcy clerk, or the district court clerk if there is no bankruptcy clerk in the district, shall serve a copy of the proposed findings and conclusions on all parties."
+    p "Subdivision (b) is derived from Rule 72(b) F.R.Civ.P. which governs objections to a recommended disposition by a magistrate."
+    p "Subdivision (c) is similar to Rule 8002(c) of the Bankruptcy Rules and provides for granting of extensions of time to file objections to proposed findings and conclusions."
+    p "Subdivision (d) adopts the de novo review provisions of Rule 72(b) F.R.Civ.P."
+    hash "0277586a53b2afeffdfe4a033d7799b47cfcc0a13bf7ae93c55eaa1d73bafcb2"
+  }
+  note "/us/usc/ptIX/rule9033/note/ungrouped/nolaw/committee-notes-on-rules-2009-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2009 Amendment"
+    p "The rule is amended to implement changes in connection with the amendment to Rule 9006(a) and the manner by which time is computed under the rules. The deadlines in the rule are amended to substitute a deadline that is a multiple of seven days. Throughout the rules, deadlines are amended in the following manner:"
+    p "• 5-day periods become 7-day periods"
+    p "• 10-day periods become 14-day periods"
+    p "• 15-day periods become 14-day periods"
+    p "• 20-day periods become 21-day periods"
+    p "• 25-day periods become 28-day periods"
+    hash "709a2fc6cab84b9eeee11cf64ce488b5326c65441afd3ed29661b2f232e5592b"
+  }
+  note "/us/usc/ptIX/rule9033/note/ungrouped/nolaw/committee-notes-on-rules-2016-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2016 Amendment"
+    p "Subdivision (a) is amended to delete language limiting this provision to non-core proceedings. Some proceedings that satisfy the statutory definition of core proceedings, 28 U.S.C. § 157(b)(2), may remain beyond the constitutional power of a bankruptcy judge to adjudicate finally. If the bankruptcy court decides, pursuant to Rule 7016, that it is appropriate to issue proposed findings of fact and conclusions of law in a proceeding, this rule governs the subsequent procedures."
+    hash "5b9ff8651ab9dbd4d91218c0d822f5858521c57870823ebefcee90982d79a4e7"
+  }
+  note "/us/usc/ptIX/rule9033/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 9033 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "1e6274ffac6e6aee6d32e16dc862d1a328cef5d94018ebefe68b431c9e0f9fb9"
+  }
+  layers {
+    operative "656f016921b1c7871c60db4517e98954162224cd22f96efaa98ece3ccfc7a413"
+    enacted "97592056a92df9a96a3905ae50a729b9a57b5af67a0fb5097f3acf6c9c72bc3a"
+    editorial "649f7d545e675d6c9855d0c6ff90dc1e267b88b797cedc6f8ac2c4a6c78bc7de"
+  }
+}

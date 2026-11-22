@@ -1,0 +1,110 @@
+edition 2
+module "/us/usc/ptI/rule1009" {
+  within "/us/usc/ptI"
+  source "usc11a.xml"
+  positive_law false
+  provision "/us/usc/ptI/rule1009" courtRule {
+    num "1009" "Rule 1009."
+    heading "Amending a Voluntary Petition, List, Schedule, or Statement"
+    provision "/us/usc/ptI/rule1009/a" subsection {
+      num "a" "(a)"
+      heading "In General."
+      provision "/us/usc/ptI/rule1009/a/1" paragraph {
+        num "1" "(1)"
+        content "By a Debtor. A debtor may amend a voluntary petition, list, schedule, or statement at any time before the case is closed. The debtor must give notice of the amendment to the trustee and any affected entity."
+        hash "f31477952f66a710dc7d42cf4ff81a6a4c70a9c06db532d66d4214304174a755"
+      }
+      provision "/us/usc/ptI/rule1009/a/2" paragraph {
+        num "2" "(2)"
+        content "By a Party in Interest. On a party in interest’s motion and after notice and a hearing, the court may order a voluntary petition, list, schedule, or statement to be amended. The clerk must give notice of the amendment to entities that the court designates."
+        hash "1d6ba95064ca2dbac6214697984130c9debf977fb26a7f8f91523f58e9518e67"
+      }
+      hash "a544c5c07b512ad1f83bbb1d0a93db15bd85d74e452c345fe98415d8be45204b"
+    }
+    provision "/us/usc/ptI/rule1009/b" subsection {
+      num "b" "(b)"
+      heading "Amending a Statement of Intention."
+      content "A debtor may amend a statement of intention at any time before the time provided in § 521(a)(2) expires. The debtor must give notice of the amendment to the trustee and any affected entity."
+      hash "34451c5e932485ac602210466b3d0e4140c41c095012a286c9aeb488b677f03c"
+    }
+    provision "/us/usc/ptI/rule1009/c" subsection {
+      num "c" "(c)"
+      heading "Amending a Statement of Social-Security Number."
+      chapeau "If a debtor learns that a social-security number shown on the statement submitted under Rule 1007(f) is incorrect, the debtor must:"
+      provision "/us/usc/ptI/rule1009/c/1" paragraph {
+        num "1" "(1)"
+        content "promptly submit an amended verified statement with the correct number (Form 121); and"
+        hash "a956898761c96f167ae1b202506ef1d01eab7fcff8ddd6dee6ae043eb99c1c95"
+      }
+      provision "/us/usc/ptI/rule1009/c/2" paragraph {
+        num "2" "(2)"
+        content "give notice of the amendment to all entities required to be listed under Rule 1007(a)(1) or (a)(2)."
+        hash "c34f5a6fed490fdd275aab3c1c3c0218edb3cb59f27c1c788913c578c871524c"
+      }
+      hash "cb46745a1b4564d34801c0cf7869c4917ad645a2cfa5f65960eff3dac81057cc"
+    }
+    provision "/us/usc/ptI/rule1009/d" subsection {
+      num "d" "(d)"
+      heading "Copy to the United States Trustee."
+      content "The clerk must promptly send a copy of every amendment filed under this rule to the United States trustee."
+      hash "28f17f2aa5927ffc79bc1e15acd1786ee216f0d4e4576851077af37c6b8c67be"
+    }
+    hash "56c00d3752db0575ffde62ea151395f051c3b894879ac0e7dac8e9bb2809fbee"
+  }
+  credit "(As amended Mar. 30, 1987, eff. Aug. 1, 1987; Apr. 30, 1991, eff. Aug. 1, 1991; Apr. 12, 2006, eff. Dec. 1, 2006; Apr. 23, 2008, eff. Dec. 1, 2008; Apr. 2, 2024, eff. Dec. 1, 2024.)"
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1983" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1983"
+    p "This rule continues the permissive approach adopted by former Bankruptcy Rule 110 to amendments of voluntary petitions and accompanying papers. Notice of any amendment is required to be given to the trustee. This is particularly important with respect to any amendment of the schedule of property affecting the debtor’s claim of exemptions. Notice of any amendment of the schedule of liabilities is to be given to any creditor whose claim is changed or newly listed."
+    p "The rule does not continue the provision permitting the court to order an amendment on its own initiative. Absent a request in some form by a party in interest, the court should not be involved in administrative matters affecting the estate."
+    p "If a list or schedule is amended to include an additional creditor, the effect on the dischargeability of the creditor’s claim is governed by the provisions of § 523(a)(3) of the Code."
+    hash "6dbc25fb82bcb058014a8d15adc942e9fe8dbe7a402a512eff6b5c653c326a25"
+  }
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1987-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1987 Amendment"
+    p "Subdivision (a) is amended to require notice and a hearing in the event a party in interest other than the debtor seeks to amend. The number of copies of the amendment will be determined by local rule of court."
+    p "Subdivision (b) is added to treat amendments of the statement of intention separately from other amendments. The intention of the individual debtor must be performed within 45 days of the filing of the statement, unless the court extends the period. Subdivision (b) limits the time for amendment to the time for performance under § 521(2)(B) [now 521(a)(2)(B)] of the Code or any extension granted by the court."
+    hash "5442c1fa13607cdf0da18079af07c7311dda2b75874648fa1f16141d3c256f10"
+  }
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/notes-of-advisory-committee-on-rules-1991-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Notes of Advisory Committee on Rules—1991 Amendment"
+    p "The amendments to subdivision (a) are stylistic."
+    p "Subdivision (c) is derived from Rule X–1002(a) and is designed to provide the United States trustee with current information to enable that office to participate effectively in the case."
+    hash "d43649740fadc53b4883f88a8dbd6f73d2016c0be9045ac9c005520ca4ecb322"
+  }
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/committee-notes-on-rules-2006-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2006 Amendment"
+    p "Subdivision (c). Rule 2002(a)(1) provides that the notice of the § 341 meeting of creditors include the debtor’s social security number. It provides creditors with the full number while limiting publication of the social security number otherwise to the final four digits of the number to protect the debtor’s identity from others who do not have the same need for that information. If, however, the social security number that the debtor submitted under Rule 1007(f) is incorrect, then the only notice to the entities contained on the list filed under Rule 1007(a)(1) or (a)(2) would be incorrect. This amendment adds a new subdivision (c) that directs the debtor to submit a verified amended statement of social security number and to give notice of the new statement to all entities in the case who received the notice containing the erroneous social security number."
+    p "Subdivision (d). Former subdivision (c) becomes subdivision (d) and is amended to include new subdivision (c) amendments in the list of documents that the clerk must transmit to the United States trustee."
+    p "Other amendments are stylistic."
+    p "Changes Made After Publication. No changes since publication."
+    hash "a34bbf2ab72fe77e8bb904b65701f1f08af27e5c0e14f40087f399e020ed4cec"
+  }
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/committee-notes-on-rules-2008-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2008 Amendment"
+    p "Subdivision (b) is amended to conform to the 2005 amendments to § 521 of the Code."
+    p "Changes Made After Publication. No changes were made after publication."
+    hash "9598dc23b96f0eb90bcdfe1b6b8e34bff29380b86377c7737554e7f47af38d11"
+  }
+  note "/us/usc/ptI/rule1009/note/ungrouped/nolaw/committee-notes-on-rules-2024-amendment" enacted {
+    group ungrouped
+    topic "miscellaneous"
+    heading "Committee Notes on Rules—2024 Amendment"
+    p "The language of Rule 1009 has been amended as part of the general restyling of the Bankruptcy Rules to make them more easily understood and to make style and terminology consistent throughout the rules. These changes are intended to be stylistic only."
+    hash "ec2bd9b3fd9b89f656d902d222e08797c49e4e0ce340cfa7e51811b2563b8644"
+  }
+  layers {
+    operative "56c00d3752db0575ffde62ea151395f051c3b894879ac0e7dac8e9bb2809fbee"
+    enacted "9520f537de5639289cd4b4d429a04d10f743af4364f42909b4e984a463ec406d"
+    editorial "8be34d70afd7bd6e5e419559729fd344416791502e2ff34968bc4dffbce4d12a"
+  }
+}

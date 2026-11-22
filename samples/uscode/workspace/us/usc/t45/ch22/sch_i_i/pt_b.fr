@@ -1,0 +1,20 @@
+edition 2
+module "/us/usc/t45/ch22/schII/ptB" {
+  within "/us/usc/t45/ch22/schII"
+  source "usc45.xml"
+  positive_law false
+  container "/us/usc/t45/ch22/schII/ptB" part {
+    num "B" "Part B—"
+    heading "Other Matters Relating to Sale"
+    member "/us/usc/t45/s1321"
+    member "/us/usc/t45/s1322"
+    member "/us/usc/t45/s1323"
+    member "/us/usc/t45/s1324"
+    hash "374dc0dcfca21dc50e7c88fe27d1a4590ccbf016567ceefe4899c9eb3600fdad"
+  }
+  layers {
+    operative "374dc0dcfca21dc50e7c88fe27d1a4590ccbf016567ceefe4899c9eb3600fdad"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "d3b942a1f8a2fb5d0f38102b8cd871a13ff27d277cfdc412888cde9d26cf80a3"
+  }
+}

@@ -1,0 +1,25 @@
+edition 2
+module "/us/usc/t45/s402" {
+  within "/us/usc/t45/ch12"
+  source "usc45.xml"
+  positive_law false
+  provision "/us/usc/t45/s402" section {
+    num "402" "§ 402."
+    heading "Exchange of information between Secretary of Labor and Railroad Retirement Board"
+    content "The Secretary of Labor, upon request, shall furnish the Railroad Retirement Board information deemed necessary by such Board for the administration of " ["section 401 of this title" -> "/us/usc/t45/s401"] ", and such Board, upon request, shall furnish the Secretary of Labor information deemed necessary by the Secretary for the administration of the Temporary Extended Unemployment Compensation Act of 1961."
+    hash "bf38fde1ab9191b55269834d7326486ac6c01f4652de3e5abd9e7303d3d49448"
+  }
+  credit "(" ["Pub. L. 87–7, § 3" -> "/us/pl/87/7/s3"] ", Mar. 24, 1961, " ["75 Stat. 17" -> "/us/stat/75/17"] ".)"
+  note "/us/usc/t45/s402/note/editorialNotes/pl.87.6/references-in-text" editorial {
+    group editorialNotes
+    topic "referencesInText"
+    heading "References in Text"
+    p "The Temporary Extended Unemployment Compensation Act of 1961, referred to in text, is " ["Pub. L. 87–6" -> "/us/pl/87/6"] ", Mar. 24, 1961, " ["75 Stat. 8" -> "/us/stat/75/8"] ", which enacted sections 1105 and 1400l to 1400v of Title 42, The Public Health and Welfare, amended sections 3301 and 3302 of Title 26, Internal Revenue Code, and enacted provisions set out as notes under sections 1101 and 1400l of Title 42. For complete classification of this Act to the Code, see Tables."
+    hash "74da2e5dbded4f5934ef888ee475e943492281a2581acc4c9ae0631917f1aa48"
+  }
+  layers {
+    operative "bf38fde1ab9191b55269834d7326486ac6c01f4652de3e5abd9e7303d3d49448"
+    enacted "a396bac23ba81b30cb34dbf808cf06deeaeb4b87e010b66646faadc6accfc6ff"
+    editorial "45b15c5d5df9c3d55bc917804fd33587d219b24dac27ec0cfc56627dee8c4971"
+  }
+}
