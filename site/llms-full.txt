@@ -7149,7 +7149,7 @@ and tested; everything else is intent, and is marked as such.
 
 ## The destination
 
-Every provision of federal and state positive law has a place in a
+Every provision of federal and state positive law is to have a place in a
 repository of Fidryn modules, at a declared depth:
 
 | Depth | Meaning |
@@ -7163,7 +7163,7 @@ Two marks sit beside depth. **Tested** means the encoding reproduces worked
 examples from authoritative material. **Reviewed** means a named, licensed
 attorney signed off on a specific version.
 
-Three rules hold at every depth:
+Three rules are to hold at every depth:
 
 - **Coverage is total and depth is graded.** A provision that is not yet
   formalized is still present, addressed and citable. A computation that
@@ -7191,7 +7191,7 @@ library modules written in Fidryn.
 | The Constitution, public laws | Not started. |
 | The fifty states, the District of Columbia, the territories | Not started. |
 | Court rulings | Not started. |
-| Meaning that executes (D3) | None yet on the imported Code: a curated module can bind a name to the text of a provision by hash and learns when that text changes, but the language cannot yet state what the provision means. The first edition of the language runs the example programs described in [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md). |
+| Meaning that executes (D3) | None yet on the imported Code: a curated module can bind a name to the text of a provision by hash and learns when that text changes, but the language cannot yet state what the provision means. The first edition of the language runs example programs, but only those that pass its checker: [Examples](https://fidryn.onlygass.dev/docs/examples.md) says which do, and [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) says what the interpreter does and does not interpret. |
 
 Nothing has been reviewed by an attorney, and nothing here is legal advice.
 
