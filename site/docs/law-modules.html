@@ -1409,7 +1409,8 @@ heading is "References in Text", one of whose own paragraphs (not one
 inside a table or quoted content) holds, in any case, the words that name
 the region (<code>this</code> and the kind word, or the words of the link) followed by
 <code>, referred to in</code>, the definition records the address of the first such
-note as <code>see_note</code>.</p>
+note in the document, among the notes of the unit and of its provisions,
+as <code>see_note</code>.</p>
 <h3 id="what-the-values-mean"><span class="hn">4.13.12</span> What the values mean <a class="anchor" href="#what-the-values-mean" aria-label="Link to this section">#</a></h3>
 <ul>
 <li><code>unstated</code>: neither the paragraph nor a chapeau above it states a reach
@@ -1423,9 +1424,12 @@ chapter and chapter 5", "subparagraph (A) of this paragraph" or, of a
 court rule, "this Rule 3021", a reach
 that names a law outside the Code, such as "this Act" or a link to a
 public law, and a reach whose kind word names neither the provision that
-states the reach nor any provision or container above it. For an
-inherited reach, the provision that states it is the provision of the
-chapeau.</li>
+states the reach nor any provision or container above it, whatever its
+words link to. Reach words of the first two kinds that are the words of
+one link to an address below the prefix are resolved: the region is the
+link's target, so "this Act" written as a link to a section of the Code
+has that section as its region. For an inherited reach, the provision
+that states it is the provision of the chapeau.</li>
 <li><code>restated</code>: the file does not declare its title positive law (its flag is
 <code>no</code>, or it has none), so the words of the provision are those of the
 editors of the Code, and the reach the law enacted may differ from the
@@ -2467,25 +2471,6 @@ not seen.</li>
 <li>An exception written inside the text of a definition, such as "means a
 widget, except in section 5", does not narrow its region: the region is
 that of the reach alone.</li>
-<li>The importer and <code>conformance/usc_definitions.py</code>
-(<a href="#a-second-implementation-of-the-rules">A second implementation of the rules</a>)
-record two rare forms differently. A release that holds one shows the
-difference only when the two are compared on it, as the check of the
-sample compares them for the sample:
-<ul>
-<li>a reach whose object begins with <code>this</code> and a space but names no kind
-of <a href="#the-region">The region</a>, and is a single link to an address below
-the prefix of the corpus, as a link whose words are <code>this Act</code> would
-be: the script records the link's target as the region, as the rules
-say, and the importer records no region;</li>
-<li>a restated definition whose unit has two notes that
-<a href="#the-note">The note</a> could point at, one at a provision and one at a
-provision below it, where the higher provision's note stands first in
-the document: the importer points at that note, and the script at the
-lower provision's, since the independent reading gives the notes of a
-provision after those of the provisions below it.</li>
-</ul>
-</li>
 </ul>
 <h3 id="change-sets-1"><span class="hn">4.21.5</span> Change sets <a class="anchor" href="#change-sets-1" aria-label="Link to this section">#</a></h3>
 <ul>

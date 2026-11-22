@@ -20,6 +20,7 @@ import zlib
 from pathlib import Path
 
 import blake3
+import uslm_common
 
 HERE = Path(__file__).resolve().parent
 FIXTURES = HERE / "fixtures" / "uslm"
@@ -127,6 +128,30 @@ def fixture_input(name: str, directory: Path) -> Path:
     return target
 
 
+class NoteAddresses:
+    """Keeps the addresses of the notes of each unit and container, in the reading's order."""
+
+    def __init__(self) -> None:
+        self.of: dict[str, list[str]] = {}
+
+    def unit(self, unit: uslm_common.Unit) -> None:
+        self.of[unit.address] = [note.address for note in unit.notes]
+
+    def container(self, container: uslm_common.Container) -> None:
+        self.of[container.address] = [note.address for note in container.notes]
+
+
+def notes_of_units(text: str) -> dict[str, list[str]]:
+    """The addresses of the notes of each module of the document `text`, read as `usc99.xml`."""
+    with tempfile.TemporaryDirectory(prefix="fidryn-uslm-notes-") as directory:
+        path = Path(directory) / MEMBER
+        path.write_text(text, encoding="utf-8")
+        sink = NoteAddresses()
+        source = uslm_common.Source(None, str(path), MEMBER)
+        uslm_common.read_member(uslm_common.Job(source, {}, True), sink)
+    return sink.of
+
+
 def expected_lines(name: str) -> list[str]:
     return (FIXTURES / f"{name}.records.jsonl").read_text(encoding="utf-8").splitlines()
 
@@ -204,6 +229,36 @@ class TextFixtures(unittest.TestCase):
 
     def test_notes_anchors(self) -> None:
         self.check("notes-anchors")
+
+    def test_the_notes_of_a_unit_are_in_document_order(self) -> None:
+        # The section's note stands before its paragraphs, and paragraph 2's in it.
+        text = (FIXTURES / "notes-anchors.xml").read_text(encoding="utf-8")
+        s1 = "/us/usc/t99/s1"
+        self.assertEqual(
+            notes_of_units(text)[s1],
+            [
+                f"{s1}/note/ungrouped/pl.999.3/noheading",
+                f"{s1}/2/note/ungrouped/pl.999.4/noheading",
+            ],
+        )
+        # A note in paragraph 1, between them, and one of the section after its paragraphs.
+        kept = "<content>Kept.</content>"
+        between = '<note topic="miscellaneous"><p>[Amended by <ref href="/us/pl/999/5">law</ref>.]</p></note>'
+        after = (
+            '<notes type="uscNote"><note topic="miscellaneous"><p>[Amended by '
+            '<ref href="/us/pl/999/6">law</ref>.]</p></note></notes></section>'
+        )
+        self.assertIn(kept, text)
+        changed = text.replace(kept, kept + between).replace("</section>", after)
+        self.assertEqual(
+            notes_of_units(changed)[s1],
+            [
+                f"{s1}/note/ungrouped/pl.999.3/noheading",
+                f"{s1}/1/note/ungrouped/pl.999.5/noheading",
+                f"{s1}/2/note/ungrouped/pl.999.4/noheading",
+                f"{s1}/note/ungrouped/pl.999.6/noheading",
+            ],
+        )
 
     def test_not_imported(self) -> None:
         self.check("not-imported")

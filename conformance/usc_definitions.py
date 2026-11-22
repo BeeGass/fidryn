@@ -433,9 +433,9 @@ def region_words(reach: Reach) -> str:
 def see_note(unit: Unit, name: str) -> str | None:
     """The note: the address of the first editorial note of the unit headed "References
     in Text", one of whose own paragraphs (not one inside a table or quoted content)
-    holds, in any case, `name` followed by `, referred to in`. The notes are taken in the
-    order in which the reading gives them, which puts the notes of a provision after
-    those of the provisions below it."""
+    holds, in any case, `name` followed by `, referred to in`. "First" is in document
+    order, the order in which the reading gives the notes of a unit, those of its
+    provisions among them."""
     referred = whole_words([name + ", referred to in"])
     for note in unit.notes:
         if note.layer != "editorial" or note.heading is None:

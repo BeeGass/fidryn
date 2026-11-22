@@ -248,6 +248,19 @@ WORDS_OF_THE_RULES: list[tuple[str, list[Record]]] = [
         content('As used in <ref href="/us/usc">the Code</ref>, the term “widget” means a device.'),
         widget(words="As used in the Code"),
     ),
+    # An object that begins with `this` and is not `this` and a kind of region is read
+    # as any other: a single link below the prefix names its target; and `this` and a
+    # kind names the nearest of that kind, whatever its link names.
+    (
+        content(f'As used in <ref href="{S2}">this Act</ref>, the term “widget” means a device.'),
+        widget(words="As used in this Act", region=S2, basis="enacted"),
+    ),
+    (
+        content(
+            f'As used in <ref href="{S2}">this section</ref>, the term “widget” means a device.'
+        ),
+        widget(words="As used in this section", region=S1, basis="enacted"),
+    ),
     # The word of a region is followed by nothing more, or by a comma, a space and
     # `unless the context`.
     (
@@ -410,6 +423,35 @@ class Rules(unittest.TestCase):
         self.assertIn(heading, text)
         changed = text.replace(heading, "<heading>Codification</heading><p>Section 2 of this title")
         self.assertIsNone(see_notes(changed)[3])
+
+    def test_the_first_note_is_the_first_in_the_document(self) -> None:
+        def notes(which: str) -> str:
+            return (
+                '<notes type="uscNote"><note role="crossHeading" topic="editorialNotes">'
+                "<heading>Editorial Notes</heading></note>"
+                '<note topic="referencesInText"><heading>References in Text</heading>'
+                f"<p>This section, referred to in text, is the {which} note.</p></note></notes>"
+            )
+
+        # The section's note stands before subsection (a), which has a note of its own.
+        inner = (
+            "<chapeau>In this section, the term “gear” means a wheel with teeth.</chapeau>"
+            f'{notes("first")}<subsection identifier="{S1}/a"><num value="a">(a)</num>'
+            f"<content>Gears turn.</content>{notes('second')}</subsection>"
+        )
+        self.assertEqual(
+            defined(with_section(inner).replace(FLAG_YES, FLAG_NO)),
+            [
+                definition(
+                    S1,
+                    ("gear",),
+                    words="In this section",
+                    region=S1,
+                    basis="restated",
+                    see_note=f"{S1}/note/editorialNotes/nolaw/references-in-text",
+                )
+            ],
+        )
 
 
 def string(value: str) -> str:

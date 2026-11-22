@@ -326,6 +326,9 @@ class Footnote:
 
 @dataclass(slots=True)
 class Unit:
+    """A unit and what it holds: its notes, those of its provisions among them, in
+    document order, and its footnotes in ordinal order."""
+
     address: str
     aliases: list[str]
     within: str | None
@@ -1125,7 +1128,7 @@ class MemberReader:
                 members.append(self.read_module(child, address, place))
             else:
                 self.refuse("an element that does not stand in a container", child)
-        read = self.read_notes(notes, address, scope)
+        read = [note for _, note in self.read_notes(notes, address, scope)]
         self.sink.container(
             Container(
                 address,
@@ -1173,7 +1176,7 @@ class MemberReader:
                 self.positive_law,
                 root,
                 unit.credit,
-                unit.notes,
+                unit.notes_in_order(),
                 scope.footnotes,
             )
         )
@@ -1204,6 +1207,8 @@ class MemberReader:
         heading: Text | None = None
         items: list[Part | Provision] = []
         notes: list[tuple[Element, str, bool]] = []
+        # The place in the unit, in document order, of each element of `notes`.
+        places: list[int] = []
         siblings: Counter[str] = Counter()
         place: Counter[str] = Counter()
         seen: set[str] = set()
@@ -1228,10 +1233,13 @@ class MemberReader:
                 items.append(self.read_provision(child, child_address, unit))
                 self.at.pop()
             elif tag == "notes":
-                notes += self.notes_of(child)
+                found = self.notes_of(child)
+                notes += found
+                places += [unit.place() for _ in found]
             elif tag == "note":
                 if not is_footnote(child):
                     notes.append((child, "ungrouped", False))
+                    places.append(unit.place())
             elif tag == "sourceCredit":
                 if address != unit.scope.address:
                     self.refuse("a source credit that is not the direct child of its unit", child)
@@ -1240,7 +1248,9 @@ class MemberReader:
                 self.count_toc(child)
             else:
                 self.refuse("an element that does not stand in a level", child)
-        unit.notes += self.read_notes(notes, address, scope)
+        unit.notes += [
+            (places[index], note) for index, note in self.read_notes(notes, address, scope)
+        ]
         return Provision(address, tag_of(element), num, heading, status, items)
 
     def provision_address(
@@ -1501,11 +1511,13 @@ class MemberReader:
 
     def read_notes(
         self, notes: list[tuple[Element, str, bool]], anchor: str, scope: Scope
-    ) -> list[Note]:
-        """The notes of one anchor, each named by its group, law and heading."""
-        read: list[Note] = []
+    ) -> list[tuple[int, Note]]:
+        """The notes of one anchor, each named by its group, law and heading, with the
+        place in `notes` of the element it is read from. A cross heading that holds
+        nothing after its label gives none."""
+        read: list[tuple[int, Note]] = []
         named: Counter[str] = Counter()
-        for element, group, labeled in notes:
+        for index, (element, group, labeled) in enumerate(notes):
             heading: Text | None = None
             if labeled:
                 topics: list[str] = []
@@ -1532,7 +1544,7 @@ class MemberReader:
                 group == "ungrouped" and any(topic in EDITORIAL_TOPICS for topic in topics)
             )
             layer = "editorial" if editorial else "enacted"
-            read.append(Note(address, layer, group, topics, heading, blocks))
+            read.append((index, Note(address, layer, group, topics, heading, blocks)))
         return read
 
     def topics_of(self, note: Element) -> list[str]:
@@ -1583,9 +1595,23 @@ class MemberReader:
 
 @dataclass(slots=True)
 class UnitState:
+    """What the provisions of one unit gather as they are read: its credit, and its
+    notes, each with the place in the document of the element it is read from, so that
+    the notes of a provision and of the provisions below it can be put in document
+    order."""
+
     scope: Scope
     credit: Text | None = None
-    notes: list[Note] = field(default_factory=list)
+    notes: list[tuple[int, Note]] = field(default_factory=list)
+    places: int = 0
+
+    def place(self) -> int:
+        """The place of the next note element of the unit, in document order."""
+        self.places += 1
+        return self.places
+
+    def notes_in_order(self) -> list[Note]:
+        return [note for _, note in sorted(self.notes, key=lambda placed: placed[0])]
 
 
 def first_quoted_origin(blocks: Iterable[Block | QuotedItem]) -> str | None:
