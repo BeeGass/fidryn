@@ -1,4 +1,4 @@
-//! Checks the pinned sample of the Code under `samples/uscode/`, eight
+//! Checks the pinned sample of the Code under `samples/uscode/`, nine
 //! things in this order, and fails with a message that names the first
 //! difference when one of them does not hold:
 //!
@@ -21,7 +21,11 @@
 //!    in both, the keys that only one of them has being named here;
 //! 6. what `conformance/uslm_text.py` prints for the archives is, line for
 //!    line, what `fidryn text samples/uscode/workspace --json` prints;
-//! 7. the check of the curated sample, `samples/uscode/curated`, which
+//! 7. the definitions that `conformance/usc_definitions.py`, a second
+//!    implementation of the definition rules, finds in the archives are
+//!    those that the `definition` blocks of the committed workspace hold,
+//!    as the script's `--against` compares them;
+//! 8. the check of the curated sample, `samples/uscode/curated`, which
 //!    depends on the generated one at a pinned release, finds no error and
 //!    no warning, a stale binding (`W750`) among the warnings, counts at
 //!    least one citation, and gives every one of its citations the outcome
@@ -29,15 +33,16 @@
 //!    `--update` writes, after the workspace, the release and the lock
 //!    digest of that dependency and the toolchain of the curated manifest,
 //!    and nothing else of it;
-//! 8. the table of `docs/coverage.md` between its two markers is the one
+//! 9. the table of `docs/coverage.md` between its two markers is the one
 //!    that the committed `coverage.json` gives; `--update` writes it, and
 //!    nothing else of the page.
 //!
 //! The `fidryn` commands run in this process, through `fidryn_cli`, as the
 //! binary runs them, and the check of the curated sample through the check
 //! of a workspace that `fidryn check` runs, so that its diagnostics can be
-//! named. Their temporary directories are made under the system's directory
-//! for temporary files and removed whether the step passes or fails, and the
+//! named. Their temporary directories, and the file the script of step 7
+//! writes its definitions to, are made under the system's directory for
+//! temporary files and removed whether the step passes or fails, and the
 //! checks keep no cache, so the step leaves the repository as it found it;
 //! only `--update` writes, and only the committed workspace, those three
 //! values of the curated manifest and the table of the page.
@@ -72,6 +77,9 @@ pub const PROFILE_SCRIPT: &str = "conformance/usc_profile.py";
 pub const WORKSPACE: &str = "samples/uscode/workspace";
 /// The script that prints the text records of the archives, independently.
 pub const TEXT_SCRIPT: &str = "conformance/uslm_text.py";
+/// The script that finds the definitions of the archives by a second
+/// implementation of the rules, and compares them with a workspace's.
+pub const DEFINITIONS_SCRIPT: &str = "conformance/usc_definitions.py";
 
 /// The curated sample, which depends on the generated sample.
 pub const CURATED: &str = "samples/uscode/curated";
@@ -97,7 +105,8 @@ const TABLE_BEGIN: &str = "<!-- coverage-table:begin -->";
 const TABLE_END: &str = "<!-- coverage-table:end -->";
 
 /// The keys of the ledger's `totals` that the profile's `import` does not
-/// have: the independent reading extracts no definitions.
+/// have: the profile counts no definitions, which step 7 compares one by
+/// one.
 const LEDGER_ONLY: [&str; 2] = ["definitions", "definitions_by_kind"];
 /// The keys of the profile's `import` that the ledger's `totals` does not
 /// have: the ledger has them at its top, where they are compared.
@@ -114,7 +123,7 @@ pub fn run(args: UscodeSampleArgs) -> Result<()> {
     check(&workspace_root(), args.update)
 }
 
-/// Runs the eight steps on the sample under `root`; with `update`, step 2
+/// Runs the nine steps on the sample under `root`; with `update`, step 2
 /// first writes the committed workspace, and then the pin and the toolchain
 /// of the curated manifest and the table of the page.
 pub fn check(root: &Path, update: bool) -> Result<()> {
@@ -212,6 +221,8 @@ pub fn check(root: &Path, update: bool) -> Result<()> {
     }
     let records = text.iter().filter(|&&byte| byte == b'\n').count();
 
+    let definitions = check_definitions(root, &scratch.join("definitions.jsonl"))?;
+
     let citations = check_curated(root)?;
 
     let page = fs::read_to_string(root.join(PAGE)).with_context(|| format!("read {PAGE}"))?;
@@ -225,9 +236,10 @@ pub fn check(root: &Path, update: bool) -> Result<()> {
         "{ARCHIVES} matches {RECORD}; {WORKSPACE} is what the ingester writes from it, on one \
          worker and on eight, checks with no error, and holds the ledger `fidryn coverage` \
          prints; {PROFILE} is current and counts the references the check counts and what the \
-         ledger counts; the text of its {records} records is what {TEXT_SCRIPT} prints; \
-         {CURATED} checks against it with no error and no warning, each of its {citations} \
-         citations `exact`; and the table of {PAGE} is what the ledger gives"
+         ledger counts; the text of its {records} records is what {TEXT_SCRIPT} prints; its \
+         {definitions} definitions are those {DEFINITIONS_SCRIPT} finds; {CURATED} checks \
+         against it with no error and no warning, each of its {citations} citations `exact`; \
+         and the table of {PAGE} is what the ledger gives"
     );
     Ok(())
 }
@@ -656,7 +668,7 @@ fn counted(count: usize, noun: &str) -> String {
     }
 }
 
-/// Step 7: the check of the curated sample under `root`, in this process
+/// Step 8: the check of the curated sample under `root`, in this process
 /// and with no cache, as `fidryn check samples/uscode/curated --no-cache`
 /// runs it. It gives the number of the sample's citations, and fails,
 /// naming the file and the first thing that is wrong, on an error, on a
@@ -708,7 +720,7 @@ fn check_curated(root: &Path) -> Result<u64> {
     Ok(citations)
 }
 
-/// How step 7 checks the curated sample: as `--no-cache` does, with no
+/// How step 8 checks the curated sample: as `--no-cache` does, with no
 /// cache, on as many workers as are available.
 fn curated_options() -> CheckOptions {
     CheckOptions {
@@ -1019,6 +1031,43 @@ fn text_command(root: &Path) -> Command {
     script_command(root, TEXT_SCRIPT)
 }
 
+/// The command that writes the definitions of the archives to `records`
+/// and compares them with those of the committed workspace.
+fn definitions_command(root: &Path, records: &Path) -> Command {
+    let mut cmd = script_command(root, DEFINITIONS_SCRIPT);
+    cmd.arg("--records")
+        .arg(records)
+        .args(["--against", WORKSPACE]);
+    cmd
+}
+
+/// Step 7: the definitions that the script finds in the archives under
+/// `root`, written to `records`, are those of the committed workspace. It
+/// gives their number, and fails when the script does: the script names
+/// the first definition that differs, or what it could not read.
+fn check_definitions(root: &Path, records: &Path) -> Result<usize> {
+    let mut command = definitions_command(root, records);
+    let shown: Vec<String> = std::iter::once(command.get_program())
+        .chain(command.get_args())
+        .map(|part| part.to_string_lossy().into_owned())
+        .collect();
+    eprintln!("+ {}", shown.join(" "));
+    let status = command
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
+        .status()
+        .with_context(|| format!("failed to spawn uv in {}", root.display()))?;
+    if !status.success() {
+        bail!(
+            "{DEFINITIONS_SCRIPT} on {ARCHIVES} with `--against {WORKSPACE}` failed ({status}): \
+             the definitions it finds are not those of {WORKSPACE}, or it could not read them, \
+             as it printed above"
+        );
+    }
+    let written = fs::read(records).with_context(|| format!("read {}", records.display()))?;
+    Ok(written.iter().filter(|&&byte| byte == b'\n').count())
+}
+
 /// What `command`, which runs `script` on the archives, prints to stdout;
 /// an error when it fails.
 fn printed_output(root: &Path, script: &str, mut command: Command) -> Result<Vec<u8>> {
@@ -1209,6 +1258,30 @@ mod tests {
             assert_eq!(args, want);
             assert_eq!(cmd.get_current_dir(), Some(root));
         }
+    }
+
+    #[test]
+    fn the_definitions_are_found_by_isolated_python_against_the_committed_workspace() {
+        let root = Path::new("/repo");
+        let records = Path::new("/scratch/definitions.jsonl");
+        let cmd = definitions_command(root, records);
+        assert_eq!(cmd.get_program(), "uv");
+        let args: Vec<&OsStr> = cmd.get_args().collect();
+        let words = [
+            "run",
+            "--locked",
+            "python",
+            "-I",
+            "conformance/usc_definitions.py",
+            "samples/uscode/archives",
+            "--records",
+            "/scratch/definitions.jsonl",
+            "--against",
+            "samples/uscode/workspace",
+        ];
+        let want: Vec<&OsStr> = words.iter().map(OsStr::new).collect();
+        assert_eq!(args, want);
+        assert_eq!(cmd.get_current_dir(), Some(root));
     }
 
     #[test]

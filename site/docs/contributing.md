@@ -56,6 +56,8 @@ writes from them on one worker and on eight, its check and its coverage
 ledger, the committed profile and its counts against the script that counts
 the archives, the check and the ledger, the text of every provision and note
 against what an independent script reads from the publisher's XML, the
+definitions of the workspace against what a second implementation of the
+definition rules finds in the archives, the
 curated sample, checked with the generated one as its dependency, every
 citation of it `exact` and its binding not stale, and the table of the
 coverage page against the ledger), generated-site consistency, the example

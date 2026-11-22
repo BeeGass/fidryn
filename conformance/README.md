@@ -176,7 +176,8 @@ The documents `definitions-*.xml` hold the cases of the rules of
 [Definitions](../docs/law-modules.md#definitions). No text record shows a
 definition, so their records and profiles are those of any other document;
 the Rust tests of `fidryn-ingest-uscode` hold the definitions the importer
-extracts from them.
+extracts from them, and `test_usc_definitions.py` those that
+`usc_definitions.py` finds in them (below).
 
 `usc_compare.py` reads two releases, each an input as `uslm_text.py` reads
 it, into their text records, and from the records alone prints which
@@ -229,6 +230,43 @@ uv run --locked python -I conformance/usc_profile.py /path/to/release --out prof
 the input. The exit codes are those of `uslm_text.py`. Each fixture has its
 expected `import` profile beside it, `<name>.profile.json`, written by hand;
 `test_usc_profile.py` compares the script's output with them.
+
+`usc_definitions.py` reads the same inputs and extracts the definitions of
+their units by the rules of
+[Definitions](../docs/law-modules.md#definitions), which it implements a
+second time on the reading of `uslm_common.py`, sharing no code with the
+importer
+([A second implementation of the rules](../docs/law-modules.md#a-second-implementation-of-the-rules)).
+`--records FILE` gets one JSON object for each definition, to a line,
+sorted by the bytes of the provision's address and then by the bytes of
+the line: `at`, `terms`, `kind`, `words` (`null` for `unstated`),
+`region`, `basis`, `borrowed_from` and `see_note`, the fields of a
+`definition` block, `null` where the block has none. The script prints
+their number and the release. With `--against DIR` it reads the
+`definition` blocks of the module files of the workspace `DIR` in their
+canonical form, refuses a line that begins with the word `definition` and
+does not begin a block in that form, and exits `1`, naming the first
+definition that differs and, when the other side has one of the same
+provision and terms, the field, unless the release gives the definitions
+that the workspace holds, as many times each.
+`cargo xtask uscode-sample` runs it on the sample against the committed
+workspace.
+
+```sh
+uv run --locked python -I conformance/usc_definitions.py /path/to/release --records definitions.jsonl
+uv run --locked python -I conformance/usc_definitions.py /path/to/release --records definitions.jsonl --against /path/to/workspace
+```
+
+Exit `0` when the records are written and, with `--against`, the
+definitions are the same; `1` when the input is refused by a reading rule,
+a module file holds a definition block in another form, or the definitions
+differ; `2` when an input cannot be read or the records cannot be
+written. `test_usc_definitions.py` holds the script to the definitions
+that the importer's tests expect of the fixtures `definitions-*.xml` and
+of small invented documents of the title 99 that it writes, and holds
+`--against` to workspaces that it writes: the same definitions, one
+definition missing on each side, a field that differs, and a block in
+another form.
 
 ## Fetching a release
 
