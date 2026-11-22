@@ -623,6 +623,7 @@ fn not_written_here(rel: &str, head: &Head, prefix: &Address) -> Option<String> 
 }
 
 /// What the head of a `.fr` file declares ([`head_of`]).
+#[derive(Debug)]
 enum Head {
     /// The head of a module of edition 2, with the value of the string after
     /// `module`.
@@ -660,10 +661,15 @@ const HEAD: [(TokenKind, Option<&str>); 5] = [
 /// and comments are skipped, as the parser skips them.
 ///
 /// Only the head is read: the first [`HEAD_BYTES`] bytes, and twice as many
-/// each time those do not hold the head and a token after it, up to
-/// [`HEAD_LIMIT`]. A token of a window is trusted only when another follows
-/// it in the window, or when the window cannot grow: at the end of the
-/// file, and at bytes that are not UTF-8.
+/// each time those do not hold the head, up to [`HEAD_LIMIT`]. A token of a
+/// window is trusted when the window's text goes on after it, so that the
+/// lexer saw where it ends; when it is the brace, which is one byte and so
+/// whole wherever the window ends; and when the window cannot grow because
+/// the file ends in it or holds bytes there that are not UTF-8. The end of
+/// the text, which the lexer gives as a token, is none. A head that lies in
+/// the first [`HEAD_LIMIT`] bytes is therefore found whatever the white
+/// space and the comments before it, as the edition check of the command
+/// line finds the marker.
 fn head_of(path: &Path) -> io::Result<Head> {
     let mut file = fs::File::open(path)?;
     let mut head = Vec::new();
@@ -688,15 +694,18 @@ fn head_of(path: &Path) -> io::Result<Head> {
                         | TokenKind::Newline
                         | TokenKind::Comment
                         | TokenKind::DocComment
+                        | TokenKind::Eof
                 )
             })
-            .take(HEAD.len() + 1)
+            .take(HEAD.len())
             .collect();
-        let trusted = if more {
-            tokens.len().saturating_sub(1)
-        } else {
-            tokens.len()
-        };
+        // Only the last of them can reach the end of the text, where the
+        // window may have cut it.
+        let cut = more
+            && tokens.last().is_some_and(|last| {
+                last.end as usize == text.len() && last.kind != TokenKind::LBrace
+            });
+        let trusted = tokens.len() - usize::from(cut);
         let token_text = |at: usize| {
             text.get(tokens[at].start as usize..tokens[at].end as usize)
                 .unwrap_or_default()
@@ -812,6 +821,7 @@ mod tests {
     use fidryn_provision::{
         Address, Block, ContainerModule, Item, PartRole, Provision, Run, Text, UnitModule,
     };
+    use fidryn_syntax::edition::{Edition, edition_of};
 
     static NEXT_SCRATCH: AtomicU64 = AtomicU64::new(0);
 
@@ -1080,6 +1090,58 @@ mod tests {
             differences(run(compare(&other, manifest("0.0.0")), &models())),
             [(COVERAGE_FILE.to_owned(), Difference::Missing)]
         );
+    }
+
+    /// A comment of `length` bytes, its line ends included: lines of
+    /// invented words, one of them not ASCII, after a first line as long as
+    /// it needs to be.
+    fn comment(length: usize) -> String {
+        const LINE: &str = "// An invented \u{2014} note.\n";
+        let lines = (length - 3) / LINE.len();
+        let first = length - lines * LINE.len();
+        format!("//{}\n{}", "-".repeat(first - 3), LINE.repeat(lines))
+    }
+
+    #[test]
+    fn a_module_that_begins_with_a_comment_of_any_length_is_recognized() {
+        // The reader's windows end at `HEAD_BYTES` bytes and at every double
+        // of that up to `HEAD_LIMIT`. For each, a comment puts the head of a
+        // module a little before the window's end, across it at each of its
+        // bytes, and a little after it; the windows before it end at each
+        // byte of a line of the comment, the two slashes and the bytes of a
+        // character that is not ASCII among them.
+        let scratch = Scratch::new("comments");
+        let rel = "zz/demo/t1/s3.fr";
+        let path = scratch.join("s3.fr");
+        let module = render(&section("3", "An invented widget may be of any color."));
+        let head = module.find('{').expect("the brace of the head") + 1;
+        let prefix = address("/zz/demo");
+        let mut window = HEAD_BYTES;
+        while window <= HEAD_LIMIT {
+            for length in window - head - 2..=window + 2 {
+                let text = format!("{}{module}", comment(length));
+                assert_eq!(text.find("edition"), Some(length));
+                fs::write(&path, &text).expect("write a module");
+                // The edition check of the command line reads these bytes as
+                // a module of edition 2.
+                assert_eq!(edition_of(&text), Ok(Edition::Two), "{length}");
+                let found = head_of(&path).expect("read the head");
+                if length + head <= HEAD_LIMIT {
+                    assert!(
+                        matches!(&found, Head::Address(at) if at == "/zz/demo/t1/s3"),
+                        "a comment of {length} bytes: {found:?}"
+                    );
+                    assert_eq!(not_written_here(rel, &found, &prefix), None);
+                } else {
+                    // The head lies past the first `HEAD_LIMIT` bytes.
+                    assert!(
+                        matches!(found, Head::TooFar),
+                        "a comment of {length} bytes: {found:?}"
+                    );
+                }
+            }
+            window *= 2;
+        }
     }
 
     #[test]

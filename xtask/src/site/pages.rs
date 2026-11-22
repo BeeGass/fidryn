@@ -293,7 +293,7 @@ fn toc_items(toc: &[TocEntry]) -> String {
         .collect()
 }
 
-/// Previous and next guide in reading order: the overview, then §1 to §10.
+/// Previous and next guide in reading order: the overview, then §1 to §11.
 fn pager(slug: &str) -> String {
     let Some(at) = GUIDES.iter().position(|g| g.slug == slug) else {
         return String::new();
@@ -564,6 +564,7 @@ mod tests {
                 "Run",
                 "Read results",
                 "Contribute",
+                "Ahead",
                 "Implementers"
             ]
         );
@@ -648,7 +649,11 @@ mod tests {
         );
         assert_eq!(
             pager("contributing"),
-            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/coverage\"><span class=\"label\">Previous &middot; &sect;9</span><span class=\"t\">Coverage</span></a></nav>"
+            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/coverage\"><span class=\"label\">Previous &middot; &sect;9</span><span class=\"t\">Coverage</span></a><a class=\"next\" href=\"/docs/roadmap\"><span class=\"label\">Next &middot; &sect;11</span><span class=\"t\">Roadmap</span></a></nav>"
+        );
+        assert_eq!(
+            pager("roadmap"),
+            "<nav class=\"pager\" aria-label=\"Previous and next guide\"><a class=\"prev\" href=\"/docs/contributing\"><span class=\"label\">Previous &middot; &sect;10</span><span class=\"t\">Contributing</span></a></nav>"
         );
     }
 
@@ -781,6 +786,7 @@ mod tests {
                 "/docs/examples",
                 "/docs/coverage",
                 "/docs/contributing",
+                "/docs/roadmap",
             ]
         );
         assert!(contents.contains(

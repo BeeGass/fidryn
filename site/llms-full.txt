@@ -23,6 +23,7 @@ Research fixture — not legal advice.
 | Examples | https://fidryn.onlygass.dev/docs/examples | https://fidryn.onlygass.dev/docs/examples.md |
 | Coverage | https://fidryn.onlygass.dev/docs/coverage | https://fidryn.onlygass.dev/docs/coverage.md |
 | Contributing | https://fidryn.onlygass.dev/docs/contributing | https://fidryn.onlygass.dev/docs/contributing.md |
+| Roadmap | https://fidryn.onlygass.dev/docs/roadmap | https://fidryn.onlygass.dev/docs/roadmap.md |
 
 ========== https://fidryn.onlygass.dev/docs/index.md ==========
 
@@ -64,6 +65,7 @@ statement of any jurisdiction's law.
 | [Outcomes](https://fidryn.onlygass.dev/docs/outcomes.md) | Determinate, Suspended, Contingent, and the rest |
 | [Examples](https://fidryn.onlygass.dev/docs/examples.md) | Trust, tax, federal slices, fifty states |
 | [Coverage](https://fidryn.onlygass.dev/docs/coverage.md) | What the sample of the United States Code in the repository holds, in counts |
+| [Roadmap](https://fidryn.onlygass.dev/docs/roadmap.md) | Where the project is going, what exists today and what comes next |
 
 The closed grammar is [`grammar.ebnf`](https://github.com/BeeGass/fidryn/blob/main/grammar.ebnf). Wire formats
 are [`schemas/case-record-v0.1.json`](https://github.com/BeeGass/fidryn/blob/main/schemas/case-record-v0.1.json),
@@ -2864,14 +2866,19 @@ else the one the environment variable `FIDRYN_CACHE_DIR` names, when it is
 set and not empty; else `fidryn` in the cache directory of the user,
 outside every workspace: on Windows the directory `LOCALAPPDATA` names,
 and on other systems the one `XDG_CACHE_HOME` names, else `.cache` in
-`HOME`, each taken only when it is an absolute path. When none of them
-names a directory, the check keeps no cache, as with `--no-cache`, and
-`fidryn check` says so once on stderr. `--no-cache` keeps no cache: the
-check then reads and checks every module file and writes no entry. Unless
-the cache is named inside it, the check writes nothing into the workspace,
-and it reads nothing there but the workspace's own files: a
-`.fidryn-cache` or any other entry whose name begins with a dot is not
-read, and a symbolic link of any name is not followed.
+`HOME`, each taken only when it is an absolute path. That directory is not
+used when it is the directory of the workspace under check or lies inside
+it, as it does when one of these variables names a directory inside the
+workspace; the two are compared with every link and every `..` resolved,
+as far as each exists. When none of them names a directory, or the one
+they name lies inside the workspace, the check keeps no cache, as with
+`--no-cache`, and `fidryn check` says so once on stderr, with the reason.
+`--no-cache` keeps no cache: the check then reads and checks every module
+file and writes no entry. Unless the cache is named inside it, the check
+writes nothing into the workspace, and it reads nothing there but the
+workspace's own files: a `.fidryn-cache` or any other entry whose name
+begins with a dot is not read, and a symbolic link of any name is not
+followed.
 
 One cache serves every workspace of a user. An entry is the result of the
 bytes of one file, whatever workspace holds the file, so the workspaces
@@ -4538,8 +4545,10 @@ The cache is outside every workspace unless `--cache-dir` or
 `FIDRYN_CACHE_DIR` names a directory inside one; such a directory is used
 like any other, and what that means is said under
 [The cache](https://fidryn.onlygass.dev/docs/law-modules.md#the-cache). When none of these names a
-directory, the check keeps no cache, as with `--no-cache`, and says so once
-on stderr.
+directory, or `fidryn` in the cache directory of the user is the
+workspace's directory or lies inside it, as when `XDG_CACHE_HOME`, `HOME`
+or `LOCALAPPDATA` names a directory inside the workspace, the check keeps
+no cache, as with `--no-cache`, and says so once on stderr.
 
 `--jobs`, `--cache-dir`, `--no-cache`, `--report` and `--unresolved`
 belong to the check of a workspace; given with a `.fr` file, they are
@@ -4590,6 +4599,9 @@ the cache hold, cannot be read, the check keeps no cache and says so once,
 as `the cache could not be used, and the check went on without it: ...`;
 so it does when no directory is named for the cache, as
 `the cache could not be used, and the check went on without it: no directory is named for it: ...`,
+when the one in the cache directory of the user lies inside the
+workspace, as
+`the cache could not be used, and the check went on without it: DIR: the directory lies inside the workspace ...`,
 and when the cache's directory is the directory of a dependency of
 the workspace, lies inside it or holds it, since nothing is written inside
 a dependency but through a symbolic link below the cache's directory that
@@ -5382,9 +5394,10 @@ provision.
 The cache is chosen, from the same variables, as by [`check`](#check), and
 every workspace the command reads, the two sides and each `--bindings`
 directory, shares it; nothing is written into any of them unless the
-cache is named inside one. A check trusts its cache, so a cache belongs
-where only people one trusts can write. `--cache-dir` and `--no-cache` are
-not given together.
+cache is named inside one, and `fidryn` in the cache directory of the user
+is not used when it lies inside one of them. A check trusts its cache, so
+a cache belongs where only people one trusts can write. `--cache-dir` and
+`--no-cache` are not given together.
 
 **Example**
 
@@ -5446,9 +5459,11 @@ A workspace that has an error ends the command with its diagnostics, each
 naming its file under the directory given, as `fidryn check` prints them;
 for a curated workspace of `--bindings` these are the diagnostics of its
 module files by themselves. When the command keeps no cache because no
-directory is named for one, or because the identity of the running
-executable cannot be read, it says so after the diagnostics of a failure
-too, as `the cache could not be used, and the check went on without it: ...`;
+directory is named for one, because the one in the cache directory of the
+user lies inside a workspace it reads, or because the identity of the
+running executable cannot be read, it says so after the diagnostics of a
+failure too, as
+`the cache could not be used, and the check went on without it: ...`;
 what the checks of the workspaces it read found of their cache is said
 only when the comparison succeeds.
 
@@ -7129,3 +7144,113 @@ ARCHITECTURE.md.
 
 This interpreter, its tests, and its example modules are not legal
 advice.
+
+========== https://fidryn.onlygass.dev/docs/roadmap.md ==========
+
+---
+title: "Roadmap"
+description: "Where Fidryn is going: United States law held as a body of checked programs, what exists today at each depth, and what comes next."
+url: "https://fidryn.onlygass.dev/docs/roadmap"
+markdown: "https://fidryn.onlygass.dev/docs/roadmap.md"
+author: "Bryan Gass"
+---
+
+> Canonical HTML: https://fidryn.onlygass.dev/docs/roadmap
+> This markdown mirror is for agents and plain-text readers.
+
+# Roadmap
+
+Fidryn is being built toward one destination: United States law held as a
+body of checked programs. This page says what that means, what exists today,
+and what comes next. It gives no dates. Everything it says exists is built
+and tested; everything else is intent, and is marked as such.
+
+## The destination
+
+Every provision of federal and state positive law is to have a place in a
+repository of Fidryn modules, at a declared depth:
+
+| Depth | Meaning |
+| --- | --- |
+| D0 pinned | The official text is present and verified by hash, with its citation and where and when it was retrieved. |
+| D1 addressed | The provision has a typed address. Its place in the hierarchy, its status and its cross-references are resolved and checked. |
+| D2 classified | What kind of provision it is has been recorded, and a definition carries its term and its reach. |
+| D3 formalized | Everything mechanical in it executes. Everything that calls for judgment is an explicit, typed open question that names who decides and under what standard. No operative word is left unrepresented. |
+
+Two marks sit beside depth. **Tested** means the encoding reproduces worked
+examples from authoritative material. **Reviewed** means a named, licensed
+attorney signed off on a specific version.
+
+Three rules are to hold at every depth:
+
+- **Coverage is total and depth is graded.** A provision that is not yet
+  formalized is still present, addressed and citable. A computation that
+  reaches it stops and quotes it; it does not guess.
+- **The weakest link shows.** A result reports every provision it relied on,
+  with its address, hash, depth and marks. If any of them is unreviewed,
+  every rendering of the result says so.
+- **A likely answer is not the answer.** Statistics about how courts have
+  ruled, when they come, attach to one named open question at a time, show
+  their sample, and never turn an undetermined result into a determined one.
+
+The language itself has one bar: any provision of law, public or private, can
+be stated in it without the compiler knowing a single legal word. A clause of
+a trust, a bylaw or a term of a contract is a provision on the same footing
+as a section of a code, and every word of legal vocabulary is declared in
+library modules written in Fidryn.
+
+## Where the project is today
+
+| Body of law | State |
+| --- | --- |
+| The United States Code | The importer has imported the whole Code at D1 (release point 119-142): 70,794 modules, 774,018 provisions, every cross-reference in operative text resolved or recorded with a reason. Definitions are extracted at D2 by a closed list of patterns; a sample of them has been drawn and has not yet been read against the official text by a person. All 27 release points the publisher offered for 2026 have been imported as a history, each with its provision-level change set. The full import is kept in a separate law repository that is not public yet. This repository holds a sample of it, checked in CI, and everything needed to reproduce the whole from the official archives. See [Law modules](https://fidryn.onlygass.dev/docs/law-modules.md) and [Coverage](https://fidryn.onlygass.dev/docs/coverage.md). |
+| Federal court rules | In the Code's appendices, imported with it. |
+| The Code of Federal Regulations | Not started. |
+| The Constitution, public laws | Not started. |
+| The fifty states, the District of Columbia, the territories | Not started. |
+| Court rulings | Not started. |
+| Meaning that executes (D3) | None yet on the imported Code: a curated module can bind a name to the text of a provision by hash and learns when that text changes, but the language cannot yet state what the provision means. The first edition of the language runs example programs, but only those that pass its checker: [Examples](https://fidryn.onlygass.dev/docs/examples.md) says which do, and [Implementation status](https://github.com/BeeGass/fidryn/blob/main/docs/implementation-status.md) says what the interpreter does and does not interpret. |
+
+Nothing has been reviewed by an attorney, and nothing here is legal advice.
+
+## What comes next, in order
+
+Each stage ends in a release.
+
+1. **The semantic core, on real provisions.** Definitions, rules with
+   exceptions, legal time, amounts and tables, typed facts, open questions
+   with names and typed answers, evaluation as of a date, and results in
+   which every step cites the provision it rests on. A conformance set of
+   real provisions is taken to D3 with tests.
+2. **Positions, instruments and organizations.** Duties, powers and
+   entitlements; private documents as sources of rules, with the statutory
+   defaults they may displace and the mandatory rules they may not; bodies
+   and voting; statuses. The existing examples are ported and the first
+   edition of the language is retired.
+3. **Authority and interpretation.** The regulations imported and attached to
+   the statutes they refine; which source prevails over which; precedential
+   rulings as changes to the law, scoped to the courts they bind.
+4. **Rulings as data.** Records of how courts resolved named open questions,
+   and estimates drawn from them that are kept apart from the legal answer. A
+   pilot on federal sentencing is to reproduce the Sentencing Commission's
+   own published figures from its raw records.
+5. **Scale.** Importers for the states; encodings drafted by machine, always
+   labeled as such; a workflow for attorney review; jobs that commit each
+   official release as it is published.
+6. **A stable language.** A frozen specification, editor support,
+   documentation written for lawyers, and public coverage figures for every
+   body of law.
+
+The import of text does not wait for the language. The regulations and the
+states can reach D1 while the semantic core is being built.
+
+## What will not be claimed
+
+- That a provision is encoded when its operative words are not all
+  represented.
+- That an encoding is reliable because it runs. Reliance needs review by a
+  licensed attorney, and the project shows at all times which logic has had
+  it.
+- That an estimate of how courts tend to rule is what the law requires.
+- That text is official because it is hashed. A hash proves which bytes were
+  encoded and where they came from.

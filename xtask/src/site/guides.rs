@@ -4,7 +4,14 @@ pub const SITE: &str = "https://fidryn.onlygass.dev";
 pub const REPO: &str = "https://github.com/BeeGass/fidryn";
 
 /// Sidebar groups, in order. Every numbered guide belongs to one.
-pub const GROUPS: &[&str] = &["Start", "Write", "Run", "Read results", "Contribute"];
+pub const GROUPS: &[&str] = &[
+    "Start",
+    "Write",
+    "Run",
+    "Read results",
+    "Contribute",
+    "Ahead",
+];
 
 pub struct Guide {
     /// URL slug; `index` is the docs overview at `/docs/`.
@@ -123,6 +130,15 @@ pub const GUIDES: &[Guide] = &[
         blurb: "Toolchain, tests, commits",
         description: "Toolchain, tests, and how to work on the Fidryn reference interpreter.",
     },
+    Guide {
+        slug: "roadmap",
+        file: "roadmap.md",
+        title: "Roadmap",
+        number: Some(11),
+        group: "Ahead",
+        blurb: "Destination, today, next",
+        description: "Where Fidryn is going: United States law held as a body of checked programs, what exists today at each depth, and what comes next.",
+    },
 ];
 
 /// Implementer documents, linked to GitHub from the sidebar: (title, file under docs/, blurb).
@@ -178,9 +194,9 @@ mod tests {
     }
 
     #[test]
-    fn numbered_guides_run_one_to_ten_in_order() {
+    fn numbered_guides_run_one_to_eleven_in_order() {
         let numbers: Vec<u32> = GUIDES.iter().filter_map(|g| g.number).collect();
-        assert_eq!(numbers, (1..=10).collect::<Vec<u32>>());
+        assert_eq!(numbers, (1..=11).collect::<Vec<u32>>());
     }
 
     #[test]

@@ -47,6 +47,7 @@ mod writer;
 mod tests;
 
 pub use check::{CheckOptions, WorkspaceReport, check_workspace};
+pub use deps::lies_inside;
 pub use index::{DependencyInterfaces, PhaseTwo, Unresolved, UnresolvedCitation, check_interfaces};
 pub use read::{CoverageError, read_coverage, read_modules};
 pub use report::CHECK_REPORT_SCHEMA;

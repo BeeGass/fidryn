@@ -241,12 +241,13 @@ interchange schema versions are maintained independently of the interpreter.
 - The cache of `fidryn check DIR` and of `fidryn changes` is, by default,
   `fidryn` in the cache directory of the user, outside every workspace:
   in `XDG_CACHE_HOME`, else in `~/.cache`, and on Windows in
-  `LOCALAPPDATA`; when none of them is set to an absolute path the check
-  keeps no cache and says so once. One cache serves every workspace. A
-  check trusts what its cache holds, so a cache belongs where only people
-  one trusts can write; a cache named inside a workspace with
-  `--cache-dir` or `FIDRYN_CACHE_DIR` is used, and a `.fidryn-cache` that
-  a workspace carries is otherwise not read.
+  `LOCALAPPDATA`; when none of them is set to an absolute path, or the
+  directory there lies inside a workspace that is read or inside one of its
+  dependencies, the check keeps no cache and says so once. One cache serves
+  every workspace. A check trusts what its cache holds, so a cache belongs
+  where only people one trusts can write; a cache named inside a workspace
+  with `--cache-dir` or `FIDRYN_CACHE_DIR` is used, and a `.fidryn-cache`
+  that a workspace carries is otherwise not read.
 - `fidryn ingest uscode --out DIR` writes only over an earlier output of
   itself: before it writes anything it reads the head of every `.fr` file
   of `DIR`, and refuses the directory, naming each, for a file of the first
@@ -309,6 +310,9 @@ interchange schema versions are maintained independently of the interpreter.
   deflated member to the end of its compressed stream as well as to its
   header, and refuse a member whose header declares fewer bytes than it
   holds.
+- A roadmap page, `docs/roadmap.md`, shown on the site as the guide
+  "Roadmap": the destination, what exists today at each depth, and what
+  comes next.
 
 ## [0.2.0] - 2026-11-22
 

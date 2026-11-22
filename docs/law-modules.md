@@ -1201,14 +1201,19 @@ else the one the environment variable `FIDRYN_CACHE_DIR` names, when it is
 set and not empty; else `fidryn` in the cache directory of the user,
 outside every workspace: on Windows the directory `LOCALAPPDATA` names,
 and on other systems the one `XDG_CACHE_HOME` names, else `.cache` in
-`HOME`, each taken only when it is an absolute path. When none of them
-names a directory, the check keeps no cache, as with `--no-cache`, and
-`fidryn check` says so once on stderr. `--no-cache` keeps no cache: the
-check then reads and checks every module file and writes no entry. Unless
-the cache is named inside it, the check writes nothing into the workspace,
-and it reads nothing there but the workspace's own files: a
-`.fidryn-cache` or any other entry whose name begins with a dot is not
-read, and a symbolic link of any name is not followed.
+`HOME`, each taken only when it is an absolute path. That directory is not
+used when it is the directory of the workspace under check or lies inside
+it, as it does when one of these variables names a directory inside the
+workspace; the two are compared with every link and every `..` resolved,
+as far as each exists. When none of them names a directory, or the one
+they name lies inside the workspace, the check keeps no cache, as with
+`--no-cache`, and `fidryn check` says so once on stderr, with the reason.
+`--no-cache` keeps no cache: the check then reads and checks every module
+file and writes no entry. Unless the cache is named inside it, the check
+writes nothing into the workspace, and it reads nothing there but the
+workspace's own files: a `.fidryn-cache` or any other entry whose name
+begins with a dot is not read, and a symbolic link of any name is not
+followed.
 
 One cache serves every workspace of a user. An entry is the result of the
 bytes of one file, whatever workspace holds the file, so the workspaces

@@ -11,6 +11,8 @@ mod release;
 mod site;
 mod test;
 #[cfg(test)]
+mod test_git;
+#[cfg(test)]
 mod test_support;
 mod uscode_sample;
 mod workspace;

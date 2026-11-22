@@ -124,7 +124,8 @@ release=$(sed -n 's/.*"release": "\\([^"]*\\)".*/\\1/p' uscode/workspace.json)
 
 
 # The variables by which git finds a repository, its objects or its configuration; the
-# whole `GIT_CONFIG` family is removed too.
+# whole `GIT_CONFIG` family is removed too. The tests of `xtask` remove the same ones
+# (`xtask/src/test_git.rs`), and the two lists are kept equal.
 GIT_LOCATIONS = (
     "GIT_DIR",
     "GIT_WORK_TREE",
@@ -134,6 +135,12 @@ GIT_LOCATIONS = (
     "GIT_COMMON_DIR",
     "GIT_NAMESPACE",
     "GIT_CEILING_DIRECTORIES",
+    "GIT_DISCOVERY_ACROSS_FILESYSTEM",
+    "GIT_IMPLICIT_WORK_TREE",
+    "GIT_GRAFT_FILE",
+    "GIT_SHALLOW_FILE",
+    "GIT_NO_REPLACE_OBJECTS",
+    "GIT_REPLACE_REF_BASE",
 )
 
 
